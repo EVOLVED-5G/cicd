@@ -1,7 +1,7 @@
 
 
 pipeline {
-    agent { node {label 'evol5-slave-uma'}  }
+    agent { node {label 'evol5-slave'}  }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')

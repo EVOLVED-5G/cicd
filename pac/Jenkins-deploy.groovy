@@ -1,5 +1,5 @@
 pipeline {
-    agent { node {label 'evolved5g'}  }
+    agent { node {label 'evol5-slave'}  }
 
     parameters {
         string(name: 'GIT_URL', defaultValue: '', description: '')
@@ -17,7 +17,8 @@ pipeline {
         stage('Get the code!') {
             steps {
                 sh '''
-                mkdir dummyapp
+                rm -rf dummyapp
+                mkdir -p dummyapp
                 cd dummyapp
                 git clone --single-branch --branch $GIT_BRANCH $GIT_URL .
                 '''
