@@ -41,7 +41,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    sudo docker exec -it ${NETAPP_NAME} curl localhost:8080
+                    sudo docker exec -it netapp curl localhost:8080
                     '''
                 }
             }
