@@ -37,15 +37,15 @@ pipeline {
                 
             }
         }
-        stage('Test stage') {
-            steps {
-                dir ("${env.WORKSPACE}") {
-                    sh '''
-                    sudo docker exec -it netapp curl localhost:8080
-                    '''
-                }
-            }
-        }
+        // stage('Test stage') {
+        //     steps {
+        //         dir ("${env.WORKSPACE}") {
+        //             sh '''
+        //             sudo docker exec -it netapp curl localhost:8080
+        //             '''
+        //         }
+        //     }
+        // }
         stage('Validation container') {
             steps {
                 dir ("${env.WORKSPACE}") {
