@@ -37,17 +37,6 @@ pipeline {
                 
             }
         }
-        stage('Execute the container in the platform (Docker)') {
-            steps {
-                dir ("${env.WORKSPACE}") {
-                        sh '''
-                        sudo docker run -d --name netapp -i evolved-5g/${NETAPP_NAME} 
-                        '''
-                    }
-                
-            }
-        }
-
         stage('Test stage') {
             steps {
                 dir ("${env.WORKSPACE}") {
