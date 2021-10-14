@@ -20,7 +20,7 @@ pipeline {
                     dir ("${env.WORKSPACE}") {
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image pull  dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
+                        docker image pull dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
                         '''
                     }
                 }
@@ -31,7 +31,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                         sh '''
-                        sudo docker run -d --name netapp -i evolved-5g/${NETAPP_NAME} 
+                        sudo docker run -d --name netapp -i dockerhub.hi.inet/evolved-5g/${NETAPP_NAME} 
                         '''
                     }
                 
