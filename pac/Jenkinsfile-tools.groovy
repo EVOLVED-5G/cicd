@@ -7,7 +7,7 @@ String dockerVersion(String options) {
 }
 
 pipeline {
-    agent { node { label 'prod-5gnet-slave-02' } }
+    agent { node { label 'evol5-slave' } }
     options {
         disableConcurrentBuilds()
         ansiColor('xterm')

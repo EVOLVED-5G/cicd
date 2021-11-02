@@ -19,21 +19,20 @@ String robotTestSelection(String tests, String customTest) {
 }
 
 test_plan = [
-    '8-Core': '8',
-    '8.1-Basic Features & Functional': '8.1',
-    '8.1.1-SCTP Link': '8.1.1',
-    '8.1.2-SCTP Reset initiated by eNB': '8.1.2',
-    '8.1.3-S1 Setup': '8.1.3',
-    '8.1.4-UE EPC attachment': '8.1.4',
-    '8.1.5-UE initiated EPC detachment': '8.1.5',
-    '8.1.6-EPC initiated EPC detachment': '8.1.6',
+    'All Capif Services': 'all',
+    'Capif Api Invoker Management': 'capif_api_invoker_management',
+    'CAPIF Api Invoker Management->Register NetApp': 'capif_api_invoker_management-1',
+    'CAPIF Api Invoker Management->Register NetApp Already registered': 'capif_api_invoker_management-2',
+    'CAPIF Api Invoker Management->Update Registered NetApp': 'capif_api_invoker_management-3',
+    'CAPIF Api Invoker Management->Update Not Registered NetApp': 'capif_api_invoker_management-4',
+    'CAPIF Api Invoker Management->Delete Registered NetApp': 'capif_api_invoker_management-5',
+    'CAPIF Api Invoker Management->Delete Not Registered NetApp': 'capif_api_invoker_management-6',
     'CUSTOM': 'CUSTOM'
     ]
 
 // ################################################
 // ## Pipeline
 // ################################################
-
 
 pipeline {
     agent { node { label 'evol5-slave' }  }
@@ -51,7 +50,8 @@ pipeline {
         string(name: 'ROBOT_TEST_OPTIONS', defaultValue: '', description: 'Options to set in test to robot testing. --variable <key>:<value>, --include <tag>, --exclude <tag>')
     }
     environment {
-        ROBOT_TESTS_DIRECTORY = "${WORKSPACE}/tests"
+        CAPIF_SERVICES_DIRECTORY="${WORKSPACE}/capif"
+        ROBOT_TESTS_DIRECTORY = "${params.CAPIF_SERVICES_DIRECTORY}/tests"
         ROBOT_COMMON_DIRECTORY = "${WORKSPACE}/common"
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         CUSTOM_TEST = "${params.CUSTOM_TEST}"
@@ -59,7 +59,7 @@ pipeline {
         ROBOT_TEST_OPTIONS = setRobotOptionsValue("${params.ROBOT_TEST_OPTIONS}")
         ROBOT_TESTS_INCLUDE = robotTestSelection("${params.TESTS}", "${params.CUSTOM_TEST}")
         ROBOT_VERSION = robotDockerVersion("${params.ROBOT_DOCKER_IMAGE_VERSION}")
-        ROBOT_IMAGE_NAME="dockerhub.hi.inet/5ghacking/5gnow-robot-test-image"
+        ROBOT_IMAGE_NAME = 'dockerhub.hi.inet/5ghacking/evolved-robot-test-image'
     }
     stages {
         stage ('Prepare testing tools') {
@@ -82,13 +82,26 @@ pipeline {
                        passwordVariable: 'GIT_PASS'
                    )]) {
                         sh 'git clone --branch ${ROBOT_COMMON_LIBRARY} https://${GIT_USER}:${GIT_PASS}@github.com/Telefonica/robot_test_automation_common.git common'
+                        sh 'git clone --branch ${ROBOT_COMMON_LIBRARY} https://${GIT_USER}:${GIT_PASS}@github.com/EVOLVED-5G/CAPIF_API_Services.git capif'
                         sh "mkdir ${ROBOT_RESULTS_DIRECTORY}"
                    }
                 }
             }
         }
+
         stage('Launch CAPIF Docker Compose') {
-            
+            steps {
+                dir ("${CAPIF_SERVICES_DIRECTORY}") {
+                        sh '''
+                            ./run.sh
+                           '''
+                }
+                dir ("${CAPIF_SERVICES_DIRECTORY}") {
+                        sh '''
+                            ./check_services_are_running.sh
+                           '''
+                }
+            }
         }
 
         stage('Launch tests') {
@@ -109,10 +122,21 @@ pipeline {
                 }
             }
         }
-
     }
     post {
         always {
+            script {
+                CAPIF_SERVICES_DIRECTORY
+                dir ("${CAPIF_SERVICES_DIRECTORY}") {
+                    echo 'Shutdown all capif services'
+                    sh './clean_capif_docker_services.sh'
+                }
+                dir ("${env.WORKSPACE}") {
+                    echo 'Remove common robot directory'
+                    sh 'sudo rm -rf common/'
+                }
+            }
+
             script {
                 /* Manually clean up /keys due to permissions failure */
                 echo 'Robot test executed'
