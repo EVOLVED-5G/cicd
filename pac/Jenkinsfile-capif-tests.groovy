@@ -47,6 +47,7 @@ pipeline {
         string(name: 'CUSTOM_TEST', defaultValue: '', description: 'If CUSTOM is set in TESTS, here you can add test tag')
         string(name: 'ROBOT_DOCKER_IMAGE_VERSION', defaultValue: '1.0', description: 'Robot Docker image version')
         string(name: 'ROBOT_COMMON_LIBRARY', defaultValue: 'develop', description: 'Common Robot library branch to use')
+        string(name: 'CAPIF_SERVICES_BRANCH', defaultValue: 'add_robot_testing', description: 'CAPIF Services Branch To Use')
         string(name: 'ROBOT_TEST_OPTIONS', defaultValue: '', description: 'Options to set in test to robot testing. --variable <key>:<value>, --include <tag>, --exclude <tag>')
     }
     environment {
@@ -56,6 +57,7 @@ pipeline {
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         CUSTOM_TEST = "${params.CUSTOM_TEST}"
         ROBOT_COMMON_LIBRARY = "${params.ROBOT_COMMON_LIBRARY}"
+        CAPIF_SERVICES_BRANCH = "${params.CAPIF_SERVICES_BRANCH}"
         ROBOT_TEST_OPTIONS = setRobotOptionsValue("${params.ROBOT_TEST_OPTIONS}")
         ROBOT_TESTS_INCLUDE = robotTestSelection("${params.TESTS}", "${params.CUSTOM_TEST}")
         ROBOT_VERSION = robotDockerVersion("${params.ROBOT_DOCKER_IMAGE_VERSION}")
@@ -82,7 +84,7 @@ pipeline {
                        passwordVariable: 'GIT_PASS'
                    )]) {
                         sh 'git clone --branch ${ROBOT_COMMON_LIBRARY} https://${GIT_USER}:${GIT_PASS}@github.com/Telefonica/robot_test_automation_common.git common'
-                        sh 'git clone --branch ${ROBOT_COMMON_LIBRARY} https://${GIT_USER}:${GIT_PASS}@github.com/EVOLVED-5G/CAPIF_API_Services.git capif'
+                        sh 'git clone --branch ${CAPIF_SERVICES_BRANCH} https://${GIT_USER}:${GIT_PASS}@github.com/EVOLVED-5G/CAPIF_API_Services.git capif'
                         sh "mkdir ${ROBOT_RESULTS_DIRECTORY}"
                    }
                 }
