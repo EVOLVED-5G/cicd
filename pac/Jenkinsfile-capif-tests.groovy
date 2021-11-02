@@ -38,7 +38,6 @@ pipeline {
     agent { node { label 'evol5-slave' }  }
     options {
         disableConcurrentBuilds()
-        withCredentials(awsCredentials)
         buildDiscarder(logRotator(daysToKeepStr: '14', numToKeepStr: '30', artifactDaysToKeepStr: '14', artifactNumToKeepStr: '30'))
         ansiColor('xterm')
     }
