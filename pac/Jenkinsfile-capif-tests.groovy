@@ -83,7 +83,7 @@ pipeline {
                        passwordVariable: 'GIT_PASS'
                    )]) {
                         sh 'git clone --branch ${ROBOT_COMMON_LIBRARY} https://${GIT_USER}:${GIT_PASS}@github.com/Telefonica/robot_test_automation_common.git common'
-                        sh 'git clone --branch ${CAPIF_SERVICES_BRANCH} https://github.com/EVOLVED-5G/CAPIF_API_Services.git/ capif'
+                        sh 'git clone --branch ${CAPIF_SERVICES_BRANCH} https://${GIT_USER}:${GIT_PASS}@github.com/EVOLVED-5G/CAPIF_API_Services.git capif'
                         sh "mkdir ${ROBOT_RESULTS_DIRECTORY}"
                    }
                 }
