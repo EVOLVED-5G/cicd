@@ -128,7 +128,7 @@ pipeline {
                 CAPIF_SERVICES_DIRECTORY
                 dir ("${CAPIF_SERVICES_DIRECTORY}") {
                     echo 'Shutdown all capif services'
-                    sh './clean_capif_docker_services.sh'
+                    sh 'sudo ./clean_capif_docker_services.sh'
                 }
                 dir ("${env.WORKSPACE}") {
                     echo 'Remove common robot directory'
@@ -140,7 +140,7 @@ pipeline {
                 /* Manually clean up /keys due to permissions failure */
                 echo 'Robot test executed'
                 echo ' clean dockerhub credentials'
-                sh 'rm -f ${HOME}/.docker/config.json'
+                sh 'sudo rm -f ${HOME}/.docker/config.json'
             }
 
             publishHTML([allowMissing: true,
@@ -156,7 +156,7 @@ pipeline {
             script {
                 dir ("${env.WORKSPACE}") {
                     sh 'sudo rm -rf tests/'
-                    sh 'sudo rm -rf common/'
+                    sh 'sudo rm -rf capif/'
                 }
             }
         }
