@@ -90,20 +90,20 @@ pipeline {
             }
         }
 
-        // stage('Launch CAPIF Docker Compose') {
-        //     steps {
-        //         dir ("${CAPIF_SERVICES_DIRECTORY}") {
-        //                 sh '''
-        //                     ./run.sh
-        //                    '''
-        //         }
-        //         dir ("${CAPIF_SERVICES_DIRECTORY}") {
-        //                 sh '''
-        //                     ./check_services_are_running.sh
-        //                    '''
-        //         }
-        //     }
-        // }
+        stage('Launch CAPIF Docker Compose') {
+            steps {
+                dir ("${CAPIF_SERVICES_DIRECTORY}") {
+                        sh '''
+                            ./run.sh
+                           '''
+                }
+                dir ("${CAPIF_SERVICES_DIRECTORY}") {
+                        sh '''
+                            ./check_services_are_running.sh
+                           '''
+                }
+            }
+        }
 
         stage('Launch tests') {
             steps {
@@ -111,6 +111,7 @@ pipeline {
                     sh """
                         docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
                         docker run -t \
+                            --network="host" \
                             --rm \
                             -v ${ROBOT_COMMON_DIRECTORY}:/opt/robot-tests/common \
                             -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
