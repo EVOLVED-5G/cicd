@@ -50,7 +50,7 @@ pipeline {
         string(name: 'ROBOT_TEST_OPTIONS', defaultValue: '', description: 'Options to set in test to robot testing. --variable <key>:<value>, --include <tag>, --exclude <tag>')
     }
     environment {
-        CAPIF_SERVICES_DIRECTORY="${WORKSPACE}/capif"
+        CAPIF_SERVICES_DIRECTORY = "${WORKSPACE}/capif"
         ROBOT_TESTS_DIRECTORY = "${params.CAPIF_SERVICES_DIRECTORY}/tests"
         ROBOT_COMMON_DIRECTORY = "${WORKSPACE}/common"
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
@@ -90,36 +90,34 @@ pipeline {
             }
         }
 
-        stage('Launch CAPIF Docker Compose') {
-            steps {
-                dir ("${CAPIF_SERVICES_DIRECTORY}") {
-                        sh '''
-                            ./run.sh
-                           '''
-                }
-                dir ("${CAPIF_SERVICES_DIRECTORY}") {
-                        sh '''
-                            ./check_services_are_running.sh
-                           '''
-                }
-            }
-        }
+        // stage('Launch CAPIF Docker Compose') {
+        //     steps {
+        //         dir ("${CAPIF_SERVICES_DIRECTORY}") {
+        //                 sh '''
+        //                     ./run.sh
+        //                    '''
+        //         }
+        //         dir ("${CAPIF_SERVICES_DIRECTORY}") {
+        //                 sh '''
+        //                     ./check_services_are_running.sh
+        //                    '''
+        //         }
+        //     }
+        // }
 
         stage('Launch tests') {
             steps {
-                withCredentials([string(credentialsId: "${SPIRENT_AUTH_TOKEN_NAME}", variable: 'SPIRENT_AUTH')]) {
-                    dir ("${env.WORKSPACE}") {
-                        sh """
-                            docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
-                            docker run -t \
-                                --rm \
-                                -v ${ROBOT_COMMON_DIRECTORY}:/opt/robot-tests/common \
-                                -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
-                                -v ${ROBOT_RESULTS_DIRECTORY}:/opt/robot-tests/results \
-                                ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} \
-                                ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
-                        """
-                    }
+                dir ("${env.WORKSPACE}") {
+                    sh """
+                        docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
+                        docker run -t \
+                            --rm \
+                            -v ${ROBOT_COMMON_DIRECTORY}:/opt/robot-tests/common \
+                            -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
+                            -v ${ROBOT_RESULTS_DIRECTORY}:/opt/robot-tests/results \
+                            ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} \
+                            ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
+                    """
                 }
             }
         }
