@@ -126,7 +126,6 @@ pipeline {
     post {
         always {
             script {
-                CAPIF_SERVICES_DIRECTORY
                 dir ("${CAPIF_SERVICES_DIRECTORY}") {
                     echo 'Shutdown all capif services'
                     sh 'sudo ./clean_capif_docker_services.sh'
