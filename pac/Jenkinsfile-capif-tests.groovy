@@ -51,7 +51,7 @@ pipeline {
     }
     environment {
         CAPIF_SERVICES_DIRECTORY = "${WORKSPACE}/capif"
-        ROBOT_TESTS_DIRECTORY = "${params.CAPIF_SERVICES_DIRECTORY}/tests"
+        ROBOT_TESTS_DIRECTORY = "${CAPIF_SERVICES_DIRECTORY}/tests"
         ROBOT_COMMON_DIRECTORY = "${WORKSPACE}/common"
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         CUSTOM_TEST = "${params.CUSTOM_TEST}"
