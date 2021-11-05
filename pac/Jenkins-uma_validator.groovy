@@ -25,9 +25,9 @@ String returnBody(){
 pipeline {
     agent { node {label 'evol5-slave2'}  }
 
-    parameters {
-        // ADD more parameters
-    }
+    // parameters {
+    //     // ADD more parameters
+    // }
 
     environment {
         MSG = returnBody()
