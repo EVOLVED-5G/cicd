@@ -1,6 +1,5 @@
 pipeline {
-    agent { node {label 'evol5-slave'}  }
-
+    agent { node {label 'evol5-slave2'}  }
 
 
     stages {
