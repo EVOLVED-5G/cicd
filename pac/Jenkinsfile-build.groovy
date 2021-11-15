@@ -1,5 +1,5 @@
 String netappName(String url) {
-    return url.substring(url.lastIndexOf("/") + 1, str. length);
+    return url.substring(url.lastIndexOf("/") + 1, str.length);
 }
 pipeline {
     agent { node {label 'evol5-slave'}  }
@@ -15,7 +15,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        NETAPP_NAME = netappName(GIT_URL)
+        NETAPP_NAME = netappName("${params.GIT_URL}")
     }
 
     stages {
