@@ -1,5 +1,6 @@
-
-
+String netappName(String url) {
+    return url.substring(url.lastIndexOf("/") + 1, str. length);
+}
 pipeline {
     agent { node {label 'evol5-slave'}  }
 
@@ -14,6 +15,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
+        NETAPP_NAME = netappName(GIT_URL)
     }
 
     stages {
@@ -31,7 +33,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/dummyapp/") {
                     sh '''
-                    docker build -t evolved-5g/dummy-netapp .
+                    docker build -t evolved-5g/${NETAPP_NAME} .
                     '''
                 }
             }
@@ -43,9 +45,9 @@ pipeline {
                     dir ("${env.WORKSPACE}/dummyapp/") {
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image tag evolved-5g/dummy-netapp dockerhub.hi.inet/evolved-5g/dummy-netapp:${VERSION}.${BUILD_NUMBER}
-                        docker image tag evolved-5g/dummy-netapp dockerhub.hi.inet/evolved-5g/dummy-netapp:latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/dummy-netapp
+                        docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}.${BUILD_NUMBER}
+                        docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
+                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
                         '''
                     }
                 }
