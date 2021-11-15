@@ -1,5 +1,6 @@
 String netappName(String url) {
-    String var = url.substring(url.lastIndexOf("/") + 1, url.length)
+    String url2 = url?:'';
+    String var = url2.substring(url2.lastIndexOf("/") + 1, url2.length);
     return var ;
 }
 pipeline {
