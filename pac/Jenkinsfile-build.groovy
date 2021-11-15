@@ -1,5 +1,6 @@
 String netappName(String url) {
-    return url.substring(url.lastIndexOf("/") + 1, str.length);
+    String var = url.substring(url.lastIndexOf("/") + 1, url.length)
+    return var ;
 }
 pipeline {
     agent { node {label 'evol5-slave'}  }
