@@ -65,7 +65,7 @@ pipeline {
                         sh '''
                         ExecutionId=`curl -X POST "https://10.11.23.220:8082/elcm/api/v0/run" -H "accept: application/json" -H "authorization: Basic ZXZvbHZlZDVncGFzczpldm9sdmVkNWc=" -H "Content-Type: application/json" --data "${MSG} " --insecure| jq -r .ExecutionId `
                         curl -X GET "https://10.11.23.220:8082/execution${ExecutionId}/json" -H "accept: application/json" -H "authorization: Basic ZXZvbHZlZDVncGFzczpldm9sdmVkNWc=" --insecure
-                        curl "http://10.11.23.220:5003/statistical_analysis/uma_mydb?experimentid=15012&measurement=server_5g&kpi=Jitter%20(ms)" > /tmp/output.json
+                        curl "http://10.11.23.220:5003/statistical_analysis/uma_mydb?experimentid=15012&measurement=server_5g&kpi=Jitter%20(ms)&kpi=Throughput%20(Mbps)&kpi=Packet%20Loss%20(%)" > /tmp/output.json
                         '''
                     }
             }
