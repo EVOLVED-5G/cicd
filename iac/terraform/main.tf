@@ -1,28 +1,47 @@
-resource "kubernetes_pod" "dummy_netapp" {
-  metadata {
+#############################################
+# DUMMY NETAPP
+#############################################
+resource "kubernetes_deployment" "dummy_netapp" {
+    metadata {
     name = "dummy-netapp"
     namespace = "evolved5g"
     labels = {
-      app = "dummynetapp"
+      app = "dummy-netapp"
     }
   }
 
   spec {
-    container {
-      image = "dockerhub.hi.inet/evolved-5g/dummy-netapp:latest"
-      name  = "dummy-netapp"
+    replicas = var.app_replicas
+    selector {
+      match_labels = {
+        app = "dummy-netapp"
+      }
+    }
+    template {
+      metadata {
+        labels = {
+          app = "dummy-netapp"
+        }
+      }
+      spec {
+        enable_service_links = false
+        container {
+          image = "dockerhub.hi.inet/evolved-5g/dummy-netapp:1.0.233"
+          name  = "dummy-netapp"
+        }
+      }
     }
   }
 }
 
 resource "kubernetes_service" "dummy_netapp_service" {
-  metadata {
-    name = "dummy-netapp-service"
+metadata {
+    name = "dummy-netapp"
     namespace = "evolved5g"
   }
   spec {
     selector = {
-      app = kubernetes_pod.dummy_netapp.metadata.0.labels.app
+      app = kubernetes_deployment.dummy_netapp.spec.0.template.0.metadata[0].labels.app
     }
     port {
       port = 8080
