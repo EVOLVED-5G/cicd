@@ -50,7 +50,7 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         sh '''
                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
+                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME --type=LoadBalancer
                         '''
                     }
                 }
