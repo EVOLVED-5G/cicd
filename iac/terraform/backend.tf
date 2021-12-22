@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
     encrypt        = true
-    bucket         = "evolved5g-dummyapp-tfstate"
-    key            = "test"
+    bucket         = "evolve5g-capif-terraform-states"
+    key            = "dummynetapp"
     region         = "eu-central-1"
     dynamodb_table = "terraform_locks"
   }
