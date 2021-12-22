@@ -33,7 +33,7 @@ pipeline {
         stage ('Deploy app in kubernetess') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/dummyapp/iac/terraform/") {
+                    dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             terraform init
                             terraform validate
