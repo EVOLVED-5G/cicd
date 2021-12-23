@@ -43,6 +43,12 @@ test_plan = [
     'CAPIF Api Discover Service->Delete APIs Published by NON Authorised apfId': 'capif_api_publish_service-13'
     ]
 
+
+String runCapifLocal(String nginxHost) {
+    return nginxHost.matches("^(http|https)://localhost") ? 'true' : 'false'
+}
+
+
 // ################################################
 // ## Pipeline
 // ################################################
@@ -70,11 +76,13 @@ pipeline {
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         CUSTOM_TEST = "${params.CUSTOM_TEST}"
         ROBOT_COMMON_LIBRARY = "${params.ROBOT_COMMON_LIBRARY}"
+        NGINX_HOSTNAME = "${params.NGINX_HOSTNAME}"
         CAPIF_SERVICES_BRANCH = "${params.CAPIF_SERVICES_BRANCH}"
         ROBOT_TEST_OPTIONS = setRobotOptionsValue("${params.ROBOT_TEST_OPTIONS}")
         ROBOT_TESTS_INCLUDE = robotTestSelection("${params.TESTS}", "${params.CUSTOM_TEST}")
         ROBOT_VERSION = robotDockerVersion("${params.ROBOT_DOCKER_IMAGE_VERSION}")
         ROBOT_IMAGE_NAME = 'dockerhub.hi.inet/5ghacking/evolved-robot-test-image'
+        RUN_LOCAL_CAPIF = runCapifLocal("${params.NGINX_HOSTNAME}")
     }
     stages {
         stage ('Prepare testing tools') {
@@ -105,6 +113,9 @@ pipeline {
         }
 
         stage('Launch CAPIF Docker Compose') {
+            when {
+                expression { RUN_LOCAL_CAPIF == 'true' }
+            }
             steps {
                 dir ("${CAPIF_SERVICES_DIRECTORY}") {
                         sh '''
@@ -131,7 +142,7 @@ pipeline {
                             -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
                             -v ${ROBOT_RESULTS_DIRECTORY}:/opt/robot-tests/results \
                             ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} \
-                            --variable NGINX_HOSTNAME:${NGINX_HOSTNAME}
+                            --variable NGINX_HOSTNAME:${NGINX_HOSTNAME} \
                             ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
                     """
                 }
