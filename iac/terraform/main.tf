@@ -1,4 +1,13 @@
 #############################################
+# VARIABLES
+#############################################
+variable "app_replicas" {
+  description = "Number of pods - replicas for Dummy NetApp"
+  type        = string
+  default     = "1"
+}
+
+#############################################
 # DUMMY NETAPP
 #############################################
 resource "kubernetes_deployment" "dummy_netapp" {
