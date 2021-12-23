@@ -20,14 +20,27 @@ String robotTestSelection(String tests, String customTest) {
 
 test_plan = [
     'All Capif Services': 'all',
-    'Capif Api Invoker Management': 'capif_api_invoker_management',
+    'CUSTOM': 'CUSTOM',
+    'CAPIF Api Invoker Management': 'capif_api_invoker_management',
     'CAPIF Api Invoker Management->Register NetApp': 'capif_api_invoker_management-1',
     'CAPIF Api Invoker Management->Register NetApp Already registered': 'capif_api_invoker_management-2',
     'CAPIF Api Invoker Management->Update Registered NetApp': 'capif_api_invoker_management-3',
     'CAPIF Api Invoker Management->Update Not Registered NetApp': 'capif_api_invoker_management-4',
     'CAPIF Api Invoker Management->Delete Registered NetApp': 'capif_api_invoker_management-5',
     'CAPIF Api Invoker Management->Delete Not Registered NetApp': 'capif_api_invoker_management-6',
-    'CUSTOM': 'CUSTOM'
+    'CAPIF Api Discover Service->Publish API by Authorised API Publisher': 'capif_api_publish_service-1',
+    'CAPIF Api Discover Service->Publish API by NON Authorised API Publisher': 'capif_api_publish_service-2',
+    'CAPIF Api Discover Service->Retrieve all APIs Published by Authorised apfId': 'capif_api_publish_service-3',
+    'CAPIF Api Discover Service->Retrieve all APIs Published by NON Authorised apfId': 'capif_api_publish_service-4',
+    'CAPIF Api Discover Service->Retrieve single APIs Published by Authorised apfId': 'capif_api_publish_service-5',
+    'CAPIF Api Discover Service->Retrieve single APIs non Published by Authorised apfId': 'capif_api_publish_service-6',
+    'CAPIF Api Discover Service->Retrieve single APIs Published by NON Authorised apfId': 'capif_api_publish_service-7',
+    'CAPIF Api Discover Service->Update API Published by Authorised apfId with valid serviceApiId': 'capif_api_publish_service-8',
+    'CAPIF Api Discover Service->Update APIs Published by Authorised apfId with invalid serviceApiId': 'capif_api_publish_service-9',
+    'CAPIF Api Discover Service->Update APIs Published by NON Authorised apfId': 'capif_api_publish_service-10',
+    'CAPIF Api Discover Service->Delete API Published by Authorised apfId with valid serviceApiId': 'capif_api_publish_service-11',
+    'CAPIF Api Discover Service->Delete APIs Published by Authorised apfId with invalid serviceApiId': 'capif_api_publish_service-12',
+    'CAPIF Api Discover Service->Delete APIs Published by NON Authorised apfId': 'capif_api_publish_service-13'
     ]
 
 // ################################################
@@ -44,6 +57,7 @@ pipeline {
     parameters {
         choice(name: 'TESTS', choices: test_plan.keySet() as ArrayList, description: 'Select option to run. Prefix')
         string(name: 'CUSTOM_TEST', defaultValue: '', description: 'If CUSTOM is set in TESTS, here you can add test tag')
+        string (name: 'NGINX_HOSTNAME', defaultValue: 'http://localhost:8080', description:'Nginx to forward requests')
         string(name: 'ROBOT_DOCKER_IMAGE_VERSION', defaultValue: '1.0', description: 'Robot Docker image version')
         string(name: 'ROBOT_COMMON_LIBRARY', defaultValue: 'develop', description: 'Common Robot library branch to use')
         string(name: 'CAPIF_SERVICES_BRANCH', defaultValue: 'develop', description: 'CAPIF Services Branch To Use')
@@ -117,6 +131,7 @@ pipeline {
                             -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
                             -v ${ROBOT_RESULTS_DIRECTORY}:/opt/robot-tests/results \
                             ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} \
+                            --variable NGINX_HOSTNAME:${NGINX_HOSTNAME}
                             ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
                     """
                 }
