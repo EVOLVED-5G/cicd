@@ -45,7 +45,7 @@ test_plan = [
 
 
 String runCapifLocal(String nginxHost) {
-    return nginxHost.matches("^(http|https)://localhost") ? 'true' : 'false'
+    return nginxHost.matches('^(http|https)://localhost') ? 'true' : 'false'
 }
 
 
