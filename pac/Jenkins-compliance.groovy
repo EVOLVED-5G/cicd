@@ -6,19 +6,20 @@ pipeline {
     }
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: '', description: '')
-        string(name: 'GIT_BRANCH', defaultValue: '', description: '')
+        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: '')
+        string(name: 'GIT_BRANCH', defaultValue: 'main', description: '')
         string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'NETAPP_NAME', defaultValue: 'dummyapp', description: '')
     }
 
     environment {
-        GIT_URL="${params.GIT_COMMIT}"
+        GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
         GIT_COMMIT="${params.GIT_COMMIT}"
     }
 
     stages {
+
         stage('Get the code!') {
             steps {
                 sh '''
