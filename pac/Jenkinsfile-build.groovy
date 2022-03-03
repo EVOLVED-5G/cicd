@@ -17,7 +17,6 @@ pipeline {
         GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
         VERSION="${params.VERSION}"
-        AWS_DEFAULT_REGION = 'eu-central-1'
         NETAPP_NAME = netappName("${params.GIT_URL}")
     }
 
