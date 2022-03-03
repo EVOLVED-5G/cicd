@@ -121,13 +121,13 @@ pipeline {
                                 }
                             }
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {    
-                                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                                        sh '''
-                                            export KUBECONFIG="~/kubeconfig"
-                                        '''
-                                    }
+                                   
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                        export KUBECONFIG="~/kubeconfig"
+                                    '''
                                 }
+                            
                             }
                         }
                         stage ('Create namespace in if it does not exist') {
