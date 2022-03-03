@@ -51,54 +51,56 @@ pipeline {
                             expression { DEPLOYMENT == "openshift"}
                         }
                     }
-                    stage('Login openshift') {
-                        steps {
-                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        export KUBECONFIG="./kubeconfig"
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                    '''
-                                    readFile('kubeconfig')
+                    stages{
+                        stage('Login openshift') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            export KUBECONFIG="./kubeconfig"
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                        '''
+                                        readFile('kubeconfig')
+                                    }
                                 }
                             }
                         }
-                    }
-                    stage ('Create namespace in if it does not exist') {
-                        steps {
-                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                        stage ('Create namespace in if it does not exist') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                                            sh '''
+                                                kubectl create namespace $NAMESPACE_NAME
+                                            '''
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Deploy app in kubernetess') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            kubectl create namespace $NAMESPACE_NAME
+                                            terraform init
+                                            terraform validate
+                                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
+                                            terraform apply --auto-approve deployment.tfplan
                                         '''
                                     }
                                 }
                             }
                         }
-                    }
-                    stage ('Deploy app in kubernetess') {
-                        steps {
-                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        terraform init
-                                        terraform validate
-                                        terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
-                                        terraform apply --auto-approve deployment.tfplan
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                    stage ('Expose service') {
-                        steps {
-                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                        oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
-                                    '''
+                        stage ('Expose service') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        sh '''
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
+                                        '''
+                                    }
                                 }
                             }
                         }
@@ -110,59 +112,61 @@ pipeline {
                             expression { DEPLOYMENT == "kubernetes"}
                         }
                     }
-                    stage('Login in Kubernetes') {
-                        when {
-                            expression {
-                                branch 'Openshiftv4';
+                    stages{
+                        stage('Login in Kubernetes') {
+                            when {
+                                expression {
+                                    branch 'Openshiftv4';
+                                }
                             }
-                        }
-                        steps {
-                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        export KUBECONFIG="./kubeconfig"
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                    '''
-                                    readFile('kubeconfig')
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            export KUBECONFIG="./kubeconfig"
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                        '''
+                                        readFile('kubeconfig')
+                                    }
                                 }
                             }
                         }
-                    }
-                    stage ('Create namespace in if it does not exist') {
-                        steps {
-                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        kubectl create namespace $NAMESPACE_NAME
-                                    '''
+                        stage ('Create namespace in if it does not exist') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            kubectl create namespace $NAMESPACE_NAME
+                                        '''
+                                    }
+                                }
+                            }
+                            }
+                        }
+                        stage ('Deploy app in kubernetess') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            terraform init
+                                            terraform validate
+                                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
+                                            terraform apply --auto-approve deployment.tfplan
+                                        '''
+                                    }
                                 }
                             }
                         }
-                        }
-                    }
-                    stage ('Deploy app in kubernetess') {
-                        steps {
-                            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        terraform init
-                                        terraform validate
-                                        terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
-                                        terraform apply --auto-approve deployment.tfplan
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                    stage ('Expose service') {
-                        steps {
-                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                        oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
-                                    '''
+                        stage ('Expose service') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        sh '''
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
+                                        '''
+                                    }
                                 }
                             }
                         }
