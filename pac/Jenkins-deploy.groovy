@@ -20,7 +20,7 @@ pipeline {
     stages {
         stage('Login openshift') {
             steps {
-                withCredentials([string(credentialsId: 'kubeconfigOSv4', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             export KUBECONFIG="./kubeconfig"
