@@ -69,7 +69,7 @@ pipeline {
                         sh '''
                             terraform init
                             terraform validate
-                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME}-out deployment.tfplan
+                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
                             terraform apply --auto-approve deployment.tfplan
                         '''
                     }
