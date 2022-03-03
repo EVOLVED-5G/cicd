@@ -125,7 +125,6 @@ pipeline {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
                                         '''
                                         readFile('kubeconfig')
                                     }
@@ -161,13 +160,10 @@ pipeline {
                         }
                         stage ('Expose service in Kubernetes') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                        sh '''
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
-                                        '''
-                                    }
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sh '''
+                                        kubectl expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
+                                    '''
                                 }
                             }
                         }
