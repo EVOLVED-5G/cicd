@@ -13,7 +13,6 @@ pipeline {
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
     }
     
-
     stages {
         stage('Login openshift to get kubernetes credentials') {
             steps {
