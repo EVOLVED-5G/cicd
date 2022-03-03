@@ -18,6 +18,7 @@ resource "kubernetes_deployment" "dummy_netapp" {
       app = "dummy-netapp"
     }
   }
+
   spec {
     replicas = var.app_replicas
     selector {
@@ -48,22 +49,22 @@ resource "kubernetes_deployment" "dummy_netapp" {
           }
         }
       }
+    }
+  }
+}
 
-      resource "kubernetes_service" "dummy_netapp_service" {
-        metadata {
-          name      = "dummy-netapp"
-          namespace = "evol5-capif"
-        }
-        spec {
-          selector = {
-            app = kubernetes_deployment.dummy_netapp.spec.0.template.0.metadata[0].labels.app
-          }
-          port {
-            port        = 8080
-            target_port = 8080
-          }
-        }
-      }
+resource "kubernetes_service" "dummy_netapp_service" {
+  metadata {
+    name      = "dummy-netapp"
+    namespace = "evol5-capif"
+  }
+  spec {
+    selector = {
+      app = kubernetes_deployment.dummy_netapp.spec.0.template.0.metadata[0].labels.app
+    }
+    port {
+      port        = 8080
+      target_port = 8080
     }
   }
 }
