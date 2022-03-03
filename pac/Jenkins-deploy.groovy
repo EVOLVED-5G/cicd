@@ -33,7 +33,7 @@ pipeline {
             steps {
                 when {
                     expression {
-                        return env.BRANCH_NAME != 'Openshiftv4';
+                        branch 'Openshiftv4';
                     }
                 }
                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
