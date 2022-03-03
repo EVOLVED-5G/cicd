@@ -37,6 +37,15 @@ resource "kubernetes_deployment" "dummy_netapp" {
         container {
           image = "dockerhub.hi.inet/evolved-5g/dummy-netapp:1.0.233"
           name  = "dummy-netapp"
+          resources {
+            limits = {
+              cpu    = "125m"
+              memory = "256Mi"
+            }
+            requests = {
+              cpu    = "65m"
+              memory = "50Mi"
+            }
         }
       }
     }

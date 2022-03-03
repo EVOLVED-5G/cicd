@@ -1,10 +1,12 @@
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
 
     parameters {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of Dummy NetApp pods to run')
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
+        string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
+        choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"]) 
     }
 
     environment {
@@ -12,7 +14,7 @@ pipeline {
         APP_REPLICAS="${params.APP_REPLICAS}"
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        OPENSHIFT_URL= 'https://openshift-epg.hi.inet:443'
+        OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
     }
 
     stages {
