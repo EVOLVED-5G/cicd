@@ -4,6 +4,17 @@ String netappName(String url) {
     var= var.toLowerCase()
     return var ;
 }
+
+
+def getNamespace(namespace,name) {
+    if("openshift".equals(namespace)) {
+        return "evol5-capif";
+    } else {
+        return name;
+    }
+}
+
+
 pipeline {
     agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
 
@@ -13,7 +24,8 @@ pipeline {
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of Dummy NetApp pods to run')
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
-        choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"]) 
+        choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"])
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes"])  
     }
 
     environment {
@@ -25,7 +37,8 @@ pipeline {
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         // For the moment NETAPP_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
         NETAPP_NAME = netappName("${params.GIT_URL}")
-        NAMESPACE_NAME = "evol5-capif"
+        NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        
     }
 
     stages {
