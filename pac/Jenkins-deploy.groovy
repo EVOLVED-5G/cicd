@@ -30,12 +30,12 @@ pipeline {
 
     stages {
         stage('Login openshift') {
-            steps {
-                when {
-                    expression {
-                        branch 'Openshiftv4';
-                    }
+            when {
+                expression {
+                    branch 'Openshiftv4';
                 }
+            }
+            steps {
                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
