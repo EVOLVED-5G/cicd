@@ -52,12 +52,14 @@ pipeline {
         stage ('Create namespace in if it does not exist') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             kubectl create namespace $NAMESPACE_NAME
                         '''
                     }
                 }
+              }
             }
         }
         stage ('Deploy app in kubernetess') {
