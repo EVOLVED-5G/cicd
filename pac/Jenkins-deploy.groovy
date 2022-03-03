@@ -6,8 +6,9 @@ String netappName(String url) {
 }
 
 
-def getNamespace(namespace,name) {
-    if("openshift".equals(namespace)) {
+def getNamespace(deployment,name) {
+    String var = deployment
+    if("openshift".equals(var)) {
         return "evol5-capif";
     } else {
         return name;
