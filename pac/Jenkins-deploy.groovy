@@ -8,7 +8,7 @@ pipeline {
     agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: '', description: '')
+        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of Dummy NetApp pods to run')
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
