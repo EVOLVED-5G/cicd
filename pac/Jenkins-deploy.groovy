@@ -128,6 +128,7 @@ pipeline {
                                         '''
                                         readFile('kubeconfig-athens')
                                     }
+                                }
                             }
                         }
                         stage ('Create namespace in if it does not exist') {
