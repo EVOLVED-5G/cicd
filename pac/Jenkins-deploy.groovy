@@ -124,9 +124,8 @@ pipeline {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {    
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            export KUBECONFIG=".~/.kube/config"
+                                            export KUBECONFIG="~/kubeconfig"
                                         '''
-                                        readFile('kubeconfig-athens')
                                     }
                                 }
                             }
