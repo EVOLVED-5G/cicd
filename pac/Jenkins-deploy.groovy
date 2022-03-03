@@ -39,6 +39,7 @@ pipeline {
         // For the moment NETAPP_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
         NETAPP_NAME = netappName("${params.GIT_URL}")
         NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        DEPLOYMENT = "${params.DEPLOYMENT}"
         
     }
 
@@ -65,7 +66,7 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Create namespace in if it does not exist') {
+                        stage ('Create namespace in Openshift if it does not exist') {
                             steps {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -92,7 +93,7 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Expose service') {
+                        stage ('Expose service in kubernets') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -106,7 +107,7 @@ pipeline {
                         }
                     }
                 }
-                stage ('Deployment in Kubernetes'){
+                stage ('Deployment in Openshift'){
                     when {
                         allOf {
                             expression { DEPLOYMENT == "kubernetes"}
@@ -158,7 +159,7 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Expose service') {
+                        stage ('Expose service in Kubernetes') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
