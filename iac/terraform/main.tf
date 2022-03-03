@@ -11,14 +11,13 @@ variable "app_replicas" {
 # DUMMY NETAPP
 #############################################
 resource "kubernetes_deployment" "dummy_netapp" {
-    metadata {
-    name = "dummy-netapp"
+  metadata {
+    name      = "dummy-netapp"
     namespace = "evolved5g"
     labels = {
       app = "dummy-netapp"
     }
   }
-
   spec {
     replicas = var.app_replicas
     selector {
@@ -46,24 +45,25 @@ resource "kubernetes_deployment" "dummy_netapp" {
               cpu    = "65m"
               memory = "50Mi"
             }
+          }
         }
       }
-    }
-  }
-}
 
-resource "kubernetes_service" "dummy_netapp_service" {
-metadata {
-    name = "dummy-netapp"
-    namespace = "evolved5g"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment.dummy_netapp.spec.0.template.0.metadata[0].labels.app
-    }
-    port {
-      port = 8080
-      target_port = 8080
+      resource "kubernetes_service" "dummy_netapp_service" {
+        metadata {
+          name      = "dummy-netapp"
+          namespace = "evolved5g"
+        }
+        spec {
+          selector = {
+            app = kubernetes_deployment.dummy_netapp.spec.0.template.0.metadata[0].labels.app
+          }
+          port {
+            port        = 8080
+            target_port = 8080
+          }
+        }
+      }
     }
   }
 }
