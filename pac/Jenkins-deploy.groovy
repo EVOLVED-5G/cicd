@@ -37,7 +37,6 @@ pipeline {
             }
             steps {
                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             export KUBECONFIG="./kubeconfig"
@@ -46,7 +45,6 @@ pipeline {
                         readFile('kubeconfig')
                     }
                 }
-              }
             }
         }
         stage ('Create namespace in if it does not exist') {
