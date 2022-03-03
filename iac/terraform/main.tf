@@ -13,7 +13,7 @@ variable "app_replicas" {
 resource "kubernetes_deployment" "dummy_netapp" {
   metadata {
     name      = "dummy-netapp"
-    namespace = "evolved5g"
+    namespace = "evol5-capif"
     labels = {
       app = "dummy-netapp"
     }
@@ -52,7 +52,7 @@ resource "kubernetes_deployment" "dummy_netapp" {
       resource "kubernetes_service" "dummy_netapp_service" {
         metadata {
           name      = "dummy-netapp"
-          namespace = "evolved5g"
+          namespace = "evol5-capif"
         }
         spec {
           selector = {
