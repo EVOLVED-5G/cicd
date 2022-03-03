@@ -121,13 +121,11 @@ pipeline {
                                 }
                             }
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                                        sh '''
-                                            export KUBECONFIG="./kubeconfig"
-                                        '''
-                                        readFile('kubeconfig')
-                                    }
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                        export KUBECONFIG="./kubeconfig"
+                                    '''
+                                    readFile('kubeconfig')
                                 }
                             }
                         }
