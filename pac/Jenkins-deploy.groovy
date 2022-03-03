@@ -25,7 +25,7 @@ pipeline {
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         // For the moment NETAPP_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
         NETAPP_NAME = netappName("${params.GIT_URL}")
-        NAMESPACE_NAME = "evol5-dummy2"
+        NAMESPACE_NAME = "evol5-dummy"
     }
 
     stages {
