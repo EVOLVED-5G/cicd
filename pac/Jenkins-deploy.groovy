@@ -107,7 +107,7 @@ pipeline {
                         }
                     }
                 }
-                stage ('Deployment in Openshift'){
+                stage ('Deployment in Kubernetes'){
                     when {
                         allOf {
                             expression { DEPLOYMENT == "kubernetes"}
