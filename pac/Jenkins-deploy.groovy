@@ -31,6 +31,11 @@ pipeline {
     stages {
         stage('Login openshift') {
             steps {
+                when {
+                    expression {
+                        return env.BRANCH_NAME != 'Openshiftv4';
+                    }
+                }
                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
@@ -62,7 +67,7 @@ pipeline {
                         sh '''
                             terraform init
                             terraform validate
-                            terraform plan -var app_replicas=${APP_REPLICAS} - var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME}-out deployment.tfplan
+                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME}-out deployment.tfplan
                             terraform apply --auto-approve deployment.tfplan
                         '''
                     }
