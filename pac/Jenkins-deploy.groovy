@@ -33,7 +33,6 @@ def getPath(deployment) {
     }
 }
 
-
 pipeline {
     agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
 
@@ -114,7 +113,7 @@ pipeline {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
                                             terraform init                                                          \
-                                                -backend-config="bucket=evolve5g-${DEPLOYMENT}-terraform-states"    \
+                                                -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
                                                 -backend-config "key=${NETAPP_NAME}"
                                         '''
                                     }
@@ -200,7 +199,7 @@ pipeline {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
                                             terraform init                                                          \
-                                                -backend-config="bucket=evolve5g-${DEPLOYMENT}-terraform-states"    \
+                                                -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
                                                 -backend-config "key=${NETAPP_NAME}"
                                         '''
                                     }
