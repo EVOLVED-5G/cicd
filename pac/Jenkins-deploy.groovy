@@ -15,6 +15,24 @@ def getNamespace(deployment,name) {
     }
 }
 
+def getContext(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer";
+    } else {
+        return "kubernetes-admin@kubernetes";
+    }
+}
+
+def getPath(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "kubeconfig";
+    } else {
+        return "~/kubeconfig";
+    }
+}
+
 
 pipeline {
     agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
@@ -40,6 +58,8 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_URL}")
         NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
         DEPLOYMENT = "${params.DEPLOYMENT}"
+        CONFIG_PATH = getPath("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
         
     }
 
@@ -79,7 +99,29 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Deploy app in kubernetess') {
+                        stage ('Configure Provider for Openshift deployment') {
+                            steps {
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                    sed -i -e "s/CONFIG_PATH/${CONFIG_PATH}/g" -e "s/CONFIG_CONTEXT/${CONFIG_CONTEXT}/g" provider.tf
+                                    '''
+                                }
+                            }
+                        }
+                        stage ('Initiate and configure app in Openshift') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            terraform init                                                          \
+                                                -backend-config="bucket=evolve5g-${DEPLOYMENT}-terraform-states"    \
+                                                -backend-config "key=${NETAPP_NAME}"
+                                        '''
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Deploy app in Openshift') {
                             steps {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
@@ -93,7 +135,7 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Expose service in kubernets') {
+                        stage ('Expose service in Openshift') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -143,12 +185,33 @@ pipeline {
                             }
                             }
                         }
+                        stage ('Configure Provider for Kubernetes deployment') {
+                            steps {
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                    sed -i -e "s/CONFIG_PATH/${CONFIG_PATH}/g" -e "s/CONFIG_CONTEXT/${CONFIG_CONTEXT}/g" provider.tf
+                                    '''
+                                }
+                            }
+                        }
+                        stage ('Initiate and configure app in kubernetes') {
+                            steps {
+                                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            terraform init                                                          \
+                                                -backend-config="bucket=evolve5g-${DEPLOYMENT}-terraform-states"    \
+                                                -backend-config "key=${NETAPP_NAME}"
+                                        '''
+                                    }
+                                }
+                            }
+                        }
                         stage ('Deploy app in kubernetess') {
                             steps {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            terraform init
                                             terraform validate
                                             terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
                                             terraform apply --auto-approve deployment.tfplan
