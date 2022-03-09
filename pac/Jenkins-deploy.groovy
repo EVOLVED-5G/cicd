@@ -43,7 +43,7 @@ pipeline {
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
         choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"])
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes"])  
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens"])  
     }
 
     environment {
@@ -58,8 +58,7 @@ pipeline {
         NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
         DEPLOYMENT = "${params.DEPLOYMENT}"
         CONFIG_PATH = getPath("${params.DEPLOYMENT}")
-        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}")
-        
+        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}") 
     }
 
     stages {            
@@ -112,9 +111,9 @@ pipeline {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            terraform init                                                          \
+                                            terraform init                                                           \
                                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                                -backend-config "key=${NETAPP_NAME}"
+                                                -backend-config="key=${NETAPP_NAME}"
                                         '''
                                     }
                                 }
@@ -125,7 +124,6 @@ pipeline {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            terraform init
                                             terraform validate
                                             terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
                                             terraform apply --auto-approve deployment.tfplan
@@ -200,7 +198,7 @@ pipeline {
                                         sh '''
                                             terraform init                                                          \
                                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                                -backend-config "key=${NETAPP_NAME}"
+                                                -backend-config="key=${NETAPP_NAME}"
                                         '''
                                     }
                                 }
