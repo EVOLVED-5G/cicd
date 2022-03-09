@@ -58,8 +58,8 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_URL}")
         NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
         DEPLOYMENT = "${params.DEPLOYMENT}"
-        CONFIG_PATH = getPath("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
-        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        CONFIG_PATH = getPath("${params.DEPLOYMENT}")
+        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}")
         
     }
 
