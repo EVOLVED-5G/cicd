@@ -18,9 +18,9 @@ def getNamespace(deployment,name) {
 def getContext(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
-        return "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer";
+        return "evol5-capif\/api-ocp-epg-hi-inet:6443\/system:serviceaccount:evol5-capif:deployer";
     } else {
-        return "kubernetes-admin@kubernetes";
+        return "kubernetes-admin\@kubernetes";
     }
 }
 
@@ -29,7 +29,7 @@ def getPath(deployment) {
     if("openshift".equals(var)) {
         return "kubeconfig";
     } else {
-        return "~/kubeconfig";
+        return "\~\/kubeconfig";
     }
 }
 
