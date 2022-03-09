@@ -149,7 +149,7 @@ pipeline {
                 stage ('Deployment in Kubernetes'){
                     when {
                         allOf {
-                            expression { DEPLOYMENT == "kubernetes"}
+                            expression { DEPLOYMENT == "kubernetes-athens"}
                         }
                     }
                     stages{
