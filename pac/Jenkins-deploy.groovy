@@ -209,6 +209,7 @@ pipeline {
                                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
+                                            export AWS_PROFILE=default
                                             terraform validate
                                             terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
                                             terraform apply --auto-approve deployment.tfplan
