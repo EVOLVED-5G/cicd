@@ -1,8 +1,8 @@
-# provider "kubernetes" { for Openshift
-#   config_path    = "kubeconfig"
-#   config_context = "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer"
-#   insecure       = true
-# }
+provider "kubernetes" {
+  config_path    = "kubeconfig"
+  config_context = "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer"
+  insecure       = true
+}
 
 # provider "kubernetes" { for Athens
 #   config_path    = "~/kubeconfig"
@@ -10,11 +10,11 @@
 #   insecure       = true
 # }
 
-provider "kubernetes" {
-  config_path    = "CONFIG_PATH"
-  config_context = "CONFIG_CONTEXT"
-  insecure       = true
-}
+# provider "kubernetes" {
+#   config_path    = "CONFIG_PATH"
+#   config_context = "CONFIG_CONTEXT"
+#   insecure       = true
+# }
 
 
 
