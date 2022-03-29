@@ -103,7 +103,6 @@ pipeline {
                                 dir ("${env.WORKSPACE}/iac/terraform/") {
                                     sh '''
                                         export KUBECONFIG="~/kubeconfig"
-                                        kubectl config use-context kubernetes-admin@kubernetes
                                     '''
                                 }
                             
@@ -146,6 +145,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
+                    kubectl config use-context kubernetes-admin@kubernetes
                     '''
                 }
             }
