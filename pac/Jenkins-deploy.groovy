@@ -99,8 +99,7 @@ pipeline {
                                     branch 'Openshiftv4';
                                 }
                             }
-                            steps {
-                                   
+                            steps { 
                                 dir ("${env.WORKSPACE}/iac/terraform/") {
                                     sh '''
                                         export KUBECONFIG="~/kubeconfig"
@@ -134,7 +133,7 @@ pipeline {
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$NAMESPACE_NAME                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
-                            --docker-username=default
+                            --docker-username=AWS
                             '''
                         }
                     }
@@ -187,13 +186,13 @@ pipeline {
                     }
                     stages{
                             stage ('Expose service in Openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                        sh '''
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                            oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
-                                        '''
+                                steps {
+                                    withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                        catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                            sh '''
+                                                oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                                oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
+                                            '''
                                     }
                                 }
                             }

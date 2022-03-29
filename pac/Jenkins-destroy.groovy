@@ -14,27 +14,58 @@ pipeline {
     }
     
     stages {
-        stage('Login openshift to get kubernetes credentials') {
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                            export KUBECONFIG="./kubeconfig"
-                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                        '''
-                        readFile('kubeconfig')
+        stage('Destroying infrastructure in Openshift or Kubernetes'){
+            parallel{
+                stage ('Destroying in Openshift') {
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "openshift"}
+                        }
+                    }
+                    stages{
+                        stage('Login openshift to get kubernetes credentials') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            export KUBECONFIG="./kubeconfig"
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                        '''
+                                        readFile('kubeconfig')
+                                    }
+                                }
+                            }
+                        }
+                        stage ('Remove service expose in openshift') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                            oc delete route dummy-netapp
+                                        '''
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
-        }
-        stage ('Remove service expose') {
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                            oc delete route dummy-netapp
-                        '''
+                stage ('Destroying in Kubernetes') {
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        }
+                    }
+                    stages{
+                        stage('Login openshift to get kubernetes credentials') {
+                            steps { 
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                        export KUBECONFIG="~/kubeconfig"
+                                    '''
+                                }
+                            }
+                        }
                     }
                 }
             }
