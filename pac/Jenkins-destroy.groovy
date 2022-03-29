@@ -78,7 +78,6 @@ pipeline {
                                 dir ("${env.WORKSPACE}/iac/terraform/") {
                                     sh '''
                                     kubectl delete service dummy-netapp -n ${NETAPP_NAME}
-                                    kubectl delete route dummy-netapp -n ${NETAPP_NAME}
                                     '''
                                 }
                             }
