@@ -191,6 +191,7 @@ pipeline {
                                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                             sh '''
                                                 oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                                oc create service nodeport dummy-netapp --tcp=8080:8080
                                                 oc expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
                                             '''
                                     }
@@ -210,6 +211,7 @@ pipeline {
                             steps {
                                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                     sh '''
+                                        kubectl create service nodeport dummy-netapp --tcp=8080:8080
                                         kubectl expose service dummy-netapp --hostname=$DUMMY_NETAPP_HOSTNAME
                                     '''
                                 }
