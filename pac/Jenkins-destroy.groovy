@@ -5,12 +5,14 @@ pipeline {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
         choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"]) 
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens"])  
     }
 
     environment {
         GIT_BRANCH="${params.GIT_BRANCH}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
+        DEPLOYMENT = "${params.DEPLOYMENT}"
     }
     
     stages {
