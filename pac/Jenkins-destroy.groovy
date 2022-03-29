@@ -4,6 +4,7 @@ pipeline {
     parameters {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
+        string(name: 'NETAPP_NAME', defaultValue: 'dummy-netapp', description: 'dummy-netapp')
         choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"]) 
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens"])  
     }
@@ -13,6 +14,7 @@ pipeline {
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
+        NETAPP_NAME = "${params.NETAPP_NAME}"
     }
     
     stages {
@@ -79,7 +81,9 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
-                            terraform init
+                            terraform init                                                           \
+                                -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
+                                -backend-config="key=${NETAPP_NAME}"
                             terraform destroy --auto-approve
                         '''
                     }
