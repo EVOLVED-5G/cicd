@@ -47,6 +47,7 @@ pipeline {
                                         dir ("${env.WORKSPACE}/iac/terraform/") {
                                             sh '''
                                                 oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                                oc delete service dummy-netapp
                                                 oc delete route dummy-netapp
                                             '''
                                         }
