@@ -41,11 +41,13 @@ pipeline {
                         stage ('Remove service expose in openshift') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                                        sh '''
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                            oc delete route dummy-netapp
-                                        '''
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                                            sh '''
+                                                oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                                oc delete route dummy-netapp
+                                            '''
+                                        }
                                     }
                                 }
                             }
