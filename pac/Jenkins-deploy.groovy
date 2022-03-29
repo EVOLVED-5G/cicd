@@ -130,7 +130,7 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         dir ("${env.WORKSPACE}/iac/terraform/") {
                             sh '''
-                            kubectl create secret docker-registry regcred 
+                            kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$NAMESPACE_NAME                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
