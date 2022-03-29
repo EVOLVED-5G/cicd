@@ -75,10 +75,12 @@ pipeline {
                         }
                         stage('Removing services') {
                             steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                    kubectl delete service dummy-netapp -n ${NETAPP_NAME}
-                                    '''
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                        kubectl delete service dummy-netapp -n ${NETAPP_NAME}
+                                        '''
+                                    }
                                 }
                             }
                         }
