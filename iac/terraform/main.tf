@@ -39,6 +39,9 @@ resource "kubernetes_deployment" "dummy_netapp" {
             }
           }
         }
+        image_pull_secrets {
+          name = regcred
+        }
       }
     }
   }

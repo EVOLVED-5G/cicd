@@ -64,7 +64,7 @@ pipeline {
     stages {            
         stage ('Login in openshift or Kubernetes'){
             parallel {
-                stage ('Login in Openshift') {
+                stage ('Login in Openshift platform') {
                     when {
                         allOf {
                             expression { DEPLOYMENT == "openshift"}
@@ -86,7 +86,7 @@ pipeline {
                         }
                     }
                 }            
-                stage ('Login in Kubernetes'){
+                stage ('Login in Kubernetes Platform'){
                     when {
                         allOf {
                             expression { DEPLOYMENT == "kubernetes-athens"}
@@ -115,13 +115,18 @@ pipeline {
         }    
         stage ('Create namespace in if it does not exist') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                        kubectl create namespace $NAMESPACE_NAME
-                        '''
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                            sh '''
+                            kubectl create namespace $NAMESPACE_NAME
+                            kubectl create secret docker-registry regcred                           \
+                                --docker-password=$(aws ecr get-login-password)                     \
+                                --namespace=$NAMESPACE_NAME || true &&                              \
+                            '''
+                        }
                     }
-                }
+                }    
             }
         }
         stage ('Configure Provider for the specific deployment') {
