@@ -73,6 +73,16 @@ pipeline {
                                 }
                             }
                         }
+                        stage('Removing services') {
+                            steps { 
+                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                    sh '''
+                                    kubectl delete service dummy-netapp
+                                    kubectl delete route dummy-netapp
+                                    '''
+                                }
+                            }
+                        }
                     }
                 }
             }
