@@ -77,6 +77,7 @@ pipeline {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
+                                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
                                         '''
                                         readFile('kubeconfig')
