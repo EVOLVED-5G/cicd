@@ -1,3 +1,21 @@
+def getContext(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer";
+    } else {
+        return "kubernetes-admin@kubernetes";
+    }
+}
+
+def getPath(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "kubeconfig";
+    } else {
+        return "~/kubeconfig";
+    }
+}
+
 pipeline {
     agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
 
@@ -15,6 +33,8 @@ pipeline {
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         NETAPP_NAME = "${params.NETAPP_NAME}"
+        CONFIG_PATH = getPath("${params.DEPLOYMENT}")
+        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}") 
     }
     
     stages {
