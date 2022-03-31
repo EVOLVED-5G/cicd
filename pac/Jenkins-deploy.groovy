@@ -71,7 +71,7 @@ pipeline {
                 }
             }
         }
-                stage ('Configure Provider for the specific deployment') {
+        stage ('Configure Provider for the specific deployment') {
             parallel{
                 stage('Configuration in Openshift'){
                     when {
