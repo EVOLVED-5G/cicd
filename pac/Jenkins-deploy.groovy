@@ -70,6 +70,39 @@ pipeline {
                     '''
                 }
             }
+        }
+                stage ('Configure Provider for the specific deployment') {
+            parallel{
+                stage('Configuration in Openshift'){
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "openshift"}
+                        }
+                    }
+                    steps {
+                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                            sh '''
+                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
+                            '''
+                        }
+                    }
+                }
+                stage('Configuration in Kubernetes'){
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        }
+                    }
+                    steps {
+                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                            sh '''
+                            kubectl config use-context kubernetes-admin@kubernetes
+                            '''
+                        }
+                    }
+                }
+
+            }
         }           
         stage ('Login in openshift or Kubernetes'){
             parallel {
@@ -148,39 +181,6 @@ pipeline {
                         }
                     }
                 }    
-            }
-        }
-        stage ('Configure Provider for the specific deployment') {
-            parallel{
-                stage('Configuration in Openshift'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
-                    }
-                    steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/") {
-                            sh '''
-                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
-                            '''
-                        }
-                    }
-                }
-                stage('Configuration in Kubernetes'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/") {
-                            sh '''
-                            kubectl config use-context kubernetes-admin@kubernetes
-                            '''
-                        }
-                    }
-                }
-
             }
         }
         stage ('Initiate and configure app in kubernetes') {
