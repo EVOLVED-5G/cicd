@@ -139,6 +139,7 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         dir ("${env.WORKSPACE}/iac/terraform/") {
                             sh '''
+                            kubectl delete secret production-tls --ignore-not-found
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$NAMESPACE_NAME                                                     \
