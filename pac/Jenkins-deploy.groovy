@@ -85,9 +85,10 @@ pipeline {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer                           
+                                            export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
                                         '''
+                                        readFile('kubeconfig')
                                     }
                                 }
                             }
