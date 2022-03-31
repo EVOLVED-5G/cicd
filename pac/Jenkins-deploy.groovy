@@ -126,7 +126,6 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
-                        kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
                         kubectl create namespace $NAMESPACE_NAME
                         '''
                     }
