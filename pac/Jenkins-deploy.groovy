@@ -171,7 +171,7 @@ pipeline {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         dir ("${env.WORKSPACE}/iac/terraform/") {
                             sh '''
-                            kubectl delete secret production-tls --ignore-not-found
+                            kubectl delete secret regcred --ignore-not-found
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$NAMESPACE_NAME                                                     \
@@ -196,7 +196,7 @@ pipeline {
                 }
             }
         }
-        stage ('Deploy app in kubernetess') {
+        stage ('Deploy Netapp') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
