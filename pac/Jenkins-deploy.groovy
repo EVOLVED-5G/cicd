@@ -33,8 +33,19 @@ def getPath(deployment) {
     }
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
         string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
@@ -42,8 +53,7 @@ pipeline {
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of Dummy NetApp pods to run')
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
-        choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"])
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens"])  
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
