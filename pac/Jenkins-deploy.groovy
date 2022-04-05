@@ -170,7 +170,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
-                        kubectl delete secret docker-registry regcred --ignore-not-found
+                        kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
                         kubectl create secret docker-registry regcred                                   \
                         --docker-password=$(aws ecr get-login-password)                                 \
                         --namespace=$NAMESPACE_NAME                                                     \
