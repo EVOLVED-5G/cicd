@@ -16,15 +16,25 @@ def getPath(deployment) {
     }
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent {node {label params.AGENT == "any" ? "" : params.AGENT }}
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
         string(name: 'NETAPP_NAME', defaultValue: 'dummy-netapp', description: 'dummy-netapp')
-        choice(name: "AGENT", choices: ["evol5-slave", "evol5-athens"]) 
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens"])  
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens","kubernethes-uma"])  
     }
 
     environment {
