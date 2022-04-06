@@ -108,8 +108,7 @@ pipeline {
                             steps { 
                                 dir ("${env.WORKSPACE}/iac/terraform/") {
                                     sh '''
-                                        export KUBECONFIG="./kubeconfig"
-                                        kubectl config use-context kubernetes-admin@kubernetes
+                                        export KUBECONFIG="~/kubeconfig"
                                     '''
                                 }
                             }

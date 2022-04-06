@@ -146,11 +146,6 @@ pipeline {
                     }
                     stages{
                         stage('Login in Kubernetes') {
-                            when {
-                                expression {
-                                    branch 'Openshiftv4';
-                                }
-                            }
                             steps { 
                                 dir ("${env.WORKSPACE}/iac/terraform/") {
                                     sh '''
