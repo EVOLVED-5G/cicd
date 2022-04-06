@@ -5,7 +5,7 @@ String netappName(String url) {
     return var ;
 }
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent { node {label 'evol5-openshift'}  }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
@@ -28,7 +28,7 @@ pipeline {
                 rm -rf dummyapp
                 mkdir dummyapp
                 cd dummyapp
-                git clone --single-branch --branch $GIT_BRANCH $GIT_URL .
+                git clone --single-branch --branch evolved5g $GIT_URL .
                 '''
             }
         }
