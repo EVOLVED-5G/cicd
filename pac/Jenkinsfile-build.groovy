@@ -49,7 +49,7 @@ pipeline {
                         $(aws ecr get-login-password)
                         docker image tag evolved-5g/${NETAPP_NAME} 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
                         docker image tag evolved-5g/${NETAPP_NAME} 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g
+                        docker image push --all-tags 
                         '''
                     }    
                 }   
@@ -67,6 +67,31 @@ pipeline {
                         '''
                     }
                 }
+            }
+        }
+        stage('Cleaning docker images and containers') {
+            steps {
+                dir ("${env.WORKSPACE}/dummyapp/") {
+                    sh '''
+                    docker stop $(docker ps -q)
+                    docker rm $(docker ps -a -q)
+                    docker rmi $(docker images -a -q)
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
             }
         }
     }
