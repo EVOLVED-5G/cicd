@@ -75,9 +75,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/dummyapp/") {
                         sh '''
-                        docker stop $(docker ps -a -q)
-                        docker rm $(docker ps -a -q)
-                        docker rmi $(docker images -a -q)
+                        docker rmi -f $(docker images -a -q)
                         '''
                     }
                 }
