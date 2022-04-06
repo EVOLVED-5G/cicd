@@ -4,13 +4,14 @@ String netappName(String url) {
     var= var.toLowerCase()
     return var ;
 }
+
 pipeline {
     agent { node {label 'evol5-openshift'}  }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
-        string(name: 'GIT_URL', defaultValue: '', description: '')
-        string(name: 'GIT_BRANCH', defaultValue: '', description: '')
+        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
     }
 
     environment {
