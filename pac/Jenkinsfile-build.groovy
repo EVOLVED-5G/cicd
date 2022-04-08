@@ -42,18 +42,29 @@ pipeline {
         AWS_DEFAULT_REGION = 'eu-central-1'
         NETAPP_FOLDER= netappName("${params.GIT_URL}")
         NETAPP_NAME = NETAPP_FOLDER.toLowerCase()
-        DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_Folder}/docker-compose.yml"
+        DOCKER_VAR = 'false'
     }
 
     stages {
         stage('Get the code!') {
+            dir ("${env.WORKSPACE}/") {
+                steps {
+                    sh '''
+                    rm -rf ${NETAPP_NAME} 
+                    mkdir ${NETAPP_NAME} 
+                    cd ${NETAPP_NAME} 
+                    git clone --single-branch --branch evolved5g $GIT_URL .
+                    '''
+                }
+           }
+        }
+        stage('Docker-compose ?') {
             steps {
-                sh '''
-                rm -rf ${NETAPP_NAME} 
-                mkdir ${NETAPP_NAME} 
-                cd ${NETAPP_NAME} 
-                git clone --single-branch --branch evolved5g $GIT_URL .
-                '''
+                script{
+                    env.DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
+                }
+                echo "DOCKER VAR is ${DOCKER_VAR}"
+                
             }
         }
 
@@ -64,7 +75,7 @@ pipeline {
                 }
             }            
             steps {
-                dir ("${env.WORKSPACE}/dummyapp/") {
+                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker build -t evolved-5g/${NETAPP_NAME} .
                     '''
@@ -78,7 +89,7 @@ pipeline {
                 }
             }  
             steps {
-                dir ("${env.WORKSPACE}/dummyapp/") {
+                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     pwd > commandResult.txt
                     '''
@@ -94,7 +105,7 @@ pipeline {
                 }
             }  
             steps {
-                dir ("${env.WORKSPACE}/dummyapp/") {
+                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker-compose up --build -d
                     '''
