@@ -2,9 +2,9 @@ import java.io.*;
 String netappName(String url) {
     String url2 = url?:'';
     String var = url2.substring(url2.lastIndexOf("/") + 1);
-    var= var.toLowerCase()
     return var ;
 }
+
 
 // Function that returns the name of the Netapp container
 String trimImage(String filepath) {
@@ -21,7 +21,7 @@ String trimImage(String filepath) {
 def fileE(String path ) {
     var = """${sh(
                     returnStdout: true,
-                    script: "env.DOCKER_VAR=$([[ -f docker-compose.yaml ]] && echo \'True')"
+                    script: "[[ -f ${path} ]] && echo 'True'"
                     )}"""
     return var
 }
@@ -40,8 +40,9 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        NETAPP_NAME = netappName("${params.GIT_URL}")
-        DOCKER_VAR = 'False'
+        NETAPP_FOLDER= netappName("${params.GIT_URL}")
+        NETAPP_NAME = NETAPP_FOLDER.toLowerCase()
+        DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_Folder}/docker-compose.yml"
     }
 
     stages {
@@ -55,18 +56,11 @@ pipeline {
                 '''
             }
         }
-        stage('Check if there is a docker-compose in the file'){
-            dir ("${env.WORKSPACE}/${NETAPP_NAME}" ){
-                script{
-                    env.DOCKER_VAR = fileE("${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yaml"))
-                }
- 
-            } 
-        }
+
         stage('Build') {
             when {
                 allOf {
-                    expression { DOCKER_VAR != "True"}
+                    expression { DOCKER_VAR == "false"}
                 }
             }            
             steps {
