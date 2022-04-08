@@ -47,8 +47,8 @@ pipeline {
 
     stages {
         stage('Get the code!') {
-            dir ("${env.WORKSPACE}/") {
-                steps {
+            steps {
+                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     rm -rf ${NETAPP_NAME} 
                     mkdir ${NETAPP_NAME} 
