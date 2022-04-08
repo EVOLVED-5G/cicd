@@ -48,7 +48,9 @@ pipeline {
         }
         stage('Check if there is a docker-compose in the file'){
             steps {
+               sh '''
                env.DOCKER_VAR=$([[ -f docker-compose.yaml ]] && echo "True")
+               '''
             }
         }
         stage('Build') {
