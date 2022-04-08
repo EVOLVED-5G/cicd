@@ -5,6 +5,19 @@ String netappName(String url) {
     return var ;
 }
 
+// Function that returns the name of the Netapp container
+String trimImage(String filepath) {
+    File file = new File(fileName);
+    Scanner input = new Scanner(file);
+    List<String> list = new ArrayList<String>();
+
+    while (input.hasNextLine()) {
+        if 
+        list.add(input.nextLine());
+    }
+
+}
+
 pipeline {
     agent { node {label 'evol5-openshift'}  }
 
@@ -20,6 +33,7 @@ pipeline {
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         NETAPP_NAME = netappName("${params.GIT_URL}")
+        DOCKER_VAR = 'False'
     }
 
     stages {
@@ -33,7 +47,17 @@ pipeline {
                 '''
             }
         }
+        stage('Check if there is a docker-compose in the file'){
+            steps {
+               env.DOCKER_VAR=$([[ -f docker-compose.yaml ]] && echo "True")
+            }
+        }
         stage('Build') {
+            when {
+                allOf {
+                    expression { DOCKER_VAR == "False"}
+                }
+            }            
             steps {
                 dir ("${env.WORKSPACE}/dummyapp/") {
                     sh '''
@@ -42,6 +66,36 @@ pipeline {
                 }
             }
         }
+        stage('Modify Docker compose for creating tag images') {
+            when {
+                allOf {
+                    expression { DOCKER_VAR == "True"}
+                }
+            }  
+            steps {
+                dir ("${env.WORKSPACE}/dummyapp/") {
+                    sh '''
+                    pwd > commandResult.txt
+                    '''
+                    trimImage(commandResult+"docker-compose.yaml")
+                }
+            }
+        }
+
+        stage('Build Docker Compose') {
+            when {
+                allOf {
+                    expression { DOCKER_VAR == "True"}
+                }
+            }  
+            steps {
+                dir ("${env.WORKSPACE}/dummyapp/") {
+                    sh '''
+                    docker-compose up --build -d
+                    '''
+                }
+            }
+        }        
         stage('Publish in AWS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
