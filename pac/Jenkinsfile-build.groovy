@@ -1,3 +1,4 @@
+import java.io.*;
 String netappName(String url) {
     String url2 = url?:'';
     String var = url2.substring(url2.lastIndexOf("/") + 1);
@@ -15,6 +16,14 @@ String trimImage(String filepath) {
         list.add(input.nextLine());
     }
 
+}
+
+def fileE(String path ) {
+    var = """${sh(
+                    returnStdout: true,
+                    script: "env.DOCKER_VAR=$([[ -f docker-compose.yaml ]] && echo \'True')"
+                    )}"""
+    return var
 }
 
 pipeline {
@@ -39,24 +48,25 @@ pipeline {
         stage('Get the code!') {
             steps {
                 sh '''
-                rm -rf dummyapp
-                mkdir dummyapp
-                cd dummyapp
+                rm -rf ${NETAPP_NAME} 
+                mkdir ${NETAPP_NAME} 
+                cd ${NETAPP_NAME} 
                 git clone --single-branch --branch evolved5g $GIT_URL .
                 '''
             }
         }
         stage('Check if there is a docker-compose in the file'){
-            steps {
-               sh '''
-               env.DOCKER_VAR=$([[ -f docker-compose.yaml ]] && echo "True")
-               '''
-            }
+            dir ("${env.WORKSPACE}/${NETAPP_NAME}" ){
+                script{
+                    env.DOCKER_VAR = fileE("${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yaml"))
+                }
+ 
+            } 
         }
         stage('Build') {
             when {
                 allOf {
-                    expression { DOCKER_VAR == "False"}
+                    expression { DOCKER_VAR != "True"}
                 }
             }            
             steps {
