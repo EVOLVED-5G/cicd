@@ -12,7 +12,6 @@ String trimImage(String filepath) {
     List<String> list = new ArrayList<String>();
 
     while (input.hasNextLine()) {
-        if 
         list.add(input.nextLine());
     }
 
