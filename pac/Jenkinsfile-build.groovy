@@ -43,12 +43,13 @@ pipeline {
         NETAPP_FOLDER= netappName("${params.GIT_URL}")
         NETAPP_NAME = NETAPP_FOLDER.toLowerCase()
         DOCKER_VAR = 'false'
+        DOCKER_COMPOSE = "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
     }
 
     stages {
         stage('Get the code!') {
             steps {
-                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
+                dir ("${env.WORKSPACE}/") {
                     sh '''
                     rm -rf ${NETAPP_NAME} 
                     mkdir ${NETAPP_NAME} 
@@ -58,10 +59,11 @@ pipeline {
                 }
            }
         }
-        stage('Docker-compose ?') {
+
+        stage('Check if there is a docker-compose in the repository') {
             steps {
                 script{
-                    env.DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
+                    DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
                 }
                 echo "DOCKER VAR is ${DOCKER_VAR}"
                 
@@ -71,9 +73,9 @@ pipeline {
         stage('Build') {
             when {
                 allOf {
-                    expression { DOCKER_VAR == "false"}
+                    expression {("${DOCKER_VAR}" == "false")}
                 }
-            }            
+            }               
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
@@ -82,26 +84,25 @@ pipeline {
                 }
             }
         }
-        stage('Modify Docker compose for creating tag images') {
-            when {
-                allOf {
-                    expression { DOCKER_VAR == "True"}
-                }
-            }  
-            steps {
-                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
-                    sh '''
-                    pwd > commandResult.txt
-                    '''
-                    trimImage(commandResult+"docker-compose.yaml")
-                }
-            }
-        }
-
+        // stage('Modify Docker compose for creating tag images') {
+        //     when {
+        //         allOf {
+        //              expression {"${DOCKER_VAR}"}
+        //         }
+        //     }  
+        //     steps {
+        //         dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
+        //             sh '''
+        //             pwd
+        //             '''
+        //             trimImage(commandResult+"docker-compose.yaml")
+        //         }
+        //     }
+        // }
         stage('Build Docker Compose') {
             when {
                 allOf {
-                    expression { DOCKER_VAR == "True"}
+                    expression {"${DOCKER_VAR}"}
                 }
             }  
             steps {
