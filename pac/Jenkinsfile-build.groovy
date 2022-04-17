@@ -6,18 +6,6 @@ String netappName(String url) {
 }
 
 
-// Function that returns the name of the Netapp container
-String trimImage(String filepath) {
-    File file = new File(fileName);
-    Scanner input = new Scanner(file);
-    List<String> list = new ArrayList<String>();
-
-    while (input.hasNextLine()) {
-        list.add(input.nextLine());
-    }
-
-}
-
 def fileE(String path ) {
     var = """${sh(
                     returnStdout: true,
@@ -40,6 +28,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
+        AWS_ACCOUNT_ID = '709233559969'
         NETAPP_FOLDER= netappName("${params.GIT_URL}")
         NETAPP_NAME = NETAPP_FOLDER.toLowerCase()
         DOCKER_VAR = 'false'
@@ -79,26 +68,11 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
-                    docker build -t evolved-5g/${NETAPP_NAME} .
+                    docker build -t ${NETAPP_NAME} .
                     '''
                 }
             }
         }
-        // stage('Modify Docker compose for creating tag images') {
-        //     when {
-        //         allOf {
-        //              expression {"${DOCKER_VAR}"}
-        //         }
-        //     }  
-        //     steps {
-        //         dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
-        //             sh '''
-        //             pwd
-        //             '''
-        //             trimImage(commandResult+"docker-compose.yaml")
-        //         }
-        //     }
-        // }
         stage('Build Docker Compose') {
             when {
                 allOf {
@@ -112,43 +86,96 @@ pipeline {
                     '''
                 }
             }
-        }        
-        stage('Publish in AWS') {
+        }
+        stage('Modify image name and upload to AWS') {
+            when {
+                allOf {
+                    expression {"${DOCKER_VAR}"}
+                }
+            }  
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
+                    script {    
+                        def cmd = "docker ps --format '{{.Image}}'"
+                        def cmd2 = "docker ps --format '{{.Names}}'"
+                        def image = sh(returnStdout: true, script: cmd).trim()
+                        def name  = sh(returnStdout: true, script: cmd2).trim()
+                        sh '''$(aws ecr get-login --no-include-email)'''
+                        [image.tokenize(), name.tokenize()].transpose().each { x ->
+                            sh """ docker tag "${x[0]}" ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-"${x[1]}"-${VERSION}.${BUILD_NUMBER} """
+                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-"${x[1]}"-${VERSION}.${BUILD_NUMBER} """
+                        }
+                    }
+                }
+            }
+        }
+        stage('Publish in AWS - Dockerfile') {
+            when {
+                allOf {
+                    expression {("${DOCKER_VAR}" == "false")}
+                }
+            } 
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                         $(aws ecr get-login --no-include-email)
-                        docker image tag evolved-5g/${NETAPP_NAME} 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
-                        docker image tag evolved-5g/${NETAPP_NAME} 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
-                        docker image push 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
+                        docker image tag evolved-5g/${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
+                        docker image tag evolved-5g/${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
+                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         '''
                     }    
                 }   
             }
         }
-        stage('Publish in Artefactory') {
+        stage('Modify container name to upload Docker-compose to Artifactory') {
+            when {
+                allOf {
+                    expression {"${DOCKER_VAR}"}
+                }
+            }   
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    dir ("${env.WORKSPACE}/dummyapp/") {
-                        sh '''
-                        docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}.${BUILD_NUMBER}
-                        docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
-                        '''
+                    script {   
+                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                        def cmd = "docker ps --format '{{.Image}}'"
+                        def cmd2 = "docker ps --format '{{.Names}}'"
+                        def image = sh(returnStdout: true, script: cmd).trim()
+                        def name  = sh(returnStdout: true, script: cmd2).trim()
+                        sh '''$(aws ecr get-login --no-include-email)'''
+                        [image.tokenize(), name.tokenize()].transpose().each { x ->
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":${VERSION}.${BUILD_NUMBER} """
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":latest"""
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}" """
+                        }
                     }
+                }               
+            }
+        }   
+        stage('Publish in Artefactory') {
+            when {
+                allOf {
+                    expression {("${DOCKER_VAR}" == "false")}
+                }
+            } 
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
+                    sh '''
+                    docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
+                    docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}.${BUILD_NUMBER}
+                    docker image tag evolved-5g/${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
+                    docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
+                    '''
                 }
             }
         }
         stage('Cleaning docker images and containers') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    dir ("${env.WORKSPACE}/dummyapp/") {
-                        sh '''
-                        docker rmi -f $(docker images -a -q)
-                        '''
-                    }
+                    sh '''
+                    docker stop $(docker ps -q)
+                    docker rmi -f $(docker images -a -q)
+                    '''
                 }
             }
         }
