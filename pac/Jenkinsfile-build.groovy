@@ -82,7 +82,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
-                    docker-compose up --build -d
+                    docker-compose up --build --force-recreate -d
                     '''
                 }
             }
@@ -174,7 +174,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     sh '''
                     docker stop $(docker ps -q)
-                    docker rmi -f $(docker images -a -q)
+                    docker system prune -a -f --volumes
                     '''
                 }
             }
