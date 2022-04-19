@@ -53,10 +53,11 @@ pipeline {
             steps {
                 script{
                     DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
-                    env.DOCKER_VAR = DOCKER_VAR
+
                 }
     
-                echo "env DOCKER VAR is ${env.DOCKER_VAR}"
+
+                echo "env DOCKER VAR is ${DOCKER_VAR}"
                 
             }
         }
@@ -64,7 +65,7 @@ pipeline {
         stage('Build') {
             when {
                 expression {
-                    return !"${env.DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean() 
                 }
             }                
             steps {
@@ -78,7 +79,7 @@ pipeline {
         stage('Build Docker Compose') {
             when {
                 expression {
-                    return "${env.DOCKER_VAR}".toBoolean()
+                    return "${DOCKER_VAR}".toBoolean()
                 }
             }  
             steps {
@@ -92,7 +93,7 @@ pipeline {
         stage('Modify image name and upload to AWS') {
             when {
                 expression {
-                    return "${env.DOCKER_VAR}".toBoolean() 
+                    return "${DOCKER_VAR}".toBoolean() 
                 }
             }     
             steps {
@@ -114,25 +115,23 @@ pipeline {
         stage('Publish in AWS - Dockerfile') {
             when {
                 expression {
-                    return !"${env.DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean() 
                 }
             }    
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                        $(aws ecr get-login --no-include-email)
-                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
-                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
-                        '''
-                    }    
+                    sh '''
+                    $(aws ecr get-login --no-include-email)
+                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
+                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
+                    '''  
                 }   
             }
         }
         stage('Modify container name to upload Docker-compose to Artifactory') {
             when {
                 expression {
-                    return "${env.DOCKER_VAR}".toBoolean()  
+                    return "${DOCKER_VAR}".toBoolean()  
                 }
             }  
             steps {
@@ -156,7 +155,7 @@ pipeline {
         stage('Publish in Artefactory') {
             when {
                 expression {
-                    return !"${env.DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean() 
                 }
             }   
             steps {
@@ -176,6 +175,8 @@ pipeline {
                     sh '''
                     docker stop $(docker ps -q)
                     docker system prune -a -f --volumes
+                    pwd
+                    sudo rm -rf $WORKSPACE/$NETAPP_NAME/
                     '''
                 }
             }
