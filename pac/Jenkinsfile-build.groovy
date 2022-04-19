@@ -19,20 +19,20 @@ pipeline {
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
-        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
     }
 
     environment {
-        GIT_URL="${params.GIT_URL}"
+        GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
+        GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = '709233559969'
-        NETAPP_FOLDER= netappName("${params.GIT_URL}")
-        NETAPP_NAME = NETAPP_FOLDER.toLowerCase()
-        DOCKER_VAR = 'false'
-        DOCKER_COMPOSE = "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
+        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
+        DOCKER_VAR = false
     }
 
     stages {
@@ -40,10 +40,10 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf ${NETAPP_NAME} 
-                    mkdir ${NETAPP_NAME} 
-                    cd ${NETAPP_NAME} 
-                    git clone --single-branch --branch evolved5g $GIT_URL .
+                    rm -rf $NETAPP_NAME 
+                    mkdir $NETAPP_NAME 
+                    cd $NETAPP_NAME
+                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     '''
                 }
            }
@@ -53,18 +53,20 @@ pipeline {
             steps {
                 script{
                     DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
+                    env.DOCKER_VAR = DOCKER_VAR
                 }
-                echo "DOCKER VAR is ${DOCKER_VAR}"
+    
+                echo "env DOCKER VAR is ${env.DOCKER_VAR}"
                 
             }
         }
 
         stage('Build') {
             when {
-                allOf {
-                    expression {("${DOCKER_VAR}" == "false")}
+                expression {
+                    return !"${env.DOCKER_VAR}".toBoolean() 
                 }
-            }               
+            }                
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
@@ -75,8 +77,8 @@ pipeline {
         }
         stage('Build Docker Compose') {
             when {
-                allOf {
-                    expression {"${DOCKER_VAR}"}
+                expression {
+                    return "${env.DOCKER_VAR}".toBoolean()
                 }
             }  
             steps {
@@ -89,10 +91,10 @@ pipeline {
         }
         stage('Modify image name and upload to AWS') {
             when {
-                allOf {
-                    expression {"${DOCKER_VAR}"}
+                expression {
+                    return "${env.DOCKER_VAR}".toBoolean() 
                 }
-            }  
+            }     
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
@@ -111,17 +113,17 @@ pipeline {
         }
         stage('Publish in AWS - Dockerfile') {
             when {
-                allOf {
-                    expression {("${DOCKER_VAR}" == "false")}
+                expression {
+                    return !"${env.DOCKER_VAR}".toBoolean() 
                 }
-            } 
+            }    
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                         $(aws ecr get-login --no-include-email)
-                        docker image tag evolved-5g/${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
-                        docker image tag evolved-5g/${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}.${BUILD_NUMBER}
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         '''
                     }    
@@ -130,10 +132,10 @@ pipeline {
         }
         stage('Modify container name to upload Docker-compose to Artifactory') {
             when {
-                allOf {
-                    expression {"${DOCKER_VAR}"}
+                expression {
+                    return "${env.DOCKER_VAR}".toBoolean()  
                 }
-            }   
+            }  
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     script {   
@@ -154,10 +156,10 @@ pipeline {
         }   
         stage('Publish in Artefactory') {
             when {
-                allOf {
-                    expression {("${DOCKER_VAR}" == "false")}
+                expression {
+                    return !"${env.DOCKER_VAR}".toBoolean() 
                 }
-            } 
+            }   
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     sh '''
