@@ -2,6 +2,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
 
     parameters {
+        string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'GIT_NEF_URL', defaultValue: 'https://github.com/EVOLVED-5G/NEF_emulator', description: 'URL of the NEF Github Repository')
         string(name: 'GIT_NEF_BRANCH', defaultValue: 'main', description: 'NEF branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
@@ -11,6 +12,7 @@ pipeline {
         GIT_NEF_URL="${params.GIT_NEF_URL}"
         GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
         GIT_NEF_BRANCH="${params.GIT_NEF_BRANCH}"
+        VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = '709233559969'
         FOLDER_NAME = "NEF_emulator"
