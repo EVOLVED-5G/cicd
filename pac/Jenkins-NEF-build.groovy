@@ -23,7 +23,7 @@ pipeline {
                     sh '''
                     mkdir $FOLDER_NAME 
                     cd $FOLDER_NAME
-                    git clone --single-branch --branch $GIT_NEF_BRANCH GIT_NEF_URL .
+                    git clone --single-branch --branch $GIT_NEF_BRANCH $GIT_NEF_URL .
                     '''
                 }
            }
