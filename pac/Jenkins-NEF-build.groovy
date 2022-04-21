@@ -8,7 +8,7 @@ pipeline {
     }
 
     environment {
-        GIT_NEF_URL="${params.GIT_NEF_URLL}"
+        GIT_NEF_URL="${params.GIT_NEF_URL}"
         GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
         GIT_NEF_BRANCH="${params.GIT_NEF_BRANCH}"
         AWS_DEFAULT_REGION = 'eu-central-1'
@@ -56,12 +56,7 @@ pipeline {
                 }
             }
         }
-        stage('Modify image name and upload to AWS') {
-            when {
-                expression {
-                    return "${DOCKER_VAR}".toBoolean() 
-                }
-            }     
+        stage('Modify image name and upload to AWS') {   
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
@@ -79,12 +74,7 @@ pipeline {
             }
         }
 
-        stage('Modify container name to upload Docker-compose to Artifactory') {
-            when {
-                expression {
-                    return "${DOCKER_VAR}".toBoolean()  
-                }
-            }  
+        stage('Modify container name to upload Docker-compose to Artifactory') { 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     script {   
@@ -109,6 +99,7 @@ pipeline {
                     sh '''
                     docker stop $(docker ps -q)
                     docker system prune -a -f --volumes
+                    sudo rm -rf $WORKSPACE/
                     '''
                 }
             }
