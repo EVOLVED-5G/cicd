@@ -169,9 +169,10 @@ resource "kubernetes_deployment" "nef_backend" {
               memory = var.nef_backend_memory_request
             }
           }
-
         }
-      }
+        image_pull_secrets {
+          name = "regcred"
+        }
     }
   }
 }
@@ -231,6 +232,9 @@ resource "kubernetes_deployment" "nef_mongo" {
             }
           }
         }
+        image_pull_secrets {
+          name = "regcred"
+        }        
       }
     }
   }
@@ -275,6 +279,9 @@ resource "kubernetes_deployment" "nef_db" {
               memory = var.nef_db_memory_request
             }
           }
+        }
+        image_pull_secrets {
+          name = "regcred"
         }
       }
     }
