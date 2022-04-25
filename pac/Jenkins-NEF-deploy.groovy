@@ -77,6 +77,8 @@ pipeline {
                 dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
+                    cp backend.tf $NETAPP_NAME/
+                    cp provider.tf $NETAPP_NAME/
                     '''
                 }
             }
@@ -188,7 +190,7 @@ pipeline {
         stage ('Initiate and configure app in kubernetes') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
                         sh '''
                             terraform init                                                           \
                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
@@ -205,7 +207,7 @@ pipeline {
                         sh '''
                             export AWS_PROFILE=default
                             terraform validate
-                            terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
+                            terraform plan -var app_replicas=${APP_REPLICAS} -out deployment.tfplan
                             terraform apply --auto-approve deployment.tfplan
                         '''
                     }

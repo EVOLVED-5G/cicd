@@ -39,12 +39,12 @@ variable "nef_backend_cpu_request" {
 variable "nef_backend_memory_limit" {
   description = "repository to download image nef "
   type        = string
-  default     = "256Mi"
+  default     = "512Mi"
 }
 variable "nef_backend_memory_request" {
   description = "repository to download image nef "
   type        = string
-  default     = "512Mi"
+  default     = "400Mi"
 }
 variable "nef_backend_port" {
   description = "repository to download image nef "
@@ -84,12 +84,12 @@ variable "nef_db_cpu_request" {
 variable "nef_db_memory_limit" {
   description = "Memory Limit for the NEF db image"
   type        = string
-  default     = "256Mi"
+  default     = "512Mi"
 }
 variable "nef_db_memory_request" {
   description = "Memory for the NEF db image"
   type        = string
-  default     = "512Mi"
+  default     = "400Mi"
 }
 
 #############################################
@@ -119,12 +119,12 @@ variable "nef_mongo_cpu_request" {
 variable "nef_mongo_memory_limit" {
   description = "Memory Limit for the NEF mongo db image"
   type        = string
-  default     = "256Mi"
+  default     = "512Mi"
 }
 variable "nef_mongo_memory_request" {
   description = "Memory for the NEF mongo db image"
   type        = string
-  default     = "512Mi"
+  default     = "400Mi"
 }
 
 #############################################
