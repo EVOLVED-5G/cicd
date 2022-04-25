@@ -74,7 +74,7 @@ pipeline {
     stages {
         stage ('Load privder and backend info'){
             steps {
-                dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
                     '''
