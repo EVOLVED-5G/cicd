@@ -44,7 +44,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
-                    make build
+                    make build-no-cache
                     '''
                 }
             }
@@ -53,7 +53,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
-                    make upd
+                    make debug-upd
                     '''
                 }
             }
