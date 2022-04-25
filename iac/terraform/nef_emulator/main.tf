@@ -38,7 +38,7 @@ variable "nef_backend_cpu_request" {
 }
 variable "nef_backend_memory_limit" {
   description = "repository to download image nef "
-  type        = number
+  type        = string
   default     = "256Mi"
 }
 variable "nef_backend_memory_request" {
@@ -83,7 +83,7 @@ variable "nef_db_cpu_request" {
 }
 variable "nef_db_memory_limit" {
   description = "Memory Limit for the NEF db image"
-  type        = number
+  type        = string
   default     = "256Mi"
 }
 variable "nef_db_memory_request" {
@@ -118,7 +118,7 @@ variable "nef_mongo_cpu_request" {
 }
 variable "nef_mongo_memory_limit" {
   description = "Memory Limit for the NEF mongo db image"
-  type        = number
+  type        = string
   default     = "256Mi"
 }
 variable "nef_mongo_memory_request" {
@@ -133,40 +133,40 @@ variable "nef_mongo_memory_request" {
 #############################################
 #               NEF_BACKEND
 #############################################
-resource "kubernetes_deployment" "nef_db" {
+resource "kubernetes_deployment" "nef_backend" {
   metadata {
-    name      = var.name_nef_db
+    name      = var.name_nef_backend
     namespace = var.nef_namespace
     labels = {
-      app = var.name_nef_db
+      app = var.name_nef_backend
     }
   }
   spec {
     replicas = var.app_replicas
     selector {
       match_labels = {
-        app = var.name_nef_db
+        app = var.name_nef_backend
       }
     }
     template {
       metadata {
         labels = {
-          app = var.name_nef_db
+          app = var.name_nef_backend
         }
       }
       spec {
         enable_service_links = false
         container {
-          image = var.image_nef
+          image = var.image_nef_bakend
           name  = var.name_nef_backend
           resources {
             limits = {
-              cpu    = var.nef_db_cpu_limit
-              memory = var.nef_db_memory_limit
+              cpu    = var.nef_backend_cpu_limit
+              memory = var.nef_backend_memory_limit
             }
             requests = {
-              cpu    = var.nef_db_cpu_request
-              memory = var.nef_db_memory_request
+              cpu    = var.nef_backend_cpu_request
+              memory = var.nef_backend_memory_request
             }
           }
 
@@ -178,7 +178,7 @@ resource "kubernetes_deployment" "nef_db" {
 
 resource "kubernetes_service" "nef_db_service" {
   metadata {
-    name      = var.name_nef_db
+    name      = var.name_nef_backend
     namespace = var.nef_namespace
   }
   spec {
