@@ -46,16 +46,18 @@ pipeline {
         stage('SonarQube Analysis and Wait for Quality Gate') {
             steps {
                  dir ("${WORKSPACE}/") {
-                    sh '''
-                        ${SCANNERHOME}/bin/sonar-scanner -X \
-                            -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER} \
-                            -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
-                            -Dsonar.host.url=http://195.235.92.134:9000  \
-                            -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
-                            -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
-                            -Dsonar.language=python \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                    '''
+                    withSonarQubeEnv('Sonar Scanner 5') {
+                        sh '''
+                            ${SCANNERHOME}/bin/sonar-scanner -X \
+                                -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER} \
+                                -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
+                                -Dsonar.host.url=http://195.235.92.134:9000  \
+                                -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
+                                -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
+                                -Dsonar.language=python \
+                                -Dsonar.sourceEncoding=UTF-8 \
+                        '''
+                    }
                     script {
                         def qg = waitForQualityGate()
                         if (qg.status != 'OK') {
