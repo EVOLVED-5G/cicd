@@ -63,13 +63,15 @@ pipeline {
         stage("Quality Gate"){
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
-                    sh '''
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            //unstable("There are Checkstyle issues")
+                    script {
+                        withSonarQubeEnv('My SonarQube Server') {
+                            def qg = waitForQualityGate()
+                            if (qg.status != 'OK') {
+                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                                //unstable("There are Checkstyle issues")
+                            }
                         }
-                    '''
+                    }
                 }
             }
         }
