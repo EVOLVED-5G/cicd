@@ -43,7 +43,7 @@ pipeline {
         }
 
         //TODO: Create a project for each NETAPP
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis and Wait for Quality Gate') {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
@@ -56,21 +56,10 @@ pipeline {
                             -Dsonar.language=python \
                             -Dsonar.sourceEncoding=UTF-8 \
                     '''
-                }
-            }
-        }
-
-        stage("Quality Gate"){
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    script {
-                        withSonarQubeEnv('My SonarQube Server') {
-                            def qg = waitForQualityGate()
-                            if (qg.status != 'OK') {
-                                error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                                //unstable("There are Checkstyle issues")
-                            }
-                        }
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        //unstable("There are Checkstyle issues")
                     }
                 }
             }
