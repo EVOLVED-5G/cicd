@@ -47,7 +47,7 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
-                        sudo ${SCANNERHOME}/bin/sonar-scanner -X \
+                        ${SCANNERHOME}/bin/sonar-scanner -X \
                             -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER} \
                             -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
                             -Dsonar.host.url=http://195.235.92.134:9000  \
