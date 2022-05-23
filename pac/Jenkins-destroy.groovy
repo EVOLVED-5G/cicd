@@ -1,5 +1,5 @@
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent any
 
     parameters {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
