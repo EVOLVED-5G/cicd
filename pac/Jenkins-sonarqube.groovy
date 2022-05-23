@@ -16,6 +16,7 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+
     }
 
     environment {
