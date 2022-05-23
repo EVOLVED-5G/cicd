@@ -75,6 +75,7 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
+                    sleep 25
                     curl -u $SQ_TOKEN -X GET -H 'Accept: application/json' http://195.235.92.134:9000/api/qualitygates/project_status\\?projectKey\\=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} > report.json
                     '''
                     def json = readJSON file:'report.json'
