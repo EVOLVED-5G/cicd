@@ -45,11 +45,11 @@ pipeline {
         //TODO: Create a project for each NETAPP
         stage('SonarQube Analysis') {
             steps {
-                 dir ("${env.WORKSPACE}/") {
+                 dir ("${WORKSPACE}/") {
                     sh '''
                         sudo ${SCANNERHOME}/bin/sonar-scanner -X \
-                            -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
-                            -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
+                            -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER} \
+                            -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
                             -Dsonar.host.url=http://195.235.92.134:9000  \
                             -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
                             -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
@@ -60,55 +60,50 @@ pipeline {
             }
         }
 
-        stage('Get SonarQube Report') {
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    script {
-                        timeout(time: 5, unit: 'MINUTES') {
-                            def qualitygate = waitForQualityGate()
-                            if (qualitygate.status != "OK") {
-                                error "Pipeline aborted due to quality gate coverage failure."
-                            }
-                        }
-                    }
+        stage("Quality Gate"){
+            timeout(time: 10, unit: 'MINUTES') {
+                def qg = waitForQualityGate()
+                if (qg.status != 'OK') {
+                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    //unstable("There are Checkstyle issues")
                 }
             }
         }
 
-        // Feature Flag para activar el salvado
-        stage('Save SonarQube Report into Artifactory') {
-            steps {
-                 dir ("${env.WORKSPACE}/") {
-                    sh '''
-                        sudo ${SCANNERHOME}/bin/sonar-scanner -X \
-                            -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
-                            -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
-                            -Dsonar.host.url=http://195.235.92.134:9000  \
-                            -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
-                            -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
-                            -Dsonar.language=python \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                    '''
-                }
-            }
-        }
-        // Feature Flag para activar el salvado
-        stage('Semaphore') {
-            steps {
-                 dir ("${env.WORKSPACE}/") {
-                    sh '''
-                        sudo ${SCANNERHOME}/bin/sonar-scanner -X \
-                            -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
-                            -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
-                            -Dsonar.host.url=http://195.235.92.134:9000  \
-                            -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
-                            -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
-                            -Dsonar.language=python \
-                            -Dsonar.sourceEncoding=UTF-8 \
-                    '''
-                }
-            }
-        }
+        // // Feature Flag para activar el salvado
+        // stage('Save SonarQube Report into Artifactory') {
+        //     steps {
+        //          dir ("${env.WORKSPACE}/") {
+        //             sh '''
+        //                 sudo ${SCANNERHOME}/bin/sonar-scanner -X \
+        //                     -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
+        //                     -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
+        //                     -Dsonar.host.url=http://195.235.92.134:9000  \
+        //                     -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
+        //                     -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
+        //                     -Dsonar.language=python \
+        //                     -Dsonar.sourceEncoding=UTF-8 \
+        //             '''
+        //         }
+        //     }
+        // }
+        // // Feature Flag para activar el salvado
+        // stage('Semaphore') {
+        //     steps {
+        //          dir ("${env.WORKSPACE}/") {
+        //             sh '''
+        //                 sudo ${SCANNERHOME}/bin/sonar-scanner -X \
+        //                     -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
+        //                     -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
+        //                     -Dsonar.host.url=http://195.235.92.134:9000  \
+        //                     -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
+        //                     -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
+        //                     -Dsonar.language=python \
+        //                     -Dsonar.sourceEncoding=UTF-8 \
+        //             '''
+        //         }
+        //     }
+        // }
 
     }
     post {
@@ -117,7 +112,7 @@ pipeline {
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                to: ["a.molina@telefonica.com"],
+                to: "a.molina@telefonica.com",
                 replyTo: "no-reply@tid.es",
                 recipientProviders: [[$class: 'CulpritsRecipientProvider']]
         }
