@@ -26,6 +26,7 @@ pipeline {
         //AWS_ACCOUNT_ID = '709233559969'
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
+        SQ_TOKEN=credentials('SONARQUBE_TOKEN')
     }
 
     stages {
@@ -46,50 +47,46 @@ pipeline {
         stage('SonarQube Analysis and Wait for Quality Gate') {
             steps {
                  dir ("${WORKSPACE}/") {
-                    withSonarQubeEnv('Sonar Scanner 5') {
+                    withSonarQubeEnv('Evol5-SonarQube') {
                         sh '''
                             ${SCANNERHOME}/bin/sonar-scanner -X \
-                                -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER} \
+                                -Dsonar.projectKey=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
                                 -Dsonar.host.url=http://195.235.92.134:9000  \
-                                -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
-                                -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
+                                -Dsonar.login=${SQ_TOKEN} \
+                                -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
                                 -Dsonar.sourceEncoding=UTF-8 \
                         '''
                     }
-                    script {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            //unstable("There are Checkstyle issues")
-                        }
-                    }
+                    // script {
+                    //     def qg = waitForQualityGate()
+                    //     if (qg.status != 'OK') {
+                    //         error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    //         //unstable("There are Checkstyle issues")
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        // Feature Flag para activar el salvado
+        stage('Get SonarQube Report') {
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''
+                    curl -u $SQ_TOKEN -X GET -H 'Accept: application/json' http://195.235.92.134:9000/api/qualitygates/project_status\\?projectKey\\=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} > report.json
+                    '''
+                    def json = readJSON file:'report.json'
+                    echo "${json.projectStatus.status}"
                 }
             }
         }
 
         // // Feature Flag para activar el salvado
-        // stage('Save SonarQube Report into Artifactory') {
-        //     steps {
-        //          dir ("${env.WORKSPACE}/") {
-        //             sh '''
-        //                 sudo ${SCANNERHOME}/bin/sonar-scanner -X \
-        //                     -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
-        //                     -Dsonar.projectBaseDir=${env.WORKSPACE}/{NETAPP_NAME}/src/ \
-        //                     -Dsonar.host.url=http://195.235.92.134:9000  \
-        //                     -Dsonar.login=40f1332530d31e2372160616f6a458b82c5e429d \
-        //                     -Dsonar.projectName=Evolved5g-master-${BUILD_NUMBER} \
-        //                     -Dsonar.language=python \
-        //                     -Dsonar.sourceEncoding=UTF-8 \
-        //             '''
-        //         }
-        //     }
-        // }
-        // // Feature Flag para activar el salvado
         // stage('Semaphore') {
         //     steps {
-        //          dir ("${env.WORKSPACE}/") {
+        //          dir ("${WORKSPACE}/") {
         //             sh '''
         //                 sudo ${SCANNERHOME}/bin/sonar-scanner -X \
         //                     -Dsonar.projectKey=Evolved5g-master-${BUILD_NUMBER}\
