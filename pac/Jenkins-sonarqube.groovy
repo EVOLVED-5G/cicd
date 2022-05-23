@@ -8,10 +8,9 @@ String netappName(String url) {
 }
 
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent { node {label 'evol5-slave2'}  }
 
     parameters {
-        //string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
@@ -19,9 +18,9 @@ pipeline {
     }
 
     environment {
-        GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
-        GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
+        // GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
+        // GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
+        // GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
@@ -59,13 +58,6 @@ pipeline {
                                 -Dsonar.sourceEncoding=UTF-8 \
                         '''
                     }
-                    script {
-                        def qg = waitForQualityGate()
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                            //unstable("There are Checkstyle issues")
-                        }
-                    }
                 }
             }
         }
@@ -78,13 +70,18 @@ pipeline {
             }
             steps {
                  dir ("${WORKSPACE}/") {
+                    //TODO: IMPROVE WAIT FOR REPORT READY
                     sh '''
-                    sleep 25
+                    sleep 30
                     curl -u $SQ_TOKEN -X GET -H 'Accept: application/json' http://195.235.92.134:9000/api/qualitygates/project_status\\?projectKey\\=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} > report-sq-${NETAPP_NAME}.json
                     '''
                     script {
-                        def json = readJSON file:'report.json'
+                        def json = readJSON file:'report-sq-${NETAPP_NAME}.json'
+                        def analisys_result = "${json.projectStatus.status}"
                         echo "${json.projectStatus.status}"
+                        if (analisys_result == "FAILED"){
+                            error "ANALISYS FAILED";
+                        }
                     }
                 }
             }
@@ -93,14 +90,15 @@ pipeline {
         stage('Upload report to Artifactory') {
             when {
                 expression {
-                    return REPORTING;
+                    if (REPORTING && analisys_result == "OK") return true;
+                    return false;
                 }
             }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
                     report_file='report-sq-${NETAPP_NAME}.json'
-                    url="$ARTIFACTORY_URL//$report_file"
+                    url="$ARTIFACTORY_URL/$report_file"
 
                     curl -v -f -i -X PUT -u "$ARTIFACTORY_CRED" \
                         --data-binary @"$report_file" \
@@ -112,6 +110,16 @@ pipeline {
 
     }
     post {
+        //TO REVIEW NOTIFICATIONS
+        failure {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                to: "a.molina@telefonica.com",
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+        }
         always {
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
