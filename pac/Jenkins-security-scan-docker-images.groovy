@@ -26,7 +26,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    git clone -single-branch --branch $GIT_NETAPP_BRANCH https:/github.com/Telefonica/Evolved5g-${NETAPP_NAME} 
+                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://github.com/Telefonica/Evolved5g-${NETAPP_NAME} 
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
                     rm -rf Evolved5g-${NETAPP_NAME}/* 
                     cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
