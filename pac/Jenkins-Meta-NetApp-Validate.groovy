@@ -16,18 +16,18 @@ pipeline {
 
         stage('Validation: Static Code Analysis'){
             steps{
-                    build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
-                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                    booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
             }
         }
 
         //Review Parameters
         stage('Validation: Security Scan Code'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/002-Security scan Code', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -38,7 +38,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Security Scan Secrets'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/003-Security scan Secrets', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -49,11 +49,11 @@ pipeline {
         //Review Parameters
         stage('Validation: Get docker Image from Registry'){
             steps{
-                    build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
-                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                    booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
             }
         }
         //Review Parameters
@@ -147,7 +147,7 @@ pipeline {
         //Review Parameters
         stage('Validation: NEF Services MonitoringEvent API'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -199,5 +199,15 @@ pipeline {
             }
         }
 
+    }
+    post {
+        always {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
     }
 }
