@@ -32,7 +32,7 @@ pipeline {
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     rm -rf .git
                     git init 
-                    git remote add origin https://github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git
+                    git remote add origin https://contint:${PASSWORD_ARTIFACTORY}@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git
                     git pull
                     git add .
                     git commit -m "Adding repo to Telefonica Project"
