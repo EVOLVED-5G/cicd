@@ -17,7 +17,7 @@ pipeline {
         stage('Validation: Static Code Analysis'){
             steps{
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true,
+                    build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
                         parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -29,7 +29,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Security Scan Code'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/002-Security scan Code', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/002-Security scan Code', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -40,7 +40,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Security Scan Secrets'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/003-Security scan Secrets', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/003-Security scan Secrets', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -64,7 +64,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Security Scan Docker Images'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
