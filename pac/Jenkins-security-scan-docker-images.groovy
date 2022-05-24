@@ -19,6 +19,7 @@ pipeline {
         GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
+        TOKEN = credentials('github_token_cred')
     }
 
     stages {
@@ -33,7 +34,7 @@ pipeline {
                     cd Evolved5g-${NETAPP_NAME}/
                     git add .
                     git commit -m "Adding repo to Telefonica Project"
-                    git push -u origin evolved5g
+                    git push -u origin $GIT_NETAPP_BRANCH
                     '''
                 }
            }
