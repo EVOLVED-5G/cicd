@@ -18,19 +18,15 @@ pipeline {
         GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
         GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
-        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
+        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
     }
 
     stages {
         stage('Get Repo and clone'){
             steps {
                 dir ("${env.WORKSPACE}/") {
-                    git(
-                    url: "https://github.com/Telefonica/Evolved5g-${NETAPP_NAME}" ,
-                    credentialsId: git_cred,
-                    branch: evolved5g
-                    )
-                    sh '''                                                
+                    sh '''
+                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}                                                
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
                     rm -rf Evolved5g-${NETAPP_NAME}/* 
                     cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
@@ -51,8 +47,6 @@ pipeline {
                                             -H 'Accept: application/json, text/plain, */*' \
                                             -k | jq '.children[].name' | grep 'fogus.*'"
                         def image = sh(returnStdout: true, script: images).trim()
-
-
                         image.tokenize().each { x ->
                             sh """  curl  -H "Content-Type: application/json"   -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=${x}&update_wiki=true&repository=Telefonica/${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=md" """
                             sh """  curl  -H "Content-Type: application/json"   -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=${x}&update_wiki=true&repository=Telefonica/${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=md" > report-tr-img-${NETAPP_NAME}.json """
