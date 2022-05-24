@@ -33,7 +33,7 @@ pipeline {
                     cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
                     cd Evolved5g-${NETAPP_NAME}/
                     git add .
-                    git commit -m "Adding repo to Telefonica Project"
+                    git commit -m "Adding repo to Telefonica Project" || true
                     git push -u origin $GIT_NETAPP_BRANCH
                     '''
                 }
