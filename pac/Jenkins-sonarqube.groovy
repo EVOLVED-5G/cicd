@@ -25,7 +25,7 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolvedg5/validation"
     }
 
     stages {
@@ -50,14 +50,13 @@ pipeline {
                         sh '''
                             ${SCANNERHOME}/bin/sonar-scanner -X \
                                 -Dsonar.projectKey=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
-                                -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
-                                -Dsonar.host.url=http://195.235.92.134:9000  \
+                                -Dsonar.projectBaseDir="${WORKSPACE}/${NETAPP_NAME}/" \
+                                -Dsonar.sources="${WORKSPACE}/${NETAPP_NAME}/src/" \
+                                -Dsonar.host.url=http://195.235.92.134:9000 \
                                 -Dsonar.login=${SQ_TOKEN} \
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
-                                -Dsonar.sourceEncoding=UTF-8 \
-                                -Dsonar.python.pylint=/usr/local/bin/pylint \
-                                -Dsonar.python.pylint.reportPath=pylint-report.txt
+                                -Dsonar.sourceEncoding=UTF-8
                         '''
                     }
                 }
@@ -75,16 +74,16 @@ pipeline {
                     //TODO: IMPROVE WAIT FOR REPORT READY
                     sh '''
                     sleep 30
-                    curl -u $SQ_TOKEN -X GET -H 'Accept: application/json' http://195.235.92.134:9000/api/qualitygates/project_status\\?projectKey\\=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} > report-sq-${NETAPP_NAME}.json
+                    sonar-report \
+                        --sonarurl="http://195.235.92.134:9000" \
+                        --sonartoken="${SQ_TOKEN}" \
+                        --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
+                        --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
+                        --release="1.0.0" \
+                        --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
+                        --sinceleakperiod="false" \
+                        --allbugs="true" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
-                    script {
-                        def json = readJSON file:'report-sq-${NETAPP_NAME}.json'
-                        def analisys_result = "${json.projectStatus.status}"
-                        echo "${json.projectStatus.status}"
-                        if (analisys_result == "FAILED"){
-                            error "ANALISYS FAILED";
-                        }
-                    }
                 }
             }
         }
@@ -92,14 +91,13 @@ pipeline {
         stage('Upload report to Artifactory') {
             when {
                 expression {
-                    if (REPORTING && analisys_result == "OK") return true;
-                    return false;
+                    return REPORTING;
                 }
             }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
-                    report_file='report-sq-${NETAPP_NAME}.json'
+                    report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html"
                     url="$ARTIFACTORY_URL/$report_file"
 
                     curl -v -f -i -X PUT -u "$ARTIFACTORY_CRED" \
