@@ -73,13 +73,12 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     //TODO: IMPROVE WAIT FOR REPORT READY
                     sh '''
-                    sleep 30
+                    sleep 15
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
                         --sonartoken="${SQ_TOKEN}" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
-                        --release="1.0.0" \
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --sinceleakperiod="false" \
                         --allbugs="true" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
@@ -109,26 +108,16 @@ pipeline {
         }
 
     }
-    // post {
-    //     //TO REVIEW NOTIFICATIONS
-    //     failure {
-    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-    //             mimeType: 'text/html',
-    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-    //             from: 'jenkins-evolved5G@tid.es',
-    //             to: "a.molina@telefonica.com",
-    //             replyTo: "no-reply@tid.es",
-    //             recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-    //     }
-    //     always {
-    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-    //             mimeType: 'text/html',
-    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-    //             from: 'jenkins-evolved5G@tid.es',
-    //             to: "a.molina@telefonica.com",
-    //             replyTo: "no-reply@tid.es",
-    //             recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-    //     }
-    // }
+    post {
+        always {
+            emailext attachmentsPattern: 'sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html',
+                body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
+    }
 }
 
