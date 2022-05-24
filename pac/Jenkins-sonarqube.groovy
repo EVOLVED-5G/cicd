@@ -97,7 +97,7 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
-                    report_file='sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html'
+                    report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html"
                     url="$ARTIFACTORY_URL/$report_file"
 
                     curl -v -f -i -X PUT -u "$ARTIFACTORY_CRED" \
