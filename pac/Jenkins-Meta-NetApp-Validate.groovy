@@ -68,7 +68,7 @@ pipeline {
         }
 
         //Review Parameters
-        stage('Validation: Security Scan Docker Images'){
+        stage('Validation: Upload Docker Images'){
             steps{
                 build job: '/100-HELPERS/002-Upload Docker Image', wait: true,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
