@@ -106,7 +106,30 @@ pipeline {
                 }
             }
         }
-
+        stage('Get SonarQube Report') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    //TODO: IMPROVE WAIT FOR REPORT READY
+                    sh '''
+                    sleep 30
+                    curl -u $SQ_TOKEN -X GET -H 'Accept: application/json' http://195.235.92.134:9000/api/qualitygates/project_status\\?projectKey\\=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} > report-sq-${NETAPP_NAME}.json
+                    '''
+                    script {
+                        def json = readJSON file:'report-sq-${NETAPP_NAME}.json'
+                        def analisys_result = "${json.projectStatus.status}"
+                        echo "${json.projectStatus.status}"
+                        if (analisys_result == "FAILED"){
+                            error "ANALISYS FAILED";
+                        }
+                    }
+                }
+            }
+        }
     }
     post {
         always {
