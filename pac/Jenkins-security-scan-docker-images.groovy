@@ -22,7 +22,7 @@ pipeline {
     }
 
     stages {
-        stage('Get Repo and clone: '){
+        stage('Get Repo and clone'){
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
@@ -30,9 +30,9 @@ pipeline {
                     mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     '''
-                    git url: "ssh://contint@ithub.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
+                    git url: "ssh://contint@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
                     credentialsId: '${PASSWORD_ARTIFACTORY}',
-                    branch: evolved5g
+                    branch: 'evolved5g'
                     sh'''
                     git pull .
                     shopt -s extglob
@@ -45,7 +45,7 @@ pipeline {
                 }
            }
         }
-        stage('Modify image name and upload to AWS') {
+        stage('Launch Github Actions command') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
