@@ -22,26 +22,30 @@ pipeline {
     }
 
     stages {
-        stage('Get Repo and clone: '){
+        stage('Get Repo and clone'){
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
                     rm -rf $NETAPP_NAME
                     mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
+                    '''
+                    git url: "https://contint@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
+                    credentialsId: "${PASSWORD_ARTIFACTORY}",
+                    branch: 'evolved5g'
+                    sh'''
+                    git pull .
+                    shopt -s extglob
+                    rm -rf !(.git/)
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
-                    rm -rf .git
-                    git init 
-                    git remote add origin https://contint:${PASSWORD_ARTIFACTORY}@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git
-                    git pull
                     git add .
                     git commit -m "Adding repo to Telefonica Project"
-                    git push -u origin main
+                    git push -u origin evolved5g
                     '''
                 }
            }
         }
-        stage('Modify image name and upload to AWS') {
+        stage('Launch Github Actions command') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
