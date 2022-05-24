@@ -53,7 +53,7 @@ pipeline {
                                 -Dsonar.projectBaseDir="${WORKSPACE}/${NETAPP_NAME}/" \
                                 -Dsonar.sources="${WORKSPACE}/${NETAPP_NAME}/src/" \
                                 -Dsonar.host.url=http://195.235.92.134:9000 \
-                                -Dsonar.login=${SQ_TOKEN} \
+                                -Dsonar.login=$SQ_TOKEN \
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
                                 -Dsonar.sourceEncoding=UTF-8
@@ -76,7 +76,7 @@ pipeline {
                     sleep 15
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
-                        --sonartoken="${SQ_TOKEN}" \
+                        --sonartoken="$SQ_TOKEN" \
                         --qualityGateStatus="true" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
@@ -123,4 +123,3 @@ pipeline {
         }
     }
 }
-
