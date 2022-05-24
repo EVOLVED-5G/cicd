@@ -102,6 +102,8 @@ pipeline {
                     curl -v -f -i -X PUT -u "$ARTIFACTORY_CRED" \
                         --data-binary @"$report_file" \
                         "$url"
+
+                    cp $report_file $report_file.txt
                     '''
                 }
             }
@@ -110,7 +112,7 @@ pipeline {
     }
     post {
         always {
-            emailext attachmentsPattern: 'sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html',
+            emailext attachmentsPattern: '**/sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
                 body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
