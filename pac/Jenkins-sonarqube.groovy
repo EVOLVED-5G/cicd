@@ -50,14 +50,13 @@ pipeline {
                         sh '''
                             ${SCANNERHOME}/bin/sonar-scanner -X \
                                 -Dsonar.projectKey=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
-                                -Dsonar.projectBaseDir=${WORKSPACE}/${NETAPP_NAME}/src/ \
-                                -Dsonar.host.url=http://195.235.92.134:9000  \
+                                -Dsonar.projectBaseDir="${WORKSPACE}/${NETAPP_NAME}/" \
+                                -Dsonar.sources="${WORKSPACE}/${NETAPP_NAME}/src/" \
+                                -Dsonar.host.url=http://195.235.92.134:9000 \
                                 -Dsonar.login=${SQ_TOKEN} \
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
-                                -Dsonar.sourceEncoding=UTF-8 \
-                                -Dsonar.python.pylint=/usr/local/bin/pylint \
-                                -Dsonar.python.pylint.reportPath=pylint-report.txt
+                                -Dsonar.sourceEncoding=UTF-8
                         '''
                     }
                 }
