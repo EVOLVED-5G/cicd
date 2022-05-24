@@ -31,7 +31,7 @@ pipeline {
                     cd $NETAPP_NAME
                     '''
                     git url: "ssh://contint@ithub.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
-                    credentialsId: '${PASSWORD_ARTIFACTORY',
+                    credentialsId: '${PASSWORD_ARTIFACTORY}',
                     branch: evolved5g
                     sh'''
                     git pull .
