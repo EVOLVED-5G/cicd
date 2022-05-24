@@ -26,14 +26,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf $NETAPP_NAME
-                    mkdir $NETAPP_NAME
-                    cd $NETAPP_NAME
-                    '''
-                    git url: "https://github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
-                    credentialsId: "artifactory_credentials",
-                    branch: 'evolved5g'
-                    sh'''
+                    git clone -single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     git pull .
                     shopt -s extglob
                     rm -rf !(.git/)
