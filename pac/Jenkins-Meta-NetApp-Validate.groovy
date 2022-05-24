@@ -16,13 +16,11 @@ pipeline {
 
         stage('Validation: Static Code Analysis'){
             steps{
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
                         parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                     booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
-                }
             }
         }
 
@@ -51,14 +49,11 @@ pipeline {
         //Review Parameters
         stage('Validation: Get docker Image from Registry'){
             steps{
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-
-                    build job: '/100-HELPERS/001-Get Docker Image', wait: true,
+                    build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
                         parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                     booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
-                }
             }
         }
         //Review Parameters
@@ -75,7 +70,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Upload Docker Images'){
             steps{
-                build job: '/100-HELPERS/002-Upload Docker Image', wait: true,
+                build job: '/100-HELPERS/002-Upload Docker Image', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -86,7 +81,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Deploy NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -97,7 +92,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Test NetApp Networking'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -108,7 +103,7 @@ pipeline {
         //Review Parameters
         stage('Validation: NetApp Onboarding Sucessfull'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/007-NetApp Onboarding Successful', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/007-NetApp Onboarding Successful', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -119,7 +114,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Discover NetApp API from CAPIF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/008-Discover NetApp API from CAPIF', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/008-Discover NetApp API from CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -130,7 +125,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Discover NetApp Callback CAPIF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -141,7 +136,7 @@ pipeline {
         //Review Parameters
         stage('Validation: NEF Services as SessionWithQoS'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -163,7 +158,7 @@ pipeline {
         //Review Parameters
         stage('Validation: NEF Services MonitoringEvent'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -174,7 +169,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Destroy NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -185,7 +180,7 @@ pipeline {
         //Review Parameters
         stage('Validation: NetApp OffBoarding'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
@@ -196,7 +191,7 @@ pipeline {
         //Review Parameters
         stage('Validation: Generate Final Report'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true,
+                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
