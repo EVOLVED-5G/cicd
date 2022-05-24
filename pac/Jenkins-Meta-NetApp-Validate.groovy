@@ -16,11 +16,13 @@ pipeline {
 
         stage('Validation: Static Code Analysis'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true,
+                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                }
             }
         }
 
@@ -49,11 +51,14 @@ pipeline {
         //Review Parameters
         stage('Validation: Get docker Image from Registry'){
             steps{
-                build job: '/100-HELPERS/001-Get Docker Image', wait: true,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+
+                    build job: '/100-HELPERS/001-Get Docker Image', wait: true,
+                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                }
             }
         }
         //Review Parameters
