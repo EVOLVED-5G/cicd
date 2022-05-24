@@ -56,6 +56,8 @@ pipeline {
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
                                 -Dsonar.sourceEncoding=UTF-8 \
+                                -Dsonar.python.pylint=/usr/local/bin/pylint \
+                                -Dsonar.python.pylint.reportPath=pylint-report.txt
                         '''
                     }
                 }
@@ -109,26 +111,26 @@ pipeline {
         }
 
     }
-    post {
-        //TO REVIEW NOTIFICATIONS
-        failure {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                to: "a.molina@telefonica.com",
-                replyTo: "no-reply@tid.es",
-                recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-        }
-        always {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                to: "a.molina@telefonica.com",
-                replyTo: "no-reply@tid.es",
-                recipientProviders: [[$class: 'CulpritsRecipientProvider']]
-        }
-    }
+    // post {
+    //     //TO REVIEW NOTIFICATIONS
+    //     failure {
+    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+    //             mimeType: 'text/html',
+    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+    //             from: 'jenkins-evolved5G@tid.es',
+    //             to: "a.molina@telefonica.com",
+    //             replyTo: "no-reply@tid.es",
+    //             recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+    //     }
+    //     always {
+    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+    //             mimeType: 'text/html',
+    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+    //             from: 'jenkins-evolved5G@tid.es',
+    //             to: "a.molina@telefonica.com",
+    //             replyTo: "no-reply@tid.es",
+    //             recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+    //     }
+    // }
 }
 
