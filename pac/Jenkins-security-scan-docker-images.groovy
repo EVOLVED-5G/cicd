@@ -46,7 +46,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
                         def images = "curl 'http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/' \
-                                            -u 'contint:${PASSWORD_ARTIFACTORY'} \
+                                            -u 'contint:${PASSWORD_ARTIFACTORY}' \
                                             -H 'Accept: application/json, text/plain, */*' \
                                             -k | jq '.children[].name' | grep 'fogus.*'"
                         def image = sh(returnStdout: true, script: images).trim()
