@@ -30,8 +30,8 @@ pipeline {
                     mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     '''
-                    git url: "https://contint@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
-                    credentialsId: "${PASSWORD_ARTIFACTORY}",
+                    git url: "https://github.com/Telefonica/Evolved5g-${NETAPP_NAME}.git",
+                    credentialsId: "artifactory_credentials",
                     branch: 'evolved5g'
                     sh'''
                     git pull .
