@@ -31,7 +31,7 @@ pipeline {
     stages {
         stage('Get the code!') {
             steps {
-                dir ("${env.WORKSPACE}/") {
+                dir ("${WORKSPACE}/") {
                     sh '''
                     rm -rf $NETAPP_NAME
                     mkdir $NETAPP_NAME
@@ -77,6 +77,7 @@ pipeline {
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
                         --sonartoken="${SQ_TOKEN}" \
+                        --qualityGateStatus="true" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
@@ -99,7 +100,7 @@ pipeline {
                     report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html"
                     url="$ARTIFACTORY_URL/$report_file"
 
-                    curl -v -f -i -X PUT -u "$ARTIFACTORY_CRED" \
+                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                         --data-binary @"$report_file" \
                         "$url"
 
