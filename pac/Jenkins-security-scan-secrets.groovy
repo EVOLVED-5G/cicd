@@ -49,7 +49,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&format=md"
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&format=json > report-tr-repo-secrets-$NETAPP_NAME_LOWER.json"
+                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&format=json" > report-tr-repo-secrets-$NETAPP_NAME_LOWER.json
                     '''
                 }
             }
@@ -84,6 +84,7 @@ pipeline {
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
                             "$url"
+                        cp $report_file $report_file.txt
                     '''
                 }
             }

@@ -49,7 +49,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md" 
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json > report-tr-repo-$NETAPP_NAME_LOWER.json"
+                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json" > report-tr-repo-$NETAPP_NAME_LOWER.json
                     '''
                 }
             }
@@ -84,6 +84,7 @@ pipeline {
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
                             "$url"
+                        cp $report_file $report_file.txt
                     '''
                 }
             }
@@ -91,15 +92,6 @@ pipeline {
 
     }
     post {
-        always {
-            emailext attachmentsPattern: '**/report-tr-repo-$NETAPP_NAME_LOWER.json.txt',
-                body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: "no-reply@tid.es",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        }
         cleanup{
             /* clean up our workspace */
             deleteDir()
