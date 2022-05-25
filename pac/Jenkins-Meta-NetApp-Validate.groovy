@@ -189,9 +189,20 @@ pipeline {
         }
 
         //Review Parameters
+        stage('Validation: OpenSource Licenses Report'){
+            steps{
+                build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+            }
+        }
+
+        //Review Parameters
         stage('Validation: Generate Final Report'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
