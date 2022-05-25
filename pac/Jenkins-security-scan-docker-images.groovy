@@ -43,7 +43,7 @@ pipeline {
         stage('Launch Github Actions command') {
             steps {
                 script {    
-                    def images = sh(returnStdout: true, script: "curl http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u contint:${PASSWORD_ARTIFACTORY} | jq '.children[].name' | grep '${NETAPP_NAME_LOWER}*'").trim()
+                    def images = sh(returnStdout: true, script: "curl http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq '.children[].name' | grep '${NETAPP_NAME_LOWER}*'").trim()
                     images.tokenize().each { x ->
                         sh(returnStdout: true, script: "curl -H 'Content-Type: application/json'  -X POST http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=dockerhub.hi.inet/evolved-5g/infolysisnetapp&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=md")
                         sh(returnStdout: true, script: "curl -H 'Content-Type: application/json'  -X POST http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=dockerhub.hi.inet/evolved-5g/${x}&update_wiki=false&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json" >> "report-tr-img-${NETAPP_NAME_LOWER}.json")
