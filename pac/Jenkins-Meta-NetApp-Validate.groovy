@@ -18,9 +18,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -29,9 +29,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -40,9 +40,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -51,9 +51,9 @@ pipeline {
             steps{
                 build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
         //Review Parameters
@@ -61,9 +61,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -72,9 +72,9 @@ pipeline {
             steps{
                 build job: '/100-HELPERS/002-Upload Docker Image', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -83,9 +83,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -93,10 +93,10 @@ pipeline {
         stage('Validation: Test NetApp Networking'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -105,9 +105,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/007-NetApp Onboarding Successful', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -116,9 +116,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/008-Discover NetApp API from CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -127,9 +127,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -149,9 +149,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -160,9 +160,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -171,9 +171,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -182,9 +182,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -193,9 +193,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
@@ -204,9 +204,9 @@ pipeline {
             steps{
                 build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_NETAPP_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(GIT_NETAPP_URL))]
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
