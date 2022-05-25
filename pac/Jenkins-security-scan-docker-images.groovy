@@ -21,6 +21,7 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
+        TOKEN_EVOLVED = credentials('github_token_evolved5g')
     }
 
     stages {
@@ -51,9 +52,9 @@ pipeline {
                     git clone $GIT_NETAPP_URL.wiki.git
                     cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                     cd ${NETAPP_NAME}.wiki/
-                    git add .
+                    git add -A .
                     git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
-                    git push  $GIT_NETAPP_URL.wiki.git
+                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                     '''
                 }
            }
