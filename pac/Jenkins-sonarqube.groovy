@@ -25,7 +25,7 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolvedg5/validation"
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
 
     stages {
