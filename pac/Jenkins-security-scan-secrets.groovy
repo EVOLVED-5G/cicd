@@ -84,8 +84,6 @@ pipeline {
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
                             "$url"
-
-                        cp $report_file $report_file.txt
                     '''
                 }
             }
@@ -93,15 +91,6 @@ pipeline {
 
     }
     post {
-        always {
-            emailext attachmentsPattern: '**/report-tr-repo-secrets-$NETAPP_NAME_LOWER.jsontxt',
-                body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: "no-reply@tid.es",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        }
         cleanup{
             /* clean up our workspace */
             deleteDir()
