@@ -11,6 +11,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
     environment {
@@ -22,6 +23,8 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
 
     stages {
@@ -61,8 +64,39 @@ pipeline {
         }
 
 
+        stage('Upload report to Artifactory') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''
+                    report_file="report-tr-img-${NETAPP_NAME_LOWER}.json"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+
+                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                        --data-binary @"$report_file" \
+                        "$url"
+
+                    cp $report_file $report_file.txt
+                    '''
+                }
+            }
+        }
+
     }
     post {
+        always {
+            emailext attachmentsPattern: '**/sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
+                body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
         cleanup{
             /* clean up our workspace */
             deleteDir()
