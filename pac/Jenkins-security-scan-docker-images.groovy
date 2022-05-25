@@ -30,7 +30,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
 
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*")
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*") | tr -d '"'
 
                     images=($response)
 
@@ -47,13 +47,13 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL.wiki.git
+                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+                    git clone $GIT_NETAPP_URL.wiki.git
                     cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                     cd ${NETAPP_NAME}.wiki/
                     git add .
-                    git commit -m "Adding Trivy report" 
-                    git push -u origin $GIT_NETAPP_BRANCH
+                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
+                    git push origin $GIT_NETAPP_URL.wiki
                     '''
                 }
            }
