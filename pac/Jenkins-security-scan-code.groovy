@@ -93,6 +93,14 @@ pipeline {
 
     }
     post {
+        always {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
         cleanup{
             /* clean up our workspace */
             deleteDir()

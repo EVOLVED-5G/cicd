@@ -95,8 +95,7 @@ pipeline {
     }
     post {
         always {
-            emailext attachmentsPattern: '**/sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
-                body: '''${SCRIPT, template="groovy-html.template"}''',
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
