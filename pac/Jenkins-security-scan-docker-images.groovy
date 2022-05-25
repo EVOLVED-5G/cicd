@@ -49,11 +49,10 @@ pipeline {
                     sh '''
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL.wiki.git
-                    #rm -rf Evolved5g-${NETAPP_NAME}.wiki/*
-                    cp -R ${NETAPP_NAME}.wiki/* Evolved5g-${NETAPP_NAME}.wiki/
-                    cd Evolved5g-${NETAPP_NAME}.wiki/
+                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+                    cd ${NETAPP_NAME}.wiki/
                     git add .
-                    git commit -m "Adding repo to Telefonica Project" || true
+                    git commit -m "Adding Trivy report" 
                     git push -u origin $GIT_NETAPP_BRANCH
                     '''
                 }
