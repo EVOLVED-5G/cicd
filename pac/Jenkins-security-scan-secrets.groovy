@@ -46,7 +46,7 @@ pipeline {
 
         stage('Launch Github Actions command') {
             steps {
-                dir ("${env.WORKSPACE}/") {
+                dir ("${env.WORKSPACE}/") {                                                                                                                                     
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&format=md"
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&format=json" > report-tr-repo-secrets-$NETAPP_NAME_LOWER.json
