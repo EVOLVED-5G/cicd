@@ -26,30 +26,23 @@ pipeline {
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
+
     stages {
-        stage('Get Repo and clone'){
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}                                                
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
-                    rm -rf Evolved5g-${NETAPP_NAME}/* 
-                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
-                    cd Evolved5g-${NETAPP_NAME}/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
-                    git push -u origin $GIT_NETAPP_BRANCH
-                    '''
-                }
-           }
-        }
 
         stage('Launch Github Actions command') {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md" 
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json > report-tr-repo-$NETAPP_NAME_LOWER.json"
+
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
+
+                    images=($response)
+
+                    for x in "${images[@]}"
+                    do
+                        curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=dockerhub.hi.inet/evolved-5g/$x&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=md"
+                        curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&image=dockerhub.hi.inet/evolved-5g/$x&update_wiki=false&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json" > report-tr-img-$x.json
+                    done
                     '''
                 }
             }
@@ -69,6 +62,7 @@ pipeline {
                 }
            }
         }
+
 
         stage('Upload report to Artifactory') {
             when {
@@ -91,15 +85,12 @@ pipeline {
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
                             "$url"
-
                         cp $report_file $report_file.txt
                     done
-
                     '''
                 }
             }
         }
-
     }
     post {
         always {
@@ -125,4 +116,3 @@ pipeline {
         }
     }
 }
-
