@@ -23,6 +23,7 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
+        TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
@@ -48,8 +49,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md" 
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=fb1d3b71-2c1e-49cb-b04b-54534534ef0a&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json" > report-tr-repo-$NETAPP_NAME_LOWER.json
+                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md" 
+                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json" > report-tr-repo-$NETAPP_NAME_LOWER.json
                     '''
                 }
             }
