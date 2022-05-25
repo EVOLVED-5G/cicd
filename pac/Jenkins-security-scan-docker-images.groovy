@@ -24,22 +24,7 @@ pipeline {
     }
 
     stages {
-        stage('Get Repo and clone'){
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL
-                    rm -rf Evolved5g-${NETAPP_NAME}/*
-                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
-                    cd Evolved5g-${NETAPP_NAME}/
-                    git add .
-                    git commit -m "Adding repo to Telefonica Project" || true
-                    git push -u origin $GIT_NETAPP_BRANCH
-                    '''
-                }
-           }
-        }
+
         stage('Launch Github Actions command') {
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -57,6 +42,22 @@ pipeline {
                     '''
                 }
             }
+        }
+        stage('Get wiki repo and update Evolved Wiki'){
+            steps {
+                dir ("${env.WORKSPACE}/") {
+                    sh '''
+                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL.wiki.git
+                    #rm -rf Evolved5g-${NETAPP_NAME}.wiki/*
+                    cp -R ${NETAPP_NAME}.wiki/* Evolved5g-${NETAPP_NAME}.wiki/
+                    cd Evolved5g-${NETAPP_NAME}.wiki/
+                    git add .
+                    git commit -m "Adding repo to Telefonica Project" || true
+                    git push -u origin $GIT_NETAPP_BRANCH
+                    '''
+                }
+           }
         }
 
 
