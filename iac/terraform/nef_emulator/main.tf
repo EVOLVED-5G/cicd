@@ -126,12 +126,12 @@ variable "nef_mongo_memory_request" {
   type        = string
   default     = "400Mi"
 }
-variable "nef_backend_port" {
+variable "nef_mongo_port" {
   description = "Pod port "
   type        = number
   default     = 80
 }
-variable "nef_backend_target_port" {
+variable "nef_mongo_target_port" {
   description = "Host port to expose NEF service port "
   type        = number
   default     = 80
@@ -214,6 +214,16 @@ variable "nef_mongo_express_memory_request" {
   description = "Memory for the NEF mongo express image"
   type        = string
   default     = "400Mi"
+}
+variable "nef_mongo_express_port" {
+  description = "Host port to expose pod pgadmin image nef "
+  type        = number
+  default     = 80
+}
+variable "nef_mongo_express_target_port" {
+  description = "Host port to expose pgadmin image nef "
+  type        = number
+  default     = 80
 }
 
 #############################################

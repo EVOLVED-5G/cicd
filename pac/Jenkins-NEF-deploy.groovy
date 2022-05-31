@@ -57,8 +57,8 @@ pipeline {
                 dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
-                    cp backend.tf $NAMESPACE_NAME/
-                    cp provider.tf $NAMESPACE_NAME/
+                    cp backend.tf $NEF_NAME/
+                    cp provider.tf $NEF_NAME/
                     '''
                 }
             }
@@ -72,7 +72,7 @@ pipeline {
                         }
                     }
                     steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                        dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                             sh '''
                             kubectl config use-context evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer
                             '''
@@ -86,7 +86,7 @@ pipeline {
                         }
                     }
                     steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                        dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                             sh '''
                             kubectl config use-context kubernetes-admin@kubernetes
                             '''
@@ -107,7 +107,7 @@ pipeline {
                         stage('Login openshift') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
@@ -128,7 +128,7 @@ pipeline {
                     stages{
                         stage('Login in Kubernetes') {
                             steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                                dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                     sh '''
                                         export KUBECONFIG="~/kubeconfig"
                                     '''
@@ -143,7 +143,7 @@ pipeline {
         stage ('Create namespace in if it does not exist') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                         sh '''
                         kubectl create namespace $NAMESPACE_NAME
                         '''
@@ -154,7 +154,7 @@ pipeline {
         stage ('Log into AWS ECR') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                         sh '''
                         kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
                         kubectl create secret docker-registry regcred                                   \
@@ -170,11 +170,11 @@ pipeline {
         stage ('Initiate and configure app in kubernetes') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                         sh '''
                             terraform init                                                           \
                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                -backend-config="key=${NEF_EMULATOR}"
+                                -backend-config="key=${NEF_NAME}"
                         '''
                     }
                 }
@@ -183,7 +183,7 @@ pipeline {
         stage ('Deploy Netapp') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_EMULATOR}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                         sh '''
                             export AWS_PROFILE=default
                             terraform validate
