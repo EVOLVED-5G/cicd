@@ -85,7 +85,6 @@ pipeline {
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
                             "$url"
-                        cp $report_file $report_file.txt
                     '''
                 }
             }
