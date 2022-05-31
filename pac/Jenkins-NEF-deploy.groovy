@@ -1,10 +1,3 @@
- String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    var= var.toLowerCase()
-    return var ;
-}
-
 def getContext(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
@@ -45,14 +38,14 @@ pipeline {
     }
 
     environment {
-        GIT_URL="${params.GIT_URL}"
-        GIT_BRANCH="${params.GIT_BRANCH}"
+        GIT_CICD_BRANCH="${params.GIT_BRANCH}"
         APP_REPLICAS="${params.APP_REPLICAS}"
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         // For the moment NAMESPACE_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
         NAMESPACE_NAME = "evol5-nef"
+        NEF_NAME = "nef_emulator"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         CONFIG_PATH = getPath("${params.DEPLOYMENT}")
         CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}") 
@@ -181,7 +174,7 @@ pipeline {
                         sh '''
                             terraform init                                                           \
                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                -backend-config="key=${NAMESPACE_NAME}"
+                                -backend-config="key=${NEF_EMULATOR}"
                         '''
                     }
                 }
@@ -190,7 +183,7 @@ pipeline {
         stage ('Deploy Netapp') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_EMULATOR}") {
                         sh '''
                             export AWS_PROFILE=default
                             terraform validate
@@ -201,6 +194,7 @@ pipeline {
                 }
             }
         }
+        //EXPOSING SERVICE PART
         // stage ('Expose service in platform') {
         //     parallel {
         //         stage ('Expose service in Openshift') {
