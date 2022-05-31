@@ -68,9 +68,9 @@ pipeline {
                         def name  = sh(returnStdout: true, script: cmd2).trim()
                         sh '''$(aws ecr get-login --no-include-email)'''
                         [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-${VERSION}.${BUILD_NUMBER}"""
+                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-${VERSION}}"""
                             sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-latest"""
-                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-${VERSION}.${BUILD_NUMBER}"""
+                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-${VERSION}"""
                             sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${x[1]}-latest"""
                         }
                     }
