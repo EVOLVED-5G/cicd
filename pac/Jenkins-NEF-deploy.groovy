@@ -1,24 +1,14 @@
-String netappName(String url) {
+ String netappName(String url) {
     String url2 = url?:'';
     String var = url2.substring(url2.lastIndexOf("/") + 1);
     var= var.toLowerCase()
     return var ;
 }
 
-
-def getNamespace(deployment,name) {
-    String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-capif";
-    } else {
-        return name;
-    }
-}
-
 def getContext(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
-        return "evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer";
+        return "evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer";
     } else {
         return "kubernetes-admin@kubernetes";
     }
@@ -48,10 +38,8 @@ pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
-        string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment cicd git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of Dummy NetApp pods to run')
-        string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'dummy-netapp-evolved5g.apps-dev.hi.inet', description: 'netapp hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
@@ -63,9 +51,8 @@ pipeline {
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
-        // For the moment NETAPP_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
-        NETAPP_NAME = netappName("${params.GIT_URL}")
-        NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        // For the moment NAMESPACE_NAME and NAMESPACE are the same, but I separated in case we want to put a different name to each one
+        NAMESPACE_NAME = "evol5-nef"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         CONFIG_PATH = getPath("${params.DEPLOYMENT}")
         CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}") 
@@ -77,8 +64,8 @@ pipeline {
                 dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
-                    cp backend.tf $NETAPP_NAME/
-                    cp provider.tf $NETAPP_NAME/
+                    cp backend.tf $NAMESPACE_NAME/
+                    cp provider.tf $NAMESPACE_NAME/
                     '''
                 }
             }
@@ -92,9 +79,9 @@ pipeline {
                         }
                     }
                     steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                        dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                             sh '''
-                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
+                            kubectl config use-context evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer
                             '''
                         }
                     }
@@ -106,7 +93,7 @@ pipeline {
                         }
                     }
                     steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                        dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                             sh '''
                             kubectl config use-context kubernetes-admin@kubernetes
                             '''
@@ -127,7 +114,7 @@ pipeline {
                         stage('Login openshift') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
@@ -148,7 +135,7 @@ pipeline {
                     stages{
                         stage('Login in Kubernetes') {
                             steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                                dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                                     sh '''
                                         export KUBECONFIG="~/kubeconfig"
                                     '''
@@ -163,7 +150,7 @@ pipeline {
         stage ('Create namespace in if it does not exist') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                         sh '''
                         kubectl create namespace $NAMESPACE_NAME
                         '''
@@ -174,7 +161,7 @@ pipeline {
         stage ('Log into AWS ECR') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                         sh '''
                         kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
                         kubectl create secret docker-registry regcred                                   \
@@ -190,11 +177,11 @@ pipeline {
         stage ('Initiate and configure app in kubernetes') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                         sh '''
                             terraform init                                                           \
                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                -backend-config="key=${NETAPP_NAME}"
+                                -backend-config="key=${NAMESPACE_NAME}"
                         '''
                     }
                 }
@@ -203,7 +190,7 @@ pipeline {
         stage ('Deploy Netapp') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/${NETAPP_NAME}") {
+                    dir ("${env.WORKSPACE}/iac/terraform/${NAMESPACE_NAME}") {
                         sh '''
                             export AWS_PROFILE=default
                             terraform validate
