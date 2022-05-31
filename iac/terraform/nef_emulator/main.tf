@@ -9,7 +9,7 @@ variable "app_replicas" {
 variable "nef_namespace" {
   description = "repository to download image nef "
   type        = string
-  default     = "evol5-capif"
+  default     = "evol5-nef"
 }
 
 #############################################

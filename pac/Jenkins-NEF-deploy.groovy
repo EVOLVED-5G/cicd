@@ -187,7 +187,7 @@ pipeline {
                         sh '''
                             export AWS_PROFILE=default
                             terraform validate
-                            terraform plan -var app_replicas=${APP_REPLICAS} -out deployment.tfplan
+                            terraform plan -var app_replicas=${APP_REPLICAS} -var nef_namespace=${NAMESPACE_NAME} -out deployment.tfplan
                             terraform apply --auto-approve deployment.tfplan
                         '''
                     }
