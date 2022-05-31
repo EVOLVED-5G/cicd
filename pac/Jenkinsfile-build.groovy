@@ -1,17 +1,7 @@
-import java.io.*;
 String netappName(String url) {
     String url2 = url?:'';
     String var = url2.substring(url2.lastIndexOf("/") + 1);
     return var ;
-}
-
-
-def fileE(String path ) {
-    var = """${sh(
-                    returnStdout: true,
-                    script: "[[ -f ${path} ]] && echo 'True'"
-                    )}"""
-    return var
 }
 
 pipeline {
@@ -30,7 +20,7 @@ pipeline {
         GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        AWS_ACCOUNT_ID = '709233559969'
+        AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         DOCKER_VAR = false
     }
@@ -52,16 +42,14 @@ pipeline {
         stage('Check if there is a docker-compose in the repository') {
             steps {
                 script{
-                    DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
-
+                    	def files = findFiles glob: '"${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.y*"'
+                        boolean DOCKER_VAR = files.length > 0
                 }
-    
-
                 echo "env DOCKER VAR is ${DOCKER_VAR}"
                 
             }
         }
-
+        //NICE TO HAVE: Makefile to encapsulate docker and docker-compose commands
         stage('Build') {
             when {
                 expression {
@@ -179,7 +167,6 @@ pipeline {
                     sh '''
                     docker stop $(docker ps -q)
                     docker system prune -a -f --volumes
-                    pwd
                     sudo rm -rf $WORKSPACE/$NETAPP_NAME/
                     '''
                 }
