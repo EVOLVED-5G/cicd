@@ -106,7 +106,7 @@ pipeline {
                     stages{
                         stage('Login openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
@@ -172,7 +172,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                         sh '''
-                            terraform init                                                           \
+                            terraform init   -reconfigure                                            \
                                 -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
                                 -backend-config="key=${NEF_NAME}"
                         '''

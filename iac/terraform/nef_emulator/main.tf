@@ -49,7 +49,7 @@ variable "nef_backend_memory_request" {
 variable "nef_backend_port" {
   description = "repository to download image nef "
   type        = number
-  default     = 80
+  default     = 8888
 }
 variable "nef_backend_target_port" {
   description = "repository to download image nef "
@@ -173,12 +173,12 @@ variable "nef_pgadmin_memory_request" {
 variable "nef_pgadmin_port" {
   description = "Host port to expose pod pgadmin image nef "
   type        = number
-  default     = 80
+  default     = 5050
 }
 variable "nef_pgadmin_target_port" {
   description = "Host port to expose pgadmin image nef "
   type        = number
-  default     = 80
+  default     = 5050
 }
 
 #############################################
@@ -218,12 +218,12 @@ variable "nef_mongo_express_memory_request" {
 variable "nef_mongo_express_port" {
   description = "Host port to expose pod pgadmin image nef "
   type        = number
-  default     = 80
+  default     = 8081
 }
 variable "nef_mongo_express_target_port" {
   description = "Host port to expose pgadmin image nef "
   type        = number
-  default     = 80
+  default     = 8081
 }
 
 #############################################
