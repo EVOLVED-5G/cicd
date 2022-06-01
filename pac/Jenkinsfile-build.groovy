@@ -42,8 +42,7 @@ pipeline {
         stage('Check if there is a docker-compose in the repository') {
             steps {
                 script{
-                    	def files = findFiles glob: '"${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.y*"'
-                        boolean DOCKER_VAR = files.length > 0
+                    DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
                 }
                 echo "env DOCKER VAR is ${DOCKER_VAR}"
                 
