@@ -36,9 +36,9 @@ variable "SERVER_PORT" {
 }
 
 variable "BACKEND_CORS_ORIGINS" {
-  description = " backend cors"
-  type        = list(string)
-  default     = ["https://5g-api-emulator.medianetlab.eu", "http://localhost"]
+  description = "backend cors"
+  type        = string
+  default     = "https://5g-api-emulator.medianetlab.eu"
 }
 
 variable "PROJECT_NAME" {
