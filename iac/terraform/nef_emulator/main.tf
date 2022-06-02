@@ -129,12 +129,12 @@ variable "nef_mongo_memory_request" {
 variable "nef_mongo_port" {
   description = "Pod port "
   type        = number
-  default     = 80
+  default     = 27017
 }
 variable "nef_mongo_target_port" {
   description = "Host port to expose NEF service port "
   type        = number
-  default     = 80
+  default     = 27017
 }
 #############################################
 #                 NEF_PGADMIN               #
@@ -258,6 +258,82 @@ resource "kubernetes_deployment" "nef_backend" {
         container {
           image = var.image_nef_bakend
           name  = var.name_nef_backend
+          env {
+            name  = "BACKEND_CORS_ORIGINS"
+            value = var.BACKEND_CORS_ORIGINS
+          }
+          env {
+            name  = "DOCKER_IMAGE_BACKEND"
+            value = var.DOCKER_IMAGE_BACKEND
+          }
+          env {
+            name  = "DOCKER_IMAGE_FRONTEND"
+            value = var.DOCKER_IMAGE_FRONTEND
+          }
+          env {
+            name  = "DOMAIN"
+            value = var.DOMAIN
+          }
+          env {
+            name  = "EMAILS_FROM_EMAIL"
+            value = var.EMAILS_FROM_EMAIL
+          }
+          env {
+            name  = "FIRST_SUPERUSER"
+            value = var.FIRST_SUPERUSER
+          }
+          env {
+            name  = "FIRST_SUPERUSER_PASSWORD"
+            value = var.FIRST_SUPERUSER_PASSWORD
+          }
+          env {
+            name  = "PROJECT_NAME"
+            value = var.PROJECT_NAME
+          }
+          env {
+            name  = "SECRET_KEY"
+            value = var.SECRET_KEY
+          }
+          env {
+            name  = "SENTRY_DSN"
+            value = var.SENTRY_DSN
+          }
+          env {
+            name  = "SERVER_HOST"
+            value = var.SERVER_NAME
+          }
+          env {
+            name  = "PROJECT_NAME"
+            value = var.PROJECT_NAME
+          }
+          env {
+            name  = "SERVER_PORT"
+            value = var.SERVER_PORT
+          }
+          env {
+            name  = "SMTP_HOST"
+            value = var.SMTP_HOST
+          }
+          env {
+            name  = "SMTP_PASSWORD"
+            value = var.SMTP_PASSWORD
+          }
+          env {
+            name  = "SMTP_PORT"
+            value = var.SMTP_PORT
+          }
+          env {
+            name  = "SMTP_TLS"
+            value = var.SMTP_TLS
+          }
+          env {
+            name  = "SMTP_USER"
+            value = var.SMTP_USER
+          }
+          env {
+            name  = "USERS_OPEN_REGISTRATION"
+            value = var.USERS_OPEN_REGISTRATION
+          }
           resources {
             limits = {
               cpu    = var.nef_backend_cpu_limit
@@ -267,6 +343,15 @@ resource "kubernetes_deployment" "nef_backend" {
               cpu    = var.nef_backend_cpu_request
               memory = var.nef_backend_memory_request
             }
+          }
+          volume_mount {
+            mount_path = "/app"
+            name       = "app-backend"
+          }
+        }
+        volume {
+          name = "app-backend"
+          empty_dir {
           }
         }
         image_pull_secrets {
@@ -321,6 +406,16 @@ resource "kubernetes_deployment" "nef_mongo" {
         container {
           image = var.image_nef_mongo
           name  = var.name_nef_mongo
+
+          env {
+            name  = "MONGO_PASSWORD"
+            value = var.MONGO_PASSWORD
+          }
+          env {
+            name  = "MONGO_USER"
+            value = var.MONGO_USER
+          }
+
           resources {
             limits = {
               cpu    = var.nef_mongo_cpu_limit
@@ -331,11 +426,49 @@ resource "kubernetes_deployment" "nef_mongo" {
               memory = var.nef_mongo_memory_request
             }
           }
+
+          volume_mount {
+            mount_path = "/data/configdb"
+            name       = "configdb"
+          }
+
+          volume_mount {
+            mount_path = "/data/db"
+            name       = "db"
+          }
         }
+
+        volume {
+          name = "configdb"
+          empty_dir {
+          }
+        }
+
+        volume {
+          name = "db"
+          empty_dir {
+          }
+        }
+
         image_pull_secrets {
           name = "regcred"
         }
       }
+    }
+  }
+}
+resource "kubernetes_service" "nef_mongo_service" {
+  metadata {
+    name      = var.name_nef_mongo
+    namespace = var.nef_namespace
+  }
+  spec {
+    selector = {
+      app = kubernetes_deployment.nef_mongo.spec.0.template.0.metadata[0].labels.app
+    }
+    port {
+      port        = var.nef_mongo_port
+      target_port = var.nef_mongo_target_port
     }
   }
 }
@@ -385,12 +518,11 @@ resource "kubernetes_deployment" "nef_mongo_express" {
       }
     }
   }
-    depends_on = [
+  depends_on = [
     kubernetes_deployment.nef_mongo,
-    kubernetes_service.nef_mongo_service
   ]
 }
-}
+
 
 resource "kubernetes_service" "nef_mongo_express_service" {
   metadata {
@@ -437,6 +569,25 @@ resource "kubernetes_deployment" "nef_db" {
         container {
           image = var.image_nef_db
           name  = var.name_nef_db
+          env {
+            name  = "POSTGRES_DB"
+            value = var.POSTGRES_DB
+          }
+
+          env {
+            name  = "POSTGRES_PASSWORD"
+            value = var.POSTGRES_PASSWORD
+          }
+
+          env {
+            name  = "POSTGRES_SERVER"
+            value = var.POSTGRES_SERVER
+          }
+
+          env {
+            name  = "POSTGRES_USER"
+            value = var.POSTGRES_USER
+          }
           resources {
             limits = {
               cpu    = var.nef_db_cpu_limit
@@ -446,6 +597,16 @@ resource "kubernetes_deployment" "nef_db" {
               cpu    = var.nef_db_cpu_request
               memory = var.nef_db_memory_request
             }
+          }
+
+          volume_mount {
+            mount_path = "/var/lib/postgresql/data/pgdata"
+            name       = "pgdata"
+          }
+        }
+        volume {
+          name = "pgdata"
+          empty_dir {
           }
         }
         image_pull_secrets {
@@ -484,6 +645,20 @@ resource "kubernetes_deployment" "nef_pgadmin" {
         container {
           image = var.image_nef_pgadmin
           name  = var.name_nef_pgadmin
+          env {
+            name  = "PGADMIN_DEFAULT_EMAIL"
+            value = var.PGADMIN_DEFAULT_EMAIL
+          }
+
+          env {
+            name  = "PGADMIN_DEFAULT_PASSWORD"
+            value = var.PGADMIN_DEFAULT_PASSWORD
+          }
+
+          env {
+            name  = "PGADMIN_LISTEN_PORT"
+            value = var.PGADMIN_LISTEN_PORT
+          }
           resources {
             limits = {
               cpu    = var.nef_pgadmin_cpu_limit
