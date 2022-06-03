@@ -510,7 +510,7 @@ resource "kubernetes_deployment" "nef_mongo_express" {
     template {
       metadata {
         labels = {
-          app = var.name_nef_backend
+          app = var.name_nef_mongo_express
         }
       }
       spec {
