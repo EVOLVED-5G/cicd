@@ -10,7 +10,7 @@ def getContext(deployment) {
 def getPath(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
-        return "kubeconfig";
+        return "kubeconfigNEF";
     } else {
         return "~/kubeconfig";
     }
@@ -71,10 +71,11 @@ pipeline {
                                 withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
+                                            kubectl config use-context evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer
                                             export KUBECONFIG="./kubeconfigNEF"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
                                         '''
-                                        readFile('kubeconfig')
+                                        readFile('kubeconfigNEF')
                                     }
                                 }
                             }
