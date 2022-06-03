@@ -108,7 +108,7 @@ variable "image_nef_mongo" {
 variable "name_nef_mongo" {
   description = "Name for the NEF mongo Database "
   type        = string
-  default     = "nef-mongo"
+  default     = "mongo"
 }
 variable "nef_mongo_cpu_limit" {
   description = "CPU Limitfor the NEF mongo db image "
