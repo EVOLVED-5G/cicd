@@ -12,6 +12,10 @@ variable "nef_namespace" {
   default     = "evol5-nef"
 }
 
+locals {
+  mongo_express_url = "mongodb://${var.MONGO_USER}:${var.MONGO_PASSWORD}@mongo:27017/"
+}
+
 #############################################
 #               NEF_BACKEND
 #############################################
@@ -256,8 +260,9 @@ resource "kubernetes_deployment" "nef_backend" {
       spec {
         enable_service_links = false
         container {
-          image = var.image_nef_bakend
-          name  = var.name_nef_backend
+          image   = var.image_nef_bakend
+          name    = var.name_nef_backend
+          command = "/start-reload.sh"
           env {
             name  = "BACKEND_CORS_ORIGINS"
             value = var.BACKEND_CORS_ORIGINS
@@ -300,6 +305,10 @@ resource "kubernetes_deployment" "nef_backend" {
           }
           env {
             name  = "SERVER_HOST"
+            value = var.SERVER_HOST
+          }
+          env {
+            name  = "SERVER_NAME"
             value = var.SERVER_NAME
           }
           env {
@@ -415,6 +424,14 @@ resource "kubernetes_deployment" "nef_mongo" {
             name  = "MONGO_USER"
             value = var.MONGO_USER
           }
+          env {
+            name  = "MONGO_INITDB_ROOT_USERNAME"
+            value = var.MONGO_USER
+          }
+          env {
+            name  = "MONGO_INITDB_ROOT_PASSWORD"
+            value = var.MONGO_PASSWORD
+          }
 
           resources {
             limits = {
@@ -501,6 +518,20 @@ resource "kubernetes_deployment" "nef_mongo_express" {
         container {
           image = var.image_nef_mongo_express
           name  = var.name_nef_mongo_express
+
+          env {
+            name  = "ME_CONFIG_MONGODB_ADMINUSERNAME"
+            value = var.MONGO_USER
+          }
+          env {
+            name  = "ME_CONFIG_MONGODB_ADMINPASSWORD"
+            value = var.MONGO_PASSWORD
+          }
+          env {
+            name  = "ME_CONFIG_MONGODB_URL"
+            value = local.mongo_express_url
+          }
+
           resources {
             limits = {
               cpu    = var.nef_mongo_express_cpu_limit
