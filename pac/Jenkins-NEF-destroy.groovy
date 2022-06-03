@@ -73,8 +73,6 @@ pipeline {
                                         sh '''
                                             export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
-
                                         '''
                                         readFile('kubeconfig')
                                     }
