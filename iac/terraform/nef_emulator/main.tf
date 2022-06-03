@@ -588,6 +588,10 @@ resource "kubernetes_deployment" "nef_db" {
             name  = "POSTGRES_USER"
             value = var.POSTGRES_USER
           }
+          env {
+            name  = "PGDATA"
+            value = var.PGDATA
+          }
           resources {
             limits = {
               cpu    = var.nef_db_cpu_limit
@@ -600,7 +604,7 @@ resource "kubernetes_deployment" "nef_db" {
           }
 
           volume_mount {
-            mount_path = "/var/lib/postgresql/data/pgdata/data"
+            mount_path = "/var/lib/postgresql/data/pgdata"
             name       = "pgdata"
           }
         }

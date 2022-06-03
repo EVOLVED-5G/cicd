@@ -159,6 +159,12 @@ variable "PGADMIN_DEFAULT_PASSWORD" {
   default     = "app"
 }
 
+variable "PGDATA" {
+  description = "pg data"
+  type        = string
+  default     = "=/var/lib/postgresql/data/pgdata"
+}
+
 
 # Mongo 
 variable "MONGO_USER" {
