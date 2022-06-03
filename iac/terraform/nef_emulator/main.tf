@@ -600,7 +600,7 @@ resource "kubernetes_deployment" "nef_db" {
           }
 
           volume_mount {
-            mount_path = "/var/lib/postgresql/data/pgdata"
+            mount_path = "/var/lib/postgresql/data/pgdata/data"
             name       = "pgdata"
           }
         }
