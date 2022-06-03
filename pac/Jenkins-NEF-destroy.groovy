@@ -2,7 +2,7 @@ def getContext(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
         return "evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer";
-    } else {
+    } else { 
         return "kubernetes-admin@kubernetes";
     }
 }
@@ -10,7 +10,7 @@ def getContext(deployment) {
 def getPath(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
-        return "kubeconfigNEF";
+        return "~/.kube/config";
     } else {
         return "~/kubeconfig";
     }
@@ -48,11 +48,13 @@ pipeline {
     }
     
     stages {
-        stage('Configuring prvider file'){
-            steps{
+        stage ('Load privder and backend info'){
+            steps {
                 dir ("${env.WORKSPACE}/iac/terraform/") {
                     sh '''
                     sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
+                    cp backend.tf $NEF_NAME/
+                    cp provider.tf $NEF_NAME/
                     '''
                 }
             }
@@ -71,11 +73,9 @@ pipeline {
                                 withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
-                                            kubectl config use-context evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer
-                                            export KUBECONFIG="./kubeconfigNEF"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+
                                         '''
-                                        readFile('kubeconfigNEF')
                                     }
                                 }
                             }
@@ -100,6 +100,7 @@ pipeline {
                         }
                     }
                 }
+               
             }
         }
         stage ('Undeploy app in kubernetess') {
@@ -117,18 +118,18 @@ pipeline {
             }
         }
     }
-    post {
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
-    }
+    // post {
+    //     cleanup{
+    //         /* clean up our workspace */
+    //         deleteDir()
+    //         /* clean up tmp directory */
+    //         dir("${env.workspace}@tmp") {
+    //             deleteDir()
+    //         }
+    //         /* clean up script directory */
+    //         dir("${env.workspace}@script") {
+    //             deleteDir()
+    //         }
+    //     }
+    // }
 }

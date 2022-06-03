@@ -551,7 +551,7 @@ resource "kubernetes_deployment" "nef_mongo_express" {
   }
   depends_on = [
     kubernetes_deployment.nef_mongo,
-    kubernetes_service.nef_mongo
+    kubernetes_service.nef_mongo_service
   ]
 }
 
