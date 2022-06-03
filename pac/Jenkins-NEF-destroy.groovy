@@ -71,7 +71,7 @@ pipeline {
                                 withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
-                                            export KUBECONFIG="./kubeconfig"
+                                            export KUBECONFIG="./kubeconfigNEF"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
                                         '''
                                         readFile('kubeconfig')
