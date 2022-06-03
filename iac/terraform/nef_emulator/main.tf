@@ -262,7 +262,7 @@ resource "kubernetes_deployment" "nef_backend" {
         container {
           image   = var.image_nef_bakend
           name    = var.name_nef_backend
-          command = "/start-reload.sh"
+          command = ["/start-reload.sh"]
           env {
             name  = "BACKEND_CORS_ORIGINS"
             value = var.BACKEND_CORS_ORIGINS

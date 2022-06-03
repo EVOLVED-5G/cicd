@@ -16,7 +16,6 @@ pipeline {
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = '709233559969'
         FOLDER_NAME = "NEF_emulator"
-        DOCKER_VAR = false
     }
     stages {
         stage('Get the code!') {
