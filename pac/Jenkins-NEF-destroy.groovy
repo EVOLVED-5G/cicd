@@ -74,7 +74,6 @@ pipeline {
                                     dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
                                         sh '''
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-
                                         '''
                                     }
                                 }
