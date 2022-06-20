@@ -6,256 +6,243 @@ variable "app_replicas" {
   type        = string
   default     = "2"
 }
-variable "nef_namespace" {
+
+variable "fogus_namespace" {
   description = "repository to download image nef "
   type        = string
-  default     = "evol5-capif"
+  default     = "evol5-fogusnetapp"
 }
 
 #############################################
-#               NEF_BACKEND
+#             FOGUS NETAPP FE
 #############################################
 
-variable "image_nef_bakend" {
-  description = "repository to download image nef "
+variable "image_fogus_fe" {
+  description = "repository to download Fogus Front-end "
   type        = string
-  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_backend_1-1.0.10"
+  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:netappfe-1.0"
 }
-variable "name_nef_backend" {
-  description = "repository to download image nef "
+variable "name_fogus_fe" {
+  description = "name of the fogus front-end"
   type        = string
-  default     = "nef-backend"
+  default     = "fogus_fe"
 }
-variable "nef_backend_cpu_limit" {
+
+variable "fogus_fe_cpu_limit" {
   description = "repository to download image nef "
   type        = string
   default     = "125m"
 }
-variable "nef_backend_cpu_request" {
+variable "fogus_fe_cpu_request" {
   description = "repository to download image nef "
   type        = string
   default     = "65m"
 }
-variable "nef_backend_memory_limit" {
+variable "fogus_fe_memory_limit" {
   description = "repository to download image nef "
   type        = string
   default     = "512Mi"
 }
-variable "nef_backend_memory_request" {
+variable "fogus_fe_memory_request" {
   description = "repository to download image nef "
   type        = string
   default     = "400Mi"
 }
-variable "nef_backend_port" {
+variable "fogus_fe_port" {
   description = "repository to download image nef "
   type        = number
-  default     = 80
+  default     = 4200
 }
-variable "nef_backend_target_port" {
+variable "fogus_fe_target_port" {
   description = "repository to download image nef "
   type        = number
-  default     = 80
+  default     = 4200
 }
 
 #############################################
-#                 NEF_DB                 #
+#             FOGUS NETAPP POSTGRES
 #############################################
 
-variable "image_nef_db" {
-  description = "Image of the NEF database "
+variable "image_fogus_postgres" {
+  description = "repository to download Fogus Postgres "
   type        = string
-  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_db_1-1.0.10"
+  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:netapppostgres-latest"
 }
-variable "name_nef_db" {
-  description = "Name for the NEF Database "
+variable "name_fogus_postgres" {
+  description = "name of the fogus postgres"
   type        = string
-  default     = "nef-db"
+  default     = "fogus_postgres"
 }
-variable "nef_db_cpu_limit" {
-  description = "CPU Limitfor the NEF db image "
+
+variable "fogus_postgres_cpu_limit" {
+  description = "Postgres limit "
   type        = string
   default     = "125m"
 }
-variable "nef_db_cpu_request" {
-  description = "CPU for the NEF db image "
+variable "fogus_postgres_cpu_request" {
+  description = "Postgres limit"
   type        = string
   default     = "65m"
 }
-variable "nef_db_memory_limit" {
-  description = "Memory Limit for the NEF db image"
+variable "fogus_postgres_memory_limit" {
+  description = "Postgres limit"
   type        = string
   default     = "512Mi"
 }
-variable "nef_db_memory_request" {
-  description = "Memory for the NEF db image"
+variable "fogus_postgres_memory_request" {
+  description = "Postgres limit"
   type        = string
   default     = "400Mi"
 }
+#No need
+variable "fogus_postgres_port" {
+  description = "Postgres port"
+  type        = number
+  default     = 5432
+}
+variable "fogus_postgres_target_port" {
+  description = "Postgres target port "
+  type        = number
+  default     = 5432
+}
 
 #############################################
-#                 NEF_MONGO                 #
+#             FOGUS NETAPP POSTGRES
 #############################################
 
-variable "image_nef_mongo" {
-  description = "Image of the NEF mongo database "
+variable "image_fogus_postgres" {
+  description = "repository to download Fogus Postgres "
   type        = string
-  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_mongo_1-1.0.10"
+  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:netapppostgres-latest"
 }
-variable "name_nef_mongo" {
-  description = "Name for the NEF mongo Database "
+variable "name_fogus_postgres" {
+  description = "name of the fogus postgres"
   type        = string
-  default     = "nef-mongo"
+  default     = "fogus_postgres"
 }
-variable "nef_mongo_cpu_limit" {
-  description = "CPU Limitfor the NEF mongo db image "
+
+variable "fogus_postgres_cpu_limit" {
+  description = "Postgres limit "
   type        = string
   default     = "125m"
 }
-variable "nef_mongo_cpu_request" {
-  description = "CPU for the NEF mongo db image "
+variable "fogus_postgres_cpu_request" {
+  description = "Postgres limit"
   type        = string
   default     = "65m"
 }
-variable "nef_mongo_memory_limit" {
-  description = "Memory Limit for the NEF mongo db image"
+variable "fogus_postgres_memory_limit" {
+  description = "Postgres limit"
   type        = string
   default     = "512Mi"
 }
-variable "nef_mongo_memory_request" {
-  description = "Memory for the NEF mongo db image"
+variable "fogus_postgres_memory_request" {
+  description = "Postgres limit"
   type        = string
   default     = "400Mi"
 }
-variable "nef_backend_port" {
-  description = "Pod port "
+#No need
+variable "fogus_postgres_port" {
+  description = "Postgres port"
   type        = number
-  default     = 80
+  default     = 5432
 }
-variable "nef_backend_target_port" {
-  description = "Host port to expose NEF service port "
+variable "fogus_postgres_target_port" {
+  description = "Postgres target port "
   type        = number
-  default     = 80
+  default     = 5432
 }
+
 #############################################
-#                 NEF_PGADMIN               #
+#             FOGUS NETAPP DJANGO
 #############################################
 
-variable "image_nef_pgadmin" {
-  description = "Image of the NEF pgadmin database "
+variable "image_fogus_django" {
+  description = "repository to download Fogus django "
   type        = string
-  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_pgadmin_1-1.0.11"
+  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:netappdjango-latest"
 }
-variable "name_nef_pgadmin" {
-  description = "Name for the NEF pgadmin Database "
+variable "name_fogus_django" {
+  description = "name of the fogus django"
   type        = string
-  default     = "nef-pgadmin"
+  default     = "fogus_django"
 }
-variable "nef_pgadmin_cpu_limit" {
-  description = "CPU Limitfor the NEF pgadmin db image "
+
+variable "fogus_django_cpu_limit" {
+  description = "django limit "
   type        = string
   default     = "125m"
 }
-variable "nef_pgadmin_cpu_request" {
-  description = "CPU for the NEF pgadmin db image "
+variable "fogus_django_cpu_request" {
+  description = "django limit"
   type        = string
   default     = "65m"
 }
-variable "nef_pgadmin_memory_limit" {
-  description = "Memory Limit for the NEF pgadmin db image"
+variable "fogus_django_memory_limit" {
+  description = "django limit"
   type        = string
   default     = "512Mi"
 }
-variable "nef_pgadmin_memory_request" {
-  description = "Memory for the NEF pgadmin db image"
+variable "fogus_django_memory_request" {
+  description = "django limit"
   type        = string
   default     = "400Mi"
 }
-variable "nef_pgadmin_port" {
-  description = "Host port to expose pod pgadmin image nef "
+#No need
+variable "fogus_django_port" {
+  description = "django port"
   type        = number
-  default     = 80
+  default     = 5432
 }
-variable "nef_pgadmin_target_port" {
-  description = "Host port to expose pgadmin image nef "
+variable "fogus_django_target_port" {
+  description = "django target port "
   type        = number
-  default     = 80
+  default     = 5432
 }
 
 #############################################
-#                 NEF_EXPRESS               #
+#               DEPLOYMENT
+#############################################
+#############################################
+#             FOGUS NETAPP FE
 #############################################
 
-variable "image_nef_mongo_express" {
-  description = "Image of the NEF mongo express database"
-  type        = string
-  default     = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_mongo-express_1-1.0.11"
-}
-variable "name_nef_mongo_express" {
-  description = "Name for the NEF mongo express database"
-  type        = string
-  default     = "nef-mongo-express"
-}
-variable "nef_mongo_express_cpu_limit" {
-  description = "CPU Limitfor the NEF mongo express image"
-  type        = string
-  default     = "125m"
-}
-variable "nef_mongo_express_cpu_request" {
-  description = "CPU for the NEF mongo express image"
-  type        = string
-  default     = "65m"
-}
-variable "nef_mongo_express_memory_limit" {
-  description = "Memory Limit for the NEF mongo express image"
-  type        = string
-  default     = "512Mi"
-}
-variable "nef_mongo_express_memory_request" {
-  description = "Memory for the NEF mongo express image"
-  type        = string
-  default     = "400Mi"
-}
-
-#############################################
-#              NEF_EMULATOR
-#############################################
-#############################################
-#               NEF_BACKEND
-#############################################
-resource "kubernetes_deployment" "nef_backend" {
+resource "kubernetes_deployment" "fogus_fe" {
   metadata {
-    name      = var.name_nef_backend
-    namespace = var.nef_namespace
+    name      = var.name_fogus_fe
+    namespace = var.fogus_namespace
     labels = {
-      app = var.name_nef_backend
+      app = var.name_fogus_fe
     }
   }
   spec {
     replicas = var.app_replicas
     selector {
       match_labels = {
-        app = var.name_nef_backend
+        app = var.name_fogus_fe
       }
     }
     template {
       metadata {
         labels = {
-          app = var.name_nef_backend
+          app = var.name_fogus_fe
         }
       }
       spec {
         enable_service_links = false
         container {
-          image = var.image_nef_bakend
-          name  = var.name_nef_backend
+          image = var.image_fogus_fe
+          name  = var.name_fogus_fe
+
+        
           resources {
             limits = {
-              cpu    = var.nef_backend_cpu_limit
-              memory = var.nef_backend_memory_limit
+              cpu    = var.fogus_fe_cpu_limit
+              memory = var.fogus_fe_memory_limit
             }
             requests = {
-              cpu    = var.nef_backend_cpu_request
-              memory = var.nef_backend_memory_request
+              cpu    = var.fogus_fe_cpu_request
+              memory = var.fogus_fe_memory_request
             }
           }
         }
@@ -267,105 +254,87 @@ resource "kubernetes_deployment" "nef_backend" {
   }
 }
 
-resource "kubernetes_service" "nef_db_service" {
+
+resource "kubernetes_service" "fogus_fe_service" {
   metadata {
-    name      = var.name_nef_backend
-    namespace = var.nef_namespace
+    name      = var.name_fogus_fe
+    namespace = var.fogus_namespace
   }
   spec {
     selector = {
-      app = kubernetes_deployment.nef_db.spec.0.template.0.metadata[0].labels.app
+      app = kubernetes_deployment.fogus_fe.spec.0.template.0.metadata[0].labels.app
     }
     port {
-      port        = var.nef_backend_port
-      target_port = var.nef_backend_target_port
+      port        = var.fogus_fe_port
+      target_port = var.fogus_fe_target_port
     }
   }
 }
+
 #############################################
-#                 NEF_MONGO
+#             FOGUS NETAPP POSTGRES
 #############################################
-resource "kubernetes_deployment" "nef_mongo" {
+
+resource "kubernetes_deployment" "fogus_postgres" {
   metadata {
-    name      = var.name_nef_mongo
-    namespace = var.nef_namespace
+    name      = var.name_fogus_postgres
+    namespace = var.fogus_namespace
     labels = {
-      app = var.name_nef_mongo
+      app = var.name_fogus_postgres
     }
   }
   spec {
     replicas = var.app_replicas
     selector {
       match_labels = {
-        app = var.name_nef_mongo
+        app = var.name_fogus_postgres
       }
     }
     template {
       metadata {
         labels = {
-          app = var.name_nef_mongo
+          app = var.name_fogus_postgres
         }
       }
       spec {
         enable_service_links = false
         container {
-          image = var.image_nef_mongo
-          name  = var.name_nef_mongo
+          image = var.image_fogus_postgres
+          name  = var.name_fogus_postgres
+
+
+          env {
+            name  = "POSTGRES_DB"
+            value = "evolvedb"
+          }
+          env {
+            name  = "POSTGRES_USER"
+            value = "evolveclient"
+          }
+          env {
+            name  = "POSTGRES_PASSWORD"
+            value = "evolvepass"
+          }
+
+        
           resources {
             limits = {
-              cpu    = var.nef_mongo_cpu_limit
-              memory = var.nef_mongo_memory_limit
+              cpu    = var.fogus_postgres_cpu_limit
+              memory = var.fogus_postgres_memory_limit
             }
             requests = {
-              cpu    = var.nef_mongo_cpu_request
-              memory = var.nef_mongo_memory_request
+              cpu    = var.fogus_postgres_cpu_request
+              memory = var.fogus_postgres_memory_request
             }
           }
-        }
-        image_pull_secrets {
-          name = "regcred"
-        }
-      }
-    }
-  }
-}
-#############################################
-#               NEF_MONGO_EXPRESS
-#############################################
-resource "kubernetes_deployment" "nef_mongo_express" {
-  metadata {
-    name      = var.name_nef_mongo_express
-    namespace = var.nef_namespace
-    labels = {
-      app = var.name_nef_mongo_express
-    }
-  }
-  spec {
-    replicas = var.app_replicas
-    selector {
-      match_labels = {
-        app = var.name_nef_mongo_express
-      }
-    }
-    template {
-      metadata {
-        labels = {
-          app = var.name_nef_backend
-        }
-      }
-      spec {
-        enable_service_links = false
-        container {
-          image = var.image_nef_mongo_express
-          name  = var.name_nef_mongo_express
-          resources {
-            limits = {
-              cpu    = var.nef_mongo_express_cpu_limit
-              memory = var.nef_mongo_express_memory_limit
+          volume_mount {
+              mount_path = "/code"
+              name       = "app-backend"
             }
-            requests = {
-              cpu    = var.nef_mongo_express_cpu_request
-              memory = var.nef_mongo_express_memory_request
+          }
+          volume {
+            name = "app-backend"
+            empty_dir {
             }
           }
         }
@@ -377,59 +346,63 @@ resource "kubernetes_deployment" "nef_mongo_express" {
   }
 }
 
-resource "kubernetes_service" "nef_mongo_express_service" {
+
+resource "kubernetes_service" "fogus_postgres_service" {
   metadata {
-    name      = var.name_nef_mongo_express
-    namespace = var.nef_namespace
+    name      = var.name_fogus_postgres
+    namespace = var.fogus_namespace
   }
   spec {
     selector = {
-      app = kubernetes_deployment.nef_mongo_express.spec.0.template.0.metadata[0].labels.app
+      app = kubernetes_deployment.fogus_postgres.spec.0.template.0.metadata[0].labels.app
     }
     port {
-      port        = var.nef_mongo_express_port
-      target_port = var.nef_mongo_express_target_port
+      port        = var.fogus_postgres_port
+      target_port = var.fogus_postgres_target_port
     }
   }
 }
 
 #############################################
-#                  NEF_DB
+#         FOGUS NETAPP DJANGO
 #############################################
-resource "kubernetes_deployment" "nef_db" {
+
+resource "kubernetes_deployment" "fogus_django" {
   metadata {
-    name      = var.name_nef_db
-    namespace = var.nef_namespace
+    name      = var.name_fogus_django
+    namespace = var.fogus_namespace
     labels = {
-      app = var.name_nef_db
+      app = var.name_fogus_django
     }
   }
   spec {
     replicas = var.app_replicas
     selector {
       match_labels = {
-        app = var.name_nef_db
+        app = var.name_fogus_django
       }
     }
     template {
       metadata {
         labels = {
-          app = var.name_nef_db
+          app = var.name_fogus_django
         }
       }
       spec {
         enable_service_links = false
         container {
-          image = var.image_nef_db
-          name  = var.name_nef_db
+          image = var.image_fogus_django
+          name  = var.name_fogus_django
+
+        
           resources {
             limits = {
-              cpu    = var.nef_db_cpu_limit
-              memory = var.nef_db_memory_limit
+              cpu    = var.fogus_django_cpu_limit
+              memory = var.fogus_django_memory_limit
             }
             requests = {
-              cpu    = var.nef_db_cpu_request
-              memory = var.nef_db_memory_request
+              cpu    = var.fogus_django_cpu_request
+              memory = var.fogus_django_memory_request
             }
           }
         }
@@ -440,65 +413,20 @@ resource "kubernetes_deployment" "nef_db" {
     }
   }
 }
-#############################################
-#               NEF_PGADMIN
-#############################################
-resource "kubernetes_deployment" "nef_pgadmin" {
+
+
+resource "kubernetes_service" "fogus_django_service" {
   metadata {
-    name      = var.name_nef_pgadmin
-    namespace = var.nef_namespace
-    labels = {
-      app = var.name_nef_pgadmin
-    }
-  }
-  spec {
-    replicas = var.app_replicas
-    selector {
-      match_labels = {
-        app = var.name_nef_pgadmin
-      }
-    }
-    template {
-      metadata {
-        labels = {
-          app = var.name_nef_pgadmin
-        }
-      }
-      spec {
-        enable_service_links = false
-        container {
-          image = var.image_nef_pgadmin
-          name  = var.name_nef_pgadmin
-          resources {
-            limits = {
-              cpu    = var.nef_pgadmin_cpu_limit
-              memory = var.nef_pgadmin_memory_limit
-            }
-            requests = {
-              cpu    = var.nef_pgadmin_cpu_request
-              memory = var.nef_pgadmin_memory_request
-            }
-          }
-        }
-        image_pull_secrets {
-          name = "regcred"
-        }
-      }
-    }
-  }
-}
-resource "kubernetes_service" "nef_pgadmin_service" {
-  metadata {
-    name      = var.name_nef_pgadmin
-    namespace = var.nef_namespace
+    name      = var.name_fogus_django
+    namespace = var.fogus_namespace
   }
   spec {
     selector = {
-      app = kubernetes_deployment.nef_pgadmin.spec.0.template.0.metadata[0].labels.app
+      app = kubernetes_deployment.fogus_django.spec.0.template.0.metadata[0].labels.app
     }
     port {
-      port        = var.nef_pgadmin_port
-      target_port = var.nef_pgadmin_target_port
+      port        = var.fogus_django_port
+      target_port = var.fogus_django_target_port
     }
   }
 }
