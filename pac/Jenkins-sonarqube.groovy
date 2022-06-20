@@ -72,17 +72,19 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     //TODO: IMPROVE WAIT FOR REPORT READY
+                    //qualityGateStatus=true provokes an error
                     sh '''
                     sleep 15
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
                         --sonartoken="$SQ_TOKEN" \
-                        --qualityGateStatus="true" \
+                        --qualityGateStatus="false" \ 
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --sinceleakperiod="false" \
-                        --allbugs="true" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --allbugs="true" \
+                        --saveReportJson == sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
@@ -97,14 +99,17 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''
-                    report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+                    files = ("html" "json")
+                    for x in "${files[@]}"
+                    do
 
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                        --data-binary @"$report_file" \
-                        "$url"
+                        report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
 
-                    cp $report_file $report_file.txt
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                    done
                     '''
                 }
             }
