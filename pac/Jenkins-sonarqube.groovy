@@ -77,15 +77,15 @@ pipeline {
                     sleep 15
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
-                        --sonartoken="$SQ_TOKEN"\
-                        --qualityGateStatus="false"\
+                        --sonartoken="$SQ_TOKEN" \
+                        --qualityGateStatus="false" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --sinceleakperiod="false" \
                         --allbugs="true" \
                         --noRulesInReport ="true" \
-                        --saveReportJson == sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --saveReportJson == "sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
