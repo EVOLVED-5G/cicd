@@ -84,8 +84,8 @@ pipeline {
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --sinceleakperiod="false" \
                         --allbugs="true" \
-                        --noRulesInReport ="true" \
-                        --saveReportJson = "sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --noRulesInReport= "true" \
+                        --saveReportJson "sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
