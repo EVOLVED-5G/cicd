@@ -24,7 +24,18 @@ pipeline {
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         DOCKER_VAR = false
     }
-
+    stages {
+        stage('Clean workspace') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh '''
+                    docker stop $(docker ps -q)
+                    docker system prune -a -f --volumes
+                    sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+                    '''
+                }
+            }
+        }
     stages {
         stage('Get the code!') {
             steps {
