@@ -85,7 +85,7 @@ pipeline {
                         
                         for x in "${files[@]}"
                             do
-                                report_file="repo-secrets-$NETAPP_NAME_LOWER.$x"
+                                report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.jsonR.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
@@ -107,18 +107,18 @@ pipeline {
                 replyTo: "no-reply@tid.es",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
+        // cleanup{
+        //     /* clean up our workspace */
+        //     deleteDir()
+        //     /* clean up tmp directory */
+        //     dir("${env.workspace}@tmp") {
+        //         deleteDir()
+        //     }
+        //     /* clean up script directory */
+        //     dir("${env.workspace}@script") {
+        //         deleteDir()
+        //     }
+        // }
     }
 }
 
