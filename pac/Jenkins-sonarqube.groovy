@@ -85,7 +85,7 @@ pipeline {
                         --sinceleakperiod="false" \
                         --allbugs="true" \
                         --noRulesInReport= "true" \
-                        --saveReportJson "report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > report-sonar_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --saveReportJson "report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
