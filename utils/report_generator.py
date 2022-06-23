@@ -10,8 +10,6 @@ import sys
 import jinja2
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))+"/../"
-print(THIS_DIR)
-
 template = sys.argv[2]
 json_filename = sys.argv[4]
 output_filename = sys.argv[6]
