@@ -71,22 +71,6 @@ pipeline {
            }
         }
 
-        stage('Generate report for the repository'){
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone $GIT_NETAPP_URL.wiki.git
-                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
-                    cd ${NETAPP_NAME}.wiki/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy scan report'
-                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
-                    '''
-                }
-           }
-        }
-
         stage('Upload report to Artifactory') {
             when {
                 expression {
@@ -124,16 +108,16 @@ pipeline {
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
         cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
+            // /* clean up our workspace */
+            // deleteDir()
+            // /* clean up tmp directory */
+            // dir("${env.workspace}@tmp") {
+            //     deleteDir()
+            // }
+            // /* clean up script directory */
+            // dir("${env.workspace}@script") {
+            //     deleteDir()
+            // }
         }
     }
 }
