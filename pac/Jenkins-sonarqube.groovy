@@ -89,6 +89,7 @@ pipeline {
                     '''
                 }
             }
+        }
 
         
         stage('Generate Markdown report and Upload reports to Artifactory') {
