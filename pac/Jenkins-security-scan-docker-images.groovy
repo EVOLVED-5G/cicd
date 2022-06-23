@@ -75,17 +75,21 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
-                    
+                    declare -a files=("json" "md")
                     images=($response)
                     
                     for x in "${images[@]}"
-                    do
-                        report_file="report-tr-img-$x.json"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+                    do  
+                        python3 utils/report_generator.py --template templates/scan-image.md.j2 --json report-tr-img-$x.json --output report-tr-img-$x.md
+                        for y in "${files[@]}"
+                        do
+                            report_file="report-tr-img-$x.$y"
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
 
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$report_file" \
+                                "$url"
+                        done
                     done
                     '''
                 }
