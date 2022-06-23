@@ -85,7 +85,7 @@ pipeline {
                         
                         for x in "${files[@]}"
                             do
-                                report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.jsonR.$x"
+                                report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
