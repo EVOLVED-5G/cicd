@@ -36,7 +36,6 @@ pipeline {
                 }
             }
         }
-    stages {
         stage('Get the code!') {
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -49,7 +48,6 @@ pipeline {
                 }
            }
         }
-
         stage('Check if there is a docker-compose in the repository') {
             steps {
                 script{
@@ -184,4 +182,3 @@ pipeline {
         }
     }
 }
-
