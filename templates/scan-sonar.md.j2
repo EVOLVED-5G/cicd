@@ -1,0 +1,29 @@
+# Evolved5G Sonarqube Report
+# Sonarqube static quality code analysis 
+
+{% set name = projectName.split("-") %}
+## Scan of {{name.1}}
+
+***
+{% if not issues %} 
+Good work. Code has a good quality.
+{% else %}
+### Issues
+| Severity | Status | Line | Component | Description | 
+|---|---|---|---|---|
+{%- for issue_type in issues %}
+{%- if ((issue_type.severity == "CRITICAL") or (issue_type.severity == "MAJOR")) %}
+| {{issue_type.severity}} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
+{%- endif %}
+{%- endfor %}
+
+### Summary
+
+| Severity | Number of vulnerabilities |
+|---|---|
+
+{%- for summary_type in summary %}
+| {{summary_type}} | {{summary[summary_type]}}|
+  {%- endfor %}
+{%- endif %}
+***
