@@ -71,6 +71,22 @@ pipeline {
            }
         }
 
+        stage('Generate report for the repository'){
+            steps {
+                dir ("${env.WORKSPACE}/") {
+                    sh '''
+                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+                    git clone $GIT_NETAPP_URL.wiki.git
+                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+                    cd ${NETAPP_NAME}.wiki/
+                    git add -A .
+                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy scan report'
+                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+                    '''
+                }
+           }
+        }
+
         stage('Upload report to Artifactory') {
             when {
                 expression {
@@ -80,11 +96,18 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                        report_file="report-tr-repo-$NETAPP_NAME_LOWER.json"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
+                        python3 utils/report_generator.py --template templates/scan-repo.md.j2 --json report-tr-repo-$NETAPP_NAME_LOWER.json --output report-tr-repo-$NETAPP_NAME_LOWER.md
+                        declare -a files=("json" "md")
+                        
+                        for x in "${files[@]}"
+                            do
+                                report_file="report-tr-repo-$NETAPP_NAME_LOWER.$x"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                    --data-binary @"$report_file" \
+                                    "$url"
+                            done
                     '''
                 }
             }

@@ -80,11 +80,18 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                        report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.json"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
+                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json report-tr-repo-secrets-$NETAPP_NAME_LOWER.json --output report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
+                        declare -a files=("json" "md")
+                        
+                        for x in "${files[@]}"
+                            do
+                                report_file="repo-secrets-$NETAPP_NAME_LOWER.$x"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                    --data-binary @"$report_file" \
+                                    "$url"
+                            done
                     '''
                 }
             }
