@@ -85,13 +85,13 @@ pipeline {
                         --sinceleakperiod="false" \
                         --allbugs="true" \
                         --noRulesInReport= "true" \
-                        --saveReportJson "sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --saveReportJson "report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > report-sonar_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
-        }
 
-        stage('Upload report to Artifactory') {
+        
+        stage('Generate Markdown report and Upload reports to Artifactory') {
             when {
                 expression {
                     return REPORTING;
@@ -100,12 +100,14 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#! /bin/bash
-                    declare -a files=("json" "html")
+
+                    python3 main.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    declare -a files=("json" "html" "md")
 
                     for x in "${files[@]}"
                     do
 
-                        report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
+                        report_file="report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
