@@ -102,7 +102,7 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#! /bin/bash
 
-                    python3 main.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md")
 
                     for x in "${files[@]}"
