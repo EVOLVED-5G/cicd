@@ -12,9 +12,7 @@ Good work. Code has a good quality.
 | Severity | Status | Line | Component | Description | 
 |---|---|---|---|---|
 {%- for issue_type in issues %}
-{%- if ((issue_type.severity == "CRITICAL") or (issue_type.severity == "MAJOR")) %}
 | {{issue_type.severity}} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
-{%- endif %}
 {%- endfor %}
 
 ### Summary
