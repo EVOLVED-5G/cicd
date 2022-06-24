@@ -36,13 +36,14 @@ pipeline {
                     sh '''#!/bin/bash
 
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
+                    
 
                     images=($response)
 
                     for x in "${images[@]}"
                     do
-                        curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=$TOKEN_TRIVY&image=dockerhub.hi.inet/evolved-5g/$x&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=md"
-                        curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-image?token=$TOKEN_TRIVY&image=dockerhub.hi.inet/evolved-5g/$x&update_wiki=false&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json" > report-tr-img-$x.json
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$x" 
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json&image=dockerhub.hi.inet/evolved-5g/$x" > report-tr-img-$x.json
                     done
                     '''
                 }
@@ -105,17 +106,17 @@ pipeline {
                 replyTo: "no-reply@tid.es",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        cleanup{
-            // /* clean up our workspace */
-            // deleteDir()
-            // /* clean up tmp directory */
-            // dir("${env.workspace}@tmp") {
-            //     deleteDir()
-            // }
-            // /* clean up script directory */
-            // dir("${env.workspace}@script") {
-            //     deleteDir()
-            // }
-        }
+        // cleanup{
+        //     /* clean up our workspace */
+        //     deleteDir()
+        //     /* clean up tmp directory */
+        //     dir("${env.workspace}@tmp") {
+        //         deleteDir()
+        //     }
+        //     /* clean up script directory */
+        //     dir("${env.workspace}@script") {
+        //         deleteDir()
+        //     }
+        // }
     }
 }
