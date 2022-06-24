@@ -38,12 +38,12 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/20 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i ".md" | tr -d '"' )
+                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i ".md" | tr -d '"' )
                     artifacts=($response)
                     
                     for x in "${artifacts[@]}"
                     do  
-                        url=$ARTIFACTORY_URL/$NETAPP_NAME/20/$x
+                        url=$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_NUMBER/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
                         echo "\n" >> report.md
                         cat $x >> report.md
@@ -57,7 +57,7 @@ pipeline {
 
                     for x in "${files[@]}"
                     do
-                        report_file="final_report.x"
+                        report_file="final_report.$x"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
@@ -80,17 +80,17 @@ pipeline {
                 replyTo: "no-reply@tid.es",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        // cleanup{
-        //     /* clean up our workspace */
-        //     deleteDir()
-        //     /* clean up tmp directory */
-        //     dir("${env.workspace}@tmp") {
-        //         deleteDir()
-        //     }
-        //     /* clean up script directory */
-        //     dir("${env.workspace}@script") {
-        //         deleteDir()
-        //     }
-        // }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
+        }
     }
 }
