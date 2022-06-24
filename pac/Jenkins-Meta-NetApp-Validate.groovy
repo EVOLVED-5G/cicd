@@ -20,7 +20,7 @@ pipeline {
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.defaultValue(BUILD_NUMBER)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
