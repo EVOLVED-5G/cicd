@@ -38,15 +38,34 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i "json" | tr -d '"' )
+                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/20 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i ".md" | tr -d '"' )
                     artifacts=($response)
                     
                     for x in "${artifacts[@]}"
                     do  
-                        url=http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER/$x
+                        url=$ARTIFACTORY_URL/$NETAPP_NAME/20/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
-                        cat $x >> report
+                        echo "\n" >> report.md
+                        cat $x >> report.md
+                        echo "\n" >> report.md
                     done
+
+                    pandoc -s report.md --metadata title="Final report" -o final_report.html
+                    pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
+
+                    declare -a files=("html" "pdf")
+
+                    for x in "${files[@]}"
+                    do
+                        report_file="final_report.x"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                    done
+
+
                     '''
                 }
             }
