@@ -20,7 +20,6 @@ pipeline {
         GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
-        NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
         TOKEN_TRIVY = credentials('token_trivy')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
@@ -38,12 +37,14 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/FogusNetApp/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i "json" | tr -d '"' )
+                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i "json" | tr -d '"' )
                     artifacts=($response)
                     
                     for x in "${artifacts[@]}"
                     do  
-                        curl -sSf -u $PASSWORD_ARTIFACTORY -O 'http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/FogusNetApp/$x'
+                        url=http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$x
+                        echo $url
+                        curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
                     done
                     '''
                 }
