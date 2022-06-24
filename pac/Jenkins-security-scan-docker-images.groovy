@@ -11,6 +11,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -83,7 +84,7 @@ pipeline {
                         for y in "${files[@]}"
                         do
                             report_file="report-tr-img-$x.$y"
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                             curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                                 --data-binary @"$report_file" \
