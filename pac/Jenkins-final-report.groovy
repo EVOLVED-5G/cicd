@@ -38,13 +38,12 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i "json" | tr -d '"' )
+                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i "json" | tr -d '"' )
                     artifacts=($response)
                     
                     for x in "${artifacts[@]}"
                     do  
-                        url=http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$x
-                        echo $url
+                        url=http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
                     done
                     '''
