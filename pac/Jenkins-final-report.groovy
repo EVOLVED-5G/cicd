@@ -45,6 +45,7 @@ pipeline {
                     do  
                         url=http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
+                        cat $x >> report
                     done
                     '''
                 }
