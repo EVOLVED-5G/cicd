@@ -36,17 +36,19 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
+                    echo $response
                     artifacts=($response)
+
                     for x in "${artifacts[@]}"
                     do  
-                        url= http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER/$x
+                        url= http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
                         echo "\n" >> final_report.md
                         cat $x >> final_report.md
                         echo "\n" >> final_report.md
                     done
-
+s
                     pandoc -s final_report.md --metadata title="Final report" -o final_report.html
                     pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
 
