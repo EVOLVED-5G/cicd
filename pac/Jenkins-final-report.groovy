@@ -80,17 +80,17 @@ pipeline {
                 replyTo: "no-reply@tid.es",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
+        // cleanup{
+        //     /* clean up our workspace */
+        //     deleteDir()
+        //     /* clean up tmp directory */
+        //     dir("${env.workspace}@tmp") {
+        //         deleteDir()
+        //     }
+        //     /* clean up script directory */
+        //     dir("${env.workspace}@script") {
+        //         deleteDir()
+        //     }
+        // }
     }
 }
