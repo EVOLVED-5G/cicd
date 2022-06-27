@@ -22,8 +22,6 @@ pipeline {
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         TOKEN = credentials('github_token_cred')
-        TOKEN_TRIVY = credentials('token_trivy')
-        TOKEN_EVOLVED = credentials('github_token_evolved5g')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
@@ -38,12 +36,11 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -v -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep  -i ".md" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
                     artifacts=($response)
-                    
                     for x in "${artifacts[@]}"
                     do  
-                        url=$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_NUMBER/$x
+                        url= http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_NUMBER/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
                         echo "\n" >> final_report.md
                         cat $x >> final_report.md
@@ -64,8 +61,6 @@ pipeline {
                             --data-binary @"$report_file" \
                             "$url"
                     done
-
-
                     '''
                 }
             }
