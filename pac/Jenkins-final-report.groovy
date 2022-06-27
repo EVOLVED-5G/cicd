@@ -47,7 +47,7 @@ pipeline {
                         cat $x >> final_report.md
                         echo "\n" >> final_report.md
                     done
-                    
+
                     pandoc -s final_report.md --metadata title="Final report" -o final_report.html
                     pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
 
@@ -71,7 +71,7 @@ pipeline {
                         report_file="final_report.$y"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                        curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
                             --data-binary @"$report_file" \
                             "$url"
                     done
