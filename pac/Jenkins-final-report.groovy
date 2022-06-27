@@ -47,7 +47,7 @@ pipeline {
                         cat $x >> final_report.md
                         echo "\n" >> final_report.md
                     done
-s
+                    
                     pandoc -s final_report.md --metadata title="Final report" -o final_report.html
                     pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
 
