@@ -9,7 +9,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
-        string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
+        string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'Netapp branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
@@ -21,8 +21,8 @@ pipeline {
         GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
+        NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
-        ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
 
@@ -36,14 +36,13 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
-                    echo $response
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do  
-                        url= http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME/$BUILD_ID/$x
-                        curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
+                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                        curl -u $PASSWORD_ARTIFACTORY $url -o $x
                         echo "\n" >> final_report.md
                         cat $x >> final_report.md
                         echo "\n" >> final_report.md
@@ -54,10 +53,35 @@ s
 
                     declare -a files=("html" "pdf" "md")
 
-                    for x in "${files[@]}"
+                    for y in "${files[@]}"
                     do
-                        report_file="final_report.$x"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                        report_file="final_report.$y"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                    done
+                    '''
+                }
+            }
+        }
+        stage('Upload documents to Artifactory') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    
+                    declare -a files=("html" "pdf" "md")
+
+                    for y in "${files[@]}"
+                    do
+                        report_file="final_report.$y"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$report_file" \
