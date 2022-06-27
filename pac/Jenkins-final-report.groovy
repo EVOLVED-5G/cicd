@@ -51,17 +51,6 @@ s
                     pandoc -s final_report.md --metadata title="Final report" -o final_report.html
                     pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
 
-                    declare -a files=("html" "pdf" "md")
-
-                    for y in "${files[@]}"
-                    do
-                        report_file="final_report.$y"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
-
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
-                    done
                     '''
                 }
             }
@@ -77,7 +66,6 @@ s
                     sh '''#!/bin/bash
                     
                     declare -a files=("html" "pdf" "md")
-
                     for y in "${files[@]}"
                     do
                         report_file="final_report.$y"
