@@ -45,15 +45,15 @@ pipeline {
                     do  
                         url=$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_NUMBER/$x
                         curl -u $PASSWORD_ARTIFACTORY -0 $url -o $x
-                        echo "\n" >> report.md
-                        cat $x >> report.md
-                        echo "\n" >> report.md
+                        echo "\n" >> final_report.md
+                        cat $x >> final_report.md
+                        echo "\n" >> fianl_report.md
                     done
 
                     pandoc -s report.md --metadata title="Final report" -o final_report.html
                     pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
 
-                    declare -a files=("html" "pdf")
+                    declare -a files=("html" "pdf" "md")
 
                     for x in "${files[@]}"
                     do
