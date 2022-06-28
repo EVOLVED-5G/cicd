@@ -4,6 +4,12 @@
 {% set name = projectName.split("-") %}
 ## Scan of {{name.1}}
 
+### Summary¡
+| Severity | Number of vulnerabilities |
+|---|---|
+{%- for summary_type in summary %}
+| {{summary_type}} | {{summary[summary_type]}}|
+  {%- endfor %}
 ***
 {% if not issues %} 
 Good work. Code has a good quality.
@@ -14,14 +20,5 @@ Good work. Code has a good quality.
 {%- for issue_type in issues %}
 | {{issue_type.severity}} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
 {%- endfor %}
-
-### Summary
-
-| Severity | Number of vulnerabilities |
-|---|---|
-
-{%- for summary_type in summary %}
-| {{summary_type}} | {{summary[summary_type]}}|
-  {%- endfor %}
 {%- endif %}
-***
+
