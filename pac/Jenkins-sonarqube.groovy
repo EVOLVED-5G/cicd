@@ -101,8 +101,8 @@ pipeline {
                     sh '''#! /bin/bash
 
                     python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
-                    docker build --build-arg=${WORKSPACE}-t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v ${WORKSPACE}/results:/usr/src/app2 -it pdf_generator markdown-pdf -f A4 -b 1cm -s /usr/src/app/style.css -o /usr/src/app2/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    docker build  -t pdf_generator utils/docker_generate_pdf/Dockerfile
+                    docker run -v "${pwd}:/usr/src/app" -it pdf_generator markdown-pdf -f A4 -b 1cm -s /usr/src/app/style.css -o /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     cp ${WORKSPACE}/results/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf ${WORKSPACE}/
                     declare -a files=("json" "html" "md" "pdf")
 
