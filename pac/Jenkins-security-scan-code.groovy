@@ -27,6 +27,7 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        DOCKER_PATH="/usr/src/app"
     }
     stages {
         stage('Get Repo and clone'){
@@ -82,7 +83,9 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                         python3 utils/report_generator.py --template templates/scan-repo.md.j2 --json report-tr-repo-$NETAPP_NAME_LOWER.json --output report-tr-repo-$NETAPP_NAME_LOWER.md
-                        declare -a files=("json" "md")
+                        docker build  -t pdf_generator utils/docker_generate_pdf/.
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-tr-repo-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                        declare -a files=("json" "md" "pdf")
                         
                         for x in "${files[@]}"
                             do
