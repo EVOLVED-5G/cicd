@@ -36,20 +36,17 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".md" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
+                    cp utils/*.pdf .
 
                     for x in "${artifacts[@]}"
                     do  
                         url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
-                        echo "\n" >> final_report.md
-                        cat $x >> final_report.md
-                        echo "\n" >> final_report.md
                     done
 
-                    pandoc -s final_report.md --metadata title="Final report" -o final_report.html
-                    pandoc final_report.html --pdf-engine=xelatex -o final_report.pdf
+                    pdfunite *.pdf final_report.pdf
 
                     '''
                 }
@@ -65,16 +62,12 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     
-                    declare -a files=("html" "pdf" "md")
-                    for y in "${files[@]}"
-                    do
-                        report_file="final_report.$y"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+                    report_file="final_report.pdf"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                        curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
-                            --data-binary @"$report_file" \
-                            "$url"
-                    done
+                    curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
+                        --data-binary @"$report_file" \
+                        "$url"
                     '''
                 }
             }
