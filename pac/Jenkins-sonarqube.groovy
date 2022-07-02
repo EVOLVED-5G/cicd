@@ -24,6 +24,7 @@ pipeline {
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        DOCKER_PATH="/usr/src/app"
     }
 
     stages {
@@ -101,9 +102,8 @@ pipeline {
                     sh '''#! /bin/bash
 
                     python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
-                    docker build  -t pdf_generator utils/docker_generate_pdf/Dockerfile
-                    docker run -v "${pwd}:/usr/src/app" -it pdf_generator markdown-pdf -f A4 -b 1cm -s /usr/src/app/style.css -o /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
-                    cp ${WORKSPACE}/results/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf ${WORKSPACE}/
+                    docker build  -t pdf_generator utils/docker_generate_pdf/.
+                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
 
                     for x in "${files[@]}"
