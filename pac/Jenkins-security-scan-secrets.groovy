@@ -27,6 +27,7 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        DOCKER_PATH="/usr/src/app"
     }
     stages {
         stage('Get Repo and clone'){
