@@ -19,9 +19,6 @@ pipeline {
     }
 
     environment {
-        // GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
-        // GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        // GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
@@ -104,7 +101,10 @@ pipeline {
                     sh '''#! /bin/bash
 
                     python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
-                    declare -a files=("json" "html" "md")
+                    docker build -t pdf_generator utils/docker_generate_pdf/.
+                    docker run -v ${WORKSPACE}:/usr/src/app -it pdf_generator markdown-pdf -f A4 -b 1cm -s /usr/src/app/style.css -o /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf /usr/src/app/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+
+                    declare -a files=("json" "html" "md" "pdf")
 
                     for x in "${files[@]}"
                     do
