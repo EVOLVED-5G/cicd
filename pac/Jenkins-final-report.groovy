@@ -38,7 +38,6 @@ pipeline {
                     sh '''#!/bin/bash
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
-                    cp utils/*.pdf .
 
                     for x in "${artifacts[@]}"
                     do  
@@ -46,7 +45,9 @@ pipeline {
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
-                    pdfunite *.pdf final_report.pdf
+                    pdfunite *.pdf mid_report.pdf
+                    cp utils/*.pdf .
+                    pdfunite cover.pdf mid_report.pdf endpage.pdf final_report.pdf
 
                     '''
                 }
@@ -61,7 +62,7 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    
+
                     report_file="final_report.pdf"
                     url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
