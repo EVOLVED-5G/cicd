@@ -18,7 +18,7 @@ pipeline {
     stages {
         stage('Login openshift') {
             steps {
-                withCredentials([string(credentialsId: '18e7aeb8-5552-4cbb-bf66-2402ca6772de', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'token-os-capif', variable: 'TOKEN')]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             export KUBECONFIG="./kubeconfig"
@@ -46,7 +46,7 @@ pipeline {
         }
         stage ('Expose service') {
             steps {
-                withCredentials([string(credentialsId: '18e7aeb8-5552-4cbb-bf66-2402ca6772de', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'token-os-capif', variable: 'TOKEN')]) {
                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                         sh '''
                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
