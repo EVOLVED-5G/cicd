@@ -14,18 +14,17 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
     environment {
-        // GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
-        // GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        // GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        DOCKER_PATH="/usr/src/app"
     }
 
     stages {
@@ -72,23 +71,27 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     //TODO: IMPROVE WAIT FOR REPORT READY
+                    //qualityGateStatus=true provokes an error
                     sh '''
                     sleep 15
                     sonar-report \
                         --sonarurl="http://195.235.92.134:9000" \
                         --sonartoken="$SQ_TOKEN" \
-                        --qualityGateStatus="true" \
+                        --qualityGateStatus="false" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --project="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --application="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
                         --sinceleakperiod="false" \
-                        --allbugs="true" > sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
+                        --allbugs="true" \
+                        --noRulesInReport= "true" \
+                        --saveReportJson "report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json" > report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
         }
 
-        stage('Upload report to Artifactory') {
+        
+        stage('Generate Markdown report and Upload reports to Artifactory') {
             when {
                 expression {
                     return REPORTING;
@@ -96,15 +99,23 @@ pipeline {
             }
             steps {
                  dir ("${WORKSPACE}/") {
-                    sh '''
-                    report_file="sonar-report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
+                    sh '''#! /bin/bash
 
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                        --data-binary @"$report_file" \
-                        "$url"
+                    python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    docker build  -t pdf_generator utils/docker_generate_pdf/.
+                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    declare -a files=("json" "html" "md" "pdf")
 
-                    cp $report_file $report_file.txt
+                    for x in "${files[@]}"
+                    do
+
+                        report_file="report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                    done
                     '''
                 }
             }

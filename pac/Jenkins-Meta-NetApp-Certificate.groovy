@@ -14,215 +14,219 @@ pipeline {
 
     stages {
 
-        stage('Validation: Static Code Analysis'){
+        stage('Certification: Static Code Analysis'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Security Scan Code'){
+        stage('Certification: Security Scan Code'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Security Scan Secrets'){
+        stage('Certification: Security Scan Secrets'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
-        //Review Parameters -- do we need to get the image from registry ?
-        stage('Validation: Get docker Image from Registry'){
+        //Review Parameters
+        stage('Certification: Get docker Image from Registry'){
             steps{
                 build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
         //Review Parameters
-        stage('Validation: Security Scan Docker Images'){
+        stage('Certification: Security Scan Docker Images'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        // stage('Validation: Upload Docker Images'){
-        //     steps{
-        //         build job: '003-NETAPPS/003-Helpers/018-Certify Images', wait: true, propagate: false,
-        //             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-        //                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-        //                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER))]
-        //     }
-        // }
+        stage('Certification: Upload Docker Images'){
+            steps{
+                build job: '/100-HELPERS/002-Upload Docker Image', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+            }
+        }
 
         //Review Parameters
-        stage('Validation: Deploy NetApp'){
+        stage('Certification: Deploy NetApp'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Test NetApp Networking'){
+        stage('Certification: Test NetApp Networking'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
                      parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NetApp Onboarding Sucessfull'){
+        stage('Certification: NetApp Onboarding Sucessfull'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/007-NetApp Onboarding Successful', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Discover NetApp API from CAPIF'){
+        stage('Certification: Discover NetApp API from CAPIF'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/008-Discover NetApp API from CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Discover NetApp Callback CAPIF'){
+        stage('Certification: Discover NetApp Callback CAPIF'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NEF Services as SessionWithQoS'){
+        stage('Certification: NEF Services as SessionWithQoS'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NEF Services MonitoringEvent API'){
+        stage('Certification: NEF Services MonitoringEvent API'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NEF Services MonitoringEvent'){
+        stage('Certification: NEF Services MonitoringEvent'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Destroy NetApp'){
+        stage('Certification: Scale replica NetApp '){
+            steps{
+                build job: '/003-NETAPPS/003-Helpers/016-Scale Netapp', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+            }
+        }
+
+        stage('Certification: Shrink replicaSet NetApp '){
+            steps{
+                build job: '/003-NETAPPS/003-Helpers/017-Shrink Netapp', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+            }
+        }
+
+        //Review Parameters
+        stage('Certification: Destroy NetApp'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NetApp OffBoarding'){
+        stage('Certification: NetApp OffBoarding'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: OpenSource Licenses Report'){
+        stage('Certification: OpenSource Licenses Report'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
 
         //Review Parameters
-        stage('Validation: Generate Final Report'){
+        stage('Certification: Generate Final Report'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }

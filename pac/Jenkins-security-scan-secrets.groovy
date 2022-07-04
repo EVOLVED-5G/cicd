@@ -11,6 +11,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -26,6 +27,7 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        DOCKER_PATH="/usr/src/app"
     }
     stages {
         stage('Get Repo and clone'){
@@ -80,11 +82,20 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                        report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.json"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$report_file"
-                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
+                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json report-tr-repo-secrets-$NETAPP_NAME_LOWER.json --output report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
+                        docker build  -t pdf_generator utils/docker_generate_pdf/.
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
+                        declare -a files=("json" "md" "pdf")
+                        
+                        for x in "${files[@]}"
+                            do
+                                report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.$x"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                    --data-binary @"$report_file" \
+                                    "$url"
+                            done
                     '''
                 }
             }
