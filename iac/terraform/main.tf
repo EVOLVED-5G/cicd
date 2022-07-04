@@ -35,7 +35,7 @@ resource "kubernetes_deployment" "dummy_netapp" {
       spec {
         enable_service_links = false
         container {
-          image = "dockerhub.hi.inet/evolved-5g/dummy-netapp:1.0.233"
+          image = "dockerhub.hi.inet/evolved-5g/dummy-netapp:latest"
           name  = "dummy-netapp"
         }
       }
