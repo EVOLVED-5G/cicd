@@ -136,17 +136,19 @@ pipeline {
             }  
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    script {   
-                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                        def cmd = "docker ps --format '{{.Image}}'"
-                        def cmd2 = "docker ps --format '{{.Names}}'"
-                        def image = sh(returnStdout: true, script: cmd).trim()
-                        def name  = sh(returnStdout: true, script: cmd2).trim()
-                        sh '''$(aws ecr get-login --no-include-email)'''
-                        [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":${VERSION}"""
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":latest"""
-                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}" """
+                    retry(2){
+                        script {   
+                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                            def cmd = "docker ps --format '{{.Image}}'"
+                            def cmd2 = "docker ps --format '{{.Names}}'"
+                            def image = sh(returnStdout: true, script: cmd).trim()
+                            def name  = sh(returnStdout: true, script: cmd2).trim()
+                            sh '''$(aws ecr get-login --no-include-email)'''
+                            [image.tokenize(), name.tokenize()].transpose().each { x ->
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}" """
+                            }
                         }
                     }
                 }               
@@ -160,12 +162,14 @@ pipeline {
             }   
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    sh '''
-                    docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                    docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}
-                    docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
-                    docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
-                    '''
+                    retry{
+                        sh '''
+                        docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
+                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}
+                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
+                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
+                        '''
+                    }
                 }
             }
         }
