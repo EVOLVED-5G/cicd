@@ -26,7 +26,7 @@ resource "kubernetes_deployment" "dummy_netapp" {
       spec {
         enable_service_links = false
         container {
-          image = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-netapp"
+          image = "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-netapp-1.0"
           name  = var.netapp_name
           resources {
             limits = {
