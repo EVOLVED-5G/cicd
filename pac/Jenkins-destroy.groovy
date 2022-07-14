@@ -103,7 +103,7 @@ pipeline {
                     stages{
                         stage('Removing services') {
                             steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                withKubeConfig([credentialsId: 'kubeconfigAthens', contextName:"kubernetes-admin@kubernetes"]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                         dir ("${env.WORKSPACE}/iac/terraform/") {
                                             sh '''
@@ -120,7 +120,7 @@ pipeline {
         }
         stage ('Undeploy app in kubernetess') {
             steps {
-                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                withKubeConfig([credentialsId: 'kubeconfigAthens', contextName:"kubernetes-admin@kubernetes"]) {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         dir ("${env.WORKSPACE}/iac/terraform/") {
                             sh '''
