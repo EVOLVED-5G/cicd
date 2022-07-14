@@ -68,21 +68,18 @@ pipeline {
                     stages{
                         stage('Login openshift to get kubernetes credentials') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'token-os-dummy', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
                                         '''
-                                        readFile('kubeconfig')
                                     }
                                 }
                             }
                         }
                         stage ('Remove service expose in openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'token-os-dummy', variable: 'TOKEN')]) {
                                     catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                         dir ("${env.WORKSPACE}/iac/terraform/") {
                                             sh '''
@@ -104,17 +101,9 @@ pipeline {
                         }
                     }
                     stages{
-                        stage('Login openshift to get kubernetes credentials') {
-                            steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        export KUBECONFIG="~/kubeconfig"
-                                    '''
-                                }
-                            }
-                        }
                         stage('Removing services') {
                             steps { 
+                            withKubeConfig([credentialsId: 'kubeconfigAthens']) {
                                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''

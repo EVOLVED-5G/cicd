@@ -80,39 +80,6 @@ pipeline {
                     '''
                 }
             }
-        }
-        stage ('Configure Provider for the specific deployment') {
-            parallel{
-                stage('Configuration in Openshift'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
-                    }
-                    steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/") {
-                            sh '''
-                            kubectl config use-context evol5-capif/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-capif:deployer
-                            '''
-                        }
-                    }
-                }
-                stage('Configuration in Kubernetes'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    steps {
-                        dir ("${env.WORKSPACE}/iac/terraform/") {
-                            sh '''
-                            kubectl config use-context kubernetes-admin@kubernetes
-                            '''
-                        }
-                    }
-                }
-
-            }
         }           
         stage ('Login in openshift or Kubernetes'){
             parallel {
@@ -125,13 +92,12 @@ pipeline {
                     stages{
                         stage('Login openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'token-os-dummy', variable: 'TOKEN')]) {
                                     dir ("${env.WORKSPACE}/iac/terraform/") {
                                         sh '''
-                                            export KUBECONFIG="./kubeconfig"
                                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                            oc get all
                                         '''
-                                        readFile('kubeconfig')
                                     }
                                 }
                             }
@@ -147,12 +113,13 @@ pipeline {
                     stages{
                         stage('Login in Kubernetes') {
                             steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
-                                    sh '''
-                                        export KUBECONFIG="~/kubeconfig"
-                                    '''
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                    dir ("${env.WORKSPACE}/iac/terraform/") {
+                                        sh '''
+                                        kubectl get all -n kube-system
+                                        '''
+                                    }
                                 }
-                            
                             }
                         }
                     }
@@ -164,7 +131,7 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
-                        kubectl create namespace $NAMESPACE_NAME
+                        kubectl create namespace evol-$NAMESPACE_NAME
                         '''
                     }
                 }
@@ -204,7 +171,6 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
-                            export AWS_PROFILE=default
                             terraform validate
                             terraform plan -var app_replicas=${APP_REPLICAS} -var namespace_name=${NAMESPACE_NAME} -var netapp_name=${NETAPP_NAME} -out deployment.tfplan
                             terraform apply --auto-approve deployment.tfplan
@@ -224,7 +190,7 @@ pipeline {
                     stages{
                             stage ('Expose service in Openshift') {
                                 steps {
-                                    withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    withCredentials([string(credentialsId: 'token-os-dummy', variable: 'TOKEN')]) {
                                         catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
                                             sh '''
                                                 oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
@@ -259,7 +225,6 @@ pipeline {
             }
         }
     }                
-
     post {
         cleanup{
             /* clean up our workspace */
