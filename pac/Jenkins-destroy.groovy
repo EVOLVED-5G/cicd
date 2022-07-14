@@ -103,17 +103,18 @@ pipeline {
                     stages{
                         stage('Removing services') {
                             steps { 
-                            withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                                        sh '''
-                                        kubectl delete service dummy-netapp -n ${NETAPP_NAME}
-                                        '''
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                        dir ("${env.WORKSPACE}/iac/terraform/") {
+                                            sh '''
+                                            kubectl delete service dummy-netapp -n ${NETAPP_NAME}
+                                            '''
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }
+                     }
+                 }
                 }
             }
         }
