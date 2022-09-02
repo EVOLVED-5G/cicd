@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: service-apis
+  name: service-apis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: service-apis
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: service-apis
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/capif/discover_service_api:latest
+          name: service-apis
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/src/app
+              name: service-apis-claim0
+      restartPolicy: Always
+      volumes:
+        - name: service-apis-claim0
+          persistentVolumeClaim:
+            claimName: service-apis-claim0
+status: {}

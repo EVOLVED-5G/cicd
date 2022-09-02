@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: capif-routing-info
+  name: capif-routing-info
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: capif-routing-info
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: capif-routing-info
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/capif/routing_info_api:latest
+          name: capif-routing-info
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+status: {}
