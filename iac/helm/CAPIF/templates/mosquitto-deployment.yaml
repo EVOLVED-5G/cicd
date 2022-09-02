@@ -30,12 +30,5 @@ spec:
           ports:
             - containerPort: 1883
           resources: {}
-          volumeMounts:
-            - mountPath: /mosquitto/config
-              name: mosquitto-claim0
       restartPolicy: Always
-      volumes:
-        - name: mosquitto-claim0
-          persistentVolumeClaim:
-            claimName: mosquitto-claim0
 status: {}

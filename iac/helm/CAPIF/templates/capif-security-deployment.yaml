@@ -33,12 +33,5 @@ spec:
           ports:
             - containerPort: 8080
           resources: {}
-          volumeMounts:
-            - mountPath: /usr/src/app
-              name: capif-security-claim0
       restartPolicy: Always
-      volumes:
-        - name: capif-security-claim0
-          persistentVolumeClaim:
-            claimName: capif-security-claim0
 status: {}

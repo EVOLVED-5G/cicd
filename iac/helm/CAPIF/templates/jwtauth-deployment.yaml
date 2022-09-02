@@ -30,12 +30,5 @@ spec:
           ports:
             - containerPort: 8080
           resources: {}
-          volumeMounts:
-            - mountPath: /usr/src/app
-              name: jwtauth-claim0
       restartPolicy: Always
-      volumes:
-        - name: jwtauth-claim0
-          persistentVolumeClaim:
-            claimName: jwtauth-claim0
 status: {}
