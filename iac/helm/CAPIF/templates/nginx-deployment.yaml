@@ -34,12 +34,5 @@ spec:
             - containerPort: 8080
             - containerPort: 443
           resources: {}
-          volumeMounts:
-            - mountPath: /etc/nginx/certs
-              name: nginx-claim0
       restartPolicy: Always
-      volumes:
-        - name: nginx-claim0
-          persistentVolumeClaim:
-            claimName: nginx-claim0
 status: {}
