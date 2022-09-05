@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: dbnetapp
+  name: dbnetapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: dbnetapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: dbnetapp
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: evolvedb
+            - name: POSTGRES_PASSWORD
+              value: evolvepass
+            - name: POSTGRES_USER
+              value: evolveclient
+          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
+          name: netapppostgres
+          resources: {}
+      restartPolicy: Always
+
+status: {}
