@@ -93,12 +93,5 @@ spec:
           image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:1.0.18
           name: db
           resources: {}
-          volumeMounts:
-            - mountPath: /var/lib/postgresql/data/pgdata
-              name: app-db-data
       restartPolicy: Always
-      volumes:
-        - name: app-db-data
-          persistentVolumeClaim:
-            claimName: app-db-data
 status: {}

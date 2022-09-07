@@ -90,12 +90,5 @@ spec:
           image: dockerhub.hi.inet/evolved-5g/nef_emulator_mongo_1:1.0.18
           name: mongo
           resources: {}
-          volumeMounts:
-            - mountPath: /data/db
-              name: app-mongo-db-data
       restartPolicy: Always
-      volumes:
-        - name: app-mongo-db-data
-          persistentVolumeClaim:
-            claimName: app-mongo-db-data
 status: {}
