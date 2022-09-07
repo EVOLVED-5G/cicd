@@ -90,7 +90,7 @@ spec:
               value: user
             - name: USERS_OPEN_REGISTRATION
               value: "true"
-          image: dockerhub.hi.inet/evolved-5g/capif/nef_emulator_db_1:1.0.18
+          image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:1.0.18
           name: db
           resources: {}
           volumeMounts:
