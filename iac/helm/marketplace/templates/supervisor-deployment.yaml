@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: supervisor
+  name: supervisor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: supervisor
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker_evolved5g_net: "true"
+        io.kompose.service: supervisor
+    spec:
+      containers:
+        - env:
+            - name: APP_ROOT
+              value: /var/www/html
+            - name: NUM_PROCS
+              value: "4"
+            - name: OPTIONS
+              value: --queue=mail-queue,blockchain-transactions --tries=3
+            - name: QUEUE_DRIVER
+              value: sync
+          image: redditsaved/laravel-supervisord:latest
+          name: supervisor
+          resources: {}
+      restartPolicy: Always
+
+status: {}
