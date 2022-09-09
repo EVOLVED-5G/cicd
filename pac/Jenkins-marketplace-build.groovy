@@ -39,17 +39,7 @@ pipeline {
                 }
             }
         }
-        stage('Build container Images') {
-            steps {
-                dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
-                    sh'''
-                    make build
-                    '''
-                }
-            }
-        }
-        
-        stage('Build container Images') {
+        stage('Configure container Images') {
             steps {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
