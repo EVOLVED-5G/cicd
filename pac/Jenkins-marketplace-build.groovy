@@ -52,7 +52,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
-                    make composer_installer
+                    make composer_install
                     '''
                 }
             }
