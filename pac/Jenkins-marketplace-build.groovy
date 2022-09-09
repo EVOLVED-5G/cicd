@@ -48,10 +48,25 @@ pipeline {
                 }
             }
         }
+        
+        stage('Build container Images') {
+            steps {
+                dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
+                    sh'''
+                      cp .env.example .env
+                      uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
+                      gid=$(id `whoami`  | cut -d " " -f2 | cut -d "=" -f2 | cut -d "(" -f1)
+                      sudo sed -i "s,DOCKER_USER_ID=1000,DOCKER_USER_ID=$uid,g" .env 
+                      sudo sed -i "s,DOCKER_GROUP_ID=1000,DOCKER_GROUP_ID=$gid,g" .env 
+                    '''
+                }
+            }
+        }
         stage('Run the containers') {
             steps {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
+                    make build
                     docker-compose run --rm composer install
                     docker-compose run --rm composer dump-autoload
                     docker-compose run --rm artisan key:generate
