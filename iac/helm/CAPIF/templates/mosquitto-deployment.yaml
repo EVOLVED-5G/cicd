@@ -25,7 +25,8 @@ spec:
         io.kompose.service: mosquitto
     spec:
       containers:
-        - image: eclipse-mosquitto:latest
+        - image: dockerhub.hi.inet/evolved-5g/capif/mosquitto:latest
+
           name: mosquitto
           ports:
             - containerPort: 1883
