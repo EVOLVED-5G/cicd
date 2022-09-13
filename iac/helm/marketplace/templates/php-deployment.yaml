@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: php
+  name: php
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: php
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/docker_evolved5g_net: "true"
+        io.kompose.service: php
+    spec:
+      containers:
+        - image: php
+          name: evolved5g-pilot-php
+          ports:
+            - containerPort: 80
+          resources: {}
+      restartPolicy: Always
+
+status: {}
