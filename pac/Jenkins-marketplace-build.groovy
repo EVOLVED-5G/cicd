@@ -1,5 +1,5 @@
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent { node {label 'evol5-slave'}  }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
@@ -47,7 +47,13 @@ pipeline {
                       uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
                       gid=$(id `whoami`  | cut -d " " -f2 | cut -d "=" -f2 | cut -d "(" -f1)
                       sudo sed -i "s,DOCKER_USER_ID=1000,DOCKER_USER_ID=$uid,g" .env 
-                      sudo sed -i "s,DOCKER_GROUP_ID=1000,DOCKER_GROUP_ID=$gid,g" .env 
+                      sudo sed -i "s,DOCKER_GROUP_ID=1000,DOCKER_GROUP_ID=$gid,g" .env
+                      sudo sed -i "s,DB_CONNECTION=mysql,DB_CONNECTION=mysql,g" .env 
+                      sudo sed -i "s,DB_HOST=127.0.0.1,DB_HOST=db,g" .env
+                      sudo sed -i "s,DB_PORT=3306,DB_PORT=3306,g" .env 
+                      sudo sed -i "s,DB_DATABASE=,DB_DATABASE=evolved5g_db,g" .env
+                      sudo sed -i "s,DB_USERNAME=,DB_USERNAME=admin,g" .env 
+                      sudo sed -i "s,DB_PASSWORD=,DB_PASSWORD=secret,g" .env                         
                     '''
                 }
             }
@@ -120,19 +126,19 @@ pipeline {
             }
         }
     }
-    post {
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
-    }
+// post {
+//     cleanup{
+//         /* clean up our workspace */
+//         deleteDir()
+//         /* clean up tmp directory */
+//         dir("${env.workspace}@tmp") {
+//             deleteDir()
+//         }
+//         /* clean up script directory */
+//         dir("${env.workspace}@script") {
+//             deleteDir()
+//         }
+//     }
+// }
 }
 
