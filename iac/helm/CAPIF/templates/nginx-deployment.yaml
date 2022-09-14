@@ -27,7 +27,7 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
-              value: openshift.evolved-5g.eu
+              value: nginx.apps.ocp-epg.hi.inet 
           image: dockerhub.hi.inet/evolved-5g/capif/nginx:latest
           name: nginx
           ports:

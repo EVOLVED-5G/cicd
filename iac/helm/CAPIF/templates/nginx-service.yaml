@@ -10,10 +10,10 @@ metadata:
   name: nginx
 spec:
   ports:
-    - name: "8080"
+    - name: nginx-http
       port: 8080
       targetPort: 8080
-    - name: "443"
+    - name: nginx-https
       port: 443
       targetPort: 443
   selector:
