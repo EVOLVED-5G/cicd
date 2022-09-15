@@ -32,8 +32,10 @@ spec:
               value: evolvepass
             - name: POSTGRES_USER
               value: evolveclient
-          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
-          name: netapppostgres
+          name: dbnetapp
+          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netapppostgres:latest
+          ports:
+            - containerPort: 5432
           resources: {}
       restartPolicy: Always
 

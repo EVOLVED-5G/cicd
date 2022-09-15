@@ -10,7 +10,7 @@ metadata:
   name: netappdjango
 spec:
   ports:
-    - name: "8000"
+    - name: "django-port"
       port: 8000
       targetPort: 8000
   selector:

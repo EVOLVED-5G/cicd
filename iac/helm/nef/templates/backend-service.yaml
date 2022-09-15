@@ -10,7 +10,7 @@ metadata:
   name: backend
 spec:
   ports:
-    - name: "8888"
+    - name: "backend-port"
       port: 8888
       targetPort: 80
   selector:

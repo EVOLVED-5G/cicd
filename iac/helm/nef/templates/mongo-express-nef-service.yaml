@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: mongo-express
-  name: mongo-express
+    io.kompose.service: mongo-express-nef
+  name: mongo-express-nef
 spec:
   ports:
     - name: "8081"
       port: 8081
       targetPort: 8081
   selector:
-    io.kompose.service: mongo-express
+    io.kompose.service: mongo-express-nef
 status:
   loadBalancer: {}

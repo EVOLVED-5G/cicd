@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: netappfe
-  name: netappfe
+    io.kompose.service: dbnetapp
+  name: dbnetapp
 spec:
   ports:
-    - name: "fe-port"
-      port: 4200
-      targetPort: 4200
+    - name: "dbnetapp-port"
+      port: 5432
+      targetPort: 5432
   selector:
-    io.kompose.service: netappfe
+    io.kompose.service: dbnetapp
 status:
   loadBalancer: {}

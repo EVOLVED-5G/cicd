@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: mongo
-  name: mongo
+    io.kompose.service: mongo-nef
+  name: mongo-nef
 spec:
   ports:
-    - name: "27017"
+    - name: "mongo-nef"
       port: 27017
       targetPort: 27017
   selector:
-    io.kompose.service: mongo
+    io.kompose.service: mongo-nef
 status:
   loadBalancer: {}

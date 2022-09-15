@@ -92,6 +92,8 @@ spec:
               value: "true"
           image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:1.0.18
           name: db
+          ports:
+            - containerPort: 5432
           resources: {}
       restartPolicy: Always
 status: {}

@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: pgadmin
-  name: pgadmin
+    io.kompose.service: db
+  name: db
 spec:
   ports:
-    - name: "pgadmin-port"
-      port: 5050
-      targetPort: 5050
+    - name: "db-port"
+      port: 5432
+      targetPort: 5432
   selector:
-    io.kompose.service: pgadmin
+    io.kompose.service: db
 status:
   loadBalancer: {}
