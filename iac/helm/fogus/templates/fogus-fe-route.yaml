@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-09-15T07:52:49Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: netappfe
+  name: netappfe
+  namespace: evol5-capif
+  resourceVersion: "753129526"
+  uid: cda24bb3-ec09-4055-804b-f557466892c7
+spec:
+  host: netappfe.apps.ocp-epg.hi.inet
+  port:
+    targetPort: fe-port
+  to:
+    kind: Service
+    name: netappfe
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-09-15T07:52:49Z"
+      status: "True"
+      type: Admitted
+    host: netappfe.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
