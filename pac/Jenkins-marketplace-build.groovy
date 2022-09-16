@@ -63,14 +63,8 @@ pipeline {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
                     make build
-                    docker-compose run --rm composer install
-                    docker-compose run --rm composer dump-autoload
-                    docker-compose run --rm artisan key:generate
-                    docker-compose run --rm artisan migrate
-                    docker-compose run --rm artisan db:seed
-                    docker-compose run --rm artisan storage:link
-                    docker-compose run --rm npm install
-                    docker-compose run --rm npm run dev
+                    make composer_install
+                    make npm_install
                     '''
                 }
             }
