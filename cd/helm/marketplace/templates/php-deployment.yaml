@@ -29,7 +29,10 @@ spec:
         - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_php:latest
           name: php-mktp
           ports:
-            - containerPort: 89
+            - containerPort: 80
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
           resources: {}
       restartPolicy: Always
 
