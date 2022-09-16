@@ -35,7 +35,7 @@ spec:
               value: --queue=mail-queue,blockchain-transactions --tries=3
             - name: QUEUE_DRIVER
               value: sync
-          image: redditsaved/laravel-supervisord:latest
+          image: dockerhub.hi.inet/evolved-5g/marketplace/supervisor:latest
           name: supervisor
           resources: {}
       restartPolicy: Always

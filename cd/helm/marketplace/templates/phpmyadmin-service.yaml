@@ -10,7 +10,7 @@ metadata:
   name: phpmyadmin
 spec:
   ports:
-    - name: "8089"
+    - name: "port-php-admin"
       port: 8089
       targetPort: 80
   selector:

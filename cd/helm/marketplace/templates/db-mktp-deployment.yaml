@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: composer
-  name: composer
+    io.kompose.service: db-mktp
+  name: db-mktp
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: composer
+      io.kompose.service: db-mktp
   strategy:
     type: Recreate
   template:
@@ -23,11 +23,22 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.network/docker_evolved5g_net: "true"
-        io.kompose.service: composer
+        io.kompose.service: db-mktp
     spec:
       containers:
-        - image: composer
-          name: evolved5g-pilot-composer
+        - env:
+            - name: MYSQL_DATABASE
+              value: evolved5g_db
+            - name: MYSQL_PASSWORD
+              value: secret
+            - name: MYSQL_ROOT_PASSWORD
+              value: secret
+            - name: MYSQL_USER
+              value: admin
+          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_db:latest
+          name: db-mktp
+          ports:
+            - containerPort: 3306
           resources: {}
       restartPolicy: Always
 

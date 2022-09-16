@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   creationTimestamp: null
-  name: docker_evolved5g_net
+  name: docker-evolved5g-net
 spec:
   ingress:
     - from:
