@@ -11,8 +11,8 @@ metadata:
 spec:
   ports:
     - name: "port-mktp"
-      port: 80
-      targetPort: 89
+      port: 89
+      targetPort: 80
   selector:
     io.kompose.service: php-mktp
 status:

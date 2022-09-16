@@ -35,7 +35,7 @@ spec:
             - name: UPLOAD_LIMIT
               value: 128M
           image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_phpmyadmin:latest
-          name: hpmyadmin
+          name: phpmyadmin
           ports:
             - containerPort: 80
           resources: {}
