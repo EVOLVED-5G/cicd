@@ -23,6 +23,7 @@ pipeline {
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         DOCKER_VAR = false
+        CAPIF_SERVICES_DIRECTORY = "${WORKSPACE}/services"
     }
     stages {
         stage('Clean workspace') {
@@ -57,12 +58,7 @@ pipeline {
                 }
             }
         }
-        stage('Modify image name and publish in AWS') {
-            when {
-                expression {
-                    return "${DOCKER_VAR}".toBoolean() 
-                }
-            }     
+        stage('Modify image name and publish in AWS') { 
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script {    
@@ -84,7 +80,7 @@ pipeline {
         stage('Publish in Artifacotry') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    dir ("${env.CAPIF_SERVICES_DIRECTORY}") {
+                    dir ("${env.WORKSPACE}/${NETAPP_NAME}/services") {
                         sh '''
                             docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
                             docker-compose push
