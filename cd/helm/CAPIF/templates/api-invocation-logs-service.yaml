@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: api-invocation-logs
+  name: api-invocation-logs
+spec:
+  ports:
+    - name: "port-api-invocation-logs"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: api-invocation-logs
+status:
+  loadBalancer: {}
