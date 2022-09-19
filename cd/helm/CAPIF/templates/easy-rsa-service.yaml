@@ -10,7 +10,7 @@ metadata:
   name: easy-rsa
 spec:
   ports:
-    - name: "8080"
+    - name: "port-rsa"
       port: 8080
       targetPort: 8080
   selector:

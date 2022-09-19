@@ -10,7 +10,7 @@ metadata:
   name: api-provider-management
 spec:
   ports:
-    - name: "8080"
+    - name: "port-api-provider-mgmt"
       port: 8080
       targetPort: 8080
   selector:

@@ -10,7 +10,7 @@ metadata:
   name: api-invoker-management
 spec:
   ports:
-    - name: "8080"
+    - name: "por-api-invoker-management-service"
       port: 8080
       targetPort: 8080
   selector:

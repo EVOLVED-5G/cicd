@@ -10,7 +10,7 @@ metadata:
   name: api-invocation-logs
 spec:
   ports:
-    - name: "8080"
+    - name: "port-api-invocation-logs"
       port: 8080
       targetPort: 8080
   selector:

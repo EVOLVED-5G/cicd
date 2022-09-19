@@ -10,7 +10,7 @@ metadata:
   name: capif-events
 spec:
   ports:
-    - name: "8080"
+    - name: "port-events"
       port: 8080
       targetPort: 8080
   selector:

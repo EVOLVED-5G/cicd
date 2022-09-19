@@ -10,7 +10,7 @@ metadata:
   name: mongo
 spec:
   ports:
-    - name: "27017"
+    - name: "port-mongo"
       port: 27017
       targetPort: 27017
   selector:

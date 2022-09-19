@@ -10,7 +10,7 @@ metadata:
   name: capif-routing-info
 spec:
   ports:
-    - name: "8080"
+    - name: "port-capif-routing"
       port: 8080
       targetPort: 8080
   selector:

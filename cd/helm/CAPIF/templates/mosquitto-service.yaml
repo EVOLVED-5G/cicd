@@ -10,7 +10,7 @@ metadata:
   name: mosquitto
 spec:
   ports:
-    - name: "1883"
+    - name: "port-mqtt"
       port: 1883
       targetPort: 1883
   selector:

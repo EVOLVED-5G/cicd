@@ -10,7 +10,7 @@ metadata:
   name: published-apis
 spec:
   ports:
-    - name: "8080"
+    - name: "port-published"
       port: 8080
       targetPort: 8080
   selector:

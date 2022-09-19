@@ -10,7 +10,7 @@ metadata:
   name: jwtauth
 spec:
   ports:
-    - name: "8080"
+    - name: "port-jwauth"
       port: 8080
       targetPort: 8080
   selector:
