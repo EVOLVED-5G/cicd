@@ -9,8 +9,8 @@ pipeline {
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
-        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
-        string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
+        string(name: 'GIT_CAPIF_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_CAPIF_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
     }
 
@@ -43,14 +43,14 @@ pipeline {
                     rm -rf $NETAPP_NAME 
                     mkdir $NETAPP_NAME 
                     cd $NETAPP_NAME
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
+                    git clone --single-branch --branch $GIT_CAPIF_BRANCH $GIT_CAPIF_URL .
                     '''
                 }
            }
         }
         stage('Build CAPIF') { 
             steps {
-                dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
+                dir ("${env.WORKSPACE}/${NETAPP_NAME}/services") {
                     sh '''
                     docker-compose up --build --force-recreate -d
                     '''
