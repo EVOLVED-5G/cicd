@@ -1,9 +1,3 @@
-String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    return var ;
-}
-
 pipeline {
     agent { node {label 'evol5-openshift'}  }
 
@@ -21,7 +15,7 @@ pipeline {
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
-        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
+        NETAPP_NAME = "capif"
         DOCKER_VAR = false
         CAPIF_SERVICES_DIRECTORY = "${WORKSPACE}/services"
     }
