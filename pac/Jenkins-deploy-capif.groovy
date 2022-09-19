@@ -92,31 +92,29 @@ pipeline {
                         stage ('Create namespace in if it does not exist') {
                             steps {
                                 catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    dir ("${env.WORKSPACE}/iac/") {
-                                        sh '''
-                                        kubectl create namespace evol-$NAMESPACE_NAME
-                                        '''
-                                    }
+                                    sh '''
+                                    kubectl create namespace evol-$NAMESPACE_NAME
+                                    '''
                                 }
-                            }
+                            }              
                         }
                     }
-                }    
+                }
+            }
+        }    
         stage ('Log into AWS ECR') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                        kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
-                        kubectl create secret docker-registry regcred                                   \
-                        --docker-password=$(aws ecr get-login-password)                                 \
-                        --namespace=$NAMESPACE_NAME                                                     \
-                        --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
-                        --docker-username=AWS
-                        '''
-                    }    
+                    sh '''
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
+                    kubectl create secret docker-registry regcred                                   \
+                    --docker-password=$(aws ecr get-login-password)                                 \
+                    --namespace=$NAMESPACE_NAME                                                     \
+                    --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                    --docker-username=AWS
+                    '''
                 }    
-            }
+            }    
         }
         stage ('Initiate and configure app in kubernetes') {
             steps {
