@@ -29,7 +29,7 @@ pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/CAPIF_API_Services', description: 'URL of the Github Repository')
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'HOSTNAME', defaultValue: 'http://openshift.evolved-5g.eu/', description: 'netapp hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
@@ -42,8 +42,8 @@ pipeline {
         HOSTNAME_URL="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
-        DEPLOYMENT_NAME = netappName("${params.GIT_URL}")
-        NAMESPACE_NAME = getNamespace("${params.DEPLOYMENT}",netappName("${params.GIT_URL}"))
+        DEPLOYMENT_NAME = "capif"
+        NAMESPACE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
 
     }
@@ -61,11 +61,9 @@ pipeline {
                         stage('Login openshift') {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/") {
-                                        sh '''
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                        '''
-                                    }
+                                    sh '''
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                    '''
                                 }
                             }
                         }
@@ -81,11 +79,9 @@ pipeline {
                         stage('Login in Kubernetes') {
                             steps { 
                                 withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    dir ("${env.WORKSPACE}/iac//") {
-                                        sh '''
-                                        kubectl get all -n kube-system
-                                        '''
-                                    }
+                                    sh '''
+                                    kubectl get all -n kube-system
+                                    '''
                                 }
                             }
                         }
@@ -118,28 +114,26 @@ pipeline {
         }
         stage ('Initiate and configure app in kubernetes') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/") {
-                        sh '''
-                            helm install $DEPLOYMENT_NAME ./cd/CAPIF/ --set capif_hostname=$HOSTNAME
-                        '''
-                    }
+                dir ("${env.WORKSPACE}/") {
+                    sh '''
+                    helm install $DEPLOYMENT_NAME ./cd/helm/CAPIF/ --set capif_hostname=$HOSTNAME
+                    '''
                 }
             }
         }
     }                
-    post {
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
-    }
+    // post {
+    //     cleanup{
+    //         /* clean up our workspace */
+    //         deleteDir()
+    //         /* clean up tmp directory */
+    //         dir("${env.workspace}@tmp") {
+    //             deleteDir()
+    //         }
+    //         /* clean up script directory */
+    //         dir("${env.workspace}@script") {
+    //             deleteDir()
+    //         }
+    //     }
+    // }
 }
