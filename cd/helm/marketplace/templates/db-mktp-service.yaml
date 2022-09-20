@@ -11,7 +11,7 @@ metadata:
 spec:
   ports:
     - name: "port-db"
-      port: 3316
+      port: 3306
       targetPort: 3306
   selector:
     io.kompose.service: db-mktp
