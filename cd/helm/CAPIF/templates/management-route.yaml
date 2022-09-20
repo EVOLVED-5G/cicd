@@ -10,7 +10,7 @@ metadata:
   resourceVersion: "751965923"
   uid: c8e8ad90-8fd3-43b5-844a-409e67e2357c
 spec:
-  host: nginx.apps.ocp-epg.hi.inet
+  host: {{ .Values.capif_hostname }}
   path: /api-provider-management
   port:
     targetPort: nginx-http
@@ -25,7 +25,7 @@ status:
     - lastTransitionTime: "2022-09-14T08:54:32Z"
       status: "True"
       type: Admitted
-    host: nginx.apps.ocp-epg.hi.inet
+    host: {{ .Values.capif_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

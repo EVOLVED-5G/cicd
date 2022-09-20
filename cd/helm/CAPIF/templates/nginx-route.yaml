@@ -35,7 +35,7 @@ status:
     - lastTransitionTime: "2022-09-15T06:43:58Z"
       status: "True"
       type: Admitted
-    host: test.evolved-5g.eu
+    host: {{ .Values.capif_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

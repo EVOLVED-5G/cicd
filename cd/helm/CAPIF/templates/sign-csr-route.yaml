@@ -10,7 +10,7 @@ metadata:
   resourceVersion: "753070217"
   uid: e358594f-878a-413e-85f0-738a959d7d90
 spec:
-  host: test.evolved-5g.eu
+  host: {{ .Values.capif_hostname }}
   path: /sign-csr
   port:
     targetPort: nginx-http
@@ -25,7 +25,7 @@ status:
     - lastTransitionTime: "2022-09-15T06:43:57Z"
       status: "True"
       type: Admitted
-    host: test.evolved-5g.eu
+    host: {{ .Values.capif_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

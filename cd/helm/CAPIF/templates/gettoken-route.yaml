@@ -10,7 +10,7 @@ metadata:
   resourceVersion: "753070207"
   uid: 164ea250-f0ef-4434-bb68-a636363a9206
 spec:
-  host: test.evolved-5g.eu
+  host: {{ .Values.capif_hostname }}
   path: /gettoken
   port:
     targetPort: nginx-http
@@ -25,7 +25,7 @@ status:
     - lastTransitionTime: "2022-09-15T06:43:56Z"
       status: "True"
       type: Admitted
-    host: test.evolved-5g.eu
+    host: {{ .Values.capif_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
