@@ -31,7 +31,7 @@ pipeline {
     parameters {
         string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/CAPIF_API_Services', description: 'URL of the Github Repository')
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'HOSTNAME', defaultValue: 'http://openshift.evolved-5g.eu/', description: 'netapp hostname')
+        string(name: 'HOSTNAME', defaultValue: 'openshift.evolved-5g.eu', description: 'Hostname')
         string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
@@ -39,7 +39,7 @@ pipeline {
     environment {
         GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
-        HOSTNAME_URL="${params.DUMMY_NETAPP_HOSTNAME}"
+        HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         DEPLOYMENT_NAME = "capif"
@@ -97,8 +97,14 @@ pipeline {
                     }
                 }
             }
-        }    
+        }
+        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "evol5-athens"}
+                }
+            }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
