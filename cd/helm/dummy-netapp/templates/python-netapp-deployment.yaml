@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: python-netapp
+  name: python-netapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: python-netapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: python-netapp
+    spec:
+      containers:
+        - env:
+            - name: CAPIF_HOSTNAME
+            - name: CAPIF_PORT
+              value: "8080"
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REQUESTS_CA_BUNDLE
+              value: /usr/src/app/ca.crt
+            - name: SSL_CERT_FILE
+              value: /usr/src/app/ca.crt
+          image: python_netapp
+          name: python-netapp
+          resources: {}
+          volumeMounts:
+            - mountPath: /usr/src/app
+              name: python-netapp-claim0
+      hostname: dummy
+      restartPolicy: Always
+      volumes:
+        - name: python-netapp-claim0
+          persistentVolumeClaim:
+            claimName: python-netapp-claim0
+status: {}
