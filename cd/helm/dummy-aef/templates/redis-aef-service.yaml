@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: capif-callback-server
-  name: capif_callback_server
+    io.kompose.service: redis-aef
+  name: redis-aef
 spec:
   ports:
-    - name: "8086"
-      port: 8086
-      targetPort: 8080
+    - name: "port-redis"
+      port: 6379
+      targetPort: 6379
   selector:
-    io.kompose.service: capif-callback-server
+    io.kompose.service: redis-aef
 status:
   loadBalancer: {}

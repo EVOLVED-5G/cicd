@@ -41,13 +41,6 @@ spec:
           image: python_netapp
           name: python-netapp
           resources: {}
-          volumeMounts:
-            - mountPath: /usr/src/app
-              name: python-netapp-claim0
       hostname: dummy
       restartPolicy: Always
-      volumes:
-        - name: python-netapp-claim0
-          persistentVolumeClaim:
-            claimName: python-netapp-claim0
 status: {}
