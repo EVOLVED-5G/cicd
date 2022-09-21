@@ -41,13 +41,6 @@ spec:
           image: python_aef
           name: python-aef
           resources: {}
-          volumeMounts:
-            - mountPath: /usr/src/app
-              name: python-aef-claim0
       hostname: exposer
       restartPolicy: Always
-      volumes:
-        - name: python-aef-claim0
-          persistentVolumeClaim:
-            claimName: python-aef-claim0
 status: {}

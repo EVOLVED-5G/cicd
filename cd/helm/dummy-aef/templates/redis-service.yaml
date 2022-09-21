@@ -10,8 +10,8 @@ metadata:
   name: capif_callback_server
 spec:
   ports:
-    - name: "port_capif_cs"
-      port: 8080
+    - name: "8086"
+      port: 8086
       targetPort: 8080
   selector:
     io.kompose.service: capif-callback-server
