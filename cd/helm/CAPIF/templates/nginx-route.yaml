@@ -18,7 +18,7 @@ metadata:
   resourceVersion: "753070340"
   uid: e253c192-d902-45f9-8678-fa28968fa9bc
 spec:
-  host: test.evolved-5g.eu
+  host: {{ .Values.capif_hostname }}
   port:
     targetPort: nginx-https
   tls:

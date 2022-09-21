@@ -31,8 +31,8 @@ spec:
               value: redis
             - name: REDIS_PORT
               value: "6379"
-          image: capif-callback-server
-          name: capif_callback_server
+          image: dockerhub.hi.inet/evolved-5g/dummy-aef/dummy-aef_capif_callback_server:latest
+          name: capif-callback-server
           ports:
             - containerPort: 8080
           resources: {}

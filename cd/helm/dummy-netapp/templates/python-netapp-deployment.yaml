@@ -28,17 +28,18 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
+              value: nginx.apps.ocp-epg.hi.inet
             - name: CAPIF_PORT
-              value: "8080"
+              value: "80"
             - name: REDIS_HOST
-              value: redis
+              value: redis-dummy
             - name: REDIS_PORT
               value: "6379"
             - name: REQUESTS_CA_BUNDLE
               value: /usr/src/app/ca.crt
             - name: SSL_CERT_FILE
               value: /usr/src/app/ca.crt
-          image: python_netapp
+          image: dockerhub.hi.inet/evolved-5g/dummy-netapp/python_netapp:latest
           name: python-netapp
           resources: {}
       hostname: dummy

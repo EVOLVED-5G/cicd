@@ -28,18 +28,23 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
+              value: nginx.apps.ocp-epg.hi.inet
             - name: CAPIF_PORT
-              value: "8080"
+              value: "80"
             - name: REDIS_HOST
-              value: redis
+              value: redis-aef
             - name: REDIS_PORT
               value: "6379"
             - name: REQUESTS_CA_BUNDLE
               value: /usr/src/app/ca.crt
             - name: SSL_CERT_FILE
               value: /usr/src/app/ca.crt
-          image: python_aef
+          image: dockerhub.hi.inet/evolved-5g/dummy-aef/python_aef:latest
           name: python-aef
+          ports:
+            - containerPort: 8085
+            - containerPort: 8086
+
           resources: {}
       hostname: exposer
       restartPolicy: Always

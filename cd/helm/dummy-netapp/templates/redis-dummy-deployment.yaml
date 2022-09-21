@@ -24,8 +24,10 @@ spec:
         io.kompose.service: redis-dummy
     spec:
       containers:
-        - image: redis:7.0
+        - image: dockerhub.hi.inet/evolved-5g/dummy-netapp/redis:latest
           name: redis-dummy
+          ports:
+            - containerPort: 6379
           resources: {}
       restartPolicy: Always
 status: {}
