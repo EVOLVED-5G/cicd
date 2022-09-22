@@ -1,5 +1,5 @@
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent any
 
     parameters {
         string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
@@ -9,13 +9,13 @@ pipeline {
         GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        OPENSHIFT_URL= 'https://openshift-epg.hi.inet:443'
+        OPENSHIFT_URL= 'https://api.ocp-epg.hi.inet:6443'
     }
 
     stages {
         stage('Login openshift to get kubernetes credentials') {
             steps {
-                withCredentials([string(credentialsId: '18e7aeb8-5552-4cbb-bf66-2402ca6772de', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'token-os-capif', variable: 'TOKEN')]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             export KUBECONFIG="./kubeconfig"
@@ -28,7 +28,7 @@ pipeline {
         }
         stage ('Remove service expose') {
             steps {
-                withCredentials([string(credentialsId: '18e7aeb8-5552-4cbb-bf66-2402ca6772de', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'token-os-capif', variable: 'TOKEN')]) {
                     dir ("${env.WORKSPACE}/iac/terraform/") {
                         sh '''
                             oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL

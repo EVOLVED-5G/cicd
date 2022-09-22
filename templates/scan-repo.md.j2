@@ -1,0 +1,38 @@
+{% set name = id.split("/") %}
+# Scan of {{type}}: {{name|last}}
+
+
+***
+{% if not vulnerabilities %} 
+Good work. No vulnerabilities found.
+{% else %}
+## Summary
+{%- set severities = [ "CRITICAL" , "HIGH" , "MEDIUM" , "LOW" ,  "UNKNOWN"] %}
+
+| Severity | Number of vulnerabilities |
+|---|---|
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == severity %}
+| {{summary_type.Severity}} | {{summary_type.counts}} |
+    {%- endif %}
+  {%- endfor %}
+{%- endfor %}
+
+***
+
+
+## Vulnerabilities
+|  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
+|---|---|---|---|---|---|
+  {%- for severity in severities %}
+    {%- for vuln in vulnerabilities %}
+      {%- if vuln.Severity == severity %}
+|{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
+      {%- endif %}
+    {%- endfor %}
+  {%- endfor %}
+{%- endif %}
+***
+Date: {{scan_date[:10]}}

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: netappdjango
+  name: netappdjango
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: netappdjango
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: netappdjango
+    spec:
+      containers:
+        - args:
+            - ./wait_db.sh
+            - dbnetapp:5432
+            - --
+            - sh
+            - docker_start_up.sh
+          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
+          name: netappdjango
+          ports:
+            - containerPort: 8000
+          resources: {}
+      restartPolicy: Always
+status: {}

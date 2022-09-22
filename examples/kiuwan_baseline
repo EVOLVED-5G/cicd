@@ -1,0 +1,167 @@
+pipeline {
+    triggers {
+        cron('0 10 * * *')
+    }
+    agent {
+        node {
+            label 'worker'
+        }
+    }
+    parameters {
+        string(name: 'PROJECT_NAME', defaultValue: 'clickAndfilma', description: '')
+        string(name: 'GITHUB_BASE_URL', defaultValue: 'https://github.com/Telefonica/', description: 'Github Organization URL')
+        string(name: 'GITHUB_BRANCH', defaultValue: 'develop', description: 'Github default branch Repository')
+        string(name: 'GITHUB_REPO_LIST', defaultValue: 'fm-clickfilma-backoffice-frontend_v2,fm-clickfilma-backend', description: 'Repository List (whit commas, no spaces)')
+        string(name: 'KIUWAN_LABEL', defaultValue: 'develop', description: 'Label to identify')
+        string(name: 'CR', defaultValue: 'Change-Request-1', description: 'The change request associated with the delivery to analyze or promote')
+        string(name: 'PBL', defaultValue: 'Promoted-Base-Line-1', description: 'The change request associated with the delivery to analyze or promote')
+    }
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+    }
+    environment {
+        PATH = "/usr/local/bin:/usr/local/bin:$PATH"
+        GITHUB_CRED=credentials('github_cred')
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        KIUWAN_CRED=credentials('kiuwan_jmp')
+    }
+    stages {
+        stage ('Clean Workspace') {
+            steps {
+                deleteDir() /* clean up our workspace */
+            }
+        }
+
+        stage('Clone Repositories') {
+            steps {
+                cloneRepos(params.GITHUB_BASE_URL, params.GITHUB_BRANCH)
+            }
+        }
+
+        stage('Download Oracle Java 8') {
+            steps {
+                sh   """#!/bin/bash
+                        set -e
+
+                        # Descarga del JDK de Oracle (no sirve el OpenJDK)
+                        curl -k -u ${ARTIFACTORY_CRED} http://artifactory.hi.inet/artifactory/misc-futme/miscellaneous/jdk-8u281-linux-x64.tar.gz --output jdk-8u281-linux-x64.tar.gz
+                        mv jdk-8u281-linux-x64.tar.gz jdk-8u281-linux-x64.tar
+                        tar xvf jdk-8u281-linux-x64.tar
+                """
+            }
+        }
+
+        stage('Download Kiuwan Agent') {
+            steps {
+                sh   """#!/bin/bash
+                        set -x
+
+                        wget https://www.kiuwan.com/pub/analyzer/KiuwanLocalAnalyzer.zip
+                        unzip KiuwanLocalAnalyzer
+                        cd ${WORKSPACE}/KiuwanLocalAnalyzer/bin
+                        chmod +x *.sh
+                """
+            }
+        }
+
+        stage('Kiuwan baseline analysis') {
+            steps {
+                sh   """#!/bin/bash
+                        set -x
+
+                        chmod 755 ${WORKSPACE}/jdk1.8.0_281
+                        export PATH=${WORKSPACE}/jdk1.8.0_281/bin:$PATH
+                        java -version
+
+                        ATTRIBS="ignore=architecture,insights \
+                        encoding=UTF-8 \
+                        timeout=85800000 \
+                        exclude.patterns=**/*migrations*/**,**/*Migrations*/**,**/test/**,**/test-bdd/**,**/*Test*/**,**/*plugins*/**,**/*jquery*,**/spark-instance/**,**/Scripts/**,**/*deploy*/**,**/*Deploy*/** \
+                        memory.max=2048m"
+
+                        cd "${WORKSPACE}/KiuwanLocalAnalyzer/bin/"
+
+                        ./agent.sh -s "${WORKSPACE}/kiuwan" -n "${PROJECT_NAME}" -l "${KIUWAN_LABEL}" -as completeDelivery -cr "${CR}" -wr \
+                        --user "${KIUWAN_CRED_USR}" --pass "${KIUWAN_CRED_PSW}" \$ATTRIBS
+
+                        ANALISYS_STATUS=\$?
+                        echo "El status es: \$ANALISYS_STATUS"
+
+                        if [ \$ANALISYS_STATUS -eq 10 ] || [ \$ANALISYS_STATUS -eq 13 ]; then
+                            echo "Result codes for UNSTABLE build"
+                            echo "See audit report for exact reasons of non compliance (checkpoints not passed, etc.)"
+                            echo "Audit associated to the analyzed application did not pass"
+                            echo "\$ANALISYS_STATUS"
+                            exit 1
+                        fi
+
+                        if [ \$ANALISYS_STATUS -eq 1 ] || [ \$ANALISYS_STATUS -eq 11 ] || [ \$ANALISYS_STATUS -eq 12 ] || [ \$ANALISYS_STATUS -eq 14 ]; then
+                            echo "Result codes for FAILURE build"
+                            echo "\$ANALISYS_STATUS"
+                            exit 1
+                        fi
+
+                        if [ \$ANALISYS_STATUS -eq 0 ]; then
+                            echo "Result codes for SUCCESS build"
+                            echo "Audit passed: true"
+                            echo "No vulnerability found, next step is Promote that CompleteDelivery to the BaseLine... working on it"
+
+                            ./agent.sh -n "${PROJECT_NAME}" --promote-to-baseline -cr "${CR}" -l "${KIUWAN_LABEL}" -pbl "${PBL}" --user "${KIUWAN_CRED_USR}" --pass "${KIUWAN_CRED_PSW}"
+                            echo "\$ANALISYS_STATUS"
+                        fi
+                """
+            }
+        }
+    }
+    post {
+        always {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-futme@tid.es',
+                to: "futmedia.tid@telefonica.com",
+                replyTo: "no-reply@tid.es",
+                recipientProviders: [[$class: 'CulpritsRecipientProvider']]
+        }
+        success {
+            echo 'I succeeded!'
+        }
+        unstable {
+            echo 'I am unstable :/'
+        }
+        failure {
+            echo 'I failed :('
+        }
+        changed {
+            echo 'Things were different before...'
+        }
+    }
+}
+
+void cloneRepos(basePath, branch) {
+    def repoList = params.GITHUB_REPO_LIST.split(',')
+    repoList.each { repo ->
+        // here is the trick
+        script {
+            stage("Clone $repo") {
+                checkout scm: [
+                    $class: 'GitSCM',
+                    branches: [[name: branch]],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [
+                                    [$class: 'CleanBeforeCheckout'],
+                                    [$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false],
+                                    [$class: 'RelativeTargetDirectory', relativeTargetDir: "kiuwan/$repo/"]
+                                ],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [
+                        [
+                            credentialsId: "github_cred",
+                            url: basePath + repo
+                        ]
+                    ]
+                ]
+            }
+        }
+    }
+}

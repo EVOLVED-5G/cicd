@@ -1,0 +1,8 @@
+name: folder
+description: A generated Helm Chart for folder from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - folder
+sources:
+home:
