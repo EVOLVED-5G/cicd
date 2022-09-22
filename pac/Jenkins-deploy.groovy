@@ -118,7 +118,7 @@ pipeline {
         }
         stage ('Initiate and configure app in kubernetes') {
             steps {
-                dir ("${env.WORKSPACE}/cd/helm") {
+                dir ("${env.WORKSPACE}") {
                     sh '''
                     helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME  --set app_replicas=APP_REPLICAS
                     '''
