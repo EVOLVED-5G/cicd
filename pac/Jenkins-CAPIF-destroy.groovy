@@ -29,19 +29,14 @@ pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
-        string(name: 'GIT_URL', defaultValue: 'https://github.com/EVOLVED-5G/CAPIF_API_Services', description: 'URL of the Github Repository')
-        string(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'HOSTNAME', defaultValue: 'openshift.evolved-5g.eu', description: 'Hostname')
-        string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
-        GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
         DEPLOYMENT_NAME = "capif"
         NAMESPACE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
@@ -62,7 +57,7 @@ pipeline {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
                                     '''
                                 }
                             }
@@ -120,26 +115,24 @@ pipeline {
         }
         stage ('Initiate and configure app in kubernetes') {
             steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/CAPIF/ --set capif_hostname=$HOSTNAME
-                    '''
-                }
+                sh '''
+                helm uninstall $DEPLOYMENT_NAME
+                '''
             }
         }
     }                
-    // post {
-    //     cleanup{
-    //         /* clean up our workspace */
-    //         deleteDir()
-    //         /* clean up tmp directory */
-    //         dir("${env.workspace}@tmp") {
-    //             deleteDir()
-    //         }
-    //         /* clean up script directory */
-    //         dir("${env.workspace}@script") {
-    //             deleteDir()
-    //         }
-    //     }
-    // }
+    post {
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
+        }
+    }
 }

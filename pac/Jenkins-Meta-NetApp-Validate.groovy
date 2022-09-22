@@ -107,11 +107,23 @@ pipeline {
             }
         }
 
-        //Review Parameters
-        stage('Validation: NetApp Onboarding Sucessfull'){
+        //Deploy CAPIF
+        stage('Validation: Deploy CAPIF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/007-NetApp Onboarding Successful', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                build job: '001-CAPIF/deploy', wait: true, propagate: false,
+                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+            }
+        }
+        
+        //Deploy NEF
+        stage('Validation: Deploy NEF'){
+            steps{
+                build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
+                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),

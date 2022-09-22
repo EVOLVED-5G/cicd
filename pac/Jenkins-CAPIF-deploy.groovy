@@ -38,10 +38,9 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "nef"
-        NAMESPACE_NAME = "nef"
+        DEPLOYMENT_NAME = "capif"
+        NAMESPACE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
-
     }
 
     stages {        
@@ -56,7 +55,7 @@ pipeline {
                     stages{
                         stage('Login openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
                                         oc login --insecure-skip-tls-verify --token=$TOKEN 
                                     '''
@@ -118,7 +117,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/cd/helm") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/nef/
+                    helm install $DEPLOYMENT_NAME ./cd/helm/CAPIF/ --set capif_hostname=$HOSTNAME
                     '''
                 }
             }
