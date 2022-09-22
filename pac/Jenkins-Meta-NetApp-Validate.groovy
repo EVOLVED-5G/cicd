@@ -86,12 +86,11 @@ pipeline {
         //Review Parameters
         stage('Validation: Deploy NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                build job: '003-NETAPPS/999-ToReview/deploy', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                 string(name: 'APP_REPLICAS', value: "2"),
+                                 string(name: 'DUMMY_NETAPP_HOSTNAME', value: "fogus.apps.ocp-epg.hi.inet")]
+
             }
         }
 
@@ -111,23 +110,28 @@ pipeline {
         stage('Validation: Deploy CAPIF'){
             steps{
                 build job: '001-CAPIF/deploy', wait: true, propagate: false,
-                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
+                                booleanParam(name: 'REPORTING', value: "openshift")]
             }
         }
-        
+
+        //Validate CAPIF
+        stage('Validation: Validate CAPIF'){
+            steps{
+                build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                     parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
+            }
+        }
+
         //Deploy NEF
         stage('Validation: Deploy NEF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
-                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                build job: '002-NEF/nef-deploy', wait: true, propagate: false,
+                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
+                                booleanParam(name: 'REPORTING', value: "openshift")]
             }
         }
 
@@ -195,23 +199,23 @@ pipeline {
         stage('Validation: Destroy NetApp'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
             }
         }
 
         //Review Parameters
-        stage('Validation: NetApp OffBoarding'){
+        stage('Validation: Destroy NEF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+            }
+        }
+
+        //Review Parameters
+        stage('Validation: Destroy CAPIF'){
+            steps{
+                build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
             }
         }
 

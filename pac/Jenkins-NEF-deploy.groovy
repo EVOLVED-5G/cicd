@@ -30,7 +30,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
+        string(name: 'HOSTNAME', defaultValue: 'nef-5g.apps.ocp-epg.hi.inet', description: 'Hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -56,7 +56,7 @@ pipeline {
                     stages{
                         stage('Login openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
                                         oc login --insecure-skip-tls-verify --token=$TOKEN 
                                     '''
@@ -118,7 +118,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/cd/helm") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/nef/
+                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME
                     '''
                 }
             }
