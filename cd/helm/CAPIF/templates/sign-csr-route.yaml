@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: nginx
   name: sign-csr
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753070217"
   uid: e358594f-878a-413e-85f0-738a959d7d90
 spec:

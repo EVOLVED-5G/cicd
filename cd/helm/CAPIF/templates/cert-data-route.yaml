@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: nginx
   name: cert-data
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753070199"
   uid: 9683a505-c4f6-42ea-a8e7-52f8a89ce967
 spec:

@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: netappfe
   name: netappfe
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753129526"
   uid: cda24bb3-ec09-4055-804b-f557466892c7
 spec:

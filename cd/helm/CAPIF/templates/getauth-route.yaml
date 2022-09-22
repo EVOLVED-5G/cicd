@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: nginx
   name: getauth
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753070207"
   uid: 164ea250-f0ef-4434-bb68-a636363a9206
 spec:
