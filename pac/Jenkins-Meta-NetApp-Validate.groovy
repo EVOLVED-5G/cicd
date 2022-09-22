@@ -61,16 +61,16 @@ pipeline {
             }
         }
         //Review Parameters
-        stage('Validation: Security Scan Docker Images'){
-            steps{
-                build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-            }
-        }
+        // stage('Validation: Security Scan Docker Images'){
+        //     steps{
+        //         build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+        //             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        //     }
+        // }
 
         //Review Parameters
         // stage('Validation: Upload Docker Images'){
