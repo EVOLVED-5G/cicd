@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: mongo-express-nef
   name: mongo-express-nef
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753695354"
   uid: 1cf39ca5-e0bc-47e7-8591-7e173f3b1110
 spec:

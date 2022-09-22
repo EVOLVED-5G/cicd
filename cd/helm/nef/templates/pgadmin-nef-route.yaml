@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: pgadmin
   name: pgadmin
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "752092491"
   uid: 88bc0d54-3a18-48db-ace5-a21535e73b59
 spec:

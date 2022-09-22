@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: backend
   name: backend
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "752092430"
   uid: 1781f4cb-7d86-4f2d-b65a-fd9f76c4c18d
 spec:

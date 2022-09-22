@@ -12,7 +12,7 @@ metadata:
 spec:
   host: mongo-express.apps.ocp-epg.hi.inet
   port:
-    targetPort: 8082
+    targetPort: 8081
   to:
     kind: Service
     name: mongo-express
