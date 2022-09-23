@@ -120,7 +120,7 @@ pipeline {
         stage('Validation: Validate CAPIF'){
             steps{
                 build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                     parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(GIT_CICD_BRANCH)),
+                     parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
                                 string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
             }
         }
