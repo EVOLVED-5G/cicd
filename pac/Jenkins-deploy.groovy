@@ -38,7 +38,7 @@ pipeline {
 
     environment {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
-        int APP_REPLICAS="${params.APP_REPLICAS}"
+        int APP_REPLICAS="${params.APP_REPLICAS}".toInteger()
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         DEPLOYMENT_NAME = "fogus"
