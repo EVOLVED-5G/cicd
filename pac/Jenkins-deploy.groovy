@@ -38,7 +38,6 @@ pipeline {
 
     environment {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
-        int APP_REPLICAS="${params.APP_REPLICAS}" as Integer
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         DEPLOYMENT_NAME = "fogus"
@@ -122,7 +121,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME --set app_replicas=$APP_REPLICAS
+                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME 
                     '''
                 }
             }
