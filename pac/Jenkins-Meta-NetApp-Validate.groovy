@@ -28,7 +28,7 @@ pipeline {
                     
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
-                    buildResults['static'] = jobResult
+                    buildResults['static-analysis'] = jobResult
 
                 }
 
@@ -47,106 +47,148 @@ pipeline {
                     
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['security'] = jobResult
+                    buildResults['security-analysis'] = jobResult
 
                 }
             }
         }
 
-        stage('Validation: Trial jenkins output'){
-            steps{
-                script {
-                    echo "Build results: ${buildResults.toString()}"
-                }
-            }
-        }
-        
-
-        // //Review Parameters
         stage('Validation: Security Scan Secrets'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+                                   parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+                    buildResults['secrets-analysis'] = jobResult
+
+                }
             }
         }
 
         //Review Parameters -- do we need to get the image from registry ?
         stage('Validation: Get docker Image from Registry'){
             steps{
-                build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                script {
+                    def jobBuild = build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Get docker Image from Registry' returned result: ${jobResult}"
+                    buildResults['docker-images'] = jobResult
+
+                }
             }
         }
-        //Review Parameters
+
+
+        //Review Parameters 
         stage('Validation: Security Scan Docker Images'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+                    buildResults['scan-docker-images'] = jobResult
+
+
+                }
             }
         }
 
-        //Review Parameters
         stage('Validation: Upload Docker Images'){
             steps{
-                build job: '003-NETAPPS/003-Helpers/018-Certify Images', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER))]
+                script {
+                    def jobBuild = build job: '003-NETAPPS/003-Helpers/018-Certify Images', wait: true, propagate: false,
+                                   parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Upload Docker Images' returned result: ${jobResult}"
+                    buildResults['upload-docker-images'] = jobResult
+
+
+                }
             }
         }
 
-        //Deploy CAPIF
-        stage('Validation: Deploy CAPIF'){
+        stage('Validation:Deploy CAPIF'){
             steps{
-                build job: '001-CAPIF/deploy', wait: true, propagate: false,
-                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
-                                booleanParam(name: 'REPORTING', value: "openshift")]
+                script {
+                    def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: false,
+                                   parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
+                                                booleanParam(name: 'REPORTING', value: "openshift")]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
+                    buildResults['deploy-capif'] = jobResult
+
+
+                }
             }
         }
 
         //Validate CAPIF
         stage('Validation: Validate CAPIF'){
             steps{
-                build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                     parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
-                                booleanParam(name: 'REPORTING', value: String.valueOf("False")),
-                                string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
+                script {
+                    def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                                   parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf("False")),
+                                                string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                    buildResults['validate-capif'] = jobResult
+
+
+                }
             }
         }
 
-        //Deploy NEF
         stage('Validation: Deploy NEF'){
             steps{
-                build job: '002-NEF/nef-deploy', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: false,
                      parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
                                 booleanParam(name: 'REPORTING', value: "openshift")]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Deploy NEF' returned result: ${jobResult}"
+                    buildResults['deploy-nef'] = jobResult
+
+
+                }
             }
         }
 
 
-        //Review Parameters
-        stage('Validation: Deploy NetApp'){
+        stage('Validation:  Deploy NetApp'){
             steps{
-                build job: '003-NETAPPS/999-ToReview/deploy', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                 string(name: 'APP_REPLICAS', value: "2"),
-                                 string(name: 'DUMMY_NETAPP_HOSTNAME', value: "fogus.apps.ocp-epg.hi.inet")]
+                script {
+                    def jobBuild = build job: '003-NETAPPS/999-ToReview/deploy', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'APP_REPLICAS', value: "2"),
+                                                string(name: 'DUMMY_NETAPP_HOSTNAME', value: "fogus.apps.ocp-epg.hi.inet")]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of ' Deploy NetApp'' returned result: ${jobResult}"
+                    buildResults['deploy-netapp'] = jobResult
 
+
+                }
             }
         }
 
@@ -221,42 +263,73 @@ pipeline {
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
-
-        //Review Parameters
+        
         stage('Validation: Destroy NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
+                    buildResults['destroy-netapp'] = jobResult
+
+
+                }
             }
         }
-
-        //Review Parameters
+ 
         stage('Validation: Destroy NEF'){
             steps{
-                build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                    echo "Build of 'Destroy NEF' returned result: ${jobResult}"
+                    buildResults['destroy-nef'] = jobResult
+
+
+                }
             }
         }
 
-        //Review Parameters
         stage('Validation: Destroy CAPIF'){
             steps{
-                build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                    
+                    echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
+                    buildResults['destroy-capif'] = jobResult
+
+
+                }
             }
         }
 
-        //Review Parameters
+
         stage('Validation: OpenSource Licenses Report'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    
+                    echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                    buildResults['opensource-license'] = jobResult
+                }
             }
         }
+
+        stage('Validation: Obtaining information for previous pipelines'){
+            steps{
+                script {
+                    echo "Build results: ${buildResults.toString()}"
+                }
+            }
+        }
+
 
         //Review Parameters
         stage('Validation: Generate Final Report'){

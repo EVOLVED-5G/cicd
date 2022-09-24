@@ -39,6 +39,9 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     
+                    mkdir executive_summary
+                    cd executive_summary
+
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
                     
                     
@@ -53,15 +56,13 @@ pipeline {
                     ## GENERATE A JINJA2 y JUNTAR TODOS LOS JSON
                     jq -s . *.json > final_json.json
 
-                     utils/report_generator.py --template templates/scan-report.md.j2 --json final_json.json --output executive-report-$NETAPP_NAME_LOWER.md
+                    utils/report_generator.py --template templates/scan-report.md.j2 --json final_json.json --output executive-report-$NETAPP_NAME_LOWER.md
 
                     ##ADD INFORMATION SOBRE LOS STEPS DE JENKINS
 
                     ## TRANSFROM MD into PDF
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-tr-repo-$NETAPP_NAME_LOWER.md
-
-
+                    docker run -v "$WORKSPACE/executive_summary":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.md
                     '''
                 }
             }
