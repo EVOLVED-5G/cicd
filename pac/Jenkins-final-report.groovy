@@ -42,14 +42,14 @@ pipeline {
                     mkdir executive_summary
                     cd executive_summary
 
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
                     
                     
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do  
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
@@ -76,12 +76,12 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do  
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
@@ -104,7 +104,7 @@ pipeline {
                     sh '''#!/bin/bash
 
                     report_file="final_report.pdf"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/54/$report_file"
 
                     curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
                         --data-binary @"$report_file" \
@@ -114,26 +114,26 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: "jenkins-evolved5G",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        }
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
-    }
+    // post {
+    //     always {
+    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+    //             mimeType: 'text/html',
+    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+    //             from: 'jenkins-evolved5G@tid.es',
+    //             replyTo: "jenkins-evolved5G",
+    //             recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+    //     }
+    //     cleanup{
+    //         /* clean up our workspace */
+    //         deleteDir()
+    //         /* clean up tmp directory */
+    //         dir("${env.workspace}@tmp") {
+    //             deleteDir()
+    //         }
+    //         /* clean up script directory */
+    //         dir("${env.workspace}@script") {
+    //             deleteDir()
+    //         }
+    //     }
+    // }
 }
