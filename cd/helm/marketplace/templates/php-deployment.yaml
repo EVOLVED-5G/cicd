@@ -26,28 +26,24 @@ spec:
         io.kompose.service: php-mktp
     spec:
       containers:
-        
         - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_php:latest
           name: php-mktp
-          volumeMounts:
-          - name: evolved5g-volume
-            mountPath: "/var/www/html"
+          env:
+            - name: APP_ROOT
+              value: /var/www/html
+            - name: NUM_PROCS
+              value: "4"
+            - name: OPTIONS
+              value: --queue=mail-queue,blockchain-transactions --tries=3
+            - name: QUEUE_DRIVER
+              value: sync
           ports:
             - containerPort: 80
           securityContext:
             runAsUser: 0
             allowPrivilegeEscalation: false
-        - name: npm-utility
-          image: dockerhub.hi.inet/evolved-5g/marketplace/marketplace_npm
-          command: ["npm install && npm run prod"]
-          volumeMounts:
-          - name: evolved5g-volume
-            mountPath: "/var/www/html"
 
       restartPolicy: Always
-      volumes:
-      - name: evolved5g-volume
-        persistentVolumeClaim:
-          claimName: evolved5g-volume
+
 
 status: {}
