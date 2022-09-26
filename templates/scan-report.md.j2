@@ -2,7 +2,7 @@
 {%- for row in json %}
 
 {% if row.date is defined  %}
-# Print {{row.date}}
+# Date {{row.date}}
 ## Quality assurance analysis of the {{row.applicationName.split("-").1[0]|upper}}{{row.applicationName.split("-").1[1:]}}
   {% if not row.issues %} 
 Good work. No vulnerabilities found.
