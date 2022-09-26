@@ -19,7 +19,7 @@ def generate_cover(title, date, buildnumber):
         cover.drawString(400, 50, "Build Number: %s" %buildnumber)
     cover.setFillColorRGB(.963,.344,.285,1)
     cover.rect(30, 20, 40, 800, 0, 1)
-    cover.drawImage("e5g.png", 170, 350)
+    cover.drawImage("utils/e5g.png", 170, 350)
     cover.save()
 
 

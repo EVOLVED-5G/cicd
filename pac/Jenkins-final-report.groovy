@@ -85,8 +85,10 @@ pipeline {
                         url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
-
+                    
+                    today =$(date +'%d/%m/%Y %H:%M:%S')
                     pdfunite *.pdf mid_report.pdf
+                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER -d $today -b $BUILD_ID
                     cp utils/*.pdf .
                     pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf endpage.pdf final_report.pdf
 
@@ -94,6 +96,11 @@ pipeline {
                 }
             }
         }
+        
+
+        def today = new Date()
+def yesterday = today - 1
+println today.format("MM/dd/yyyy")
         stage('Upload documents to Artifactory') {
             when {
                 expression {
