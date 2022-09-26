@@ -156,7 +156,7 @@ pipeline {
             }
         }
 
-        Validate CAPIF
+        // Validate CAPIF
         stage('Validation: Validate CAPIF'){
             steps{
                 script {
