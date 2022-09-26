@@ -338,22 +338,22 @@ pipeline {
 
         stage('Validation: Obtaining information for previous pipelines'){
             steps{
-                script {
-                        writeFile file: "report-steps-$NETAPP_NAME_LOWER.json", text: JsonOutput.toJson([key: [buildResults]])
-                }
-                script{
-                sh '''#!/bin/bash
-                report_file="report-steps-$NETAPP_NAME_LOWER.json"
-                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                dir ("${env.WORKSPACE}/") {
+                    script {
+                        writeFile file: 'report-steps-"$NETAPP_NAME_LOWER".json', text: JsonOutput.toJson([key: [buildResults]])
+                    }
+                    sh '''#!/bin/bash
+                    report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
-                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
-                '''
+                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$report_file" \
+                                "$url"
+                                '''
                 }
             }
         }
-        
+
 
 
         //Review Parameters
