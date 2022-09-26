@@ -52,6 +52,11 @@ pipeline {
                         url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
+                    
+                    cd ..
+                    python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md
+                    cd executive_summary
+                    rm -f report-steps-"$NETAPP_NAME_LOWER".json
 
                     jq -s . *.json > final_json.json
                     jq '{"json": .}' < final_json.json  > report.json
@@ -61,6 +66,7 @@ pipeline {
 
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.md
+                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
                     '''
                 }
             }
@@ -85,8 +91,8 @@ pipeline {
                     
                     today=$(date +'%d/%m/%Y')
                     pdfunite *.pdf mid_report.pdf
-                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today -b $BUILD_ID
-                    pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf utils/endpage.pdf final_report.pdf
+                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER VALIDATION REPORT" -d $today -b $BUILD_ID
+                    pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf mid_report.pdf utils/endpage.pdf final_report.pdf
 
                     '''
                 }
