@@ -24,6 +24,8 @@ pipeline {
     environment {
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
 
     stages {
@@ -337,14 +339,21 @@ pipeline {
         stage('Validation: Obtaining information for previous pipelines'){
             steps{
                 script {
-                        
-                        writeFile file: 'report-steps-$NETAPP_NAME_LOWER.json', text: JsonOutput.toJson([key: [buildResults]])
-}
-                    
+                        writeFile file: "report-steps-$NETAPP_NAME_LOWER.json", text: JsonOutput.toJson([key: [buildResults]])
+                }
+                script{
+                sh '''#!/bin/bash
+                report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                '''
                 }
             }
         }
+        
 
 
         //Review Parameters
