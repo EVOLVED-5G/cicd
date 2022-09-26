@@ -53,15 +53,11 @@ pipeline {
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
-                    ## GENERATE A JINJA2 y JUNTAR TODOS LOS JSON
                     jq -s . *.json > final_json.json
                     jq '{"json": .}' < final_json.json  > report.json
 
-                    utils/report_generator.py --template templates/scan-report.md.j2 --json report.json --output executive-report-$NETAPP_NAME_LOWER.md
+                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json report.json --output executive-report-$NETAPP_NAME_LOWER.md
 
-                    ##ADD INFORMATION SOBRE LOS STEPS DE JENKINS
-
-                    ## TRANSFROM MD into PDF
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     docker run -v $WORKSPACE/executive_summary:$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.md
                     '''
