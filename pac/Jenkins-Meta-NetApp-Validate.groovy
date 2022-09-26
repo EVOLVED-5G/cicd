@@ -1,5 +1,11 @@
-import groovy.json.*
+import groovy.json.JsonOutput
 def buildResults = [:]
+
+String netappName(String url) {
+    String url2 = url?:'';
+    String var = url2.substring(url2.lastIndexOf("/") + 1);
+    return var ;
+}
 
 pipeline {
     agent {
@@ -13,6 +19,11 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+    }
+
+    environment {
+        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
+        NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
     }
 
     stages {
@@ -326,14 +337,11 @@ pipeline {
         stage('Validation: Obtaining information for previous pipelines'){
             steps{
                 script {
-                    echo "Build results: ${buildResults.toString()}"
+                        
+                        writeFile file: 'report-steps-$NETAPP_NAME_LOWER.json', text: JsonOutput.toJson([key: [buildResults]])
+}
                     
-                    def json = new groovy.json.JsonBuilder()
 
-                    json key: buildResults
-
-                    println "json output: "
-                    println groovy.json.JsonOutput.prettyPrint(json.toString())
                 }
             }
         }
