@@ -38,18 +38,18 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    
+        
                     mkdir executive_summary
                     cd executive_summary
 
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
                     
                     
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do  
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54/$x"
+                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
@@ -74,21 +74,19 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54 -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
+                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do  
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/54/$x"
+                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
                     
-                    today=$(date +'%d/%m/%Y %H:%M:%S')
+                    today=$(date +'%d/%m/%Y')
                     pdfunite *.pdf mid_report.pdf
-                    
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today -b $BUILD_ID
-                    cp utils/*.pdf .
-                    pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf endpage.pdf final_report.pdf
+                    pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf utils/endpage.pdf final_report.pdf
 
                     '''
                 }
@@ -106,7 +104,7 @@ pipeline {
                     sh '''#!/bin/bash
 
                     report_file="final_report.pdf"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/54/$report_file"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
                     curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
                         --data-binary @"$report_file" \
