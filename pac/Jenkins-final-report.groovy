@@ -57,10 +57,10 @@ pipeline {
                     jq '{"json": .}' < final_json.json  > report.json
 
                     cd ..
-                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json executive_summary/report.json --output executive-report-$NETAPP_NAME_LOWER.md
+                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json executive_summary/report.json --output executive-summary/executive-summary-$NETAPP_NAME_LOWER.md
 
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v"$WORKSPACE"/executive_summary:$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.md
+                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive-summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary/executive-summary-$NETAPP_NAME_LOWER.md
                     '''
                 }
             }
