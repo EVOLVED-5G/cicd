@@ -164,7 +164,7 @@ pipeline {
                 script {
                     def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: false,
                      parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
+                                string(name: 'HOSTNAME', value: "nef.apps.ocp-epg.hi.inet" ),
                                 booleanParam(name: 'REPORTING', value: "openshift")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy NEF' returned result: ${jobResult}"
@@ -282,7 +282,8 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                    def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy NEF' returned result: ${jobResult}"
                     buildResults['destroy-nef'] = jobResult
 
@@ -295,8 +296,8 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
-                    
+                                   parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                    def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
                     buildResults['destroy-capif'] = jobResult
 
@@ -315,7 +316,7 @@ pipeline {
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    
+                    def jobResult = jobBuild.getResult()
                     echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
                     buildResults['opensource-license'] = jobResult
                 }
