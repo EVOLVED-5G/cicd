@@ -147,8 +147,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                   parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf("False")),
+                                   parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo",
                                                 string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
@@ -180,7 +179,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '003-NETAPPS/999-ToReview/deploy', wait: true, propagate: false,
-                                    parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
+                                    parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'APP_REPLICAS', value: "2"),
                                                 string(name: 'DUMMY_NETAPP_HOSTNAME', value: "fogus.apps.ocp-epg.hi.inet")]
                     def jobResult = jobBuild.getResult()
