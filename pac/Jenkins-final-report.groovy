@@ -92,11 +92,7 @@ pipeline {
                 }
             }
         }
-        
 
-        def today = new Date()
-def yesterday = today - 1
-println today.format("MM/dd/yyyy")
         stage('Upload documents to Artifactory') {
             when {
                 expression {
