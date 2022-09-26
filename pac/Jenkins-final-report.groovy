@@ -56,10 +56,11 @@ pipeline {
                     jq -s . *.json > final_json.json
                     jq '{"json": .}' < final_json.json  > report.json
 
-                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json report.json --output executive-report-$NETAPP_NAME_LOWER.md
+                    cd ..
+                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json executive_summary/report.json --output executive-report-$NETAPP_NAME_LOWER.md
 
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v $WORKSPACE/executive_summary:$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.md
+                    docker run -v"$WORKSPACE"/executive_summary:$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive-summary-$NETAPP_NAME_LOWER.md
                     '''
                 }
             }
@@ -84,6 +85,7 @@ pipeline {
                     
                     today =$(date +'%d/%m/%Y %H:%M:%S')
                     pdfunite *.pdf mid_report.pdf
+                    
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER -d $today -b $BUILD_ID
                     cp utils/*.pdf .
                     pdfunite cover.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf endpage.pdf final_report.pdf
