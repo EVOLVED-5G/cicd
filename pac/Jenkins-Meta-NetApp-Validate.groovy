@@ -175,12 +175,12 @@ pipeline {
             }
         }
 
-
+        //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
                 script {
                     def jobBuild = build job: '003-NETAPPS/999-ToReview/deploy', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
                                                 string(name: 'APP_REPLICAS', value: "2"),
                                                 string(name: 'DUMMY_NETAPP_HOSTNAME', value: "fogus.apps.ocp-epg.hi.inet")]
                     def jobResult = jobBuild.getResult()
