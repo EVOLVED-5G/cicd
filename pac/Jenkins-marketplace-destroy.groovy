@@ -1,18 +1,16 @@
-def getContext(deployment) {
-    String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-nef/api-ocp-epg-hi-inet:6443/system:serviceaccount:evol5-nef:deployer";
-    } else { 
-        return "kubernetes-admin@kubernetes";
-    }
+String netappName(String url) {
+    String url2 = url?:'';
+    String var = url2.substring(url2.lastIndexOf("/") + 1);
+    var= var.toLowerCase()
+    return var ;
 }
 
-def getPath(deployment) {
+def getNamespace(deployment,name) {
     String var = deployment
     if("openshift".equals(var)) {
-        return "~/.kube/config";
+        return "evol5-capif";
     } else {
-        return "~/kubeconfig";
+        return name;
     }
 }
 
@@ -32,36 +30,23 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'OPENSHIFT_URL', defaultValue: 'https://api.ocp-epg.hi.inet:6443', description: 'openshift url')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens","kubernethes-uma"])  
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
-        GIT_CICD_BRANCH="${params.GIT_BRANCH}"
-        APP_REPLICAS="${params.APP_REPLICAS}"
+        GIT_BRANCH="${params.GIT_BRANCH}"
+        HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        OPENSHIFT_URL= "${params.OPENSHIFT_URL}"
-        NEF_NAME = "nef_emulator"
+        DEPLOYMENT_NAME = "marketplace"
+        NAMESPACE_NAME = "marketplace"
         DEPLOYMENT = "${params.DEPLOYMENT}"
-        CONFIG_PATH = getPath("${params.DEPLOYMENT}")
-        CONFIG_CONTEXT = getContext("${params.DEPLOYMENT}") 
+
     }
-    
-    stages {
-        stage ('Load privder and backend info'){
-            steps {
-                dir ("${env.WORKSPACE}/iac/terraform/") {
-                    sh '''
-                    sed -i -e "s,CONFIG_PATH,${CONFIG_PATH},g" -e "s,CONFIG_CONTEXT,${CONFIG_CONTEXT},g" provider.tf
-                    cp backend.tf $NEF_NAME/
-                    cp provider.tf $NEF_NAME/
-                    '''
-                }
-            }
-        }
-        stage('Destroying infrastructure in Openshift or Kubernetes'){
-            parallel{
-                stage ('Destroying in Openshift') {
+
+    stages {        
+        stage ('Login in openshift or Kubernetes'){
+            parallel {
+                stage ('Login in Openshift platform') {
                     when {
                         allOf {
                             expression { DEPLOYMENT == "openshift"}
@@ -70,65 +55,84 @@ pipeline {
                     stages{
                         stage('Login openshift') {
                             steps {
-                                withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
-                                    dir ("${env.WORKSPACE}/iac/terraform/${NEF_NAME}") {
-                                        sh '''
-                                            oc login --insecure-skip-tls-verify --token=$TOKEN $OPENSHIFT_URL
-                                        '''
-                                    }
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    sh '''
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                    '''
                                 }
                             }
                         }
                     }
-                }
-                stage ('Destroying in Kubernetes') {
+                }            
+                stage ('Login in Kubernetes Platform'){
                     when {
                         allOf {
                             expression { DEPLOYMENT == "kubernetes-athens"}
                         }
                     }
                     stages{
-                        stage('Login openshift to get kubernetes credentials') {
+                        stage('Login in Kubernetes') {
                             steps { 
-                                dir ("${env.WORKSPACE}/iac/terraform/") {
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
                                     sh '''
-                                        export KUBECONFIG="~/kubeconfig"
+                                    kubectl get all -n kube-system
                                     '''
                                 }
                             }
                         }
+                        stage ('Create namespace in if it does not exist') {
+                            steps {
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sh '''
+                                    kubectl create namespace evol-$NAMESPACE_NAME
+                                    '''
+                                }
+                            }              
+                        }
                     }
                 }
-               
             }
         }
-        stage ('Undeploy app in kubernetess') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '328ab84a-aefc-41c1-aca2-1dfae5b150d2', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir ("${env.WORKSPACE}/iac/terraform/") {
-                        sh '''
-                            terraform init                                                           \
-                                -backend-config="bucket=evolved5g-${DEPLOYMENT}-terraform-states"    \
-                                -backend-config="key=${NEF_NAME}"
-                            terraform destroy --auto-approve
-                        '''
-                    }
+        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
+        stage ('Log into AWS ECR') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "evol5-athens"}
                 }
+            }
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    sh '''
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
+                    kubectl create secret docker-registry regcred                                   \
+                    --docker-password=$(aws ecr get-login-password)                                 \
+                    --namespace=$NAMESPACE_NAME                                                     \
+                    --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                    --docker-username=AWS
+                    '''
+                }    
+            }    
+        }
+        stage ('Initiate and configure app in kubernetes') {
+            steps {
+                sh '''
+                helm uninstall $DEPLOYMENT_NAME
+                '''
+            }
+        }
+    }                
+    post {
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
             }
         }
     }
-    // post {
-    //     cleanup{
-    //         /* clean up our workspace */
-    //         deleteDir()
-    //         /* clean up tmp directory */
-    //         dir("${env.workspace}@tmp") {
-    //             deleteDir()
-    //         }
-    //         /* clean up script directory */
-    //         dir("${env.workspace}@script") {
-    //             deleteDir()
-    //         }
-    //     }
-    // }
 }
