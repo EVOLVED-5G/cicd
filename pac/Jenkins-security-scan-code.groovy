@@ -63,6 +63,10 @@ pipeline {
         }
         stage('Get wiki repo and update Evolved Wiki'){
             steps {
+                options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                    }
                 dir ("${env.WORKSPACE}/") {
                     sh '''
                     git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
