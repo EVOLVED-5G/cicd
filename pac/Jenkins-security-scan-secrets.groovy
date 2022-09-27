@@ -5,7 +5,7 @@ String netappName(String url) {
 }
 
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(2)
