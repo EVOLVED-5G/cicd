@@ -1,4 +1,6 @@
-# Scan of {{type}}: {{id}}
+{% set name = id.split("/") %}
+# Scan of {{type}}: {{name|last}}
+
 
 ***
 {% if not vulnerabilities %} 
@@ -27,9 +29,7 @@ Good work. No vulnerabilities found.
   {%- for severity in severities %}
     {%- for vuln in vulnerabilities %}
       {%- if vuln.Severity == severity %}
-        {%- if vuln.Severity == "CRITICAL" %}
 |{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
-        {%- endif %}
       {%- endif %}
     {%- endfor %}
   {%- endfor %}

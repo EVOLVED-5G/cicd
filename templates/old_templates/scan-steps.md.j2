@@ -1,0 +1,25 @@
+
+# Evolved5G Validation Report
+# Overall validation steps information
+***
+
+{% set vars = {'foo': False} %}
+{% set counter = 0 -%}
+{% for group in key.0 -%}
+  STEP {{ counter + loop.index0 }}: {{ group|upper|replace("-"," ") }} status: {{key.0[group]}}
+    {%- if key.0[group] == "FAILURE" %}
+      {% if vars.update({'foo': True}) %} 
+      {% endif %}
+    {%- endif %}
+  {% set counter = counter + group|length %}
+{% endfor -%}
+{% if vars.foo %}
+  **Please, take a look to those steps that are failing.**
+{% endif %}
+
+
+
+
+
+
+
