@@ -37,11 +37,12 @@ pipeline {
     stages {
 
         stage('Launch Github Actions command') {
-            steps {
-                options {
+            options {
                     timeout(time: 10, unit: 'MINUTES')
                     retry(2)
                 }
+            steps {
+
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
 
