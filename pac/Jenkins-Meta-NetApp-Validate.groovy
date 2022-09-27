@@ -33,99 +33,94 @@ pipeline {
     }
 
     stages {
+        stage ('Static Code Analysis'){
+            parallel {
+                stage('Validation: Static Code Analysis'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
+                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
+                            buildResults['static-analysis'] = jobResult
 
-        stage('Validation: Static Code Analysis'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
-                    buildResults['static-analysis'] = jobResult
+                        }
 
+                    }
                 }
-
-            }
-        }
-
-        stage('Validation: Security Scan Code'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
-                                   parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['security-analysis'] = jobResult
-
+                stage('Validation: Security Scan Code'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
+                            buildResults['security-analysis'] = jobResult
+                        }
+                    }
                 }
-            }
-        }
-
-        stage('Validation: Security Scan Secrets'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                                   parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['secrets-analysis'] = jobResult
-
+                stage('Validation: Security Scan Secrets'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+                            buildResults['secrets-analysis'] = jobResult
+                        }
+                    }
                 }
-            }
-        }
-
-        //Review Parameters -- do we need to get the image from registry ?
-        stage('Validation: Get docker Image from Registry'){
-            steps{
-                script {
-                    def jobBuild = build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Get docker Image from Registry' returned result: ${jobResult}"
-                    buildResults['docker-images'] = jobResult
-
+                        //Review Parameters -- do we need to get the image from registry ?
+                stage('Validation: Get docker Image from Registry'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
+                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Get docker Image from Registry' returned result: ${jobResult}"
+                            buildResults['docker-images'] = jobResult
+                        }
+                    }
                 }
-            }
-        }
-
-
         //Review Parameters 
-        stage('Validation: Security Scan Docker Images'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-                    buildResults['scan-docker-images'] = jobResult
-
-
+                stage('Validation: Security Scan Docker Images'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+                            buildResults['scan-docker-images'] = jobResult
+                        }
+                    }
                 }
             }
         }
+
+
 
         stage('Validation: Upload Docker Images'){
             steps{
