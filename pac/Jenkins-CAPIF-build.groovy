@@ -1,5 +1,9 @@
 pipeline {
     agent { node {label 'evol5-openshift'}  }
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        retry(2)
+    }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
@@ -33,10 +37,6 @@ pipeline {
         }
         stage('Get the code!') {
             steps {
-                options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
-                }
                 dir ("${env.WORKSPACE}/") {
                     sh '''
                     rm -rf $NETAPP_NAME 

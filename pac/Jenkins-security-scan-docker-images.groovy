@@ -6,6 +6,10 @@ String netappName(String url) {
 
 pipeline {
     agent { node {label 'evol5-openshift'}  }
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        retry(2)
+    }
 
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
