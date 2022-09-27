@@ -163,7 +163,7 @@ pipeline {
                 script {
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
                                    parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
-                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: False),
+                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                 string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
