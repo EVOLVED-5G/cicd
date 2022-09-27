@@ -37,6 +37,10 @@ pipeline {
             }
         }
         stage('Get the code!') {
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''

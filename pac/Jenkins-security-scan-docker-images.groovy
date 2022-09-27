@@ -34,6 +34,10 @@ pipeline {
 
         stage('Launch Github Actions command') {
             steps {
+                options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
 
@@ -50,6 +54,10 @@ pipeline {
             }
         }
         stage('Get wiki repo and update Evolved Wiki'){
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''

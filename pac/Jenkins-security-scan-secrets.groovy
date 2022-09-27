@@ -31,6 +31,10 @@ pipeline {
     }
     stages {
         stage('Get Repo and clone'){
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
@@ -58,6 +62,10 @@ pipeline {
             }
         }
         stage('Get wiki repo and update Evolved Wiki'){
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''

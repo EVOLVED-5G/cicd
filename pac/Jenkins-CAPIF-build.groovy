@@ -33,6 +33,10 @@ pipeline {
         }
         stage('Get the code!') {
             steps {
+                options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
                 dir ("${env.WORKSPACE}/") {
                     sh '''
                     rm -rf $NETAPP_NAME 
