@@ -39,7 +39,7 @@ pipeline {
         stage('Launch Github Actions command') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(3)
                 }
             steps {
 
