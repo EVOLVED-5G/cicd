@@ -14,7 +14,7 @@ pipeline {
         }
     }
     options {
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
         retry(2)
     }
 
@@ -150,7 +150,7 @@ pipeline {
                     def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: false,
                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
-                                                booleanParam(name: 'REPORTING', value: "openshift")]
+                                                booleanParam(name: 'REPORTING', value: True)]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
                     buildResults['deploy-capif'] = jobResult
@@ -166,6 +166,7 @@ pipeline {
                 script {
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
                                    parameters: [string(name: 'BRANCH_NAME', value: "CAPIF_aef_demo"),
+                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: False),
                                                 string(name: 'CAPIF_HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
