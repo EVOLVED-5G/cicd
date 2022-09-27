@@ -149,13 +149,10 @@ pipeline {
                 script {
                     def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: false,
                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet" ),
-                                                booleanParam(name: 'REPORTING', value: True)]
+                                                string(name: 'HOSTNAME', value: "nginx.apps.ocp-epg.hi.inet")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
                     buildResults['deploy-capif'] = jobResult
-
-
                 }
             }
         }
@@ -171,8 +168,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                     buildResults['validate-capif'] = jobResult
-
-
                 }
             }
         }
@@ -187,8 +182,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy NEF' returned result: ${jobResult}"
                     buildResults['deploy-nef'] = jobResult
-
-
                 }
             }
         }
@@ -204,8 +197,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp'' returned result: ${jobResult}"
                     buildResults['deploy-netapp'] = jobResult
-
-
                 }
             }
         }
@@ -290,8 +281,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
                     buildResults['destroy-netapp'] = jobResult
-
-
                 }
             }
         }
@@ -304,8 +293,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy NEF' returned result: ${jobResult}"
                     buildResults['destroy-nef'] = jobResult
-
-
                 }
             }
         }
@@ -318,8 +305,6 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
                     buildResults['destroy-capif'] = jobResult
-
-
                 }
             }
         }
