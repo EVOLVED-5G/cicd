@@ -31,6 +31,10 @@ pipeline {
     }
     stages {
         stage('Get Repo and clone'){
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+                retry(2)
+            }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
@@ -44,7 +48,7 @@ pipeline {
                     git push -u origin $GIT_NETAPP_BRANCH
                     '''
                 }
-           }
+            }
         }
 
         stage('Launch Github Actions command') {
