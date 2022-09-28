@@ -44,6 +44,7 @@ spec:
           ports:
             - containerPort: 8085
             - containerPort: 8086
+            - containerPort: 443
           resources: {}
       hostname: exposer
       restartPolicy: Always
