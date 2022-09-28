@@ -95,7 +95,7 @@ pipeline {
                     
                     today=$(date +'%d/%m/%Y')
                     pdfunite *.pdf mid_report.pdf
-                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER Report" -d $today -b $BUILD_ID
+                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today -b $BUILD_ID
                     pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf utils/endpage.pdf final_report.pdf
 
                     '''

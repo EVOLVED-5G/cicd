@@ -3,26 +3,14 @@ import sys, getopt
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import yellow, red, black,white
-from reportlab.pdfbase.pdfmetrics import stringWidth
-
-
-
-## DefaultPageSize of a A4 paper
-PAGE_WIDTH  = 595
-PAGE_HEIGHT = 891
 
 def generate_cover(title, date, buildnumber):
 
     cover = canvas.Canvas("cover.pdf", pagesize=A4)
     cover.setFont("Times-Roman", 40)
     #A4 = 595x891
-    ##Part of the code to adjust the text to the file
-    text = title
-    text_width = stringWidth(text)
-    y=750 ## y position (height)
-    ##Handle the case if the text_width is larger than the PAGE_WIDTH
     if title != None:
-        cover.drawString((PAGE_WIDTH - text_width) / 2.0, y, text)
+        cover.drawString(200, 750, title)
     if date != None:
         cover.setFont("Helvetica", 20)
         cover.drawString(400, 80, "Date: %s" %date)
