@@ -14,11 +14,11 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: nginx
   name: nginx
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753070340"
   uid: e253c192-d902-45f9-8678-fa28968fa9bc
 spec:
-  host: test.evolved-5g.eu
+  host: {{ .Values.capif_hostname }}
   port:
     targetPort: nginx-https
   tls:
@@ -35,7 +35,7 @@ status:
     - lastTransitionTime: "2022-09-15T06:43:58Z"
       status: "True"
       type: Admitted
-    host: test.evolved-5g.eu
+    host: {{ .Values.capif_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-09-23T11:15:52Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: php-mktp
+  name: php-mktp
+  namespace: {{ .Release.Namespace }}
+  resourceVersion: "763218280"
+  uid: 8818ad48-7014-4b0c-ae4f-b282961d7e23
+spec:
+  host: {{ .Values.mktp_hostname }}
+  port:
+    targetPort: port-mktp
+  to:
+    kind: Service
+    name: php-mktp
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-09-23T11:15:52Z"
+      status: "True"
+      type: Admitted
+    host: {{ .Values.mktp_hostname }}
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None

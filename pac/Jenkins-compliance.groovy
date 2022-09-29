@@ -20,6 +20,10 @@ pipeline {
     stages {
 
         stage('Get the code!') {
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 sh '''
                 rm -rf ${NETAPP_NAME}
@@ -55,7 +59,7 @@ pipeline {
                 subject: "Evolved 5G - Compliance Analysis Result ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'pro-dcip-evol5-01@tid.es',
                 to: "evolved5g.devops@telefonica.com",
-                replyTo: "no-reply@tid.es",
+                replyTo: "jenkins-evolved5G",
                 compressLog: true,
                 attachLog: true
         }
@@ -67,9 +71,21 @@ pipeline {
                 subject: "Evolved 5G - ${NETAPP_NAME} - Compliance Analysis Result ${currentBuild.currentResult}",
                 from: 'pro-dcip-evol5-01@tid.es',
                 to: "evolved5g.devops@telefonica.com",
-                replyTo: "no-reply@tid.es",
+                replyTo: "jenkins-evolved5G",
                 compressLog: true,
                 attachLog: true
+        }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
         }
     }
 }

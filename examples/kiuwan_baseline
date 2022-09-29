@@ -120,7 +120,7 @@ pipeline {
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-futme@tid.es',
                 to: "futmedia.tid@telefonica.com",
-                replyTo: "no-reply@tid.es",
+                replyTo: "jenkins-evolved5G",
                 recipientProviders: [[$class: 'CulpritsRecipientProvider']]
         }
         success {

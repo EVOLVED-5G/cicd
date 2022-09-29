@@ -6,13 +6,13 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: mongo-express
   name: mongo-express
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "751945857"
   uid: 6d7963ca-3fd7-41a6-a09a-83bc0bc64bc4
 spec:
   host: mongo-express.apps.ocp-epg.hi.inet
   port:
-    targetPort: 8082
+    targetPort: {{ .Values.mongo_express_port}}
   to:
     kind: Service
     name: mongo-express

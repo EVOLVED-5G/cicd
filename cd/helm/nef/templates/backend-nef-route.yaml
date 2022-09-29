@@ -6,11 +6,11 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: backend
   name: backend
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "752092430"
   uid: 1781f4cb-7d86-4f2d-b65a-fd9f76c4c18d
 spec:
-  host: nef.apps.ocp-epg.hi.inet
+  host: {{ .Values.nef_hostname }}
   port:
     targetPort: backend-port
   to:
@@ -24,7 +24,7 @@ status:
     - lastTransitionTime: "2022-09-14T11:22:47Z"
       status: "True"
       type: Admitted
-    host: nef.apps.ocp-epg.hi.inet
+    host: {{ .Values.nef_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

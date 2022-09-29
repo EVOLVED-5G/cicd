@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: netappfe
   name: netappfe
 spec:
-  replicas: 1
+  replicas: {{ .Values.app_replicas }}
   selector:
     matchLabels:
       io.kompose.service: netappfe

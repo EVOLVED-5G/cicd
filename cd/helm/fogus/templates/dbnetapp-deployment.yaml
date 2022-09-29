@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: dbnetapp
   name: dbnetapp
 spec:
-  replicas: 1
+  replicas: {{ .Values.app_replicas }}
   selector:
     matchLabels:
       io.kompose.service: dbnetapp

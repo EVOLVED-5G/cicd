@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-aef
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: python-aef
+  name: python-aef
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: python-aef
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-aef
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: python-aef
+    spec:
+      containers:
+        - env:
+            - name: CAPIF_HOSTNAME
+              value: nginx.apps.ocp-epg.hi.inet
+            - name: CAPIF_PORT
+              value: "80"
+            - name: REDIS_HOST
+              value: redis-aef
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REQUESTS_CA_BUNDLE
+              value: /usr/src/app/ca.crt
+            - name: SSL_CERT_FILE
+              value: /usr/src/app/ca.crt
+          image: dockerhub.hi.inet/evolved-5g/dummy-aef/python_aef:latest
+          name: python-aef
+          ports:
+            - containerPort: 8085
+            - containerPort: 8086
+            - containerPort: 443
+          resources: {}
+      hostname: exposer
+      restartPolicy: Always
+status: {}

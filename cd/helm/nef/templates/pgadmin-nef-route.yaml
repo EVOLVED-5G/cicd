@@ -6,11 +6,11 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: pgadmin
   name: pgadmin
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "752092491"
   uid: 88bc0d54-3a18-48db-ace5-a21535e73b59
 spec:
-  host: pgadmin.apps.ocp-epg.hi.inet
+  host: {{ print "pgadmin-" .Values.nef_hostname }}
   port:
     targetPort: pgadmin-port
   to:
@@ -24,7 +24,7 @@ status:
     - lastTransitionTime: "2022-09-14T11:22:51Z"
       status: "True"
       type: Admitted
-    host: pgadmin.apps.ocp-epg.hi.inet
+    host: {{ print "pgadmin-" .Values.nef_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

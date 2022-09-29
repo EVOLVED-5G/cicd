@@ -1,4 +1,4 @@
-# Evolved5G Sonarqube Report
+# ANEX
 # Sonarqube static quality code analysis 
 
 {% set name = projectName.split("-") %}
@@ -18,7 +18,9 @@ Good work. Code has a good quality.
 | Severity | Status | Line | Component | Description | 
 |---|---|---|---|---|
 {%- for issue_type in issues %}
+  {% if issue_type.severity in ["blocker","critical"] %} 
 | {{issue_type.severity}} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
+  {%- endif %}
 {%- endfor %}
 {%- endif %}
 

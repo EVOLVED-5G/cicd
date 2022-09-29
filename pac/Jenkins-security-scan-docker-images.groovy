@@ -6,6 +6,10 @@ String netappName(String url) {
 
 pipeline {
     agent { node {label 'evol5-openshift'}  }
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        retry(2)
+    }
 
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
@@ -33,7 +37,12 @@ pipeline {
     stages {
 
         stage('Launch Github Actions command') {
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(3)
+                }
             steps {
+
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
 
@@ -50,6 +59,10 @@ pipeline {
             }
         }
         stage('Get wiki repo and update Evolved Wiki'){
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
@@ -104,7 +117,7 @@ pipeline {
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: "no-reply@tid.es",
+                replyTo: "jenkins-evolved5G",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
         cleanup{

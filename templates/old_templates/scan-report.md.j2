@@ -1,0 +1,61 @@
+# Evolved5G summary
+{%- for row in json %}
+
+{% if row.date is defined  %}
+# Date {{row.date}}
+## Quality assurance analysis of the {{row.applicationName.split("-").1[0]|upper}}{{row.applicationName.split("-").1[1:]}}
+  {% if not row.issues %} 
+Good work. No vulnerabilities found.
+    {% else %}    
+| Severity | Number of vulnerabilities |
+|---|---|
+      {%- for summary_type in row.summary %}
+| {{summary_type}} | {{row.summary[summary_type]}}|
+      {%- endfor %}
+      {%- for summary_type in row.summary %}
+        {%- if summary_type == "blocker" %}
+          {%- if row.summary[summary_type] > 0 %}
+BLOCKER Quality issues detected, please check the SonarQube analysis
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+  {%- endif %}
+
+{% else %}       
+***
+    {% set name = row.id.split("/") %}
+## Security analysis of the {{row.type[0]|upper}}{{row.type[1:]}}: {{name |last}}
+
+
+    {% if not row.vulnerabilities %} 
+Good work. No vulnerabilities found.
+    {% else %}
+### Summary
+    {%- set severities = [ "CRITICAL" , "HIGH" , "MEDIUM" , "LOW" ,  "UNKNOWN"] %}
+| Severity | Number of vulnerabilities |
+|---|---|
+    {%- for summary_type in row.summary %}
+      {%- if summary_type.Description is defined  %}
+| {{summary_type.Description}} | {{summary_type.counts}} |
+    {%- endif %}
+  {%- endfor %}
+
+    {%- for severity in severities %}
+      {%- for summary_type in row.summary %}
+
+          {%- if summary_type.Severity == severity %}
+| {{summary_type.Severity}} | {{summary_type.counts}} |
+          {%- endif %}
+
+      {%- endfor %}
+    {%- endfor %}
+
+      {%- for summary_type in row.summary %}
+        {%- if summary_type.Severity == "CRITICAL" %}
+CRITICAL Vulnerabilities detected, please check the {{row.type}}
+        {%- endif %}
+      {%- endfor %}
+
+    {%- endif %}
+{%- endif %}
+{%- endfor %}

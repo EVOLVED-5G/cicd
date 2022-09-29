@@ -6,11 +6,11 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: netappdjango
   name: netappdjango
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "753699128"
   uid: de9c37fa-3862-4248-9a2a-cc8f7e14022e
 spec:
-  host: backend-fogus.apps.ocp-epg.hi.inet
+  host: {{ print "backend-" .Values.hostname }}
   port:
     targetPort: django-port
   to:
@@ -24,7 +24,7 @@ status:
     - lastTransitionTime: "2022-09-15T19:08:15Z"
       status: "True"
       type: Admitted
-    host: backend-fogus.apps.ocp-epg.hi.inet
+    host: {{ print "backend-" .Values.hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

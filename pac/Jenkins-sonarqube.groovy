@@ -9,6 +9,10 @@ String netappName(String url) {
 
 pipeline {
     agent { node {label 'evol5-slave2'}  }
+    options {
+        timeout(time: 10, unit: 'MINUTES')
+        retry(2)
+    }
 
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
@@ -29,6 +33,10 @@ pipeline {
 
     stages {
         stage('Get the code!') {
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
+                }
             steps {
                 dir ("${WORKSPACE}/") {
                     sh '''
@@ -129,8 +137,20 @@ pipeline {
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: "no-reply@tid.es",
+                replyTo: "jenkins-evolved5G",
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
         }
     }
 }

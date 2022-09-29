@@ -28,12 +28,22 @@ spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_php:latest
           name: php-mktp
+          env:
+            - name: APP_ROOT
+              value: /var/www/html
+            - name: NUM_PROCS
+              value: "4"
+            - name: OPTIONS
+              value: --queue=mail-queue,blockchain-transactions --tries=3
+            - name: QUEUE_DRIVER
+              value: sync
           ports:
             - containerPort: 80
           securityContext:
             runAsUser: 0
             allowPrivilegeEscalation: false
-          resources: {}
+
       restartPolicy: Always
+
 
 status: {}

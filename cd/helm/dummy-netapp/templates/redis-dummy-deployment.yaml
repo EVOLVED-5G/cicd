@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis-dummy
+  name: redis-dummy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis-dummy
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: redis-dummy
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/dummy-netapp/redis:latest
+          name: redis-dummy
+          ports:
+            - containerPort: 6379
+          resources: {}
+      restartPolicy: Always
+status: {}

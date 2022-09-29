@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-aef
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: capif-callback-server
+  name: capif-callback-server
+spec:
+  ports:
+    - name: "port-capif-cs"
+      port: 8080
+      targetPort: 8080
+  selector:
+    io.kompose.service: capif-callback-server
+status:
+  loadBalancer: {}
