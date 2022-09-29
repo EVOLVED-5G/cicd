@@ -139,6 +139,6 @@ pipeline {
             dir("${env.workspace}@script") {
                 deleteDir()
             }
-        }
+        }       
     }
 }

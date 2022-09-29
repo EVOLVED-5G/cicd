@@ -75,5 +75,17 @@ pipeline {
                 compressLog: true,
                 attachLog: true
         }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
+        }
     }
 }

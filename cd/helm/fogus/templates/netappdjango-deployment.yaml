@@ -9,7 +9,7 @@ metadata:
     io.kompose.service: netappdjango
   name: netappdjango
 spec:
-  replicas: {{ .Values.capif_hostname }}
+  replicas: {{ .Values.app_replicas }}
   selector:
     matchLabels:
       io.kompose.service: netappdjango

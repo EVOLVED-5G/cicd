@@ -177,15 +177,25 @@ pipeline {
                 }
             }
         }
-        stage('Cleaning docker images and containers') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh '''
-                    docker stop $(docker ps -q)
-                    docker system prune -a -f --volumes
-                    sudo rm -rf $WORKSPACE/$NETAPP_NAME/
-                    '''
-                }
+    }
+    post {
+        always {
+            sh '''
+            docker stop $(docker ps -q)
+            docker system prune -a -f --volumes
+            sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+            '''
+        }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
             }
         }
     }

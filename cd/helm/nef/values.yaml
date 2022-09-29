@@ -1,2 +1,2 @@
 ## variables for the CAPIF
-capif_hostname: nginx.apps.ocp-epg.hi.inet
+nef_hostname: nef.apps.ocp-epg.hi.inet

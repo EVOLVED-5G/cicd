@@ -100,19 +100,15 @@ pipeline {
                 }               
             }
         }   
-        stage('Cleaning docker images and containers') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh '''
-                    docker stop $(docker ps -q)
-                    docker system prune -a -f --volumes
-                    sudo rm -rf $WORKSPACE/
-                    '''
-                }
-            }
-        }
     }
     post {
+        always {
+            sh '''
+            docker stop $(docker ps -q)
+            docker system prune -a -f --volumes
+            sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+            '''
+        }
         cleanup{
             /* clean up our workspace */
             deleteDir()
