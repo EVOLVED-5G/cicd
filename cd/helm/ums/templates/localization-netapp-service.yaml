@@ -6,20 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: python-aef
-  name: python-aef
+    io.kompose.service: localization-netapp
+  name: localization-netapp
 spec:
   ports:
-    - name: port-security
+    - name: port-localization
       port: 8085
       targetPort: 8085
-    - name: port-app
-      port: 8086
-      targetPort: 8086
-    - name: port-app-hettps
-      port: 443
-      targetPort: 443
   selector:
-    io.kompose.service: python-aef
+    io.kompose.service: localization-netapp
 status:
   loadBalancer: {}
