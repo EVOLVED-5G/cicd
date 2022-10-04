@@ -6,20 +6,17 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: python-aef
-  name: python-aef
+    io.kompose.service: infolysis-netapp
+  name: infolysis-netapp
 spec:
   ports:
-    - name: port-security
-      port: 8085
-      targetPort: 8085
-    - name: port-app
-      port: 8086
-      targetPort: 8086
-    - name: port-app-hettps
-      port: 443
-      targetPort: 443
+    - name: frontend-config
+      port: 80
+      targetPort: 80
+    - name: netapp-controller
+      port: 8000
+      targetPort: 8000
   selector:
-    io.kompose.service: python-aef
+    io.kompose.service: infolysis-netapp
 status:
   loadBalancer: {}

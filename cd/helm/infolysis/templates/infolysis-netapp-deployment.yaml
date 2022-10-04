@@ -27,6 +27,15 @@ spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/infolysisnetapp:latest
           name: infolysis-netapp
-          resources: {}
+          ports:
+            - containerPort: 8000
+            - containerPort: 80
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+          resources: {} 
       restartPolicy: Always
 status: {}
