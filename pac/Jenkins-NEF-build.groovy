@@ -104,7 +104,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker stop $(docker ps -q)
+            docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf $WORKSPACE/$NETAPP_NAME/
             '''
