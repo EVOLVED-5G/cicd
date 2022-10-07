@@ -240,6 +240,17 @@ pipeline {
         //Review Parameters
         stage('Certification: NEF Services MonitoringEvent API'){
             steps{
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'NEF Services MonitoringEvent' returned result: ${jobResult}"
+                    buildResults['nef-service-monitoring'] = jobResult
+                }
                 build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
@@ -252,44 +263,63 @@ pipeline {
         //Review Parameters
         stage('Certification: NEF Services MonitoringEvent'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-            }
-        }
-        
-        //Review Parameters
-        stage('Certification: Scale replica NetApp '){
-            steps{
-                build job: '/003-NETAPPS/003-Helpers/016-Scale Netapp', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'NEF Services MonitoringEvent' returned result: ${jobResult}"
+                    buildResults['nef-service-monitoring'] = jobResult
+                }
             }
         }
 
-        stage('Certification: Shrink replicaSet NetApp '){
+        stage('Certification: Scale replica NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/017-Shrink Netapp', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/016-Scale Netapp', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Scale replica NetApp' returned result: ${jobResult}"
+                    buildResults['scale-netapp'] = jobResult
+                }
+            }
+        }
+
+        stage('Certification: Shrink replicaSet NetApp'){
+            steps{
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/017-Shrink Netapp', wait: true, propagate: false,
+                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Shrink replicaSet NetApp' returned result: ${jobResult}"
+                    buildResults['Shrink-netapp'] = jobResult
+                }
             }
         }
 
         //Review Parameters
         stage('Certification: NetApp OffBoarding'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/014-NetApp OffBoarding', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'NetApp OffBoarding' returned result: ${jobResult}"
+                    buildResults['offboard-netapp'] = jobResult
+                }
             }
         }
 
@@ -300,7 +330,7 @@ pipeline {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
                     def jobResult = jobBuild.getResult()
-                    echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
+                    echo "Build of 'Destroy NetApp' returned result: ${jobResult}"
                     buildResults['destroy-netapp'] = jobResult
                 }
             }
