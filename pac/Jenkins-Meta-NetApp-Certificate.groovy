@@ -162,6 +162,22 @@ pipeline {
                 }
             }
         }
+        
+        stage('Validation: Validate NEF'){
+            steps{
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                    buildResults['validate-nef'] = jobResult
+                }
+            }
+        }
 
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Certification:  Deploy NetApp'){
