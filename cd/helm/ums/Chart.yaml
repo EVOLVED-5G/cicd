@@ -1,4 +1,4 @@
-name: nef
+name: ums
 description: A generated Helm Chart for nef from Skippbox Kompose
 version: 0.0.1
 apiVersion: v1
