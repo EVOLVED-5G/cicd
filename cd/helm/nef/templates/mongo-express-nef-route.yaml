@@ -10,7 +10,7 @@ metadata:
   resourceVersion: "753695354"
   uid: 1cf39ca5-e0bc-47e7-8591-7e173f3b1110
 spec:
-  host: {{ print "mongo-express-" .Values.nef_hostname }} 
+  host: "{{ .Release.Namespace }}-{{ print "mongo-express-" .Values.nef_hostname }}"
   port:
     targetPort: 8081
   to:
@@ -24,7 +24,7 @@ status:
     - lastTransitionTime: "2022-09-15T19:03:41Z"
       status: "True"
       type: Admitted
-    host: {{ print "mongo-express-" .Values.nef_hostname }}
+    host: "{{ .Release.Namespace }}-{{ print "mongo-express-" .Values.nef_hostname }}"
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

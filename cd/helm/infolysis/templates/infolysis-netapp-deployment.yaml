@@ -25,7 +25,10 @@ spec:
         io.kompose.service: infolysis-netapp
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/infolysisnetapp:latest
+        - image: dockerhub.hi.inet/evolved-5g/infolysisnetapp:1.0
+          env:
+            - name: NEF_HOSTNAME
+              value: {{ .Values.nef_hostname }}
           name: infolysis-netapp
           ports:
             - containerPort: 8000
