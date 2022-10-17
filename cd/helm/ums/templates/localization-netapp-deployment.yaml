@@ -27,6 +27,13 @@ spec:
     spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/localizationnetapp:latest
+          env:
+            - name: NEF_HOST
+              value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+            - name: NEF_PORT
+              value: "80"
+            - name: UE_EXTERNAL_ID
+              value: 10003@domain.com
           name: localization-netapp
           resources: {}
       restartPolicy: Always
