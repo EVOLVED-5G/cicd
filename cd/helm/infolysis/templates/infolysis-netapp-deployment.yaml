@@ -33,6 +33,24 @@ spec:
           ports:
             - containerPort: 8000
             - containerPort: 80
+          readinessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl -s localhost:80/configui/index.php
+            failureThreshold: 10
+            initialDelaySeconds: 7
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command:
+              - /bin/sh
+              - -c
+              - curl -s localhost:80/configui/index.php
+            failureThreshold: 10
+            initialDelaySeconds: 15
+            periodSeconds: 5
           resources: {} 
       restartPolicy: Always
 status: {}
