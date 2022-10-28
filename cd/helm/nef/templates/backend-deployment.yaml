@@ -85,7 +85,9 @@ spec:
               value: user
             - name: USERS_OPEN_REGISTRATION
               value: "true"
-          image: dockerhub.hi.inet/evolved-5g/nef_emulator_backend_1:1.0.18
+            - name: MONGO_CLIENT
+              value: mongodb://mongo-nef:27017
+          image: dockerhub.hi.inet/evolved-5g/nef_emulator_backend_1:latest
           name: backend
           ports:
             - containerPort: 80

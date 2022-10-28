@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: immersion-netapp
+  name: immersion-netapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: immersion-netapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: immersion-netapp
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/immersionnetapp-imm_netapp_container:latest
+          env:
+            - name: NEF_HOST
+              value: {{ .Values.nef_host}}
+            - name: NEF_CALLBACK_URL
+              value: {{ .Values.nef_callback_url }}
+            - name: NETAPP_ID
+              value: {{ .Values.netappid }}
+            - name: NETAPP_NAME
+              value: {{ .Values.netapp_name }}
+            - name: NETAPP_IP
+              value: {{ .Values.netapp_ip }}
+            - name: NETAPP_SERVER_VAPP
+              value: {{ .Values.vapp_ip }}
+            - name: NETAPP_PORT_5G
+              value: {{ .Values.netapp_port_5g | quote }}
+            - name: NETAPP_PORT_WEB
+              value: {{ .Values.netapp_port_web | quote }}
+            - name: NETAPP_PORT_VAPP
+              value: {{ .Values.netapp_port_vapp | quote }}
+          name: immersion-netapp
+          ports:
+            - containerPort: {{ .Values.netapp_port_5g }}
+            - containerPort: {{ .Values.netapp_port_web }}
+            - containerPort: {{ .Values.netapp_port_vapp }}
+          resources: {} 
+      restartPolicy: Always
+status: {}

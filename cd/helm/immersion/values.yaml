@@ -1,0 +1,10 @@
+## variables for the CAPIF
+nef_host: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+nef_callback_url: "http://immersion-netapp"
+netappid: immnetapp
+netapp_name: IMMNetapp
+netapp_ip: "http://0.0.0.0"
+vapp_ip: "127.0.0.1"
+netapp_port_5g: 9999
+netapp_port_web: 9998
+netapp_port_vapp: 9986

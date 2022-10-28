@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-10-27T13:42:37Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: immersion-netapp
+  name: imm-web
+  namespace: evol5-capif
+  resourceVersion: "805604232"
+  uid: 864a9c79-be57-40b0-bdba-65d3116eb281
+spec:
+  host: immersion-web-controller.apps.ocp-epg.hi.inet
+  port:
+    targetPort: netapp-port-web
+  to:
+    kind: Service
+    name: immersion-netapp
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-10-27T13:42:37Z"
+      status: "True"
+      type: Admitted
+    host: immersion-web-controller.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
