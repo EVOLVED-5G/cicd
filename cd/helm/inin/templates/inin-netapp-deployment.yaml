@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: inin-netapp
+  name: inin-netapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: inin-netapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: inin-netapp
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/ininrmonnetapp:latest
+          env:
+            - name: NET_APP_NAME
+              value: {{ .Values.NET_APP_NAME}}
+            - name: NET_API_PROT
+              value: {{ .Values.NET_API_PROT }}
+            - name: NET_API_HOST
+              value: {{ .Values.NET_API_HOST }}
+            - name: NET_API_PORT
+              value: {{ .Values.NET_API_PORT | quote }}
+            - name: NET_API_USER
+              value: {{ .Values.NET_API_USER }}
+            - name: NET_API_PASS
+              value: {{ .Values.NET_API_PASS }}
+            - name: CALLBACK_HOST
+              value: {{ .Values.CALLBACK_HOST }}
+            - name: CALLBACK_PORT
+              value: {{ .Values.CALLBACK_PORT | quote }}
+            - name: COLLECTOR_HOST
+              value: {{ .Values.COLLECTOR_HOST }}
+            - name: COLLECTOR_USER
+              value: {{ .Values.COLLECTOR_USER }}
+            - name: COLLECTOR_PASS
+              value: {{ .Values.COLLECTOR_PASS }}
+            - name: MN_HOST
+              value: {{ .Values.MN_HOST }}
+            - name: MN_TOKEN
+              value: {{ .Values.MN_TOKEN }}
+          name: inin-netapp
+          ports:
+            - containerPort: 80
+          resources: {} 
+      restartPolicy: Always
+status: {}
