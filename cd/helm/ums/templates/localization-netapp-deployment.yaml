@@ -32,6 +32,8 @@ spec:
               value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
             - name: NEF_PORT
               value: "80"
+            - name: CELLID_PORT
+              value: "80"
             - name: UE_EXTERNAL_ID
               value: 10003@domain.com
           name: localization-netapp

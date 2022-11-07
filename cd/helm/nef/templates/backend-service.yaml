@@ -13,6 +13,9 @@ spec:
     - name: "backend-port"
       port: 8888
       targetPort: 80
+    - name: "nef-port"
+      port: 8000
+      targetPort: 8000
   selector:
     io.kompose.service: backend
 status:
