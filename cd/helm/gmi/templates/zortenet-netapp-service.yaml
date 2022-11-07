@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: localization-netapp
-  name: localization-netapp
+    io.kompose.service: zortenet-netapp
+  name: zortenet-netapp
 spec:
   ports:
-    - name: ums-port
-      port: 8000
-      targetPort: 8000
+    - name: port-zortenet
+      port: {{ .Values.netapp_port }}
+      targetPort: {{ .Values.netapp_port }}
   selector:
-    io.kompose.service: localization-netapp
+    io.kompose.service: zortenet-netapp
 status:
   loadBalancer: {}

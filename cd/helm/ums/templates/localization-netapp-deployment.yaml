@@ -36,7 +36,13 @@ spec:
               value: "80"
             - name: UE_EXTERNAL_ID
               value: 10003@domain.com
+            - name: NETAPP_PORT
+              value: "8000"
+            - name: NETAPP_HOST
+              value: "http://evol5-capif-ums.apps.ocp-epg.hi.inet"
           name: localization-netapp
+          ports:
+            - containerPort: 8000
           resources: {}
       restartPolicy: Always
 status: {}
