@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: zortenet-netapp
-  name: zortenet-netapp
+    io.kompose.service: gmi-netapp
+  name: gmi-netapp
 spec:
   ports:
-    - name: port-zortenet
-      port: {{ .Values.netapp_port }}
-      targetPort: {{ .Values.netapp_port }}
+    - name: port-gmi
+      port: 8000
+      targetPort: 8000
   selector:
-    io.kompose.service: zortenet-netapp
+    io.kompose.service: gmi-netapp
 status:
   loadBalancer: {}
