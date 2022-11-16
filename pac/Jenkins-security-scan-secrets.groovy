@@ -30,7 +30,7 @@ pipeline {
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        ARTIFACTORY_URL=    
         DOCKER_PATH="/usr/src/app"
     }
     stages {
