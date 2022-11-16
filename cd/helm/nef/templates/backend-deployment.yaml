@@ -24,7 +24,16 @@ spec:
       labels:
         io.kompose.service: backend
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}   
       containers:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_backend_1-latest
+        {{- else }}
+        - image: dockerhub.hi.inet/evolved-5g/nef_emulator_backend_1:latest
+        {{- end }}
         - args:
             - /start-reload.sh
           env:
@@ -87,7 +96,6 @@ spec:
               value: "true"
             - name: MONGO_CLIENT
               value: mongodb://mongo-nef:27017
-          image: dockerhub.hi.inet/evolved-5g/nef_emulator_backend_1:latest
           name: backend
           ports:
             - containerPort: 80

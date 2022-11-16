@@ -24,7 +24,16 @@ spec:
       labels:
         io.kompose.service: db
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}   
       containers:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_db_1-1.0
+        {{- else }}
+        - image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:latest
+        {{- end }}
         - args:
             - -c
             - shared_buffers=256MB
@@ -90,7 +99,6 @@ spec:
               value: user
             - name: USERS_OPEN_REGISTRATION
               value: "true"
-          image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:latest
           name: db
           ports:
             - containerPort: 5432

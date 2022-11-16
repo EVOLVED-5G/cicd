@@ -8,3 +8,4 @@ vapp_ip: "127.0.0.1"
 netapp_port_5g: 9999
 netapp_port_web: 9998
 netapp_port_vapp: 9986
+env: kubernetes
