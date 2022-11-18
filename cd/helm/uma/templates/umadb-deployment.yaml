@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: postgres_container
+  name: postgres_container
+spec:
+  selector:
+    matchLabels:
+      io.kompose.service: postgres_container
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: postgres_container
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/testnetapp-postgres_container:latest
+          name: postgres_container
+          ports:
+            - containerPort: 5433
+          resources: {}
+      restartPolicy: Always
+status: {}
