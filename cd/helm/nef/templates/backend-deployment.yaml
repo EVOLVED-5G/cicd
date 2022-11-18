@@ -34,7 +34,7 @@ spec:
         {{- else }}
         - image: dockerhub.hi.inet/evolved-5g/nef_emulator_backend_1:latest
         {{- end }}
-        - args:
+          args:
             - /start-reload.sh
           env:
             - name: BACKEND_CORS_ORIGINS

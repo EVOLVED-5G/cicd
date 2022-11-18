@@ -33,7 +33,7 @@ spec:
         {{- else }}
         - image: dockerhub.hi.inet/evolved-5g/nef_emulator_mongo-express_1:latest
         {{- end }}
-        - env:
+          env:
             - name: BACKEND_CORS_ORIGINS
               value: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
             - name: DOCKER_IMAGE_BACKEND

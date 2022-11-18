@@ -34,7 +34,7 @@ spec:
         {{- else }}
         - image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:latest
         {{- end }}
-        - args:
+          args:
             - -c
             - shared_buffers=256MB
             - -c
