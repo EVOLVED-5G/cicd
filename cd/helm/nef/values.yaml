@@ -1,3 +1,4 @@
 ## variables for the CAPIF
 nef_hostname: nef.apps.ocp-epg.hi.inet
+capif_hostname: nginx.apps.ocp-epg.hi.inet
 env: openshift

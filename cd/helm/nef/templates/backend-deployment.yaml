@@ -96,6 +96,8 @@ spec:
               value: "true"
             - name: MONGO_CLIENT
               value: mongodb://mongo-nef:27017
+            - name: CAPIF_HOST
+              value: {{ .Values.capif_hostname}}
           name: backend
           ports:
             - containerPort: 80
