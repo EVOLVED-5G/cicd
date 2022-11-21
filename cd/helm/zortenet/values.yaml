@@ -1,0 +1,7 @@
+## variables for the ZORTENET
+nef_url: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+nef_user: admin@my-email.com
+nef_pass: pass
+netapp_host: zorte_netapp
+netapp_ip: "0.0.0.0"
+netapp_port: 5000

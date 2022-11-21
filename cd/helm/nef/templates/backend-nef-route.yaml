@@ -1,3 +1,4 @@
+{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -10,7 +11,7 @@ metadata:
   resourceVersion: "752092430"
   uid: 1781f4cb-7d86-4f2d-b65a-fd9f76c4c18d
 spec:
-  host: {{ .Values.nef_hostname }}
+  host: "{{ .Release.Namespace }}-{{ .Values.nef_hostname }}"
   port:
     targetPort: backend-port
   to:
@@ -24,7 +25,10 @@ status:
     - lastTransitionTime: "2022-09-14T11:22:47Z"
       status: "True"
       type: Admitted
-    host: {{ .Values.nef_hostname }}
+    host: "{{ .Release.Namespace }}-{{ .Values.nef_hostname }}"
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

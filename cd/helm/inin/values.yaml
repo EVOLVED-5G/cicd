@@ -1,0 +1,14 @@
+## variables for the CAPIF
+NET_APP_NAME: test
+NET_API_PROT: http
+NET_API_HOST: evol5-capif-nef.apps.ocp-epg.hi.inet
+NET_API_PORT: 80
+NET_API_USER: admin@my-email.com
+NET_API_PASS: pass
+CALLBACK_HOST: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+CALLBACK_PORT: 81
+COLLECTOR_HOST: https://evolved5g-collector.qmon.eu
+COLLECTOR_USER: test
+COLLECTOR_PASS: test
+MN_HOST: http://evolved5g-mn.qmon.eu
+MN_TOKEN: d074feb62430a78e49b5a6da58cb81827e4229b9e3a4ecb28d2a3e47469871247e15ab95a9f34ac713682cebee1031c4da3a

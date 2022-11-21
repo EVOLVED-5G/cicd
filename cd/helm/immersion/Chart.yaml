@@ -1,0 +1,8 @@
+name: infolysis
+description: A generated Helm Chart for nef from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - immersion
+sources:
+home:

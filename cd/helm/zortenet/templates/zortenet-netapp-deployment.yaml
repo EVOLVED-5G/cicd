@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: zortenet-netapp
+  name: zortenet-netapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: zortenet-netapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: zortenet-netapp
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/zortenetnetapp-zorte_netapp:latest
+          env:
+            - name: nef_url
+              value: {{ .Values.nef_url}}
+            - name: nef_user
+              value: {{ .Values.nef_user}}
+            - name: nef_pass
+              value: {{ .Values.nef_pass}}
+            - name: netapp_host
+              value: {{ .Values.netapp_host}}
+            - name: netapp_ip
+              value: {{ .Values.netapp_ip}}
+            - name: netapp_port
+              value: {{ .Values.netapp_port | quote }}
+          name: zortenet-netapp
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+status: {}

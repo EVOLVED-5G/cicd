@@ -112,22 +112,11 @@ pipeline {
                 }               
             }
         }   
-        stage('Cleaning docker images and containers') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh '''
-                    docker stop $(docker ps -q)
-                    docker system prune -a -f --volumes
-                    sudo rm -rf $WORKSPACE/
-                    '''
-                }
-            }
-        }
     }
     post {
         always {
             sh '''
-            docker stop $(docker ps -q)
+            docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf $WORKSPACE/$NETAPP_NAME/
             '''

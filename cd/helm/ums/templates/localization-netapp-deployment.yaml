@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o dummy-netapp
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: localization-netapp
+  name: localization-netapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: localization-netapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o dummy-netapp
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: localization-netapp
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/localizationnetapp:latest
+          env:
+            - name: NEF_HOST
+              value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+            - name: NEF_PORT
+              value: "80"
+            - name: CELLID_PORT
+              value: "80"
+            - name: UE_EXTERNAL_ID
+              value: 10003@domain.com
+            - name: NETAPP_PORT
+              value: "8000"
+            - name: NETAPP_HOST
+              value: "http://evol5-capif-ums.apps.ocp-epg.hi.inet"
+          name: localization-netapp
+          ports:
+            - containerPort: 8000
+          resources: {}
+      restartPolicy: Always
+status: {}

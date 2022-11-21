@@ -1,0 +1,8 @@
+name: uma
+description: A generated Helm Chart for fogus from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - uma
+sources:
+home:
