@@ -222,9 +222,9 @@ pipeline {
         }
 
         //Review Parameters
-        stage('Validation: Discover NetApp API from CAPIF'){
+        stage('Validation: Onboarding NetApp as Invoker to CAPIF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/008-Discover NetApp API from CAPIF', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
