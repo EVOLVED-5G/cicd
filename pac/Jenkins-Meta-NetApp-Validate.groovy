@@ -184,7 +184,7 @@ pipeline {
         stage('Validation: Validate NEF'){
             steps{
                 script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -200,14 +200,12 @@ pipeline {
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                build job: '/003-NETAPPS/005-Deploy NetApp', wait: true, propagate: false,
+                    parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(NETAPP_NAME)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
             }
         }
+
 
         //Review Parameters
         stage('Validation: Test NetApp Networking'){
@@ -234,9 +232,9 @@ pipeline {
         }
 
         //Review Parameters
-        stage('Validation: Discover NetApp Callback CAPIF'){
+        stage('Validation: Discover NEF APIs from CAPIF'){
             steps{
-                build job: '/003-NETAPPS/003-Helpers/009-NetApp Callback CAPIF', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),

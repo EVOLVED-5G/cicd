@@ -37,6 +37,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
         string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Netapp hostname')
+        string(name: 'DEPLOYMENT_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -44,11 +45,9 @@ pipeline {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "fogus"
+        DEPLOYMENT_NAME = "${params.DEPLOYMENT_NAME}"
         NAMESPACE_NAME = "fogus" //Parametrized here and create an universal pipeline for building
         DEPLOYMENT = "${params.DEPLOYMENT}"
-
-        
     }
 
         stages {        
