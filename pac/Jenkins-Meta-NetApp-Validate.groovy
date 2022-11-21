@@ -200,7 +200,7 @@ pipeline {
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
-                build job: '/003-NETAPPS/005-Deploy NetApp', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
                     parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(NETAPP_NAME)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
             }
