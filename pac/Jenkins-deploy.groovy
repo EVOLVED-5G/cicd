@@ -31,8 +31,6 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES')
         retry(2)
     }
-
-
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
@@ -50,7 +48,7 @@ pipeline {
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
-        stages {        
+    stages {        
         stage ('Login in openshift or Kubernetes'){
             parallel {
                 stage ('Login in Openshift platform') {

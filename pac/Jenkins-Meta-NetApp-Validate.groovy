@@ -180,7 +180,6 @@ pipeline {
                 }
             }
         }
-
         stage('Validation: Validate NEF'){
             steps{
                 script {
