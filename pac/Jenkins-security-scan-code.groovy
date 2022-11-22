@@ -78,7 +78,7 @@ pipeline {
                     cd ${NETAPP_NAME}.wiki/
                     git add -A .
                     git diff-index --quiet HEAD || git commit -m 'Addig Trivy scan report'
-                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+                    git push https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                     '''
                 }
            }
