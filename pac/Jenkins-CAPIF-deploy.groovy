@@ -125,6 +125,7 @@ pipeline {
                     '''
                 }
             }
+            sleep time: 30, unit: 'SECONDS'
         }
     }                
     post {
