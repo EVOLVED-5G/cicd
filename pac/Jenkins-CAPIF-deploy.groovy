@@ -122,10 +122,10 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     helm install $DEPLOYMENT_NAME ./cd/helm/CAPIF/ --set capif_hostname=$HOSTNAME
+                    sleep 30
                     '''
                 }
             }
-            sleep time: 30, unit: 'SECONDS'
         }
     }                
     post {
