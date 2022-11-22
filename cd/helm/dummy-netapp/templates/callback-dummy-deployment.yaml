@@ -24,7 +24,7 @@ spec:
         io.kompose.service: callback-dummy
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/dummy-netapp/dummy-netapp/dummy-netapp_capif_callback_server_1:latest
+        - image: dockerhub.hi.inet/evolved-5g/dummy-netapp/dummy-netapp_capif_callback_server_1:latest
           name: callback-dummy
           ports:
             - containerPort: 8080
