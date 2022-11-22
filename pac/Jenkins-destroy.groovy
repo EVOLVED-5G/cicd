@@ -118,6 +118,7 @@ pipeline {
             steps {
                 sh '''
                 helm uninstall $DEPLOYMENT_NAME
+                sleep 30
                 '''
             }
         }
