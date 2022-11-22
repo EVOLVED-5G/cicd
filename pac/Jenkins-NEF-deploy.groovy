@@ -123,6 +123,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME
+                    sleep 100
                     '''
                 }
             }

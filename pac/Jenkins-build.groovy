@@ -25,17 +25,6 @@ pipeline {
         DOCKER_VAR = false
     }
     stages {
-        stage('Clean workspace') {
-            steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    sh '''
-                    docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
-                    docker system prune -a -f --volumes
-                    sudo rm -rf $WORKSPACE/$NETAPP_NAME/
-                    '''
-                }
-            }
-        }
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
@@ -149,9 +138,9 @@ pipeline {
                             def name  = sh(returnStdout: true, script: cmd2).trim()
                             sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":${VERSION}"""
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}":latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}-"${x[1]}" """
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${x[1]}" """
                             }
                         }
                     }
