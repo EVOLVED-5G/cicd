@@ -39,6 +39,9 @@ pipeline {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
                     make prepare-dev-env
+
+
+                    EXTERNAL_NET=false
                     '''
                 }
             }

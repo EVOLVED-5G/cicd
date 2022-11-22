@@ -17,7 +17,6 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
-
     environment {
         GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
         GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
@@ -83,7 +82,6 @@ pipeline {
                 }
            }
         }
-
         stage('Upload report to Artifactory') {
             when {
                 expression {
@@ -111,8 +109,8 @@ pipeline {
                 }
             }
         }
-
     }
+
     post {
         always {
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
