@@ -79,7 +79,7 @@ stages {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    value=$(kubectl get pods | grep ^r | awk '{print $1}')
+                    value=$(kubectl get pods | grep ^api-invoker-management | awk '{print $1}')
                     logs=$(kubectl logs --tail=20 $value) 
                     while IFS= read -r line; do
                         if [[ $line == *"Netapp onboarded sucessfuly"* ]]; then
