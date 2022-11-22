@@ -10,7 +10,7 @@ metadata:
   resourceVersion: "751945857"
   uid: 6d7963ca-3fd7-41a6-a09a-83bc0bc64bc4
 spec:
-  host: mongo-express.apps.ocp-epg.hi.inet
+  host: mongo-express-capif.apps.ocp-epg.hi.inet
   port:
     targetPort: {{ .Values.mongo_express_port}}
   to:
@@ -24,7 +24,7 @@ status:
     - lastTransitionTime: "2022-09-14T08:31:33Z"
       status: "True"
       type: Admitted
-    host: mongo-express.apps.ocp-epg.hi.inet
+    host: mongo-express-capif.apps.ocp-epg.hi.inet
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
