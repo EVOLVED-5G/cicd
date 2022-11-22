@@ -1,18 +1,3 @@
-String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    var= var.toLowerCase()
-    return var ;
-}
-
-def getNamespace(deployment,name) {
-    String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-capif";
-    } else {
-        return name;
-    }
-}
 
 def getAgent(deployment) {
     String var = deployment
@@ -34,24 +19,79 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
-
-    environment {
-        GIT_BRANCH="${params.GIT_BRANCH}"
-        HOSTNAME="${params.HOSTNAME}"
-        AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "capif"
-        NAMESPACE_NAME = "capif"
-        DEPLOYMENT = "${params.DEPLOYMENT}"
-    }
-
-
-// Parsear información sobre los logs de CAPIF y obtener la traza que demuestra que la NETAPP ha hecho discover APIs
+// Parsear información sobre los logs de CAPIF y obtener la traza que demuestra que la NETAPP ha sido onboarded
 // Preguntar NACHO cual es el log que da esta informacion -- Pedir a Nacho una KEY especifica
 // kubectl/oc logs y parsear la salida  --
-    stages {        
 
-}
+stages {        
+        stage ('Login in openshift or Kubernetes'){
+            parallel {
+                stage ('Login in Openshift platform') {
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "openshift"}
+                        }
+                    }
+                    stages{
+                        stage('Login openshift') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    sh '''
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                }            
+                stage ('Login in Kubernetes Platform'){
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        }
+                    }
+                    stages{
+                        stage('Login in Kubernetes') {
+                            steps { 
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                    sh '''
+                                    kubectl get all -n kube-system
+                                    '''
+                                }
+                            }
+                        }
+                        stage ('Create namespace in if it does not exist') {
+                            steps {
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sh '''
+                                    kubectl create namespace evol-$NAMESPACE_NAME
+                                    '''
+                                }
+                            }              
+                        }
+                    }
+                }
+            }
+        }
+        stage('Verify is netapp is onboarded') {
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    value=$(kubectl get pods | grep ^published-apis | awk '{print $1}')
+                    logs=$(kubectl logs --tail=20 $value) 
+                    while IFS= read -r line; do
+                        if [[ $line == *"Discovered APIs by:"* ]]; then
+                            echo "This is true"
+                            result=TRUE
+                        fi
+                    done <<< "$logs"
+                    echo $result
+                    echo $result || exit 0
+                    '''
+                }
+            }
+        }
+    }
 }
