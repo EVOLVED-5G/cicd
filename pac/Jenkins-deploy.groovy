@@ -123,7 +123,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME
-                    sleep 30
+                    sleep 100
                     '''
                 }
             }
