@@ -28,7 +28,7 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
-              value: capif.apps.ocp-epg.hi.ine
+              value: capif.apps.ocp-epg.hi.inet
             - name: CAPIF_PORT
               value: "80"
             - name: REDIS_HOST
