@@ -192,13 +192,6 @@ pipeline {
                 }
             }
         }
-            parameters {
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
-        string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Netapp hostname')
-        string(name: 'DEPLOYMENT_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
-    }
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
