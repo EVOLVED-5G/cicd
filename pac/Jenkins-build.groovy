@@ -4,23 +4,23 @@ String netappName(String url) {
     return var ;
 }
 
-def getPathAWS(deployment) {
+String getPathAWS(deployment) {
     String var = deployment
     if("verification".equals(var)) {
         return "";
     }else if("validation".equals(var)){
-        return "validation"
+        return "validation";
     }else {
         return "certification";
     }
 }
 
-def getPath(deployment) {
+String getPath(deployment) {
     String var = deployment
     if("verification".equals(var)) {
         return "";
     }else if("validation".equals(var)){
-        return "validation/"
+        return "validation/";
     }else {
         return "certification/";
     }
@@ -119,10 +119,10 @@ pipeline {
                         def name  = sh(returnStdout: true, script: cmd2).trim()
                         sh '''$(aws ecr get-login --no-include-email)'''
                         [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
-                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
-                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
-                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
+                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
+                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
                         }
                     }
                 }
@@ -138,10 +138,10 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
                     $(aws ecr get-login --no-include-email)
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}/:${NETAPP_NAME}-${VERSION}
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}/:${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}/:${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${PATH_AWS}/:${NETAPP_NAME}-${VERSION}
+                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g$"{PATH_AWS}"/:${NETAPP_NAME}-${VERSION}
+                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-latest
+                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-latest
+                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-${VERSION}
                     '''  
                 }   
             }
