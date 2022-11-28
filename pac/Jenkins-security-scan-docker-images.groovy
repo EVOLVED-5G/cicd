@@ -42,8 +42,8 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        PATH=getPath("${params.STAGE}")
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/${PATH}"
+        STAGE=getPath("${params.STAGE}")
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/${STAGE}"
         DOCKER_PATH="/usr/src/app"
     }
 
@@ -57,6 +57,7 @@ pipeline {
             steps {
 
                 dir ("${env.WORKSPACE}/") {
+                    sh 'printenv'
                     sh '''#!/bin/bash
 
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
@@ -64,8 +65,8 @@ pipeline {
 
                     for x in "${images[@]}"
                     do
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/${PATH}/$x" 
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json&image=dockerhub.hi.inet/evolved-5g/${PATH}/$x" > report-tr-img-$x.json
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/${STAGE}/$x" 
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json&image=dockerhub.hi.inet/evolved-5g/${STAGE}/$x" > report-tr-img-$x.json
                     done
                     '''
                 }
