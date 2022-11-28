@@ -104,14 +104,15 @@ pipeline {
                 }
 
                 // FIX VERSION = 1 --> Validacion
-                stage('Validation: Build validaition image  Report'){
+                stage('Validation: Build validation image  Report'){
                     steps{
                         script {
                             def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
-                                            parameters: [string(name: 'VERSION', value: '1'),
+                                            parameters: [string(name: 'VERSION', value: '1.0'),
                                                         string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'STAGE', value: "validation") ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Netapp' returned result: ${jobResult}"
                             buildResults['build'] = jobResult
@@ -119,23 +120,6 @@ pipeline {
                     }
                 }
 
-                //Review Parameters -- do we need to get the image from registry ?
-                stage('Validation: Get docker Image from Registry'){
-                    steps{
-                        script {
-                            def jobBuild = build job: '/100-HELPERS/001-Get Docker Image', wait: true, propagate: false,
-                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Get docker Image from Registry' returned result: ${jobResult}"
-                            buildResults['docker-images'] = jobResult
-                        }
-                    }
-                }
-        //Review Parameters 
                 stage('Validation: Security Scan Docker Images'){
                     steps{
                         script {

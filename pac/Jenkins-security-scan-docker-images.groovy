@@ -4,6 +4,17 @@ String netappName(String url) {
     return var ;
 }
 
+def getPath(deployment) {
+    String var = deployment
+    if("verification".equals(var)) {
+        return "";
+    }else if("validation".equals(var)){
+        return "validation"
+    }else {
+        return "certification";
+    }
+}
+
 pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
@@ -16,6 +27,7 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        string(name: 'STAGE', choices: ["verification", "validation", "certification"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -30,7 +42,8 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        PATH=getPath("${params.GIT_NETAPP_URL}")
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/"+getPath("${params.GIT_NETAPP_URL}")
         DOCKER_PATH="/usr/src/app"
     }
 
@@ -51,8 +64,8 @@ pipeline {
 
                     for x in "${images[@]}"
                     do
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$x" 
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json&image=dockerhub.hi.inet/evolved-5g/$x" > report-tr-img-$x.json
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/${PATH}/$x" 
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-${NETAPP_NAME}&branch=${GIT_NETAPP_BRANCH}&output_format=json&image=dockerhub.hi.inet/evolved-5g/${PATH}/$x" > report-tr-img-$x.json
                     done
                     '''
                 }
