@@ -42,7 +42,7 @@ pipeline {
         TOKEN_TRIVY = credentials('token_trivy')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        PATH=getPath("${params.GIT_NETAPP_URL}")
+        PATH=getPath("${params.STAGE}")
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/"+getPath("${params.GIT_NETAPP_URL}")
         DOCKER_PATH="/usr/src/app"
     }

@@ -128,31 +128,13 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        string(name: 'STAGE', value: "validation"),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
                             buildResults['scan-docker-images'] = jobResult
                         }
                     }
-                }
-            }
-        }
-
-
-
-        stage('Validation: Upload Docker Images'){
-            steps{
-                script {
-                    def jobBuild = build job: '003-NETAPPS/003-Helpers/018-Certify Images', wait: true, propagate: false,
-                                   parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Upload Docker Images' returned result: ${jobResult}"
-                    buildResults['upload-docker-images'] = jobResult
-
-
                 }
             }
         }
@@ -165,12 +147,10 @@ pipeline {
                                                 string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                    buildResults['deploy-capif'] = jobResult
+                    //buildResults['deploy-capif'] = jobResult
                 }
             }
         }
-
-        // Validate CAPIF
         stage('Validation: Validate CAPIF'){
             steps{
                 script {
@@ -180,7 +160,7 @@ pipeline {
                                                 string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                    buildResults['validate-capif'] = jobResult
+                    //buildResults['validate-capif'] = jobResult
                 }
             }
         }
@@ -194,7 +174,7 @@ pipeline {
                                 booleanParam(name: 'REPORTING', value: "openshift")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy NEF' returned result: ${jobResult}"
-                    buildResults['deploy-nef'] = jobResult
+                    //buildResults['deploy-nef'] = jobResult
                 }
             }
         }
