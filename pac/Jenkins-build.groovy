@@ -46,7 +46,7 @@ pipeline {
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         DOCKER_VAR = false
-        PATH = getPath("${params.STAGE}")
+        STAGE = getPath("${params.STAGE}")
         PATH_AWS = getPathAWS("${params.STAGE}")
     }
     stages {
@@ -163,9 +163,9 @@ pipeline {
                             def name  = sh(returnStdout: true, script: cmd2).trim()
                             sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}/"${x[1]}":${VERSION}"""
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}/"${x[1]}":latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}/"${x[1]}" """
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}" """
                             }
                         }
                     }
@@ -183,9 +183,9 @@ pipeline {
                     retry(2){
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}:${VERSION}
-                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}:latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH}${NETAPP_NAME}
+                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}:${VERSION}
+                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}:latest
+                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}
                         '''
                     }
                 }
