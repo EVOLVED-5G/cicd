@@ -51,7 +51,6 @@ pipeline {
                             echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
                             buildResults['static-analysis'] = jobResult
                         }
-
                     }
                 }
                 stage('Validation: Source Code Security Analysis'){
@@ -189,18 +188,26 @@ pipeline {
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                    buildResults['validate-nef'] = jobResult
+                    //buildResults['validate-nef'] = jobResult
                 }
             }
         }
-
+            parameters {
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
+        string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Netapp hostname')
+        string(name: 'DEPLOYMENT_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
+    }
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
                                 parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(NETAPP_NAME)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'ENVIRONMENT', value: String.valueOf(ENVIRONMENT))
+                                ]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy Netapp' returned result: ${jobResult}"
                     buildResults['deploy-netapp'] = jobResult

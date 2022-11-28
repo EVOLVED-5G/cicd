@@ -27,7 +27,7 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
-        string(name: 'STAGE', choices: ["verification", "validation", "certification"])
+        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
