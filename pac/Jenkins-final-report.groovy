@@ -127,26 +127,26 @@ pipeline {
             }
         }
     }
-    post {
-        always {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: "jenkins-evolved5G",
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-        }
-        cleanup{
-            /* clean up our workspace */
-            deleteDir()
-            /* clean up tmp directory */
-            dir("${env.workspace}@tmp") {
-                deleteDir()
-            }
-            /* clean up script directory */
-            dir("${env.workspace}@script") {
-                deleteDir()
-            }
-        }
-    }
+    // post {
+    //     always {
+    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+    //             mimeType: 'text/html',
+    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+    //             from: 'jenkins-evolved5G@tid.es',
+    //             replyTo: "jenkins-evolved5G",
+    //             recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+    //     }
+    //     cleanup{
+    //         /* clean up our workspace */
+    //         deleteDir()
+    //         /* clean up tmp directory */
+    //         dir("${env.workspace}@tmp") {
+    //             deleteDir()
+    //         }
+    //         /* clean up script directory */
+    //         dir("${env.workspace}@script") {
+    //             deleteDir()
+    //         }
+    //     }
+    // }
 }
