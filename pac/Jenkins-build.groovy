@@ -138,10 +138,10 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
                     $(aws ecr get-login --no-include-email)
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g$"{PATH_AWS}"/:${NETAPP_NAME}-${VERSION}
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/:${NETAPP_NAME}-${VERSION}
+                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g$"{env.PATH_AWS}"/${NETAPP_NAME}-${VERSION}
+                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${PATH_AWS}"/${NETAPP_NAME}-latest
+                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${env.PATH_AWS}"/${NETAPP_NAME}-latest
+                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${env.PATH_AWS}"/${NETAPP_NAME}-${VERSION}
                     '''  
                 }   
             }
@@ -163,9 +163,9 @@ pipeline {
                             def name  = sh(returnStdout: true, script: cmd2).trim()
                             sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}":${VERSION}"""
-                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}":latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${x[1]}" """
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
                             }
                         }
                     }
