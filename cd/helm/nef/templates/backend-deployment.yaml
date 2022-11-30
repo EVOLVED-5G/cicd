@@ -98,6 +98,10 @@ spec:
               value: mongodb://mongo-nef:27017
             - name: CAPIF_HOST
               value: {{ .Values.capif_hostname}}
+            - name: CAPIF_HTTP_PORT
+              value: "80"
+            - name: CAPIF_HTTPS_PORT
+              value: "443"
           name: backend
           ports:
             - containerPort: 80
