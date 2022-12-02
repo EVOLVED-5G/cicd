@@ -118,7 +118,7 @@ pipeline {
                     version=$(curl -u admin:SONARQB_PASSWORD http://195.235.92.134:9000/api/system/info | jq ".System.Version")
                     url=$(http://195.235.92.134:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH})
 
-                    python3 utils/report_sonar_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md --
+                    python3 utils/report_sonar_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md --repo $GIT_NETAPP_URL --branch $GIT_NETAPP_BRANCH --commit $commit --version $version
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
