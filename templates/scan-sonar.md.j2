@@ -9,12 +9,12 @@ Last Commit ID: @CommitID
 The Source Code analysis has been performed using SonarQube versión @SonarqubeVersion
 
 {% set name = projectName.split("-") %}
+{% set blocker_issues = [] %}
 ## Scan of {{name.1}}
 
 ### Summary
 | Severity | Number of vulnerabilities |
 |---|---|
-{% set blocker_issues = [] %}
 {%- for summary_type in summary %}
 | {{summary_type}} | {{summary[summary_type]}}|
         {%- if summary_type == "blocker" %}
@@ -25,7 +25,7 @@ The Source Code analysis has been performed using SonarQube versión @SonarqubeV
   {%- endfor %}
 ***
 {% if not blocker_issues %} 
-Good work. Netapp code doest have any blocker issues.
+Good work. Netapp code does not have any blocker issues.
 {% else %}
 The Source Code Analysis results have failed because we have found the following blocker issues:
 
