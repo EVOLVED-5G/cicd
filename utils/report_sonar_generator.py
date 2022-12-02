@@ -17,7 +17,7 @@ output_filename = sys.argv[6]
 repo = sys.argv[8]
 branch = sys.argv[10]
 commit = sys.argv[12]
-version = sys.argv[14]
+version = 'hola'
 
 def render(template,json_data):
     return jinja2.Environment(
