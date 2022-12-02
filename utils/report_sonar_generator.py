@@ -22,7 +22,7 @@ version = 'hola'
 def render(template,json_data):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(THIS_DIR)
-    ).get_template(template).render(json_data)
+    ).get_template(template).render(json_data, repo=repo, branch=branch, commit=commit, version=version)
 
 # load json from file
 jsonConfigName = json_filename
@@ -30,7 +30,7 @@ with open(jsonConfigName) as json_file:
     json_data = json.load(json_file)
 
 ##Apply the template
-result =render(template,json_data, repo=repo, branch=branch, commit=commit, version=version)
+result =render(template,json_data)
 
 # write output to a file 
 outFile = open(output_filename, "w")
