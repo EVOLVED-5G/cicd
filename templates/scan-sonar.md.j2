@@ -14,12 +14,18 @@ The Source Code analysis has been performed using SonarQube versión @SonarqubeV
 ### Summary
 | Severity | Number of vulnerabilities |
 |---|---|
+{% set blocker_issues = [] %}
 {%- for summary_type in summary %}
 | {{summary_type}} | {{summary[summary_type]}}|
+        {%- if summary_type == "blocker" %}
+          {%- if row.summary[summary_type] > 0 %}
+            {% if blocker_issues.append(1) %}{% endif %}
+          {%- endif %}
+        {%- endif %}
   {%- endfor %}
 ***
-{% if not issues %} 
-Good work. Code has a good quality.
+{% if not blocker_issues %} 
+Good work. Netapp code doest have any blocker issues.
 {% else %}
 The Source Code Analysis results have failed because we have found the following blocker issues:
 
