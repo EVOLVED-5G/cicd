@@ -1,5 +1,12 @@
-# ANEX
-# Sonarqube static quality code analysis 
+# Sonarqube static quality code analysis
+
+Test Description: SCQA testing consist in @IncludeDefinition
+
+NETAPP REPO used for the analysis: @REPO_NAME
+Branch used for the Analysis: @BRANCH_NAME
+Last Commit ID: @CommitID
+
+The Source Code analysis has been performed using SonarQube versión @SonarqubeVersion
 
 {% set name = projectName.split("-") %}
 ## Scan of {{name.1}}
@@ -14,13 +21,17 @@
 {% if not issues %} 
 Good work. Code has a good quality.
 {% else %}
-### Issues
-| Severity | Status | Line | Component | Description | 
+The Source Code Analysis results have failed because we have found the following blocker issues:
+
+### Blocker issues
+| Issue | Status | Line | Component | Description | 
 |---|---|---|---|---|
 {%- for issue_type in issues %}
-  {% if issue_type.severity in ["blocker","critical"] %} 
-| {{issue_type.severity}} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
+  {% if issue_type.severity in ["blocker"] %} 
+| {{ loop.index }} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
   {%- endif %}
 {%- endfor %}
+
+The information for critical, major and minor issues can be found in the following link: @LINK_URL
 {%- endif %}
 
