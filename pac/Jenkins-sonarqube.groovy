@@ -26,6 +26,7 @@ pipeline {
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
+        SONARQB_PASSWORD=credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
         DOCKER_PATH="/usr/src/app"
@@ -44,6 +45,7 @@ pipeline {
                     mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
+
                     '''
                 }
            }
@@ -109,7 +111,14 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#! /bin/bash
 
-                    python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    # get Commit Information
+                    cd $NETAPP_NAME
+                    commit=$(git rev-parse HEAD)
+                    cd ..
+                    version=$(curl -u admin:SONARQB_PASSWORD http://195.235.92.134:9000/api/system/info | jq ".System.Version")
+                    url=$(http://195.235.92.134:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH})
+
+                    python3 utils/report_sonar_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md --
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
