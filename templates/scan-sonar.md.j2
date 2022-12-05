@@ -1,17 +1,13 @@
-# Sonarqube static quality code analysis
+# SOURCE CODE QUALITY ANALYSIS 
+# Test Resutls
 
-Test Description: SCQA testing consist in @IncludeDefinition
+Test Description: SonarQube is a Code Quality Assurance tool that collects and analyzes source code, and provides reports for the code quality of your project. It combines static and dynamic analysis tools and enables quality to be measured continually over time.
 
-NETAPP REPO used for the analysis: @REPO_NAME
-Branch used for the Analysis: @BRANCH_NAME
-Last Commit ID: @CommitID
+NETAPP REPO used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
 
-The Source Code analysis has been performed using SonarQube versión @SonarqubeVersion
-Prueba de variables
-Var 1 {{repo}}
-Var 1 {{branch}}
-Var 1 {{commit}}
-Var 1 {{version}}
+The Source Code analysis has been performed using SonarQube version {{version}}
 
 {% set name = projectName.split("-") %}
 {% set blocker_issues = [] %}
