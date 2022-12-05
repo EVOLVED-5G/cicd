@@ -18,11 +18,12 @@ repo = sys.argv[8]
 branch = sys.argv[10]
 commit = sys.argv[12]
 version = sys.argv[14]
+url = sys.argv[16]
 
 def render(template,json_data):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(THIS_DIR)
-    ).get_template(template).render(json_data, repo=repo, branch=branch, commit=commit, version=version)
+    ).get_template(template).render(json_data, repo=repo, branch=branch, commit=commit, version=version, url=url)
 
 # load json from file
 jsonConfigName = json_filename
