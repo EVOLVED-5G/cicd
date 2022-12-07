@@ -9,6 +9,7 @@ Last Commit ID: {{commit}}
 The security scan has been performed using Trivy version {{version}}
 {% set name = id.split("/") %}
 {% set critical_issues = [] %}
+{% set possible_fixing = [] %}
 # Scan of {{type}}: {{name|last}}
 
 
@@ -26,20 +27,24 @@ Good work. No vulnerabilities found.
   {%- for summary_type in summary %}
     {%- if summary_type.Severity == severity %}
 | {{summary_type.Severity}} | {{summary_type.counts}} |
-      {%- if summary_type.Severity == "CRITICAL" %}
-        {%- if summary_type.counts > 0 %}
-          {% if critical_issues.append(1) %}{% endif %}
-      {%- endif %}
-    {%- endif %}
     {%- endif %}
   {%- endfor %}
 {%- endfor %}
 
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == "CRITICAL" %}
+    {%- if summary_type.counts > 0 %}
+      {% if critical_issues.append(1) %}{% endif %}
+  {%- endif %}
+{%- endif %}
+  {%- endfor %}
+{%- endfor %}
 ***
 {% if not critical_issues %} 
 Good work. Netapp code does not have any security issue.
 {% else %}
-The Source Code Security Analysis scan has failed because we have found the following critical_issues:
+The Source Code Security Analysis scan has found the following CRITICAL ISSUES:
 
 ## Vulnerabilities
 |  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
@@ -53,6 +58,22 @@ The Source Code Security Analysis scan has failed because we have found the foll
         {%- endif %}
       {%- endfor %}
     {%- endfor %}
+  {%- endif %}
+{%- for severity in severities %}
+  {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
+              {%- if vuln.FixedVersion != "" %}
+                {% if possible_fixing.append(1) %}{% endif %}
+            {%- endif %}
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endfor %}
+  {% if possible_fixing %} 
+The Source Code Security Analysis scan stage has failed because we have found Critical Issues with a possible solution. Please try to solve this error.
+  {% else %}
+The Source Code Security Analysis has been completed successfuly
   {%- endif %}
 {%- endif %}
 ***
