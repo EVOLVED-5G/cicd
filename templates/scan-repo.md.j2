@@ -1,4 +1,14 @@
+# SOURCE CODE SECURITY ANALYSIS 
+# Test Results
+
+Test Description: Trivy is a Code Security Assurance tool that collects and analyzes source code, and provides reports for the code security of your project.
+Netapp repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
+
+The security scan has been performed using Trivy version {{version}}
 {% set name = id.split("/") %}
+{% set critical_issues = [] %}
 # Scan of {{type}}: {{name|last}}
 
 
@@ -16,25 +26,35 @@ Good work. No vulnerabilities found.
   {%- for summary_type in summary %}
     {%- if summary_type.Severity == severity %}
 | {{summary_type.Severity}} | {{summary_type.counts}} |
+      {%- if summary_type.Severity == "CRITICAL" %}
+        {%- if summary_type.counts > 0 %}
+          {% if critical_issues.append(1) %}{% endif %}
+      {%- endif %}
+    {%- endif %}
     {%- endif %}
   {%- endfor %}
 {%- endfor %}
 
 ***
-
+{% if not critical_issues %} 
+Good work. Netapp code does not have any security issue.
+{% else %}
+The Source Code Security Analysis scan has failed because we have found the following critical_issues:
 
 ## Vulnerabilities
 |  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
 |---|---|---|---|---|---|
-  {%- for severity in severities %}
-    {%- for vuln in vulnerabilities %}
-      {%- if vuln.Severity == severity %}
-        {%- if vuln.Severity == "CRITICAL" %}
+    {%- for severity in severities %}
+      {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
 |{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
+          {%- endif %}
         {%- endif %}
-      {%- endif %}
+      {%- endfor %}
     {%- endfor %}
-  {%- endfor %}
+  {%- endif %}
 {%- endif %}
 ***
+Information about high, medium, low and unknown issues can be found in the following link: {{url}}
 Date: {{scan_date[:10]}}

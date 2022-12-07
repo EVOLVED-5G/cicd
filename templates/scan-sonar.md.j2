@@ -1,9 +1,9 @@
 # SOURCE CODE QUALITY ANALYSIS 
-# Test Resutls
+# Test Results
 
 Test Description: SonarQube is a Code Quality Assurance tool that collects and analyzes source code, and provides reports for the code quality of your project. It combines static and dynamic analysis tools and enables quality to be measured continually over time.
 
-NETAPP REPO used for the analysis: {{repo}}
+Netapp repository used for the analysis: {{repo}}
 Branch used for the Analysis: {{branch}}
 Last Commit ID: {{commit}}
 
@@ -38,7 +38,6 @@ The Source Code Analysis results have failed because we have found the following
 | {{ loop.index }} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
   {%- endif %}
 {%- endfor %}
-
-The information for critical, major and minor issues can be found in the following link: {{url}}
 {%- endif %}
+The information for critical, major and minor issues can be found in the following link: {{url}}
 

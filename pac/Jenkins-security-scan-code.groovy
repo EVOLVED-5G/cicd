@@ -91,7 +91,13 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                        python3 utils/report_generator.py --template templates/scan-repo.md.j2 --json report-tr-repo-$NETAPP_NAME_LOWER.json --output report-tr-repo-$NETAPP_NAME_LOWER.md
+
+                        # get Commit Information
+                        cd $NETAPP_NAME
+                        commit=$(git rev-parse HEAD)
+                        cd ..
+
+                        python3 utils/report_sonar_generator.py --template templates/scan-repo.md.j2 --json report-tr-repo-$NETAPP_NAME_LOWER.json --output report-tr-repo-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-tr-repo-$NETAPP_NAME_LOWER.md
                         declare -a files=("json" "md" "pdf")
