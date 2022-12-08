@@ -17,6 +17,11 @@ pipeline {
         GIT_URL="${params.GIT_URL}"
         GIT_BRANCH="${params.GIT_BRANCH}"
         GIT_COMMIT="${params.GIT_COMMIT}"
+        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
+        NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
     }
 
     stages {
