@@ -1,0 +1,87 @@
+# LICENSE COMPLIANCE ANALYSIS
+# Analisys Results
+
+Test Description: Licenses, as written by man and with different objectives in mind, are by their nature gradual in the restrictions they require for the use of open source software.
+Netapp repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
+
+Licenses introduce a varying degree of conditions to be fulfilled for using the licensed software. Open Source licenses gives indeed many freedoms, but seldom completely unconditionally:
+
+- Almost all licenses require you to attribute the distributed software with a copyright and a permission notice, sometimes in addition with the entire license text.
+- Some licenses require you to publish the source code as well, which add work to ensure that you are in compliance with the license.
+- Some licenses add rights and conditions beyond the copyright, suchs as on patents, trademarks, data, and privacy which may make it more difficult to altogether achieve compliance of a license.
+- And to complicate things even further, some Open Source licenses have conditions which makes them incompatible with other Open Source licenses. This is most notably with the GPL license.
+
+The security scan has been performed using Trivy version {{version}}
+{% set name = id.split("/") %}
+{% set critical_issues = [] %}
+{% set possible_fixing = [] %}
+# Scan of {{type}}: {{name|last}}
+
+
+***
+{% if not vulnerabilities %}
+Good work. No vulnerabilities found.
+{% else %}
+## Summary
+{%- set severities = [ "CRITICAL" , "HIGH" , "MEDIUM" , "LOW" ,  "UNKNOWN"] %}
+
+| Severity | Number of vulnerabilities |
+|---|---|
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == severity %}
+| {{summary_type.Severity}} | {{summary_type.counts}} |
+    {%- endif %}
+  {%- endfor %}
+{%- endfor %}
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == "CRITICAL" %}
+    {%- if summary_type.counts > 0 %}
+      {% if critical_issues.append(1) %}{% endif %}
+  {%- endif %}
+{%- endif %}
+  {%- endfor %}
+{%- endfor %}
+***
+{% if not critical_issues %}
+Good work. Netapp code does not have any security issue.
+{% else %}
+The Source Code Security Analysis scan has found the following CRITICAL ISSUES:
+
+## Vulnerabilities
+|  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
+|---|---|---|---|---|---|
+    {%- for severity in severities %}
+      {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
+|{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endfor %}
+  {%- endif %}
+{%- for severity in severities %}
+  {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
+              {%- if vuln.FixedVersion != "" %}
+                {% if possible_fixing.append(1) %}{% endif %}
+            {%- endif %}
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endfor %}
+  {% if possible_fixing %}
+The Source Code Security Analysis scan stage has failed because we have found Critical Issues with a possible solution. Please try to solve this error.
+  {% else %}
+The Source Code Security Analysis has been completed successfuly
+  {%- endif %}
+{%- endif %}
+***
+Information about high, medium, low and unknown issues can be found in the following link: {{url}}
