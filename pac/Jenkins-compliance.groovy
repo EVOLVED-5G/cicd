@@ -62,6 +62,7 @@ pipeline {
                 cat scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report
                 UPLOAD_ID=$(grep "Checking scan status of upload with ID" scan_vul_${NETAPP_NAME}_$GIT_COMMIT.report | sed 's/[^0-9]*//g')
                 debricked "${WORKSPACE}/${NETAPP_NAME}" debricked:license-report  "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" "$UPLOAD_ID" > compliance_${NETAPP_NAME}_"$GIT_COMMIT".report
+                tail -1 compliance_${NETAPP_NAME}_"$GIT_COMMIT".report > compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json
                 '''
             }
         }
@@ -81,7 +82,7 @@ stage('Upload report to Artifactory') {
                         commit=$(git rev-parse HEAD)
                         cd ..
 
-                        python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report --output report-licenses-repo-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
+                        python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json --output report-licenses-repo-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-licenses-repo-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-licenses-repo-$NETAPP_NAME_LOWER.md
                         declare -a files=("md" "pdf")
