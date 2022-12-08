@@ -66,7 +66,7 @@ pipeline {
             }
         }
 
-        stage('Upload report to Artifactory') {
+stage('Upload report to Artifactory') {
             when {
                 expression {
                     return REPORTING;
@@ -77,14 +77,18 @@ pipeline {
                     sh '''#!/bin/bash
 
                         # get Commit Information
-                        cd "${WORKSPACE}/${NETAPP_NAME}"
-                        GIT_COMMIT=$(git log --format="%H" -n 1)
+                        cd $NETAPP_NAME
+                        commit=$(git rev-parse HEAD)
+                        cd ..
 
-                        declare -a files=("report")
+                        python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report --output report-licenses-repo-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
+                        docker build  -t pdf_generator utils/docker_generate_pdf/.
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-licenses-repo-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-licenses-repo-$NETAPP_NAME_LOWER.md
+                        declare -a files=("md" "pdf")
 
                         for x in "${files[@]}"
                             do
-                                report_file="report-compliance-repo-$NETAPP_NAME_LOWER.$x"
+                                report_file="report-licenses-repo-$NETAPP_NAME_LOWER.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
