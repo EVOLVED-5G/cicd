@@ -1,3 +1,9 @@
+String netappName(String url) {
+    String url2 = url?:'';
+    String var = url2.substring(url2.lastIndexOf("/") + 1);
+    return var ;
+}
+
 pipeline {
     agent { node {label 'evol5-slave'}  }
 
