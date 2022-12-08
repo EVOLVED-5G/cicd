@@ -17,14 +17,14 @@ pipeline {
         timeout(time: 60, unit: 'MINUTES')
         retry(2)
     }
-    
 
-    
+
+
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        choice(name: 'ENVIRONMENT', choices: ["openshift", "athens", "malaga"])  
+        choice(name: 'ENVIRONMENT', choices: ["openshift", "athens", "malaga"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -44,7 +44,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]           
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
                     buildResults['static-analysis'] = jobResult
@@ -75,7 +75,7 @@ pipeline {
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    
+
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
                     buildResults['secrets-analysis'] = jobResult
@@ -86,7 +86,7 @@ pipeline {
         stage('Validation: OpenSource Licenses Report'){
             steps{
                 script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource Licenses Report', wait: true, propagate: false,
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
                                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -201,7 +201,7 @@ pipeline {
                 }
             }
         }
-                
+
         //Review Parameters
         stage('Validation: Test NetApp Networking'){
             steps{
@@ -288,7 +288,7 @@ pipeline {
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             }
         }
-        
+
         stage('Validation: Destroy NetApp'){
             steps{
                 script {
@@ -301,7 +301,7 @@ pipeline {
                 }
             }
         }
- 
+
         stage('Validation: Destroy NEF'){
             steps{
                 script {
