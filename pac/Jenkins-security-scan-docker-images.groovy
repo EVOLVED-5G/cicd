@@ -103,12 +103,18 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/ -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
+                    cd $NETAPP_NAME
+                    commit=$(git rev-parse HEAD)
+                    cd ..
+                    versionT=0.35.0
                     declare -a files=("json" "md" "pdf")
                     images=($response)
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     for x in "${images[@]}"
                     do  
-                        python3 utils/report_generator.py --template templates/scan-image.md.j2 --json report-tr-img-$x.json --output report-tr-img-$x.md
+                        urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x"
+                        python3 utils/report_sonar_generator.py --template templates/scan-image.md.j2 --json report-tr-img-$x.json --output report-tr-img-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
+                        
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-img-$x.pdf $DOCKER_PATH/report-tr-img-$x.md
                         for y in "${files[@]}"
                         do
