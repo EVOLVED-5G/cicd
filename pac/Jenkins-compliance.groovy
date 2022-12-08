@@ -42,7 +42,7 @@ pipeline {
             }
             steps {
                 sh '''
-                cd ${WORKSPACE}/${NETAPP_NAME}
+                cd "${WORKSPACE}/${NETAPP_NAME}"
                 debricked-scan ${WORKSPACE}/${NETAPP_NAME} debricked:scan "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" ${NETAPP_NAME} "$GIT_COMMIT" null cli > scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report
                 debricked-license debricked:license-report  "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" "$UPLOAD_ID" > compliance_${NETAPP_NAME}_"$GIT_COMMIT".report
                 '''
@@ -60,7 +60,7 @@ pipeline {
                     sh '''#!/bin/bash
 
                         # get Commit Information
-                        cd ${WORKSPACE}/${NETAPP_NAME}
+                        cd "${WORKSPACE}/${NETAPP_NAME}"
                         GIT_COMMIT=$(git log --format="%H" -n 1)
 
                         declare -a files=("report")
