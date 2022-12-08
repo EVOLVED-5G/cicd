@@ -51,11 +51,11 @@ li ul, li ul {
 p, ul, ol {
     font-size: 16px;
     line-height: 24px;
-    max-width: 800px;
+    max-width: 100px;
 }
 pre {
     padding: 0px 24px;
-    max-width: 800px;
+    max-width: 1000px;
     white-space: pre-wrap;
 }
 code {
@@ -66,15 +66,15 @@ code {
 aside {
     display: block;
     float: right;
-    width: 800px;
+    width: 1000px;
 }
 blockquote {
     margin: 1em 2em;
-    max-width: 800px;
+    max-width: 1000px;
 }
 blockquote p {
     color: #666;
-    max-width: 800px;
+    max-width: 1000px;
 }
 
 hr {
