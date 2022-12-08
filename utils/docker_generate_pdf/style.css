@@ -39,7 +39,13 @@ a {
     vertical-align: baseline;
 }
 
-p {
+li {
+    line-height: 24px;
+}
+li ul, li ul {
+    margin-left: 24px;
+}
+p, ul, ol {
     font-size: 16px;
     line-height: 24px;
     max-width: 1000px;
