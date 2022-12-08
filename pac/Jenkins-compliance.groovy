@@ -58,10 +58,9 @@ pipeline {
             steps {
                 sh '''
                 cd "${WORKSPACE}/${NETAPP_NAME}"
-                echo "debricked \"${WORKSPACE}/${NETAPP_NAME}\" debricked:scan \"$DEBRICKED_CREDENTIALS_USR\" \"$DEBRICKED_CREDENTIALS_PSW\" ${NETAPP_NAME} \"$GIT_COMMIT\" null cli"
                 debricked "${WORKSPACE}/${NETAPP_NAME}" debricked:scan "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" ${NETAPP_NAME} "$GIT_COMMIT" null cli > scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report
-                cat scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report.txt
-                UPLOAD_ID=$(grep "Checking scan status of upload with ID" scan_vul_${NETAPP_NAME}_$GIT_COMMIT.report.txt | sed 's/[^0-9]*//g')
+                cat scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report
+                UPLOAD_ID=$(grep "Checking scan status of upload with ID" scan_vul_${NETAPP_NAME}_$GIT_COMMIT.report | sed 's/[^0-9]*//g')
                 debricked "${WORKSPACE}/${NETAPP_NAME}" debricked:license-report  "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" "$UPLOAD_ID" > compliance_${NETAPP_NAME}_"$GIT_COMMIT".report
                 '''
             }
