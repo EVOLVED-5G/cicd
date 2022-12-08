@@ -18,16 +18,20 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
-
+    
     environment {
-        GIT_URL="${params.GIT_URL}"
-        GIT_BRANCH="${params.GIT_BRANCH}"
-        GIT_COMMIT="${params.GIT_COMMIT}"
+        GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
+        GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
+        GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
+        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
+        TOKEN = credentials('github_token_cred')
+        TOKEN_EVOLVED = credentials('github_token_evolved5g')
+        TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
-        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
+        DOCKER_PATH="/usr/src/app"
     }
 
     stages {
@@ -42,7 +46,7 @@ pipeline {
                 rm -rf ${NETAPP_NAME}
                 mkdir ${NETAPP_NAME}
                 cd ${NETAPP_NAME}
-                git clone --single-branch --branch $GIT_BRANCH $GIT_URL .
+                git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                 '''
             }
         }
