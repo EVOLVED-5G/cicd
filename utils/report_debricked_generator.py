@@ -34,11 +34,11 @@ dependencies_summary = {}
 for dependency in json_data["dependencyLicenses"]:
     for license in dependency["licenses"]:
         if license in licenses_summary:
-            print ("License already found %s" %license)
-            print (licenses_summary[license])
+            #print ("License already found %s" %license)
+            #print (licenses_summary[license])
             licenses_summary[license]["count"] += 1
         else:
-            print ("License not found %s" %license)
+            #print ("License not found %s" %license)
             licenses_summary[license] = {"count" : 1}
             licenses_summary[license]["family"] = dependency["families"][dependency["licenses"].index(license)]
 

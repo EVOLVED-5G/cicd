@@ -20,7 +20,7 @@ The licenses scan has been performed using Debricked SaaS.
 | License Name | Families | Dependencies |
 |---|---|---|
 
-{%- for license, value in licenses %}
+{%- for license, value in licenses.items() %}
 | {{license}} | {{value["family"]}} | {{value["count"]}}  |
 {%- endfor %}
 
@@ -31,7 +31,7 @@ The licenses scan has been performed using Debricked SaaS.
 | Dependency Name | Version | Licenses | Families |
 |---|---|---|---|
 
-{%- for dependency, value in dependencies %}
+{%- for dependency, value in dependencies.items() %}
 | {{dependency}} | {{value["version"]}} | {{value["licenses"]}}  | {{value["families"]}}  |
 {%- endfor %}
 
