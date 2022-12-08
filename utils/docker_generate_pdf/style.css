@@ -39,13 +39,20 @@ a {
     vertical-align: baseline;
 }
 
-li {
+ul {
     line-height: 24px;
+    font-size: 16px;
+    margin: 5px 0 15px;
+    padding: 0;
 }
-li ul, li ul {
-    margin-left: 24px;
+
+li {
+    list-style-type: circle;
+    position: relative;
+    padding: 0 0 0 20px;
 }
-p, ul, ol {
+
+p {
     font-size: 16px;
     line-height: 24px;
     max-width: 1000px;
