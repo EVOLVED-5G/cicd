@@ -4,7 +4,7 @@ body{
     font-size: 10px;
     color: #444444;
     line-height: 1;
-    max-width: 1800px;
+    max-width: 1000px;
     padding: 10px;
     zoom: 50%;
 }
@@ -51,7 +51,7 @@ li ul, li ul {
 p, ul, ol {
     font-size: 16px;
     line-height: 24px;
-    max-width: 540px;
+    max-width: 800px;
 }
 pre {
     padding: 0px 24px;
@@ -66,15 +66,15 @@ code {
 aside {
     display: block;
     float: right;
-    width: 390px;
+    width: 800px;
 }
 blockquote {
     margin: 1em 2em;
-    max-width: 476px;
+    max-width: 800px;
 }
 blockquote p {
     color: #666;
-    max-width: 460px;
+    max-width: 800px;
 }
 
 hr {
