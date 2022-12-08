@@ -18,7 +18,7 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
-    
+
     environment {
         GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
         GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
@@ -58,6 +58,7 @@ pipeline {
             steps {
                 sh '''
                 cd "${WORKSPACE}/${NETAPP_NAME}"
+                cat "debricked-scan ${WORKSPACE}/${NETAPP_NAME} debricked:scan \"$DEBRICKED_CREDENTIALS_USR\" \"$DEBRICKED_CREDENTIALS_PSW\" ${NETAPP_NAME} \"$GIT_COMMIT\" null cli > command.txt
                 debricked-scan ${WORKSPACE}/${NETAPP_NAME} debricked:scan "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" ${NETAPP_NAME} "$GIT_COMMIT" null cli > scan_vul_${NETAPP_NAME}_"$GIT_COMMIT".report
                 debricked-license debricked:license-report  "$DEBRICKED_CREDENTIALS_USR" "$DEBRICKED_CREDENTIALS_PSW" "$UPLOAD_ID" > compliance_${NETAPP_NAME}_"$GIT_COMMIT".report
                 '''
