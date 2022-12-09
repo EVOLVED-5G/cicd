@@ -33,7 +33,7 @@ pipeline {
 
     stages {
 
-        stage('Generate executive summary') {
+        stage('Generate steps summary') {
             when {
                 expression {
                     return REPORTING;
@@ -47,8 +47,6 @@ pipeline {
                     cd executive_summary
 
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
-
-
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
@@ -59,17 +57,9 @@ pipeline {
 
                     cd ..
                     python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md
-                    cd executive_summary
-                    rm -f report-steps-"$NETAPP_NAME_LOWER".json
-
-                    jq -s . *.json > final_json.json
-                    jq '{"json": .}' < final_json.json  > report.json
 
                     cd ..
-                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json executive_summary/report.json --output executive_summary/executive-summary-$NETAPP_NAME_LOWER.md
-
-                    docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.md
+                    docker build  -t pdf_generator utils/docker_generate_pdf/ .
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
                     '''
                 }
@@ -99,8 +89,7 @@ pipeline {
                     # Remember install PDFTK for watermarking
                     pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
                     pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf
-                    pdftk executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/executive-summary-$NETAPP_NAME_LOWER_watermark.pdf
-                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
+                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
                     '''
                 }
             }
@@ -127,26 +116,26 @@ pipeline {
             }
         }
     }
-    // post {
-    //     always {
-    //         emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-    //             mimeType: 'text/html',
-    //             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-    //             from: 'jenkins-evolved5G@tid.es',
-    //             replyTo: "jenkins-evolved5G",
-    //             recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
-    //     }
-    //     cleanup{
-    //         /* clean up our workspace */
-    //         deleteDir()
-    //         /* clean up tmp directory */
-    //         dir("${env.workspace}@tmp") {
-    //             deleteDir()
-    //         }
-    //         /* clean up script directory */
-    //         dir("${env.workspace}@script") {
-    //             deleteDir()
-    //         }
-    //     }
-    // }
+    post {
+        always {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: "jenkins-evolved5G",
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+        }
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
+            }
+        }
+    }
 }
