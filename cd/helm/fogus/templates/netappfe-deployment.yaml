@@ -27,6 +27,33 @@ spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappfe:latest
           name: netappfe
+          env:
+            - name:  FRONTEND_ADDRESS
+              value: "fogus.apps.ocp-epg.hi.inet"
+            - name: CALLBACK_ADDRESS
+              value: "backend-fogus.apps.ocp-epg.hi.inet"
+            - name: POSTGRES_PASSWORD
+              value: evolvepass
+            - name: POSTGRES_USER
+              value: evolveclient
+            - name: POSTGRES_DB
+              value: evolvedb
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_HOSTNAME
+              value: "capif.apps.ocp-epg.hi.inet"
+            - name: PATH_TO_CERTS
+              value: /code/capif_onboarding
+            - name: VAPP_ADDRESS
+              value: "195.134.66.79:7000"
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_USER
+              value: "admin@my-email.com"
+            - name: NEF_ADDRESS
+              value: "evol5-demo-nef.apps.ocp-epg.hi.inet"
           ports:
             - containerPort: 4200
           resources: {}
