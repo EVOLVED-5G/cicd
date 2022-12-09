@@ -38,7 +38,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOYMENT_NAME}"
+        DEPLOYMENT_NAME = "fogus"
         NAMESPACE_NAME = "fogus"
         DEPLOYMENT = "${params.DEPLOYMENT}"
 
