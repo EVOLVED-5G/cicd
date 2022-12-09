@@ -118,6 +118,30 @@ pipeline {
                 }
             }
         }
+        stage('Check stage status') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    
+                    if grep -q "failed" report-tr-repo-fogusnetapp.md; then
+                        result=false
+                    else
+                        result=true
+                    fi
+                    if  $result ; then
+                        echo "Security Scan was completed succesfuly"
+                    else
+                        exit 1
+
+                    '''
+                }
+            }
+        }
     }
 
     post {
