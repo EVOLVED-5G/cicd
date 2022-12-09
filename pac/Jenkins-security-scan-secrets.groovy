@@ -120,7 +120,28 @@ pipeline {
                 }
             }
         }
-
+        stage('Check stage status') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    if grep -q "failed" report-tr-repo-secrets-$NETAPP_NAME_LOWER.md; then
+                        result=false
+                    else
+                        result=true
+                    fi
+                    if  $result ; then
+                        echo "Scan secrets was completed succesfuly"
+                    else
+                        exit 1
+                    '''
+                }
+            }
+        }
     }
     post {
         always {

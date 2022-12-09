@@ -127,7 +127,6 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    
                     if grep -q "failed" report-tr-repo-fogusnetapp.md; then
                         result=false
                     else

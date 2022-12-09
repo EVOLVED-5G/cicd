@@ -126,7 +126,6 @@ pipeline {
 
                     for x in "${files[@]}"
                     do
-
                         report_file="report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
@@ -138,7 +137,28 @@ pipeline {
                 }
             }
         }
-
+        stage('Check stage status') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    if grep -q "failed" report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md; then
+                        result=false
+                    else
+                        result=true
+                    fi
+                    if  $result ; then
+                        echo "SonarQube Scan was completed succesfuly"
+                    else
+                        exit 1
+                    '''
+                }
+            }
+        }
     }
     post {
         always {
