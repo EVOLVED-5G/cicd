@@ -57,7 +57,7 @@ spec:
             - name: NEF_USER
               value: "admin@my-email.com"
             - name: NEF_ADDRESS
-              value: "evol5-demo-nef.apps.ocp-epg.hi.inet"
+              value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
             - name:  FRONTEND_ADDRESS
               value: "fogus.apps.ocp-epg.hi.inet"
           ports:
