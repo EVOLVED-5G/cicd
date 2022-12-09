@@ -32,10 +32,14 @@ The licenses scan has been performed using Debricked SaaS.
 
 ## Dependencies Summary
 
+This is the packages list with license families other than Permissive
+
 | Dependency Name | Version | Licenses | Families |
 |---|---|---|---|
 
 {%- for dependency, value in dependencies.items() %}
+    {%- if value["families"].find("Unknown") != -1 or value["families"].find("Strong") != -1 or value["families"].find("Weak") != -1%}
 | {{dependency}} | {{value["version"]}} | {{value["licenses"]}}  | {{value["families"]}}  |
+    {%- endif %}
 {%- endfor %}
 
