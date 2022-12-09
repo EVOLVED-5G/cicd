@@ -53,7 +53,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -154,7 +154,7 @@ pipeline {
             }  
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    retry(2){
+                    retry(1){
                         script {   
                             sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
                             def cmd = "docker ps --format '{{.Image}}'"
@@ -180,7 +180,7 @@ pipeline {
             }   
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    retry(2){
+                    retry(1){
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
                         docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}:${VERSION}

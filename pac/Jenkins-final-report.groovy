@@ -8,7 +8,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {

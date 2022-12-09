@@ -2,7 +2,7 @@ pipeline {
     agent { node {label 'evol5-slave'}  }
     options {
         timeout(time: 25, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {

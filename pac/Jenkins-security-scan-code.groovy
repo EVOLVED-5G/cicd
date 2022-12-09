@@ -8,7 +8,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
@@ -35,7 +35,7 @@ pipeline {
         stage('Get Repo and clone'){
             options {
                 timeout(time: 10, unit: 'MINUTES')
-                retry(2)
+                retry(1)
             }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -66,7 +66,7 @@ pipeline {
         stage('Get wiki repo and update Evolved Wiki'){
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -136,7 +136,7 @@ pipeline {
                         echo "Security Scan was completed succesfuly"
                     else
                         exit 1
-
+                    fi
                     '''
                 }
             }

@@ -11,7 +11,7 @@ pipeline {
     agent { node {label 'evol5-slave2'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -36,7 +36,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${WORKSPACE}/") {
@@ -155,6 +155,7 @@ pipeline {
                         echo "SonarQube Scan was completed succesfuly"
                     else
                         exit 1
+                    fi
                     '''
                 }
             }

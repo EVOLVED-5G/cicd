@@ -8,7 +8,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -37,7 +37,7 @@ pipeline {
         stage('Get Repo and clone'){
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -68,7 +68,7 @@ pipeline {
         stage('Get wiki repo and update Evolved Wiki'){
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -127,9 +127,9 @@ pipeline {
                 }
             }
             steps {
-                 dir ("${WORKSPACE}/") {
+                 dir ("${WORKSPACE}") {
                     sh '''#!/bin/bash
-                    if grep -q "failed" report-tr-repo-secrets-$NETAPP_NAME_LOWER.md; then
+                    if grep -q "failed" report-tr-repo-secrets-$NETAPP_NAME_LOWER.md ; then
                         result=false
                     else
                         result=true
@@ -138,6 +138,7 @@ pipeline {
                         echo "Scan secrets was completed succesfuly"
                     else
                         exit 1
+                    fi
                     '''
                 }
             }

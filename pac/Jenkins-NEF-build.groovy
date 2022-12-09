@@ -21,7 +21,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
