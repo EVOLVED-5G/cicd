@@ -9,22 +9,11 @@ def getAgent(deployment) {
     }
 }
 
-def getPath(deployment) {
-    String var = deployment
-    if("verification".equals(var)) {
-        return "";
-    }else if("validation".equals(var)){
-        return "validation"
-    }else {
-        return "certification";
-    }
-}
-
 pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(1)
+        retry(2)
     }
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
@@ -35,11 +24,10 @@ pipeline {
 
     environment {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
-        DUMMY_NETAPP_HOSTNAME="${params.DEPLOYMENT_NAME}.apps.ocp-epg.hi.inet"
+        DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOYMENT_NAME}"
+        DEPLOYMENT_NAME = "fogus"
         NAMESPACE_NAME = "fogus" //Parametrized here and create an universal pipeline for building
-        PATH=getPath("${params.STAGE}")
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -57,7 +45,7 @@ pipeline {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN -n evol5-capif
                                     '''
                                 }
                             }
@@ -117,8 +105,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME --set path=$PATH
-                    sleep 50
+                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/
+                    sleep 100
                     '''
                 }
             }

@@ -36,101 +36,101 @@ pipeline {
     }
 
     stages {
-        stage('Validation: Source Code Quality Analysis'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
-                    buildResults['static-analysis'] = jobResult
-                }
-            }
-        }
-        stage('Validation: Source Code Security Analysis'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['security-analysis'] = jobResult
-                }
-            }
-        }
-        stage('Validation: Source Code Secret Leakage'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        // stage('Validation: Source Code Quality Analysis'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: false,
+        //                             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
+        //             buildResults['static-analysis'] = jobResult
+        //         }
+        //     }
+        // }
+        // stage('Validation: Source Code Security Analysis'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
+        //                         parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
+        //             buildResults['security-analysis'] = jobResult
+        //         }
+        //     }
+        // }
+        // stage('Validation: Source Code Secret Leakage'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+        //                         parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['secrets-analysis'] = jobResult
-                }
-            }
-        }
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+        //             buildResults['secrets-analysis'] = jobResult
+        //         }
+        //     }
+        // }
 
-        stage('Validation: OpenSource Licenses Report'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                    buildResults['opensource-license'] = jobResult
-                }
-            }
-        }
+        // stage('Validation: OpenSource Licenses Report'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+        //                             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+        //             buildResults['opensource-license'] = jobResult
+        //         }
+        //     }
+        // }
             // FIX VERSION = 1 --> Validacion
-        stage('Validation: Build validation image  Report'){
-            steps{
-                script {
-                    def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
-                                    parameters: [string(name: 'VERSION', value: '1.0'),
-                                                string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'STAGE', value: "validation") ]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Netapp' returned result: ${jobResult}"
-                    buildResults['build'] = jobResult
-                }
-            }
-        }
+        // stage('Validation: Build validation image  Report'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
+        //                             parameters: [string(name: 'VERSION', value: '1.0'),
+        //                                         string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'STAGE', value: "validation") ]
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Netapp' returned result: ${jobResult}"
+        //             buildResults['build'] = jobResult
+        //         }
+        //     }
+        // }
 
-        stage('Validation: Security Scan Docker Images'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'STAGE', value: "validation"),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-                    buildResults['scan-docker-images'] = jobResult
-                }
-            }
-        }
+        // stage('Validation: Security Scan Docker Images'){
+        //     steps{
+        //         script {
+        //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+        //                             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+        //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+        //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+        //                                         string(name: 'STAGE', value: "validation"),
+        //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+        //             buildResults['scan-docker-images'] = jobResult
+        //         }
+        //     }
+        // }
 
         stage('Validation:Deploy CAPIF'){
             steps{
@@ -148,7 +148,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                   parameters: [string(name: 'BRANCH_NAME', value: "GHACKING-6064_adapt_robot_tests_new_flows"),
+                                   parameters: [string(name: 'BRANCH_NAME', value: "develop"),
                                                 booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                 string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
