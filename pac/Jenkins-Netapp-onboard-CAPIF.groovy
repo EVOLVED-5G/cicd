@@ -87,7 +87,7 @@ stages {
                     logs=$(kubectl logs --tail=20 $value)
                     echo $logs
                     while IFS= read -r line; do
-                        if [[ $line == *"Netapp onboarded sucessfuly"* ]]; then
+                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
                             result=true
                         fi
                     done <<< "$logs"

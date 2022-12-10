@@ -86,7 +86,7 @@ stages {
                     logs=$(kubectl logs --tail=20 $value)
                     echo $logs
                     while IFS= read -r line; do
-                        if [[ $line == *"Discovered APIs by:"* ]]; then
+                        if [[ $line == *"GET /service-apis/v1/allServiceAPIs?api-invoker-id="* ]]; then
                             result=true
                         fi
                     done <<< "$logs"
