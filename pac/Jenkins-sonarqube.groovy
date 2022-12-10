@@ -115,8 +115,8 @@ pipeline {
                     cd $NETAPP_NAME
                     commit=$(git rev-parse HEAD)
                     cd ..
-                    versionsq=$(curl -u admin:$SONARQB_PASSWORD http://195.235.92.134:9000/api/system/info | jq ".System.Version")
-                    urlsq=http://195.235.92.134:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}
+                    versionsq=$(curl -u admin:$SONARQB_PASSWORD http://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
+                    urlsq=http://sq.mobilesandbox.cloud:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}
 
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq
