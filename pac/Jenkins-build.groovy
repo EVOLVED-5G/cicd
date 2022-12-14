@@ -50,6 +50,18 @@ pipeline {
         PATH_AWS = getPathAWS("${params.STAGE}")
     }
     stages {
+        stage('Clean workspace') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                    sh '''
+                    docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
+                    docker system prune -a -f --volumes
+                    sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+                    docker network create services_default
+                    '''
+                }
+            }
+        }
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
