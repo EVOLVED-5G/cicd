@@ -98,7 +98,7 @@ pipeline {
                 }
             }
         }
-            FIX VERSION = 1 --> Validacion
+
         stage('Validation: Build validation image  Report'){
             steps{
                 script {

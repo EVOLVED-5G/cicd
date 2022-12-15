@@ -75,6 +75,7 @@ pipeline {
                     mkdir $NETAPP_NAME 
                     cd $NETAPP_NAME
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
+                    cp env_to_copy.dev .env
                     '''
                 }
            }
