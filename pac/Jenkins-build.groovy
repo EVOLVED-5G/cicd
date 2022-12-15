@@ -197,7 +197,7 @@ pipeline {
                                 if (env.PATH_DOCKER != null){
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g//${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
                                 } else{
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
