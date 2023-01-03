@@ -32,27 +32,43 @@ spec:
         {{- if eq .Values.env "kubernetes" }}
         - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:immersionnetapp-imm_netapp_container-3.0
         {{- else }}
-        - image: dockerhub.hi.inet/evolved-5g/immersionnetapp-imm_netapp_container:latest
+        - image: dockerhub.hi.inet/evolved-5g/immersionnetapp/immersionnetapp-imm_netapp_container:latest
         {{- end }}
           env:
-            - name: NEF_HOST
-              value: {{ .Values.nef_host}}
-            - name: NEF_CALLBACK_URL
-              value: {{ .Values.nef_callback_url }}
-            - name: NETAPP_ID
-              value: {{ .Values.netappid }}
+              # NetApp variables
             - name: NETAPP_NAME
-              value: {{ .Values.netapp_name }}
+              value: IMM_Netapp
+            - name: NETAPP_ID
+              value: imm_netapp
             - name: NETAPP_IP
-              value: {{ .Values.netapp_ip }}
-            - name: NETAPP_SERVER_VAPP
-              value: {{ .Values.vapp_ip }}
+              value: immersion-web-controller.apps.ocp-epg.hi.inet
+            - name: SERVER_FOR_VAPP
+              value: 127.0.0.1:9877
+            - name: CALLBACK_ADDRESS
+              value: immersion-callback-controller.apps.ocp-epg.hi.inet
+            - name: FRONTEND_CALLBACK_ADDRESS
+              value: immersion-web-controller.apps.ocp-epg.hi.inet
+            # Ports
             - name: NETAPP_PORT_5G
-              value: {{ .Values.netapp_port_5g | quote }}
+              value: "9999"
             - name: NETAPP_PORT_WEB
-              value: {{ .Values.netapp_port_web | quote }}
-            - name: NETAPP_PORT_VAPP
-              value: {{ .Values.netapp_port_vapp | quote }}
+              value:  "9988"
+            # NEF variables (when NetApp is Dockerized)
+            - name: NEF_USER
+              value: admin@my-email.com
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_ADDRESS
+              value: evol5-capif-nef.apps.ocp-epg.hi.inet
+            # CAPIF variables
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: PATH_TO_CERTS
+              value: /usr/src/app/capif_onboarding
           name: immersion-netapp
           ports:
             - containerPort: {{ .Values.netapp_port_5g }}

@@ -6,7 +6,7 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: localization-netapp
   name: localization-netapp
-  namespace: evol5-capif
+  namespace: {{ .Release.Namespace }}
   resourceVersion: "819410106"
   uid: 10b5a659-6fd8-4e1f-898d-1b629f394664
 spec:

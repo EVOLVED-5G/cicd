@@ -28,18 +28,26 @@ spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/zortenetnetapp-zorte_netapp:latest
           env:
-            - name: nef_url
-              value: {{ .Values.nef_url}}
-            - name: nef_user
-              value: {{ .Values.nef_user}}
-            - name: nef_pass
-              value: {{ .Values.nef_pass}}
-            - name: netapp_host
-              value: {{ .Values.netapp_host}}
-            - name: netapp_ip
-              value: {{ .Values.netapp_ip}}
-            - name: netapp_port
-              value: {{ .Values.netapp_port | quote }}
+            - name: CALLBACK_ADDRESS
+              value: "backend-fogus.apps.ocp-epg.hi.inet"
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_HOSTNAME
+              value: "capif.apps.ocp-epg.hi.inet"
+            - name: PATH_TO_CERTS
+              value: /code/capif_onboarding
+            - name: VAPP_ADDRESS
+              value: "195.134.66.79:7000"
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_USER
+              value: "admin@my-email.com"
+            - name: NEF_ADDRESS
+              value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
+            - name:  NETAPP_ADDRESS
+              value: "fogus.apps.ocp-epg.hi.inet"
           name: zortenet-netapp
           ports:
             - containerPort: 5000

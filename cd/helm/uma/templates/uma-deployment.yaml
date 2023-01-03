@@ -28,8 +28,38 @@ spec:
         - env:
             - name: NEFHOST
               value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+            - name: FLASK_APP 
+              value: "main.py"
+            - name: SECRET_KEY 
+              value: = '7110c8ae51a4b5af97be6534caefs0e4bb9bdcb3380af00sr50b23a5d1616bf319bc298105da20fe'
+            - name: SQLALCHEMY_DATABASE_URI 
+              value: = "postgresql://netapp:secret@postgres_container:5433/netappdb" 
+            - name: SQLALCHEMY_TRACK_MODIFICATIONS 
+              value: = False
+            - name: SHOW_SQLALCHEMY_LOG_MESSAGES
+              value: = False
+            - name: ERROR_404_HELP 
+              value: = False
+            - name: CAPIFHOST 
+              value: = "capif.apps.ocp-epg.hi.inet"
+            - name: CAPIFHTTPS 
+              value: = 443
+            - name: CAPIFHTTP 
+              value: = 80
+            - name:  CALLBACK_ADDRESS
+              value: uma.apps.ocp-epg.hi.inet
+            - name: POSTGRES_USER
+              value:  "netapp"
+            - name: POSTGRES_PASSWORD
+              value:  "secret"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data"
+            - name: POSTGRES_DB 
+              value: "netappdb"
+            - name: PATH_TO_CERTS
+              value: : "/usr/src/app/certs"
           name: uma-netapp
-          image: dockerhub.hi.inet/evolved-5g/testnetapp-netapp:latest
+          image: dockerhub.hi.inet/evolved-5g/umacsictest/umacsictest-netapp:latest
           ports:
             - containerPort: 10001
           resources: {}

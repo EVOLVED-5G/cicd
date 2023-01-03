@@ -24,7 +24,7 @@ spec:
         io.kompose.service: postgres_container
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/testnetapp-postgres_container:latest
+        - image: dockerhub.hi.inet/evolved-5g/umacsictest/umacsictest-postgres_container:latest
           name: postgres_container
           ports:
             - containerPort: 5433

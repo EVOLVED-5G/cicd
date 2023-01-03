@@ -11,8 +11,8 @@ metadata:
 spec:
   ports:
     - name: port-gmi
-      port: 8000
-      targetPort: 8000
+      port: 8383
+      targetPort: 8383
   selector:
     io.kompose.service: gmi-netapp
 status:

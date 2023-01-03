@@ -30,19 +30,17 @@ spec:
             - name: NET_APP_NAME
               value: {{ .Values.NET_APP_NAME}}
             - name: NET_API_PROT
-              value: {{ .Values.NET_API_PROT }}
-            - name: NET_API_HOST
-              value: {{ .Values.NET_API_HOST }}
+              value: http
+            - name: NET_API_ADDRESS
+              value: evol5-capif-nef.apps.ocp-epg.hi.inet
             - name: NET_API_PORT
               value: {{ .Values.NET_API_PORT | quote }}
             - name: NET_API_USER
               value: {{ .Values.NET_API_USER }}
             - name: NET_API_PASS
               value: {{ .Values.NET_API_PASS }}
-            - name: CALLBACK_HOST
-              value: {{ .Values.CALLBACK_HOST }}
-            - name: CALLBACK_PORT
-              value: {{ .Values.CALLBACK_PORT | quote }}
+            - name: CALLBACK_ADDRESS
+              value: netapp2.evolved-5g.eu
             - name: COLLECTOR_HOST
               value: {{ .Values.COLLECTOR_HOST }}
             - name: COLLECTOR_USER
@@ -53,6 +51,16 @@ spec:
               value: {{ .Values.MN_HOST }}
             - name: MN_TOKEN
               value: {{ .Values.MN_TOKEN }}
+            - name: CAPIF_PATH
+              value: /app/capif_onboarding/
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_CALLBACK_ADDRESS
+              value: http://localhost:5000 
           name: inin-netapp
           ports:
             - containerPort: 80
