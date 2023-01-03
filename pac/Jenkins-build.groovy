@@ -160,10 +160,18 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
                     $(aws ecr get-login --no-include-email)
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}/${NETAPP_NAME}-${VERSION}
-                    docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}"/${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${env.PATH_AWS}"/${NETAPP_NAME}-latest
-                    docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g"${env.PATH_AWS}"/${NETAPP_NAME}-${VERSION}
+                    if [[ -n ${PATH_AWS} ]]
+                    then
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${VERSION}
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-latest
+                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-latest
+                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${VERSION}
+                    else
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
+                        docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
+                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
+                        docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
+                    fi
                     '''  
                 }   
             }
@@ -188,7 +196,7 @@ pipeline {
                                 if (env.PATH_DOCKER != null){
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${STAGE}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
                                 } else{
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
@@ -211,9 +219,17 @@ pipeline {
                     retry(1){
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:${VERSION}
-                        docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}
+                        if [[ -n ${PATH_DOCKER} ]]
+                        then
+                            docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:${VERSION}
+                            docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:latest
+                            docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}
+                        else
+                            docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}
+                            docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
+                            docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
+                        fi
+
                         '''
                     }
                 }

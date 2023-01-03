@@ -61,7 +61,7 @@ pipeline {
                                 -Dsonar.projectKey=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.projectBaseDir="${WORKSPACE}/${NETAPP_NAME}/" \
                                 -Dsonar.sources="${WORKSPACE}/${NETAPP_NAME}/src/" \
-                                -Dsonar.host.url=http://195.235.92.134:9000 \
+                                -Dsonar.host.url=https://sq.mobilesandbox.cloud:9000 \
                                 -Dsonar.login=$SQ_TOKEN \
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
@@ -85,7 +85,7 @@ pipeline {
                     sh '''
                     sleep 15
                     sonar-report \
-                        --sonarurl="http://195.235.92.134:9000" \
+                        --sonarurl="https://sq.mobilesandbox.cloud:9000" \
                         --sonartoken="$SQ_TOKEN" \
                         --qualityGateStatus="false" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
@@ -115,7 +115,7 @@ pipeline {
                     cd $NETAPP_NAME
                     commit=$(git rev-parse HEAD)
                     cd ..
-                    versionsq=$(curl -u admin:$SONARQB_PASSWORD http://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
+                    versionsq=$(curl -u admin:$SONARQB_PASSWORD https://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
                     urlsq=https://sq.mobilesandbox.cloud:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}
 
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
