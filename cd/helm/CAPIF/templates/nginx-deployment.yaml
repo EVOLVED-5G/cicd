@@ -27,7 +27,7 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
-              value: {{ .Values.capif_hostname }}
+              value: {{ .Values.capif_hostname }} 
           image: dockerhub.hi.inet/evolved-5g/capif/nginx:latest
           name: nginx
           ports:

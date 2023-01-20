@@ -39,11 +39,12 @@ spec:
               value: /usr/src/app/ca.crt
             - name: SSL_CERT_FILE
               value: /usr/src/app/ca.crt
-          image: dockerhub.hi.inet/evolved-5g/dummy-aef/python_aef:latest
+          image: dockerhub.hi.inet/evolved-5g/dummy-aef/dummy-aef-python_aef:latest
           name: python-aef
           ports:
-            - containerPort: 8085
             - containerPort: 8086
+            - containerPort: 8087
+            - containerPort: 8088
             - containerPort: 443
           resources: {}
       hostname: exposer

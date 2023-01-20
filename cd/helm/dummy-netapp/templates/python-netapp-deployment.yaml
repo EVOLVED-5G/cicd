@@ -39,7 +39,7 @@ spec:
               value: /usr/src/app/ca.crt
             - name: SSL_CERT_FILE
               value: /usr/src/app/ca.crt
-          image: dockerhub.hi.inet/evolved-5g/dummy-netapp/python_netapp:latest
+          image: dockerhub.hi.inet/evolved-5g/dummy-netapp/dummy-netapp-python_netapp:latest
           name: python-netapp
           resources: {}
       hostname: dummy

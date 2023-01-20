@@ -1,0 +1,33 @@
+{{- if eq .Values.env "openshift" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-10-27T13:42:37Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: cafa-netapp
+  name: imm-web
+  namespace: {{ .Release.Namespace }}
+  resourceVersion: "805604232"
+spec:
+  host: cafa.apps.ocp-epg.hi.inet
+  port:
+    targetPort: cafa-web
+  to:
+    kind: Service
+    name: cafa-netapp
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-10-27T13:42:37Z"
+      status: "True"
+      type: Admitted
+    host: cafa.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}
