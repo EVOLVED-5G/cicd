@@ -45,7 +45,7 @@ spec:
             - name: CAPIF_PORT_HTTPS
               value: "443"
             - name: CALLBACK_ADDRESS
-              value: teleopnetapp.apps.ocp-epg.hi.inet
+              value: http://teleopnetapp.apps.ocp-epg.hi.inet
           name: teleopnetapp
           ports:
             - containerPort: 5000

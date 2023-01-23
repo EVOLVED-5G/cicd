@@ -24,6 +24,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment netapp name')
         choice(name: 'ENVIRONMENT', choices: ["openshift", "athens", "malaga"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
@@ -191,7 +192,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
-                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(NETAPP_NAME)),
+                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'ENVIRONMENT', value: String.valueOf(ENVIRONMENT))
                                 ]
@@ -293,7 +294,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(NETAPP_NAME)),
+                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"

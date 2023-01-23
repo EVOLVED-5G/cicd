@@ -45,7 +45,7 @@ spec:
             - name: SERVER_FOR_VAPP
               value: 127.0.0.1:9877
             - name: CALLBACK_ADDRESS
-              value: immersion-callback-controller.apps.ocp-epg.hi.inet
+              value: http://immersion-callback-controller.apps.ocp-epg.hi.inet
             - name: FRONTEND_CALLBACK_ADDRESS
               value: immersion-web-controller.apps.ocp-epg.hi.inet
             # Ports
