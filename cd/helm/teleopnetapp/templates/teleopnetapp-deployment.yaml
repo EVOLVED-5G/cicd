@@ -29,7 +29,7 @@ spec:
             - name: UE_ID
               value: "10.0.0.3"
             - name: DESTINATION_ADDRESS
-              value: teleopnetapp.apps.ocp-epg.hi.inet/monitoring/callback
+              value: http://teleopnetapp.apps.ocp-epg.hi.inet/monitoring/callback
             - name: ENDPOINT_ADDRESS
               value: teleopnetapp.apps.ocp-epg.hi.inet/qos
             - name: HOST_OF_THE_NEF_EMULATOR
