@@ -191,7 +191,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
-                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(DEPLOY_NAME)),
+                                parameters: [string(name: 'DEPLOY_NAME', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'ENVIRONMENT', value: String.valueOf(ENVIRONMENT))
                                 ]
@@ -293,7 +293,7 @@ pipeline {
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                                parameters: [string(name: 'DEPLOYMENT_NAME', value: String.valueOf(DEPLOY_NAME)),
+                                parameters: [string(name: 'DEPLOY_NAME', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
