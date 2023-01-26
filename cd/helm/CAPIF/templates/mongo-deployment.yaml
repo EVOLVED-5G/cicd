@@ -29,7 +29,7 @@ spec:
               value: example
             - name: MONGO_INITDB_ROOT_USERNAME
               value: root
-          image: mongo:latest
+          image: dockerhub.hi.inet/evolved-5g/capif/mongo:latest
           name: mongo
           ports:
             - containerPort: 27017
