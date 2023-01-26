@@ -31,7 +31,7 @@ spec:
               value: root
             - name: ME_CONFIG_MONGODB_URL
               value: mongodb://root:example@mongo:27017/
-          image: dockerhub.hi.inet/evolved-5g/capif/mongo-express:latest
+          image: mongo-express:1.0.0-alpha.4
           name: mongo-express
           ports:
             - containerPort: {{ .Values.mongo_express_port}}
