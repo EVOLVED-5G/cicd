@@ -79,8 +79,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     dir ("${env.WORKSPACE}/${NETAPP_NAME}/services") {
-                        sh '''
-                            docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet'''
+                        script{
+                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet'''
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
                             def image = sh(returnStdout: true, script: cmd).trim()
@@ -89,6 +89,7 @@ pipeline {
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/capif/"${x[1]}":${VERSION}"""
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/capif/"${x[1]}":latest"""
                             sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/capif/"${x[1]}" """
+                        }
                     }
                 }
             }
