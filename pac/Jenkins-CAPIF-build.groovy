@@ -1,7 +1,7 @@
 pipeline {
-    agent { node {label 'evol5-slave'}  }
+    agent { node {label 'evol5-openshift'}  }
     options {
-        timeout(time: 25, unit: 'MINUTES')
+        timeout(time: 35, unit: 'MINUTES')
         retry(1)
     }
 
@@ -56,25 +56,25 @@ pipeline {
                 }
             }
         }
-        stage('Modify image name and publish in AWS') { 
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
-                    script {    
-                        def cmd = "docker ps --format '{{.Image}}'"
-                        def cmd2 = "docker ps --format '{{.Names}}'"
-                        def image = sh(returnStdout: true, script: cmd).trim()
-                        def name  = sh(returnStdout: true, script: cmd2).trim()
-                        sh '''$(aws ecr get-login --no-include-email)'''
-                        [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
-                            sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
-                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
-                            sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
-                        }
-                    }
-                }
-            }
-        }  
+        // stage('Modify image name and publish in AWS') { 
+        //     steps {
+        //         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
+        //             script {    
+        //                 def cmd = "docker ps --format '{{.Image}}'"
+        //                 def cmd2 = "docker ps --format '{{.Names}}'"
+        //                 def image = sh(returnStdout: true, script: cmd).trim()
+        //                 def name  = sh(returnStdout: true, script: cmd2).trim()
+        //                 sh '''$(aws ecr get-login --no-include-email)'''
+        //                 [image.tokenize(), name.tokenize()].transpose().each { x ->
+        //                     sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+        //                     sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
+        //                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+        //                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }  
         stage('Publish in Artifacotry') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
