@@ -89,6 +89,7 @@ pipeline {
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/capif/"${x[1]}":${VERSION}"""
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/capif/"${x[1]}":latest"""
                             sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/capif/"${x[1]}" """
+                            }
                         }
                     }
                 }
