@@ -24,7 +24,7 @@ spec:
         io.kompose.service: capif-routing-info
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/routing_info_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-routing-info_1:{{ .Values.version }}"
           name: capif-routing-info
           ports:
             - containerPort: 8080

@@ -28,7 +28,7 @@ spec:
         - env:
             - name: CAPIF_HOSTNAME
               value: {{ .Values.capif_hostname }} 
-          image: dockerhub.hi.inet/evolved-5g/capif/nginx:latest
+          image: "dockerhub.hi.inet/evolved-5g/capif/services_nginx_1:{{ .Values.version }}"
           name: nginx
           ports:
             - containerPort: 8080

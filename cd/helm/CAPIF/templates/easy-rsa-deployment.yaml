@@ -24,7 +24,7 @@ spec:
         io.kompose.service: easy-rsa
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/easy-rsa:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_easy-rsa_1:{{ .Values.version }}"
           name: easy-rsa
           ports:
             - containerPort: 8080

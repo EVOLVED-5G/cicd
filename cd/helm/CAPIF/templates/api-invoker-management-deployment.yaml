@@ -25,7 +25,7 @@ spec:
         io.kompose.service: api-invoker-management
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/api_invoker_management_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-invoker-management_1:{{ .Values.version }}"
           name: api-invoker-management
           ports:
             - containerPort: 8080

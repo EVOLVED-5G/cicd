@@ -24,7 +24,7 @@ spec:
         io.kompose.service: aef-security
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/aef/security_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_aef-security_1:{{ .Values.version }}"
           name: aef-security
           ports:
             - containerPort: 8080
