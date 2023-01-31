@@ -25,7 +25,7 @@ spec:
         io.kompose.service: service-apis
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-provider-management_1:{{ .Values.version }}"
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_service-apis_1:{{ .Values.version }}"
           name: service-apis
           ports:
             - containerPort: 8080

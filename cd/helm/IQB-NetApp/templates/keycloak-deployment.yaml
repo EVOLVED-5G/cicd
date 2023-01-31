@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: iqb-keycloack
+  name: iqb-keycloack
+spec:
+  replicas: {{ .Values.app_replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: keycloak
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: keycloak
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/iqb-netapp/iqb-netapp-keycloak:latest
+          name: keycloak
+          env:
+            - name: KEYCLOAK_LOGLEVEL
+              value: "DEBUG"
+            - name: KEYCLOAK_USER
+              value: "admin"
+            - name: KEYCLOAK_PASSWORD
+              value: admin
+            - name: KEYCLOAK_IMPORT
+              value: /tmp/import/realm-export.json
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+
