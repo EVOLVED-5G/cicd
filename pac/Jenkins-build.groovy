@@ -112,6 +112,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
+                    docker network create demo-network
                     docker-compose up --build --force-recreate -d
                     '''
                 }
