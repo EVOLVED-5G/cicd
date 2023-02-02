@@ -29,6 +29,12 @@ spec:
           env:
             - name: NEF_HOSTNAME
               value: {{ .Values.nef_hostname }}
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
+              value: "80"
           name: infolysis-netapp
           ports:
             - containerPort: 8000

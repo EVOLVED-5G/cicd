@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: 8bellsnetapp
+  name: 8bellsnetapp
+spec:
+  ports:
+    - name: "8bells-port"
+      port: 5000
+      targetPort: 5000
+  selector:
+    io.kompose.service: 8bellsnetapp
+status:
+  loadBalancer: {}

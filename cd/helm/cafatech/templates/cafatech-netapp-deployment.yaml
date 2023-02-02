@@ -7,7 +7,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: cafa-netapp
-  name: inin-netapp
+  name: cafa-netapp
 spec:
   replicas: 1
   selector:
