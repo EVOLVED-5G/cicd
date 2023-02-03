@@ -36,24 +36,24 @@ spec:
               value: "8383"
             - name: NETAPP_PATH
               value: /src
-            - name: NEF_HOST
+            - name: NEF_ADDRESS
               value: evol5-capif-nef.apps.ocp-epg.hi.inet
-            - name: NEF_LOGIN
+            - name: NEF_USER
               value: admin@my-email.com
-            - name: NEF_PWD
+            - name: NEF_PASSWORD
               value: pass
             - name: NEF_CALLBACK_URL
-              value: gmi.apps.ocp-epg.hi.inet/monitoring/callback
-            - name: CAPIF_HOST
-              value: nginx.apps.ocp-epg.hi.inet
+              value: netapp2.evolved-5g.eu/monitoring/callback
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet
             - name: CAPIF_HTTP_PORT
               value: "80"
-            - name: CAPIF_KEY_PATH
+            - name: PATH_TO_CERTS
               value: /code/src/capif_onboarding
             - name: CAPIF_HTTPS_PORT
               value: "443"
             - name: CAPIF_CALLBACK_URL
-              value: gmi.apps.ocp-epg.hi.inet
+              value: netapp2.evolved-5g.eu
             - name: UE_REQUESTED_IP
               value: "10.0.0.1"
           name: gmi-netapp
