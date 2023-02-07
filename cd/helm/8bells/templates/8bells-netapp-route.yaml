@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-09-15T19:08:15Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: my-8bells-netapp
+  name: my-8bells-netapp
+  namespace: {{ .Release.Namespace }}
+  resourceVersion: "753699128"
+  uid: de9c37fa-3862-4248-9a2a-cc8f7e14022e
+spec:
+  host: {{ print "backend-" .Values.hostname }}
+  port:
+    targetPort: my-8bells-port
+  to:
+    kind: Service
+    name: my-8bells-netapp
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-09-15T19:08:15Z"
+      status: "True"
+      type: Admitted
+    host: my-8bells-netapp.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None

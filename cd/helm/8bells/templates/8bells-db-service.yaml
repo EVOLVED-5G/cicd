@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: 8bellsnetapp
-  name: 8bellsnetapp
+    io.kompose.service: my-8bells-db
+  name: my-8bells-db
 spec:
   ports:
-    - name: "8bells-port"
-      port: 5000
-      targetPort: 5000
+    - name: "my-8bells-db-port"
+      port: 5432
+      targetPort: 5432
   selector:
-    io.kompose.service: 8bellsnetapp
+    io.kompose.service: my-8bells-db
 status:
   loadBalancer: {}

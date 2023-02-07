@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: iqb-keycloack
-  name: iqb-keycloack
+    io.kompose.service: my-8bells-db
+  name: my-8bells-db
 spec:
   replicas: {{ .Values.app_replicas }}
   selector:
     matchLabels:
-      io.kompose.service: keycloak
+      io.kompose.service: my-8bells-db
   strategy:
     type: Recreate
   template:
@@ -22,22 +22,16 @@ spec:
         kompose.version: 1.26.1 (HEAD)
       creationTimestamp: null
       labels:
-        io.kompose.service: keycloak
+        io.kompose.service: my-8bells-db
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/iqb-netapp/iqb-netapp-keycloak:latest
-          name: keycloak
+        - image: dockerhub.hi.inet/evolved-5g/8bellsnetapp/8bellsnetapp-8b_netapp_db:latest
+          name: my-8bells-db
           env:
-            - name: KEYCLOAK_LOGLEVEL
-              value: "DEBUG"
-            - name: KEYCLOAK_USER
-              value: "admin"
-            - name: KEYCLOAK_PASSWORD
-              value: admin
-            - name: KEYCLOAK_IMPORT
-              value: /tmp/import/realm-export.json
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
           ports:
-            - containerPort: 8080
+            - containerPort: 5432
           resources: {}
       restartPolicy: Always
 

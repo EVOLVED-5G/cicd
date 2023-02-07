@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: iqbcallbacks
-  name: iqbcallbacks
+    io.kompose.service: my-8bells-adminer
+  name: my-8bells-adminer
 spec:
   replicas: {{ .Values.app_replicas }}
   selector:
     matchLabels:
-      io.kompose.service: iqbcallbacks
+      io.kompose.service: my-8bells-adminer
   strategy:
     type: Recreate
   template:
@@ -22,13 +22,13 @@ spec:
         kompose.version: 1.26.1 (HEAD)
       creationTimestamp: null
       labels:
-        io.kompose.service: iqbcallbacks
+        io.kompose.service: my-8bells-adminer
     spec:
       containers:
-        - name: iqbcallbacks
-          image: dockerhub.hi.inet/evolved-5g/iqb-netapp/iqb-netapp-callbacks:latest
+        - name: my-8bells-adminer
+          image: dockerhub.hi.inet/evolved-5g/8bellsnetapp/8bellsnetapp-8b_netapp_adminer:latest
           ports:
-            - containerPort: 5002
+            - containerPort: 8080
           resources: {}
       restartPolicy: Always
 status: {}
