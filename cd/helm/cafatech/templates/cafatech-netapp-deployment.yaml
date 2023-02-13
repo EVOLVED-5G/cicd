@@ -33,11 +33,11 @@ spec:
             - name: NETAPP_ID
               value: CAFA-NetApp-3
             - name: NETAPP_IP
-              value: cafa.apps.ocp-epg.hi.inet
+              value: netapp.evolved-5g.eu
             - name: SERVER_FOR_VAPP
               value: 127.0.0.1:9877
             - name: CALLBACK_ADDRESS
-              value: https://cafa.apps.ocp-epg.hi.inet/nefcallbacks
+              value: https://netapp.evolved-5g.eu/nefcallbacks
             - name: FRONTEND_CALLBACK_ADDRESS
               value: https://cafa.apps.ocp-epg.hi.inet
             # NEF variables (when NetApp is Dockerized)
