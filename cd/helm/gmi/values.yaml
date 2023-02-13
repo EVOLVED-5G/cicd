@@ -1,4 +1,5 @@
 ## variables for the ZORTENET
+env: openshift
 nef_url: http://evol5-capif-nef.apps.ocp-epg.hi.inet
 nef_user: admin@my-email.com
 nef_pass: pass

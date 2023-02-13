@@ -1,7 +1,11 @@
+{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   creationTimestamp: "2023-02-02T17:31:09Z"
+  annotations:
+    meta.helm.sh/release-name: ums
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: localization-netapp
@@ -28,3 +32,6 @@ status:
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

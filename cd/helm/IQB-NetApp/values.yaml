@@ -1,3 +1,4 @@
 ## variables for the CAPIF
+env: openshift
 app_replicas: 1
 hostname: iqb.apps.ocp-epg.hi.inet
