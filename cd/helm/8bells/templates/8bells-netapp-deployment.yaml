@@ -33,7 +33,7 @@ spec:
             - name: NETAPP_IP
               value: "myNetapp"
             - name: NEF_IP
-              value: "http://evol5-capif-nef.apps.ocp-epg.hi.inet:8888"
+              value: "http://evol5-capif-nef.apps.ocp-epg.hi.inet"
             - name: NEF_USER
               value: "admin@my-email.com"
             - name: NEF_PASS
@@ -41,7 +41,7 @@ spec:
             - name: NEF_PORT
               value: "8888"
             - name: CALLBACK_ADR
-              value: "http://my-8bells-netapp.apps.ocp-epg.hi.inet:5000/monitoring/callback"
+              value: "http://backend-8bells.apps.ocp-epg.hi.inet/monitoring/callback"
             - name: HOST
               value: "my-8bells-db"
             - name: DB_NAME
@@ -63,7 +63,7 @@ spec:
             - name: NEF_ADDRESS
               value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
             - name:  CALLBACK_ADDRESS
-              value: "my-8bells-netapp.apps.ocp-epg.hi.inet:5000/monitoring/callback"
+              value: "backend-8bells.apps.ocp-epg.hi.inet/monitoring/callback"
           ports:
             - containerPort: 5000
           resources: {}
