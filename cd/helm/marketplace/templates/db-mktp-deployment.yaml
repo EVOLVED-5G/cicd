@@ -28,14 +28,14 @@ spec:
       containers:
         - env:
             - name: MYSQL_DATABASE
-              value: evolved5g_db
+              value: {{ .Values.db_name }}
             - name: MYSQL_PASSWORD
-              value: secret
+              value: {{ .Values.db_password }}
             - name: MYSQL_ROOT_PASSWORD
-              value: secret
+              value: {{ .Values.db_password }}
             - name: MYSQL_USER
-              value: admin
-          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_db:latest
+              value: {{ .Values.db_user }}
+          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_db:latest
           name: db-mktp
           ports:
             - containerPort: 3306

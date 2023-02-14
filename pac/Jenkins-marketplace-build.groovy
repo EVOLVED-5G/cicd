@@ -69,6 +69,7 @@ pipeline {
                       sudo sed -i "s,DB_PORT=3306,DB_PORT=3306,g" .env 
                       sudo sed -i "s,DB_DATABASE=,DB_DATABASE=evolved5g_db,g" .env
                       sudo sed -i "s,DB_USERNAME=,DB_USERNAME=admin,g" .env 
+                      sudo sed -i "s,DB_PASSWORD=,DB_PASSWORD=secret,g" .env 
                       sudo sed -i "s,CRYPTO_SENDER_ADDRESS=,CRYPTO_SENDER_ADDRESS=72d6019506866a2ca1dc6bfd0f2f65ac0953ba1e,g" .env
                       sudo sed -i "s,CRYPTO_RECEIVER_ADDRESS=,CRYPTO_RECEIVER_ADDRESS=72d6019506866a2ca1dc6bfd0f2f65ac0953ba1e,g" .env    
                       sudo sed -i "s,CRYPTO_WALLET_PRIVATE_KEY=,CRYPTO_WALLET_PRIVATE_KEY=36b134f2175656978eeb7821c19a2213d6716a6de2ea297dbf21e100175632d4,g" .env    

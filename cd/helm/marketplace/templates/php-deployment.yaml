@@ -26,7 +26,7 @@ spec:
         io.kompose.service: php-mktp
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_php:latest
+        - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel:latest
           name: php-mktp
           env:
             - name: APP_ROOT
@@ -37,6 +37,19 @@ spec:
               value: --queue=mail-queue,blockchain-transactions --tries=3
             - name: QUEUE_DRIVER
               value: sync
+            - name: DATABASE_URL
+              value: sync
+            - name: DB_HOST
+              value: db-mktp.apps.ocp-epg.hi.inet
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_DATABASE
+              value: {{ .Values.db_name }}
+            - name: DB_USERNAME
+              value: {{ .Values.db_user }}
+            - name: DB_PASSWORD
+              value: {{ .Values.db_password }}
+
           ports:
             - containerPort: 80
           securityContext:

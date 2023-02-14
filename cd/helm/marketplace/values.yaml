@@ -1,2 +1,5 @@
 ## variables for the CAPIF
 mktp_hostname: marketplace.apps.ocp-epg.hi.inet
+db_name: evolved5g_db
+db_user: admin
+db_password: secret

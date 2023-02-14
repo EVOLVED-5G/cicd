@@ -27,14 +27,14 @@ spec:
       containers:
         - env:
             - name: MYSQL_ROOT_PASSWORD
-              value: secret
+              value: {{ .Values.db_password }}
             - name: MYSQL_USERNAME
-              value: admin
+              value: {{ .Values.db_user }}
             - name: PMA_HOST
-              value: db
+              value: db-mktp
             - name: UPLOAD_LIMIT
               value: 128M
-          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_phpmyadmin:latest
+          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_phpmyadmin:latest
           name: phpmyadmin
           ports:
             - containerPort: 80
