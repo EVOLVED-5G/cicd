@@ -4,8 +4,8 @@ metadata:
   creationTimestamp: "2022-09-23T11:15:52Z"
   labels:
     app.kubernetes.io/managed-by: Helm
-    io.kompose.service: php-mktp
-  name: php-mktp
+    io.kompose.service: {{ .Values.mktp_php_service }}
+  name: {{ .Values.mktp_php_service }}
   namespace: {{ .Release.Namespace }}
   resourceVersion: "763218280"
   uid: 8818ad48-7014-4b0c-ae4f-b282961d7e23
@@ -15,7 +15,7 @@ spec:
     targetPort: port-mktp
   to:
     kind: Service
-    name: php-mktp
+    name: {{ .Values.mktp_php_service }}
     weight: 100
   wildcardPolicy: None
 status:

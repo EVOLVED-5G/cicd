@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2023-02-20T13:23:41Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: mktp-phpmyadmin
+  name: mktp-phpmyadmin
+  namespace: evol5-capif
+  resourceVersion: "961977398"
+  uid: 73c7cc46-f99b-4a2f-b5ed-b01fb1e9019d
+spec:
+  host: mktp-phpmyadmin.apps.ocp-epg.hi.inet
+  port:
+    targetPort: port-php-admin
+  to:
+    kind: Service
+    name: mktp-phpmyadmin
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2023-02-20T13:23:41Z"
+      status: "True"
+      type: Admitted
+    host: mktp-phpmyadmin.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None

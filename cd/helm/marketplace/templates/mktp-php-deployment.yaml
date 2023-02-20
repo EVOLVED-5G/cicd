@@ -6,13 +6,13 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: php-mktp
-  name: php-mktp
+    io.kompose.service:  {{ .Values.mktp_php_service }}
+  name: {{ .Values.mktp_php_service }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: php-mktp
+      io.kompose.service: {{ .Values.mktp_php_service }}
   strategy:
     type: Recreate
   template:
@@ -23,11 +23,11 @@ spec:
       creationTimestamp: null
       labels:
         io.kompose.network/docker_evolved5g_net: "true"
-        io.kompose.service: php-mktp
+        io.kompose.service: {{ .Values.mktp_php_service }}
     spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel:latest
-          name: php-mktp
+          name: {{ .Values.mktp_php_service }}
           env:
             - name: APP_ROOT
               value: /var/www/html
@@ -37,10 +37,8 @@ spec:
               value: --queue=mail-queue,blockchain-transactions --tries=3
             - name: QUEUE_DRIVER
               value: sync
-            - name: DATABASE_URL
-              value: sync
             - name: DB_HOST
-              value: db-mktp.apps.ocp-epg.hi.inet
+              value: {{ .Values.mktp_db_service }}
             - name: DB_PORT
               value: "3306"
             - name: DB_DATABASE

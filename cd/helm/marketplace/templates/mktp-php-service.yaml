@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: php-mktp
-  name: php-mktp
+    io.kompose.service: {{ .Values.mktp_php_service }}
+  name: {{ .Values.mktp_php_service }}
 spec:
   ports:
     - name: "port-mktp"
       port: 89
       targetPort: 80
   selector:
-    io.kompose.service: php-mktp
+    io.kompose.service: {{ .Values.mktp_php_service }}
 status:
   loadBalancer: {}

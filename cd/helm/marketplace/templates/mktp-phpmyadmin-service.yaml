@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: phpmyadmin
-  name: phpmyadmin
+    io.kompose.service: {{ .Values.mktp_phpmyadmin_service }}
+  name: {{ .Values.mktp_phpmyadmin_service }}
 spec:
   ports:
     - name: "port-php-admin"
       port: 8089
       targetPort: 80
   selector:
-    io.kompose.service: phpmyadmin
+    io.kompose.service: {{ .Values.mktp_phpmyadmin_service }}
 status:
   loadBalancer: {}
