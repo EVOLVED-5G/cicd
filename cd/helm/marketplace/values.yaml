@@ -1,6 +1,7 @@
 ## variables for the CAPIF
 env: openshift
-mktp_hostname: marketplace.evolved-5g.eu
+# mktp_hostname: marketplace.evolved-5g.eu
+mktp_hostname: test.evolved-5g.eu
 db_name: evolved5g_db
 db_user: admin
 db_password: secret

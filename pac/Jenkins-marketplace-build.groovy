@@ -51,7 +51,7 @@ pipeline {
                       uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
                       gid=$(id `whoami`  | cut -d " " -f2 | cut -d "=" -f2 | cut -d "(" -f1)
                       sudo sed -i "s,APP_KEY=,APP_KEY=base64:vAaqm+X4+cBPWSabYrcJMPR3yZZw2ljgLjuTN7d4/J8=,g" .env
-                      sudo sed -i "s,APP_URL=http://localhost,APP_URL=https://marketplace-os.evolved-5g.eu,g" .env
+                      sudo sed -i "s,APP_URL=http://localhost,APP_URL=https://test.evolved-5g.eu,g" .env
                       sudo sed -i "s,MAIL_MAILER=smtp,MAIL_MAILER=smtp,g" .env
                       sudo sed -i "s,MAIL_HOST=mailhog,DOCKER_USER_ID=$uid,g" .env
                       sudo sed -i "s,MAIL_MAILER=smtp,DOCKER_USER_ID=$uid,g" .env

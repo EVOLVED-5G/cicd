@@ -11,7 +11,7 @@ metadata:
   resourceVersion: "962604413"
   uid: d2e4f272-b525-44b5-8311-e7c02a2f52a8
 spec:
-  host: marketplace.evolved-5g.eu
+  host: {{ .Values.mktp_hostname }}
   port:
     targetPort: port-mktp
   tls:
@@ -28,7 +28,7 @@ status:
     - lastTransitionTime: "2023-02-20T21:03:21Z"
       status: "True"
       type: Admitted
-    host: marketplace.evolved-5g.eu
+    host: {{ .Values.mktp_hostname }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
