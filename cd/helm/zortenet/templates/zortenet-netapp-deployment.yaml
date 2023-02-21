@@ -50,7 +50,7 @@ spec:
               value: {{ .Values.netapp_address }}
           name: zortenet-netapp
           ports:
-            - containerPort: 5000
+            - containerPort: {{ .Values.netapp_port }}
           resources: {}
       restartPolicy: Always
 status: {}

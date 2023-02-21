@@ -12,7 +12,7 @@ metadata:
   resourceVersion: "821566519"
   uid: f15aa2cc-8db1-4883-ac42-edc1e2d3205e
 spec:
-  host: zortenet.apps.ocp-epg.tid.es
+  host: {{ .Values.netapp_address }}
   port:
     targetPort: port-zortenet
   tls:
@@ -29,7 +29,7 @@ status:
     - lastTransitionTime: "2022-11-09T09:53:41Z"
       status: "True"
       type: Admitted
-    host: zortenet.apps.ocp-epg.tid.es
+    host: {{ .Values.netapp_address }}
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
@@ -37,7 +37,7 @@ status:
     - lastTransitionTime: "2022-11-09T09:53:41Z"
       status: "True"
       type: Admitted
-    host: zortenet.apps.ocp-epg.tid.es
+    host: {{ .Values.netapp_address }}
     routerCanonicalHostname: router-ingress-tid-es.apps.ocp-epg.pre.tid.es
     routerName: ingress-tid-es
     wildcardPolicy: None
