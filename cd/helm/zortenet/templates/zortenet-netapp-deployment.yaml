@@ -26,20 +26,28 @@ spec:
         io.kompose.service: zortenet-netapp
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/zortenetnetapp-zorte_netapp:latest
+        - image: dockerhub.hi.inet/evolved-5g/zortenetnetapp/zortenetnetapp-zorte_netapp:latest
           env:
-            - name: nef_url
-              value: {{ .Values.nef_url}}
-            - name: nef_user
-              value: {{ .Values.nef_user}}
-            - name: nef_pass
-              value: {{ .Values.nef_pass}}
-            - name: netapp_host
-              value: {{ .Values.netapp_host}}
-            - name: netapp_ip
-              value: {{ .Values.netapp_ip}}
-            - name: netapp_port
-              value: {{ .Values.netapp_port | quote }}
+            - name: CALLBACK_ADDRESS
+              value: {{ .Values.callback_address }}
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_HOSTNAME
+              value: {{ .Values.capif_hostname }}
+            - name: PATH_TO_CERTS
+              value: /zortenet_netapp/capif_onboarding
+            - name: VAPP_ADDRESS
+              value: "195.134.66.79:7000"
+            - name: NEF_PASSWORD
+              value: {{ .Values.nef_pass }}
+            - name: NEF_USER
+              value: {{ .Values.nef_user }}
+            - name: NEF_ADDRESS
+              value: {{ .Values.nef_address }}
+            - name:  NETAPP_ADDRESS
+              value: {{ .Values.netapp_address }}
           name: zortenet-netapp
           ports:
             - containerPort: 5000

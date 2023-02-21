@@ -25,7 +25,7 @@ spec:
         io.kompose.service: api-provider-management
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/api_provider_management_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-provider-management_1:{{ .Values.version }}"
           name: api-provider-management
           ports:
             - containerPort: 8080

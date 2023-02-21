@@ -1,0 +1,33 @@
+{{- if eq .Values.env "openshift" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2022-10-27T13:42:37Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: immersion-netapp
+  name: imm-5g
+  namespace: {{ .Release.Namespace }}
+  resourceVersion: "805604232"
+spec:
+  host: immersion-callback-controller.apps.ocp-epg.hi.inet
+  port:
+    targetPort: netapp-port-5g
+  to:
+    kind: Service
+    name: immersion-netapp
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2022-10-27T13:42:37Z"
+      status: "True"
+      type: Admitted
+    host: immersion-callback-controller.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

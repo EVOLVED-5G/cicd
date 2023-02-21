@@ -1,30 +1,30 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  creationTimestamp: "2022-09-23T11:15:52Z"
+  creationTimestamp: "2023-01-23T12:10:20Z"
   labels:
     app.kubernetes.io/managed-by: Helm
-    io.kompose.service: php-mktp
-  name: php-mktp
+    io.kompose.service: infolysis-netapp
+  name: info-netapp
   namespace: {{ .Release.Namespace }}
-  resourceVersion: "763218280"
-  uid: 8818ad48-7014-4b0c-ae4f-b282961d7e23
+  resourceVersion: "914679648"
+  uid: a294e3ed-2e87-4add-aadf-adf3ddc8cb31
 spec:
-  host: {{ .Values.mktp_hostname }}
+  host: infolysis.apps.ocp-epg.hi.inet
   port:
-    targetPort: port-mktp
+    targetPort: frontend-config
   to:
     kind: Service
-    name: php-mktp
+    name: infolysis-netapp
     weight: 100
   wildcardPolicy: None
 status:
   ingress:
   - conditions:
-    - lastTransitionTime: "2022-09-23T11:15:52Z"
+    - lastTransitionTime: "2023-01-23T12:10:20Z"
       status: "True"
       type: Admitted
-    host: {{ .Values.mktp_hostname }}
+    host: infolysis.apps.ocp-epg.hi.inet
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None

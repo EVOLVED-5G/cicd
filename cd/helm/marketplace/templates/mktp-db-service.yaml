@@ -6,14 +6,14 @@ metadata:
     kompose.version: 1.26.1 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: db-mktp
-  name: db-mktp
+    io.kompose.service: {{ .Values.mktp_db_service }}
+  name: {{ .Values.mktp_db_service }}
 spec:
   ports:
     - name: "port-db"
       port: 3306
       targetPort: 3306
   selector:
-    io.kompose.service: db-mktp
+    io.kompose.service: {{ .Values.mktp_db_service }}
 status:
   loadBalancer: {}

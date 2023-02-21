@@ -1,3 +1,3 @@
 ## variables for the CAPIF
-app_replicas: 2
+app_replicas: 1
 hostname: fogus.apps.ocp-epg.hi.inet

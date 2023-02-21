@@ -25,7 +25,7 @@ spec:
         io.kompose.service: published-apis
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/publish_service_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_published-apis_1:{{ .Values.version }}"
           name: published-apis
           ports:
             - containerPort: 8080

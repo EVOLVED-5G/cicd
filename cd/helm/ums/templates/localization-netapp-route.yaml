@@ -1,18 +1,22 @@
+{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  creationTimestamp: "2022-11-07T15:45:22Z"
+  creationTimestamp: "2023-02-02T17:31:09Z"
+  annotations:
+    meta.helm.sh/release-name: ums
+    meta.helm.sh/release-namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: localization-netapp
   name: localization-netapp
   namespace: evol5-capif
-  resourceVersion: "819410106"
-  uid: 10b5a659-6fd8-4e1f-898d-1b629f394664
+  resourceVersion: "927898575"
+  uid: 1af24488-60ff-4ea0-aa16-917ec6255552
 spec:
   host: evol5-capif-ums.apps.ocp-epg.hi.inet
   port:
-    targetPort: port-localization
+    targetPort: ums-port
   to:
     kind: Service
     name: localization-netapp
@@ -21,10 +25,13 @@ spec:
 status:
   ingress:
   - conditions:
-    - lastTransitionTime: "2022-11-07T15:45:22Z"
+    - lastTransitionTime: "2023-02-02T17:31:09Z"
       status: "True"
       type: Admitted
     host: evol5-capif-ums.apps.ocp-epg.hi.inet
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

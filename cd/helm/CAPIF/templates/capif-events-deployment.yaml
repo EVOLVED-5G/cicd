@@ -24,7 +24,7 @@ spec:
         io.kompose.service: capif-events
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/events_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-events_1:{{ .Values.version }}"
           name: capif-events
           ports:
             - containerPort: 8080

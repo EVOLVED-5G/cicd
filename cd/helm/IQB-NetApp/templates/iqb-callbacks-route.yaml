@@ -1,0 +1,34 @@
+{{- if eq .Values.env "openshift" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2023-01-31T12:37:34Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: iqbcallbacks
+  name: iqbcallbacks
+  namespace: evol5-capif
+  resourceVersion: "924656937"
+  uid: d13749d9-3b29-4656-bce5-5969f67d5c8a
+spec:
+  host: iqb-callback.apps.ocp-epg.hi.inet
+  port:
+    targetPort: iqbcallbacks-port
+  to:
+    kind: Service
+    name: iqbcallbacks
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2023-01-31T12:37:34Z"
+      status: "True"
+      type: Admitted
+    host: iqb-callback.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

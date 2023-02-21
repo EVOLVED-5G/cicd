@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: my-8bells-db
+  name: my-8bells-db
+spec:
+  replicas: {{ .Values.app_replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: my-8bells-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: my-8bells-db
+    spec:
+      containers:
+        - image: dockerhub.hi.inet/evolved-5g/8bellsnetapp/8bellsnetapp-8b_netapp_db:latest
+          name: my-8bells-db
+          env:
+            - name: POSTGRES_PASSWORD
+              value: "postgres"
+          ports:
+            - containerPort: 5432
+          resources: {}
+      restartPolicy: Always
+

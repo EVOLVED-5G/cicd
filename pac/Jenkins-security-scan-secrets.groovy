@@ -8,7 +8,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -37,7 +37,7 @@ pipeline {
         stage('Get Repo and clone'){
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -68,7 +68,7 @@ pipeline {
         stage('Get wiki repo and update Evolved Wiki'){
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${env.WORKSPACE}/") {
@@ -94,7 +94,15 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json report-tr-repo-secrets-$NETAPP_NAME_LOWER.json --output report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
+
+                        # get Commit Information
+                        cd $NETAPP_NAME
+                        commit=$(git rev-parse HEAD)
+                        cd ..
+                        urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/secrets-Telefonica-Evolved5g-$NETAPP_NAME
+                        versionT=0.35.0
+
+                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json report-tr-repo-secrets-$NETAPP_NAME_LOWER.json --output report-tr-repo-secrets-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
                         declare -a files=("json" "md" "pdf")
@@ -112,7 +120,29 @@ pipeline {
                 }
             }
         }
-
+        stage('Check stage status') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}") {
+                    sh '''#!/bin/bash
+                    if grep -q "failed" report-tr-repo-secrets-$NETAPP_NAME_LOWER.md ; then
+                        result=false
+                    else
+                        result=true
+                    fi
+                    if  $result ; then
+                        echo "Scan secrets was completed succesfuly"
+                    else
+                        exit 1
+                    fi
+                    '''
+                }
+            }
+        }
     }
     post {
         always {

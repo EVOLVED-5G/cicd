@@ -26,23 +26,39 @@ spec:
         io.kompose.service: gmi-netapp
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/gmiaeronetapp-gmi_netapp_container:latest
+        - image: dockerhub.hi.inet/evolved-5g/gmiaeronetapp/gmiaeronetapp-gmi_netapp_container:latest
           env:
-            - name: nef_url
-              value: {{ .Values.nef_url}}
-            - name: nef_user
-              value: {{ .Values.nef_user}}
-            - name: nef_pass
-              value: {{ .Values.nef_pass}}
-            - name: netapp_host
-              value: {{ .Values.netapp_host}}
-            - name: netapp_ip
-              value: {{ .Values.netapp_ip}}
-            - name: netapp_port
-              value: {{ .Values.netapp_port | quote }}
+            - name: NETAPP_NAME
+              value: "GMI_Netapp"
+            - name: NETAPP_ID
+              value: "gmi_netapp"
+            - name: NETAPP_PORT_VAPP
+              value: "8383"
+            - name: NETAPP_PATH
+              value: /src
+            - name: NEF_ADDRESS
+              value: evol5-capif-nef.apps.ocp-epg.hi.inet
+            - name: NEF_USER
+              value: admin@my-email.com
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_CALLBACK_URL
+              value: https://netapp2.evolved-5g.eu/monitoring/callback
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet
+            - name: CAPIF_HTTP_PORT
+              value: "80"
+            - name: PATH_TO_CERTS
+              value: /code/src/capif_onboarding
+            - name: CAPIF_HTTPS_PORT
+              value: "443"
+            - name: CAPIF_CALLBACK_URL
+              value: https://netapp2.evolved-5g.eu
+            - name: UE_REQUESTED_IP
+              value: "10.0.0.1"
           name: gmi-netapp
           ports:
-            - containerPort: 8000
+            - containerPort: 8383
           resources: {}
       restartPolicy: Always
 status: {}

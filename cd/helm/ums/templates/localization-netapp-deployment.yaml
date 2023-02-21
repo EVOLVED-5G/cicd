@@ -28,18 +28,26 @@ spec:
       containers:
         - image: dockerhub.hi.inet/evolved-5g/localizationnetapp:latest
           env:
-            - name: NEF_HOST
-              value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
-            - name: NEF_PORT
+            - name: CALLBACK_ADDRESS
+              value: "evol5-capif-ums.apps.ocp-epg.hi.inet"
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
               value: "80"
-            - name: CELLID_PORT
-              value: "80"
+            - name: CAPIF_HOSTNAME
+              value: {{ .Values.capif_hostname }}
+            - name: PATH_TO_CERTS
+              value: /evolved5g/cfg/capif_onboarding
+            - name: VAPP_ADDRESS
+              value: "195.134.66.79:7000"
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_USER
+              value: "admin@my-email.com"
+            - name: NEF_ADDRESS
+              value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
             - name: UE_EXTERNAL_ID
-              value: 10003@domain.com
-            - name: NETAPP_PORT
-              value: "8000"
-            - name: NETAPP_HOST
-              value: "http://evol5-capif-ums.apps.ocp-epg.hi.inet"
+              value: "10002@domain.com"
           name: localization-netapp
           ports:
             - containerPort: 8000

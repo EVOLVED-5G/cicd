@@ -38,24 +38,26 @@ a {
     padding: 0;
     vertical-align: baseline;
 }
+
 ul, ol {
-    padding: 0;
-    margin: 0;
-}
-li {
     line-height: 24px;
+    font-size: 16px;
+    margin: 5px 0 15px 20px;
+    list-style-type: circle;
 }
-li ul, li ul {
-    margin-left: 24px;
+
+li {
+    padding: 0 0 0 10px;
 }
-p, ul, ol {
+
+p {
     font-size: 16px;
     line-height: 24px;
-    max-width: 540px;
+    max-width: 1000px;
 }
 pre {
     padding: 0px 24px;
-    max-width: 800px;
+    max-width: 1000px;
     white-space: pre-wrap;
 }
 code {
@@ -66,15 +68,15 @@ code {
 aside {
     display: block;
     float: right;
-    width: 390px;
+    width: 1000px;
 }
 blockquote {
     margin: 1em 2em;
-    max-width: 476px;
+    max-width: 1000px;
 }
 blockquote p {
     color: #666;
-    max-width: 460px;
+    max-width: 1000px;
 }
 
 hr {

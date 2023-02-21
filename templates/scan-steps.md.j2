@@ -1,7 +1,17 @@
 
-# Evolved5G Validation Report
-# Overall validation steps information
+# Validation Report Executive Summary
 ***
+
+This Validation Report contains the results of the Validation
+Process executed over the Netapp {{version}}
+
+The repo used for Validation has been: {{repo}}
+The branch used for Validation has been: {{branch}}
+The last commit ID has been: {{commit}}
+
+The result of the Validation Process over the Netapp {{version}} has been: 
+
+The individual result of the validations test has been as show in the following table:
 
 {% set vars = {'foo': False} %}
 {% set counter = 0 -%}
@@ -16,6 +26,10 @@
 {% if vars.foo %}
   **Please, take a look to those steps that are failing.**
 {% endif %}
+
+
+In the following pages, we provide details of the tests executed 
+and the results.
 
 
 

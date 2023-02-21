@@ -11,7 +11,7 @@ pipeline {
     agent { node {label 'evol5-slave2'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -26,6 +26,7 @@ pipeline {
         SCANNERHOME = tool 'Sonar Scanner 5';
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}").toLowerCase()
         SQ_TOKEN=credentials('SONARQUBE_TOKEN')
+        SONARQB_PASSWORD=credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
         DOCKER_PATH="/usr/src/app"
@@ -35,7 +36,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(1)
                 }
             steps {
                 dir ("${WORKSPACE}/") {
@@ -44,6 +45,7 @@ pipeline {
                     mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
+
                     '''
                 }
            }
@@ -59,7 +61,7 @@ pipeline {
                                 -Dsonar.projectKey=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.projectBaseDir="${WORKSPACE}/${NETAPP_NAME}/" \
                                 -Dsonar.sources="${WORKSPACE}/${NETAPP_NAME}/src/" \
-                                -Dsonar.host.url=http://195.235.92.134:9000 \
+                                -Dsonar.host.url=https://sq.mobilesandbox.cloud:9000 \
                                 -Dsonar.login=$SQ_TOKEN \
                                 -Dsonar.projectName=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH} \
                                 -Dsonar.language=python \
@@ -83,7 +85,7 @@ pipeline {
                     sh '''
                     sleep 15
                     sonar-report \
-                        --sonarurl="http://195.235.92.134:9000" \
+                        --sonarurl="https://sq.mobilesandbox.cloud:9000" \
                         --sonartoken="$SQ_TOKEN" \
                         --qualityGateStatus="false" \
                         --sonarcomponent="Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}" \
@@ -109,14 +111,21 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     sh '''#! /bin/bash
 
-                    python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
+                    # get Commit Information
+                    cd $NETAPP_NAME
+                    commit=$(git rev-parse HEAD)
+                    cd ..
+                    versionsq=$(curl -u admin:$SONARQB_PASSWORD https://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
+                    urlsq=https://sq.mobilesandbox.cloud:9000/dashboard?id=Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}
+
+                    docker build  -t pdf_generator utils/docker_generate_pdf/.
+                    python3 utils/report_generator.py --template templates/scan-sonar.md.j2 --json report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
 
                     for x in "${files[@]}"
                     do
-
                         report_file="report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.$x"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
@@ -128,7 +137,29 @@ pipeline {
                 }
             }
         }
-
+        stage('Check stage status') {
+            when {
+                expression {
+                    return REPORTING;
+                }
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                    if grep -q "failed" report-sonar-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.md; then
+                        result=false
+                    else
+                        result=true
+                    fi
+                    if  $result ; then
+                        echo "SonarQube Scan was completed succesfuly"
+                    else
+                        exit 1
+                    fi
+                    '''
+                }
+            }
+        }
     }
     post {
         always {

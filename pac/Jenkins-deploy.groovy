@@ -1,19 +1,3 @@
-String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    var= var.toLowerCase()
-    return var ;
-}
-
-def getNamespace(deployment,name) {
-    String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-capif";
-    } else {
-        return name;
-    }
-}
-
 def getAgent(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
@@ -34,8 +18,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
-        string(name: 'DUMMY_NETAPP_HOSTNAME', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Netapp hostname')
-        string(name: 'DEPLOYMENT_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
+        string(name: 'DEPLOY_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -43,7 +26,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
         DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOYMENT_NAME}"
+        DEPLOYMENT_NAME = "${params.DEPLOY_NAME}"
         NAMESPACE_NAME = "fogus" //Parametrized here and create an universal pipeline for building
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
@@ -62,7 +45,7 @@ pipeline {
                             steps {
                                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN -n evol5-capif
                                     '''
                                 }
                             }
@@ -122,11 +105,13 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/  --set hostname=$DUMMY_NETAPP_HOSTNAME 
+                    helm install $DEPLOY_NAME ./cd/helm/$DEPLOY_NAME/
+                    sleep 100
                     '''
                 }
             }
         }
+
     }                
     post {
         cleanup{

@@ -11,11 +11,14 @@ metadata:
 spec:
   ports:
     - name: port-security
-      port: 8085
-      targetPort: 8085
-    - name: port-app
       port: 8086
       targetPort: 8086
+    - name: port-oauth
+      port: 8087
+      targetPort: 8087
+    - name: port-pki
+      port: 8088
+      targetPort: 8088
     - name: port-app-hettps
       port: 443
       targetPort: 443

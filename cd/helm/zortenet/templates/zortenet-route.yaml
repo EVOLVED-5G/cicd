@@ -1,3 +1,4 @@
+{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -40,3 +41,6 @@ status:
     routerCanonicalHostname: router-ingress-tid-es.apps.ocp-epg.pre.tid.es
     routerName: ingress-tid-es
     wildcardPolicy: None
+{{ else }}
+# Default case
+{{- end }}

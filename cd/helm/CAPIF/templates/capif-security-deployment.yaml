@@ -27,8 +27,8 @@ spec:
       containers:
         - env:
             - name: CAPIF_HOSTNAME
-              value: openshift.evolved-5g.eu
-          image: dockerhub.hi.inet/evolved-5g/capif/security_api:latest
+              value: capif.apps.ocp-epg.hi.inet
+          image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-security_1:{{ .Values.version }}"
           name: capif-security
           ports:
             - containerPort: 8080

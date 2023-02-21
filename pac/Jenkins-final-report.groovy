@@ -8,7 +8,7 @@ pipeline {
     agent { node {label 'evol5-openshift'}  }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -33,7 +33,7 @@ pipeline {
 
     stages {
 
-        stage('Generate executive summary') {
+        stage('Generate steps summary') {
             when {
                 expression {
                     return REPORTING;
@@ -42,34 +42,24 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-        
+
                     mkdir executive_summary
                     cd executive_summary
 
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
-                    
-                    
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
-                    do  
+                    do
                         url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
-                    
-                    cd ..
-                    python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md
-                    cd executive_summary
-                    rm -f report-steps-"$NETAPP_NAME_LOWER".json
-
-                    jq -s . *.json > final_json.json
-                    jq '{"json": .}' < final_json.json  > report.json
 
                     cd ..
-                    python3 utils/report_generator.py --template templates/scan-report.md.j2 --json executive_summary/report.json --output executive_summary/executive-summary-$NETAPP_NAME_LOWER.md
 
+                    commit=$(git ls-remote ${GIT_NETAPP_URL}.git | grep $GIT_NETAPP_BRANCH | awk '{ print $1}')
+                    python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --name $NETAPP_NAME --url url
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/executive-summary-$NETAPP_NAME_LOWER.md
                     docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
                     '''
                 }
@@ -88,16 +78,22 @@ pipeline {
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
-                    do  
+                    do
                         url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
-                    
-                    today=$(date +'%d/%m/%Y')
-                    pdfunite *.pdf mid_report.pdf
-                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today -b $BUILD_ID
-                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf executive_summary/executive-summary-$NETAPP_NAME_LOWER.pdf mid_report.pdf utils/endpage.pdf final_report.pdf
 
+                    today=$(date +'%d/%m/%Y')
+                    mv *-licenses*.pdf executive_summary/
+                    pdfunite *.pdf mid_report1.pdf
+                    pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf
+
+                    python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
+                    
+                    # Remember install PDFTK for watermarking
+                    pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
+                    pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf
+                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
                     '''
                 }
             }

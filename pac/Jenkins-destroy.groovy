@@ -30,6 +30,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'DEPLOY_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -37,7 +38,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "fogus"
+        DEPLOYMENT_NAME = "${params.DEPLOY_NAME}"
         NAMESPACE_NAME = "fogus"
         DEPLOYMENT = "${params.DEPLOYMENT}"
 
@@ -116,7 +117,8 @@ pipeline {
         stage ('Initiate and configure app in kubernetes') {
             steps {
                 sh '''
-                helm uninstall $DEPLOYMENT_NAME
+                helm uninstall $DEPLOY_NAME
+                sleep 30
                 '''
             }
         }

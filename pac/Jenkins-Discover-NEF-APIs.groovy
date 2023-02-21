@@ -14,7 +14,7 @@ pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -75,22 +75,42 @@ stages {
                 }
             }
         }
-        stage('Verify is netapp is onboarded') {
+        stage('Verify if Netapp has discovered NEF APIs') {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    value=$(kubectl get pods | grep ^published-apis | awk '{print $1}')
-                    logs=$(kubectl logs --tail=20 $value) 
+                    result=false
+                    value_pod=$(kubectl get pods | grep ^python-netapp | awk '{print $1}')
+                    kubectl exec $value_pod -- python 2_netapp_discover_service.py 
+                    value=$(kubectl get pods | grep ^service-apis | awk '{print $1}')
+                    logs=$(kubectl logs --tail=20 $value)
+                    echo $logs
                     while IFS= read -r line; do
-                        if [[ $line == *"Discovered APIs by:"* ]]; then
-                            echo "This is true"
-                            result=TRUE
+                        if [[ $line == *"GET /service-apis/v1/allServiceAPIs?api-invoker-id="* ]]; then
+                            result=true
                         fi
                     done <<< "$logs"
-                    echo $result
-                    echo $result || exit 0
+                    if  $result ; then
+                        echo "DISCOVER APIs work correctly"
+                    else
+                        exit 1
+                    fi
                     '''
                 }
+            }
+        }
+    }
+    post {
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
             }
         }
     }

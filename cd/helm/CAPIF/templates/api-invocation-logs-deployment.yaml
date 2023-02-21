@@ -24,7 +24,7 @@ spec:
         io.kompose.service: api-invocation-logs
     spec:
       containers:
-        - image: dockerhub.hi.inet/evolved-5g/capif/api_invocation_logs_api:latest
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-invocation-logs_1:{{ .Values.version }}"
           name: api-invocation-logs
           ports:
             - containerPort: 8080

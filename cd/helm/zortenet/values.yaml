@@ -1,7 +1,10 @@
 ## variables for the ZORTENET
-nef_url: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+env: openshift
 nef_user: admin@my-email.com
 nef_pass: pass
-netapp_host: zorte_netapp
-netapp_ip: "0.0.0.0"
+nef_address: evol5-capif-nef.apps.ocp-epg.hi.inet
+netapp_address: zortenet.apps.ocp-epg.tid.es
 netapp_port: 5000
+
+callback_address: zortenet.apps.ocp-epg.tid.es
+capif_hostname: capif.apps.ocp-epg.hi.inet

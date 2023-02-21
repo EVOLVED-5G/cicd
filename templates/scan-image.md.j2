@@ -1,4 +1,9 @@
-# Scan of {{type}}: {{id}}
+# IMAGE SECURITY ANALYSIS 
+# Test Results
+
+Test Description: Trivy is a Code Security Assurance tool that collects and analyzes source code, and provides reports for the code security of your project.
+Netapp repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
 
 ***
 {% if not vulnerabilities %} 
@@ -35,4 +40,5 @@ Good work. No vulnerabilities found.
   {%- endfor %}
 {%- endif %}
 ***
-Date: {{scan_date[:10]}}
+The Source Code Security Analysis has been completed successfuly
+Information about high, medium, low and unknown issues can be found in the following link: {{url}}

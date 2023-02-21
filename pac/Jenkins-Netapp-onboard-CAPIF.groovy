@@ -10,11 +10,12 @@ def getAgent(deployment) {
     }
 }
 
+//Define a global variable in order to get this result
 pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(2)
+        retry(1)
     }
 
     parameters {
@@ -79,18 +80,40 @@ stages {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
+                    result=false
+                    value_pod=$(kubectl get pods | grep ^python-netapp | awk '{print $1}')
+                    kubectl exec $value_pod -- python 1_netapp_to_capif.py 
                     value=$(kubectl get pods | grep ^api-invoker-management | awk '{print $1}')
-                    logs=$(kubectl logs --tail=20 $value) 
+                    logs=$(kubectl logs --tail=20 $value)
+                    echo $logs
                     while IFS= read -r line; do
-                        if [[ $line == *"Netapp onboarded sucessfuly"* ]]; then
-                            echo "This is true"
-                            result=TRUE
+                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
+                            result=true
                         fi
                     done <<< "$logs"
                     echo $result
-                    echo $result || exit 0
+                    if  $result ; then
+                        echo "NETAPP was onboarded successfuly"
+                    else
+                        exit 1
+                    fi
                     '''
                 }
+            }
+        }
+
+    }
+    post {
+        cleanup{
+            /* clean up our workspace */
+            deleteDir()
+            /* clean up tmp directory */
+            dir("${env.workspace}@tmp") {
+                deleteDir()
+            }
+            /* clean up script directory */
+            dir("${env.workspace}@script") {
+                deleteDir()
             }
         }
     }
