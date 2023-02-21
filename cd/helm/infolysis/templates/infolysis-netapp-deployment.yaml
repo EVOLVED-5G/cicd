@@ -30,7 +30,7 @@ spec:
             - name: NEF_HOSTNAME
               value: {{ .Values.nef_hostname }}
             - name: CAPIF_HOSTNAME
-              value: capif.apps.ocp-epg.hi.inet
+              value: {{ .Values.capif_hostname }}
             - name: CAPIF_PORT_HTTPS
               value: "443"
             - name: CAPIF_PORT_HTTP

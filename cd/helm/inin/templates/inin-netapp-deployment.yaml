@@ -54,7 +54,7 @@ spec:
             - name: CAPIF_PATH
               value: /app/capif_onboarding/
             - name: CAPIF_HOSTNAME
-              value: capif.apps.ocp-epg.hi.inet
+              value: {{ .Values.capif_hostname }}
             - name: CAPIF_PORT_HTTP
               value: "80"
             - name: CAPIF_PORT_HTTPS

@@ -1,4 +1,5 @@
 ## variables for the CAPIF
+capif_hostname: capif.apps.ocp-epg.hi.inet
 NET_APP_NAME: test
 NET_API_PROT: http
 NET_API_ADDRESS: 192.168.202.35:8888

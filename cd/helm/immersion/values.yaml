@@ -1,4 +1,5 @@
 ## variables for the CAPIF
+capif_hostname: capif.apps.ocp-epg.hi.inet
 nef_host: http://evol5-capif-nef.apps.ocp-epg.hi.inet
 host_front: immersion-web-controller.apps.ocp-epg.hi.inet
 netappid: immnetapp

@@ -1,4 +1,5 @@
 ## variables for the CAPIF
+capif_hostname: capif.apps.ocp-epg.hi.inet
 env: openshift
 hostname: http://evol5-capif-nef.apps.ocp-epg.hi.inet
 namespace: evol5-capif
