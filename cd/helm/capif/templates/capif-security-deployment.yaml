@@ -24,11 +24,19 @@ spec:
       labels:
         io.kompose.service: capif-security
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}  
       containers:
-        - env:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_capif-security_1-{{ .Values.version }}
+        {{- else }}
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-security_1:{{ .Values.version }}"
+        {{- end }}
+          env:
             - name: CAPIF_HOSTNAME
-              value: capif.apps.ocp-epg.hi.inet
-          image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-security_1:{{ .Values.version }}"
+              value: capif.apps.ocp-epg.hi.inet 
           name: capif-security
           ports:
             - containerPort: 8080

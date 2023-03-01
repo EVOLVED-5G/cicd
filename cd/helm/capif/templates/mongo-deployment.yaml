@@ -23,13 +23,21 @@ spec:
       labels:
         io.kompose.service: mongo
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
-        - env:
+      {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_mongo_1-{{ .Values.version }}
+      {{- else}}
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_mongo_1:{{ .Values.version }}"
+      {{- end }}
+          env:
             - name: MONGO_INITDB_ROOT_PASSWORD
               value: example
             - name: MONGO_INITDB_ROOT_USERNAME
               value: root
-          image: "dockerhub.hi.inet/evolved-5g/capif/services_mongo_1:{{ .Values.version }}"
           name: mongo
           ports:
             - containerPort: 27017
