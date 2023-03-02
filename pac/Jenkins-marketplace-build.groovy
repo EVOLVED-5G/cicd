@@ -50,6 +50,7 @@ pipeline {
                       cp .env.example .env
                       uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
                       gid=$(id `whoami`  | cut -d " " -f2 | cut -d "=" -f2 | cut -d "(" -f1)
+                      sudo sed -i "s,APP_ENV=local,APP_ENV=production,g" .env
                       sudo sed -i "s,APP_KEY=,APP_KEY=base64:vAaqm+X4+cBPWSabYrcJMPR3yZZw2ljgLjuTN7d4/J8=,g" .env
                       sudo sed -i "s,APP_URL=http://localhost,APP_URL=https://marketplace-pro.evolved-5g.eu,g" .env
                       sudo sed -i "s,MAIL_MAILER=smtp,MAIL_MAILER=smtp,g" .env
