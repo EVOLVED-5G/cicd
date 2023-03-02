@@ -117,8 +117,8 @@ pipeline {
         stage('Modify container name to upload Docker-compose to Artifactory') { 
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    script {   
-                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                    script {  
+                        sh ''' echo ${ARTIFACTORY_CREDENTIALS} | docker login --username ${ARTIFACTORY_USER} --password-stdin dockerhub.hi.inet '''
                         def cmd = "docker ps --format '{{.Image}}'"
                         def cmd2 = "docker ps --format '{{.Names}}'"
                         def image = sh(returnStdout: true, script: cmd).trim()
