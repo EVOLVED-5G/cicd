@@ -32,26 +32,26 @@ pipeline {
         DOCKER_PATH="/usr/src/app"
     }
     stages {
-        stage('Get Repo and clone'){
-            options {
-                timeout(time: 10, unit: 'MINUTES')
-                retry(1)
-            }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}                                                
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
-                    rm -rf Evolved5g-${NETAPP_NAME}/* 
-                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
-                    cd Evolved5g-${NETAPP_NAME}/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
-                    git push -u origin $GIT_NETAPP_BRANCH
-                    '''
-                }
-            }
-        }
+//        stage('Get Repo and clone'){
+//            options {
+//                timeout(time: 10, unit: 'MINUTES')
+//                retry(1)
+//            }
+//            steps {
+//                dir ("${env.WORKSPACE}/") {
+//                    sh '''
+//                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}                                                
+//                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
+//                    rm -rf Evolved5g-${NETAPP_NAME}/* 
+//                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
+//                    cd Evolved5g-${NETAPP_NAME}/
+//                    git add -A .
+//                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
+//                    git push -u origin $GIT_NETAPP_BRANCH
+//                    '''
+//                }
+//            }
+//        }
 
         stage('Launch Github Actions command') {
             steps {
@@ -63,25 +63,25 @@ pipeline {
                 }
             }
         }
-        stage('Get wiki repo and update Evolved Wiki'){
-            options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
-                }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone $GIT_NETAPP_URL.wiki.git
-                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
-                    cd ${NETAPP_NAME}.wiki/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy scan report'
-                    git push https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
-                    '''
-                }
-           }
-        }
+//        stage('Get wiki repo and update Evolved Wiki'){
+//            options {
+//                    timeout(time: 10, unit: 'MINUTES')
+//                    retry(1)
+//                }
+//            steps {
+//                dir ("${env.WORKSPACE}/") {
+//                    sh '''
+//                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+//                    git clone $GIT_NETAPP_URL.wiki.git
+//                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+//                    cd ${NETAPP_NAME}.wiki/
+//                    git add -A .
+//                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy scan report'
+//                    git push https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+//                    '''
+//                }
+//           }
+//        }
         stage('Upload report to Artifactory') {
             when {
                 expression {

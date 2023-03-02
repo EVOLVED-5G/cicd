@@ -72,25 +72,25 @@ pipeline {
                 }
             }
         }
-        stage('Get wiki repo and update Evolved Wiki'){
-            options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
-                }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone $GIT_NETAPP_URL.wiki.git
-                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
-                    cd ${NETAPP_NAME}.wiki/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
-                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
-                    '''
-                }
-           }
-        }
+//        stage('Get wiki repo and update Evolved Wiki'){
+//            options {
+//                    timeout(time: 10, unit: 'MINUTES')
+//                    retry(1)
+//                }
+//            steps {
+//                dir ("${env.WORKSPACE}/") {
+//                    sh '''
+//                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+//                    git clone $GIT_NETAPP_URL.wiki.git
+//                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+//                    cd ${NETAPP_NAME}.wiki/
+//                    git add -A .
+//                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
+//                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+//                    '''
+//                }
+//           }
+//        }
 
 
         stage('Upload report to Artifactory') {
