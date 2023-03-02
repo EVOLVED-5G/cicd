@@ -34,8 +34,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-//        string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
-        string(name: 'HOSTNAME', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname')
+        string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -43,8 +42,8 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "capif-test"
-        NAMESPACE_NAME = "capif-test"
+        DEPLOYMENT_NAME = "capif"
+        NAMESPACE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -122,7 +121,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/capif/ --set capif_hostname=$HOSTNAME --create-namespace -n $NAMESPACE_NAME
+                    helm install $DEPLOYMENT_NAME ./cd/helm/capif/ --set capif_hostname=$HOSTNAME
                     sleep 100
                     '''
                 }
