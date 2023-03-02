@@ -44,7 +44,7 @@ pipeline {
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         DEPLOYMENT_NAME = "capif-test"
-        NAMESPACE_NAME = "capif"
+        NAMESPACE_NAME = "capif-test"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
