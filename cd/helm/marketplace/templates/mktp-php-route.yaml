@@ -19,7 +19,7 @@ metadata:
   resourceVersion: "963399539"
   uid: eb7eb6e4-0e45-4157-b596-c77498da74da
 spec:
-  host: test.evolved-5g.eu
+  host: {{ .Values.mktp_hostname }}
   port:
     targetPort: port-mktp
   tls:
