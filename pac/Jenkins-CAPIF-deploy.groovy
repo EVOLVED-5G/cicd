@@ -121,7 +121,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/CAPIF/ --set capif_hostname=$HOSTNAME
+                    helm install $DEPLOYMENT_NAME ./cd/helm/capif/ --set capif_hostname=$HOSTNAME
                     sleep 100
                     '''
                 }
