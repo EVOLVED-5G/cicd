@@ -49,19 +49,17 @@ pipeline {
     }
 
     stages {        
-        stage ('Login in openshift or Kubernetes'){
-            stage ("'Login in Openshift platform'") {
-                when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+        stage ("Login in openshift"){
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                steps {
-                    withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                        sh '''
-                            oc login --insecure-skip-tls-verify --token=$TOKEN 
-                        '''
-                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
         }
