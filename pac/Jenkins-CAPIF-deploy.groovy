@@ -83,8 +83,8 @@ pipeline {
         }
         stage ('Upgrade app in kubernetes') {
             when {
-                anyOf {
-                    expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
+                allyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
                 }
             }
             steps {
