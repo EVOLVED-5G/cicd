@@ -50,7 +50,7 @@ pipeline {
 
     stages {        
         stage ('Login in openshift or Kubernetes'){
-            parallel {
+//            parallel {
                 stage ('Login in Openshift platform') {
                     when {
                         allOf {
@@ -69,35 +69,34 @@ pipeline {
                         }
                     }
                 }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl config view
-                                    #kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
-                }
-            }
+//                stage ('Login in Kubernetes Platform'){
+//                    when {
+//                        allOf {
+//                            expression { DEPLOYMENT == "kubernetes-athens"}
+//                        }
+//                    }
+//                    stages{
+//                        stage('Login in Kubernetes') {
+//                            steps { 
+//                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+//                                    sh '''
+//                                    kubectl get all -n kube-system
+//                                    '''
+//                                }
+//                            }
+//                        }
+//                        stage ('Create namespace in if it does not exist') {
+//                            steps {
+//                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+//                                    sh '''
+//                                    kubectl create namespace evol-$NAMESPACE_NAME
+//                                    '''
+//                                }
+//                            }              
+//                        }
+//                    }
+//                }
+//            }
         }
         //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
@@ -117,15 +116,14 @@ pipeline {
                     --docker-username=AWS
                     '''
                 }    
-            }    
-        }
-        stage ('Initiate and configure app in kubernetes') {
-            steps {
-                dir ("${env.WORKSPACE}") {
-                    sh '''
-                    helm install $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME
-                    sleep 100
-                    '''
+            }
+            stage ('Initiate and configure app in kubernetes') {
+                steps {
+                    dir ("${env.WORKSPACE}") {
+                        sh '''
+                        helm install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                        '''
+                    }
                 }
             }
         }
