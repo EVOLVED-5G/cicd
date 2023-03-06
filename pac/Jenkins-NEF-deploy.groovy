@@ -72,7 +72,7 @@ pipeline {
                 stage ('Login in Kubernetes Platform'){
                     when {
                         allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
+                            expression { DEPLOYMENT == "kubernetes-athens" ; DEPLOYMENT == "kubernetes-uma"}
                         }
                     }
                     stages{
@@ -80,7 +80,8 @@ pipeline {
                             steps { 
                                 withKubeConfig([credentialsId: 'kubeconfigAthens']) {
                                     sh '''
-                                    kubectl get all -n kube-system
+                                    kubectl config view
+                                    #kubectl get all -n kube-system
                                     '''
                                 }
                             }
