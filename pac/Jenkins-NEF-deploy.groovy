@@ -102,7 +102,7 @@ pipeline {
         stage ('Log into AWS ECR') {
             when {
                 allOf {
-                    expression { DEPLOYMENT == "evol5-athens"}
+                    expression { DEPLOYMENT == "kubernetes-athens"}
                 }
             }
             steps {
