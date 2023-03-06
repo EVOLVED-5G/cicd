@@ -122,7 +122,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --set env=$DEPLOYMENT --atomic
+                    helm install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
                     '''
                 }
             }
