@@ -50,21 +50,45 @@ pipeline {
 
     stages {        
         stage ('Login in openshift or Kubernetes'){
-            stage ('Login in Openshift platform') {
-                when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
+            parallel {
+                stage ('Login in Openshift platform') {
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "openshift"}
+                        }
                     }
-                }
-                steps {
-                    withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    sh '''
-                    oc login --insecure-skip-tls-verify --token=$TOKEN 
-                    '''
+                    stages{
+                        stage('Login openshift') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    sh '''
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                    '''
+                                }
+                            }
+                        }
+                    }
+                }            
+                stage ('Login in Kubernetes Platform'){
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        }
+                    }
+                    stages{
+                        stage('Login in Kubernetes') {
+                            steps { 
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                    sh '''
+                                    cat /home/contint/.kube/config
+                                    '''
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }            
+        }
         stage ('Log into AWS ECR') {
             when {
                 anyOf {
