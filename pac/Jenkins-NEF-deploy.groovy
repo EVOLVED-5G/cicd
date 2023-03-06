@@ -50,41 +50,42 @@ pipeline {
 
     stages {        
         stage ('Login in openshift or Kubernetes'){
-//            parallel {
-            stage ('Login in Openshift platform') {
-                when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
+            parallel {
+                stage ('Login in Openshift platform') {
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "openshift"}
+                        }
                     }
-                }
-                stages{
-                    stage('Login openshift') {
-                        steps {
-                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                sh '''
-                                    oc login --insecure-skip-tls-verify --token=$TOKEN 
-                                '''
+                    stages{
+                        stage('Login openshift') {
+                            steps {
+                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                    sh '''
+                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                    '''
+                                }
                             }
                         }
                     }
-                }
-            }            
-//                stage ('Login in Kubernetes Platform'){
-//                    when {
-//                        allOf {
-//                            expression { DEPLOYMENT == "kubernetes-athens"}
-//                        }
-//                    }
-//                    stages{
-//                        stage('Login in Kubernetes') {
-//                            steps { 
-//                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-//                                    sh '''
-//                                    kubectl get all -n kube-system
-//                                    '''
-//                                }
-//                            }
-//                        }
+                }            
+                stage ('Login in Kubernetes Platform'){
+                    when {
+                        allOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        }
+                    }
+                    stages{
+                        stage('Get login information to cluster') {
+                            steps { 
+                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+                                    sh '''
+                                    kubectl config view
+                                    cat /home/contint/.kube/config
+                                    '''
+                                }
+                            }
+                        }
 //                        stage ('Create namespace in if it does not exist') {
 //                            steps {
 //                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
@@ -94,9 +95,9 @@ pipeline {
 //                                }
 //                            }              
 //                        }
-//                    }
-//                }
-//            }
+                    }
+                }
+            }
         }
         //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
