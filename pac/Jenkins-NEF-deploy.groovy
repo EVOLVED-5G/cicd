@@ -71,8 +71,8 @@ pipeline {
                 }            
                 stage ('Login in Kubernetes Platform'){
                     when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
+                        anyOf {
+                            expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
                         }
                     }
                     stages{
@@ -91,8 +91,8 @@ pipeline {
         }
         stage ('Log into AWS ECR') {
             when {
-                anyOf {
-                    expression { DEPLOYMENT == "kubernetes-athens" ; DEPLOYMENT == "kubernetes-uma" }
+                allOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
                 }
             }
             steps {
@@ -106,7 +106,7 @@ pipeline {
                     --docker-username=AWS
                     '''
                 }    
-            }    
+            }
         }
         stage ('Upgrade app in kubernetes') {
             when {
