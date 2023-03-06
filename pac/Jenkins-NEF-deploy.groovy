@@ -85,20 +85,10 @@ pipeline {
                                 }
                             }
                         }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    echo "kubectl create namespace evol-$NAMESPACE_NAME"
-                                    '''
-                                }
-                            }              
-                        }
                     }
                 }
             }
         }
-        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
             when {
                 allOf {
