@@ -50,44 +50,58 @@ pipeline {
 
     stages {        
         stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
+            stage ("'Login in Openshift platform'") {
+                when {
                         allOf {
                             expression { DEPLOYMENT == "openshift"}
                         }
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                steps {
+                    withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                                     sh '''
                                         oc login --insecure-skip-tls-verify --token=$TOKEN 
                                     '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        anyOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    cat /home/contint/.kube/config
-                                    '''
-                                }
-                            }
-                        }
                     }
                 }
             }
+//            parallel {
+//                stage ('Login in Openshift platform') {
+//                    when {
+//                        allOf {
+//                            expression { DEPLOYMENT == "openshift"}
+//                        }
+//                    }
+//                    stages{
+//                        stage('Login openshift') {
+//                            steps {
+//                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+//                                    sh '''
+//                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+//                                    '''
+//                                }
+//                            }
+//                        }
+//                    }
+//                }            
+//                stage ('Login in Kubernetes Platform'){
+//                    when {
+//                        anyOf {
+//                            expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
+//                        }
+//                    }
+//                    stages{
+//                        stage('Login in Kubernetes') {
+//                            steps { 
+//                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
+//                                    sh '''
+//                                    cat /home/contint/.kube/config
+//                                    '''
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         }
         stage ('Log into AWS ECR') {
             when {
