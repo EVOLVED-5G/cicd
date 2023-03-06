@@ -1,5 +1,5 @@
 ## variables for the CAPIF
 capif_hostname: capif.apps.ocp-epg.hi.inet
 mongo_express_port: 8081
-version: "2.1"
+version: "3.0"
 env: "kubernetes"
