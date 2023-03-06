@@ -51,24 +51,24 @@ pipeline {
     stages {        
         stage ('Login in openshift or Kubernetes'){
 //            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+            stage ('Login in Openshift platform') {
+                when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                                    '''
-                                }
+                }
+                stages{
+                    stage('Login openshift') {
+                        steps {
+                            withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                                sh '''
+                                    oc login --insecure-skip-tls-verify --token=$TOKEN 
+                                '''
                             }
                         }
                     }
-                }            
+                }
+            }            
 //                stage ('Login in Kubernetes Platform'){
 //                    when {
 //                        allOf {
