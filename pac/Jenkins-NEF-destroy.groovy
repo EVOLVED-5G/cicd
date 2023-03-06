@@ -71,7 +71,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME --wait
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME -n $NAMESPACE_NAME --wait
                     '''
                 }
             }
