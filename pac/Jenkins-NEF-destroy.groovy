@@ -69,9 +69,11 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME --wait
-                '''
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME --wait
+                    '''
+                }
             }
         }
         stage ('Destroy/Uninstall app in Openshift') {
