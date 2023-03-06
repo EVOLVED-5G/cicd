@@ -48,81 +48,44 @@ pipeline {
     }
 
     stages {        
-        stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
-                    }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
-                }
-            }
-        }
-        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
-        stage ('Log into AWS ECR') {
+        stage ("Login in openshift"){
             when {
-                allOf {
-                    expression { DEPLOYMENT == "evol5-athens"}
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
+                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
-                    kubectl create secret docker-registry regcred                                   \
-                    --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$NAMESPACE_NAME                                                     \
-                    --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
-                    --docker-username=AWS
-                    '''
-                }    
-            }    
         }
-        stage ('Initiate and configure app in kubernetes') {
+        stage ('Destroy/Uninstall app in kubernetes') {
+            when {
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
+                }
+            }
             steps {
                 sh '''
-                helm uninstall $DEPLOYMENT_NAME
-                sleep 30
+                helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME --wait
                 '''
+            }
+        }
+        stage ('Destroy/Uninstall app in Openshift') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "openshift"}
+                }
+            }
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    helm uninstall --debug $DEPLOYMENT_NAME --wait
+                    '''
+                }
             }
         }
     }                
