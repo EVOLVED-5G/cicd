@@ -1,4 +1,4 @@
 ## variables for the CAPIF
 nef_hostname: nef.apps.ocp-epg.hi.inet
 capif_hostname: capif.apps.ocp-epg.hi.inet
-env: openshift
+env: kubernetes-athens
