@@ -72,7 +72,7 @@ pipeline {
                 stage ('Login in Kubernetes Platform'){
                     when {
                         allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens" ; DEPLOYMENT == "kubernetes-uma"}
+                            expression { DEPLOYMENT == "kubernetes-athens"}
                         }
                     }
                     stages{
