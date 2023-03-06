@@ -91,8 +91,8 @@ pipeline {
         }
         stage ('Log into AWS ECR') {
             when {
-                allOf {
-                    expression { DEPLOYMENT == "kubernetes-athens"}
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" ; DEPLOYMENT == "kubernetes-uma" }
                 }
             }
             steps {
@@ -108,11 +108,30 @@ pipeline {
                 }    
             }    
         }
-        stage ('Initiate and configure app in kubernetes') {
+        stage ('Upgrade app in kubernetes') {
+            when {
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
+                }
+            }
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     helm upgrade --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    '''
+                }
+            }
+        }
+        stage ('Upgrade app in Openshift') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "openshift"}
+                }
+            }
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    helm upgrade --debug --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
                     '''
                 }
             }
