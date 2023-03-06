@@ -76,25 +76,24 @@ pipeline {
                         }
                     }
                     stages{
-                        stage('Get login information to cluster') {
+                        stage('Login in Kubernetes') {
                             steps { 
                                 withKubeConfig([credentialsId: 'kubeconfigAthens']) {
                                     sh '''
-                                    kubectl config view
                                     cat /home/contint/.kube/config
                                     '''
                                 }
                             }
                         }
-//                        stage ('Create namespace in if it does not exist') {
-//                            steps {
-//                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-//                                    sh '''
-//                                    kubectl create namespace evol-$NAMESPACE_NAME
-//                                    '''
-//                                }
-//                            }              
-//                        }
+                        stage ('Create namespace in if it does not exist') {
+                            steps {
+                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                                    sh '''
+                                    echo "kubectl create namespace evol-$NAMESPACE_NAME"
+                                    '''
+                                }
+                            }              
+                        }
                     }
                 }
             }
@@ -117,14 +116,15 @@ pipeline {
                     --docker-username=AWS
                     '''
                 }    
-            }
-            stage ('Initiate and configure app in kubernetes') {
-                steps {
-                    dir ("${env.WORKSPACE}") {
-                        sh '''
-                        helm install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
-                        '''
-                    }
+            }    
+        }
+        stage ('Initiate and configure app in kubernetes') {
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    helm install --debug --kubeconfig /home/contint/.kube/config --create-namespace --n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    sleep 100
+                    '''
                 }
             }
         }
