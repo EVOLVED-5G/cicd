@@ -64,8 +64,8 @@ pipeline {
         }
         stage ('Destroy/Uninstall app in kubernetes') {
             when {
-                anyOf {
-                    expression { DEPLOYMENT == "kubernetes-athens"; DEPLOYMENT == "kubernetes-uma" }
+                allOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
                 }
             }
             steps {
