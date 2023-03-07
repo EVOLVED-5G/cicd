@@ -45,7 +45,7 @@ pipeline {
         HOSTNAME="${params.HOSTNAME}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        RELEASE_NAME = "capif"
+        RELEASE_NAME = "${params.RELEASE_NAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
