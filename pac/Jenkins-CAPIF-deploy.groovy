@@ -71,6 +71,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
                     kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}
+                    kubectl create namespace $DEPLOYMENT_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
                     --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}                                                     \
