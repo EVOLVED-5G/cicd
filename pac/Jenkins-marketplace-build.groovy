@@ -142,7 +142,7 @@ pipeline {
         }
         cleanup{
             /* clean up our workspace */
-            // deleteDir()
+            deleteDir()
             /* clean up tmp directory */
             dir("${env.workspace}@tmp") {
                 deleteDir()
