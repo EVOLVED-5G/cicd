@@ -96,7 +96,7 @@ pipeline {
                         [image.tokenize(), name.tokenize()].transpose().each { x ->
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":${VERSION}.${BUILD_NUMBER} """
                             sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":latest"""
-                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/"${x[1]}" """
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/nef/"${x[1]}" """
                         }
                     }
                 }               
