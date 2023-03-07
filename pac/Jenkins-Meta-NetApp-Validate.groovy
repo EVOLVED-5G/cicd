@@ -137,7 +137,8 @@ pipeline {
                 script {
                     def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: false,
                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet")]
+                                                string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet"),
+                                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
                     //buildResults['deploy-capif'] = jobResult
@@ -164,10 +165,11 @@ pipeline {
                     def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: false,
                      parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'HOSTNAME', value: "nef.apps.ocp-epg.hi.inet" ),
+                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
                                 booleanParam(name: 'REPORTING', value: "openshift")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy NEF' returned result: ${jobResult}"
-                    //buildResults['deploy-nef'] = jobResult
+                    buildResults['deploy-nef'] = jobResult
                 }
             }
         }
@@ -182,7 +184,7 @@ pipeline {
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                    //buildResults['validate-nef'] = jobResult
+                    buildResults['validate-nef'] = jobResult
                 }
             }
         }
@@ -203,6 +205,7 @@ pipeline {
         }
 
         //Review Parameters
+        //jenkins-dummy
         stage('Validation: Test NetApp Networking'){
             steps{
                 script {
@@ -254,6 +257,7 @@ pipeline {
         }
 
         //Review Parameters
+        //jenkins-dummy
         stage('Validation: NEF Services as SessionWithQoS'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
@@ -266,6 +270,7 @@ pipeline {
         }
 
         //Review Parameters
+        //jenkins-dummy
         stage('Validation: NEF Services MonitoringEvent API'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
@@ -278,6 +283,7 @@ pipeline {
         }
 
         //Review Parameters
+        //jenkins-dummy
         stage('Validation: NEF Services MonitoringEvent'){
             steps{
                 build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,

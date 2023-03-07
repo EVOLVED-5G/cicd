@@ -32,60 +32,24 @@ pipeline {
     }
 
     stages {        
-        stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+        stage ("Login in openshift"){
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN -n evol5-capif
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
         }
-        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
             when {
                 allOf {
-                    expression { DEPLOYMENT == "evol5-athens"}
+                    expression { DEPLOYMENT == "kubernetes-athens"}
                 }
             }
             steps {
@@ -101,12 +65,30 @@ pipeline {
                 }    
             }    
         }
-        stage ('Initiate and configure app in kubernetes') {
+        stage ('Upgrade app in kubernetes') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
+                }
+            }
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOY_NAME ./cd/helm/$DEPLOY_NAME/
-                    sleep 100
+                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    '''
+                }
+            }
+        }
+        stage ('Upgrade app in Openshift') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "openshift"}
+                }
+            }
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    helm upgrade --install --debug --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
                     '''
                 }
             }
