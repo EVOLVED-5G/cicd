@@ -35,14 +35,17 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
+        string(name: 'VERSION', defaultValue: '3.0', description: 'Version')
+        string(name: 'RELEASE_NAME', defaultValue: 'capif', description: 'Release name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
+        VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "capif"
+        RELEASE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -70,11 +73,11 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}
-                    kubectl create namespace $DEPLOYMENT_NAME-${BUILD_NUMBER}
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$RELEASE_NAME-${BUILD_NUMBER}
+                    kubectl create namespace $RELEASE_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}                                                     \
+                    --namespace=$RELEASE_NAME-${BUILD_NUMBER}                                                     \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     '''
@@ -90,7 +93,12 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $DEPLOYMENT_NAME-${BUILD_NUMBER} --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
+                    --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
+                    --wait $RELEASE_NAME ./cd/helm/$RELEASE_NAME/ \
+                    --set nef_hostname=$HOSTNAME --set env=$DEPLOYMENT \
+                    --set version=$VERSION \
+                    --atomic
                     '''
                 }
             }
@@ -104,7 +112,10 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --craete-namespace -n evol5-$DEPLOYMENT_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    helm upgrade --install --debug --craete-namespace -n evol5-$RELEASE_NAME \
+                    --wait $RELEASE_NAME ./cd/helm/$RELEASE_NAME/ --set nef_hostname=$HOSTNAME \
+                    --set env=$DEPLOYMENT --set version=$VERSION \
+                    --atomic
                     '''
                 }
             }
