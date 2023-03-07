@@ -73,7 +73,7 @@ pipeline {
                     kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$$DEPLOYMENT_NAME-${BUILD_NUMBER}                                                     \
+                    --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}                                                     \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     '''
