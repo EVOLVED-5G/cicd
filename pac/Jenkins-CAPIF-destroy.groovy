@@ -30,7 +30,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'RELEASE_NAME', defaultValue: 'develop', description: 'Release name')
+        string(name: 'RELEASE_NAME', defaultValue: 'capif-test', description: 'Release name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
