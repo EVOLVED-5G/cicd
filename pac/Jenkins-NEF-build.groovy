@@ -39,8 +39,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
                     make prepare-dev-env
-
-
+                    sed -i "s,EXTERNAL_NET=.*,EXTERNAL_NET=false,g" .env
                     EXTERNAL_NET=false
                     '''
                 }
