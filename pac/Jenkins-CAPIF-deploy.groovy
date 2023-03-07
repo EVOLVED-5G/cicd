@@ -43,7 +43,6 @@ pipeline {
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         DEPLOYMENT_NAME = "capif"
-        NAMESPACE_NAME = "capif"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -71,10 +70,10 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$DEPLOYMENT_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$NAMESPACE_NAME                                                     \
+                    --namespace=$$DEPLOYMENT_NAME-${BUILD_NUMBER}                                                     \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     '''
@@ -90,7 +89,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $DEPLOYMENT_NAME-${BUILD_NUMBER} --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
                     '''
                 }
             }
@@ -104,7 +103,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --craete-namespace -n evol5-$NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    helm upgrade --install --debug --craete-namespace -n evol5-$DEPLOYMENT_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
                     '''
                 }
             }
