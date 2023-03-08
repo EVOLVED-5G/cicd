@@ -105,7 +105,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug -n evol5-$RELEASE_NAME \
+                    helm upgrade --install --debug -n evol5-netapp \
                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
                     --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
                     --set env=$DEPLOYMENT \
