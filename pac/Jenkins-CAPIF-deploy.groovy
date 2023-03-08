@@ -96,7 +96,7 @@ pipeline {
                            RELEASE_NAME="capif"
                            OUTPUT=($(helm ls --all-namespaces -q -f $RELEASE_NAME))
                            echo "$OUTPUT"
-                           ARRAY=$(declare -p OUTPUT | grep -q '^declare \-a' && echo array || echo no array)
+                           ARRAY=$(declare -p OUTPUT | grep -q '^declare -a' && echo array || echo no array)
                             if [[ $ARRAY == "array" ]]; then
                                 echo "this is array"
                                 if [[ " ${OUTPUT[@]} " =~ " ${RELEASE_NAME} " ]]; then
