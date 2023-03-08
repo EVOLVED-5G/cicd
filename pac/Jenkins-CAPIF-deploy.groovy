@@ -88,6 +88,7 @@ pipeline {
             when {
                 allOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
+                    expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
             steps {
