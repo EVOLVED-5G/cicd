@@ -123,7 +123,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --craete-namespace -n evol5-$RELEASE_NAME \
+                    helm upgrade --install --debug --create-namespace -n evol5-$RELEASE_NAME \
                     --wait $RELEASE_NAME ./cd/helm/capif/ --set nef_hostname=$HOSTNAME \
                     --set env=$DEPLOYMENT --set version=$VERSION \
                     --atomic
