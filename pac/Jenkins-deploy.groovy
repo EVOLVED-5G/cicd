@@ -85,6 +85,9 @@ pipeline {
                                     exit 1
                                 else
                                     echo "applying helm"
+                                    echo "$RELEASE_NAME"
+                                    echo "$FOLDER_NETWORK_APP"
+                                    echo "$DEPLOYMENT"
                                     helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
                                     --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
                                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
