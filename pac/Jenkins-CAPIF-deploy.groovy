@@ -36,7 +36,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
         string(name: 'VERSION', defaultValue: '3.0', description: 'Version')
-        string(name: 'RELEASE_NAME', defaultValue: 'capif', description: 'Release name')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-capif', description: 'Release name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
