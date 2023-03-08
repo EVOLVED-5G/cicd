@@ -87,6 +87,7 @@ pipeline {
                                     --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
                                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
                                     --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                                    --set env=$DEPLOYMENT \
                                     --atomic
                                 fi
                             fi
@@ -107,6 +108,7 @@ pipeline {
                     helm upgrade --install --debug -n evol5-$RELEASE_NAME \
                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
                     --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                    --set env=$DEPLOYMENT \
                     --atomic
                     '''
                 }

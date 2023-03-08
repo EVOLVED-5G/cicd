@@ -24,6 +24,10 @@ spec:
       labels:
         io.kompose.service: dbnetapp
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}   
       containers:
         - env:
             - name: POSTGRES_DB
@@ -33,7 +37,11 @@ spec:
             - name: POSTGRES_USER
               value: evolveclient
           name: dbnetapp
+          {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netapppostgres:latest
+          {{- else }}
           image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netapppostgres:latest
+          {{- end }}
           ports:
             - containerPort: 5432
           resources: {}

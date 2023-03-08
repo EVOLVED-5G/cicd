@@ -24,6 +24,10 @@ spec:
       labels:
         io.kompose.service: netappdjango
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
         - args:
             - ./wait_db.sh
@@ -31,7 +35,11 @@ spec:
             - --
             - sh
             - docker_start_up.sh
+          {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango:latest
+          {{- else }}
           image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
+          {{- end }}
           name: netappdjango
           env:
             - name: POSTGRES_PASSWORD
