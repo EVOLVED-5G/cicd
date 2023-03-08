@@ -58,6 +58,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
                     sh '''
+                        echo $TOKEN
                         oc login --insecure-skip-tls-verify --token=$TOKEN 
                     '''
                 }
