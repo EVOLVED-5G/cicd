@@ -92,13 +92,26 @@ pipeline {
             }
             steps {
                 dir ("${env.WORKSPACE}") {
-                    sh '''
-                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
-                    --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
-                    --wait $RELEASE_NAME ./cd/helm/capif/ \
-                    --set nef_hostname=$HOSTNAME --set env=$DEPLOYMENT \
-                    --set version=$VERSION \
-                    --atomic
+                    sh '''#!/bin/bash
+                           RELEASE_NAME="capif"
+                           OUTPUT=($(helm ls --all-namespaces -q -f $RELEASE_NAME))
+                           echo "$OUTPUT"
+                           ARRAY=$(declare -p OUTPUT | grep -q '^declare \-a' && echo array || echo no array)
+                            if [[ $ARRAY == "array" ]]; then
+                                echo "this is array"
+                                if [[ " ${OUTPUT[@]} " =~ " ${RELEASE_NAME} " ]]; then
+                                    echo "Release name $RELEASE_NAME already exists, use another release name"
+                                    exit 1
+                                else
+                                    echo "applying helm"
+                                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
+                                    --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
+                                    --wait $RELEASE_NAME ./cd/helm/capif/ \
+                                    --set nef_hostname=$HOSTNAME --set env=$DEPLOYMENT \
+                                    --set version=$VERSION \
+                                    --atomic
+                                fi
+                            fi
                     '''
                 }
             }
