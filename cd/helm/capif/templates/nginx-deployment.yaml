@@ -24,11 +24,19 @@ spec:
       labels:
         io.kompose.service: nginx
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
-        - env:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_nginx_1-{{ .Values.version }} 
+        {{- else }}
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_nginx_1:{{ .Values.version }}"
+        {{- end }}
+          env:
             - name: CAPIF_HOSTNAME
-              value: {{ .Values.capif_hostname }} 
-          image: "dockerhub.hi.inet/evolved-5g/capif/services_nginx_1:{{ .Values.version }}"
+              value: {{ .Values.capif_hostname }}  
           name: nginx
           ports:
             - containerPort: 8080

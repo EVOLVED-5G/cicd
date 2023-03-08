@@ -41,6 +41,6 @@ status:
     routerCanonicalHostname: router-ingress-tid-es.apps.ocp-epg.pre.tid.es
     routerName: ingress-tid-es
     wildcardPolicy: None
-{{ else }}
+{{- else }}
 # Default case
 {{- end }}

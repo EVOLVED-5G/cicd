@@ -25,8 +25,18 @@ spec:
       labels:
         io.kompose.service: redis
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_redis_1-{{ .Values.version }}
+          imagePullPolicy: Always
+        {{- else}}
         - image: "dockerhub.hi.inet/evolved-5g/capif/services_redis_1:{{ .Values.version }}"
+          imagePullPolicy: Always
+        {{- end }}
           command:
           - redis-server
           name: redis
@@ -39,6 +49,6 @@ spec:
       restartPolicy: Always
 status: {}
 
-{{ else }}
+{{- else }}
 # Default case
 {{- end }}
