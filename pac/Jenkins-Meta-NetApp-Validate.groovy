@@ -88,21 +88,21 @@ pipeline {
             }
         }
 
-        stage('Validation: OpenSource Licenses Report'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                    buildResults['opensource-license'] = jobResult
-                }
-            }
-        }
+//        stage('Validation: OpenSource Licenses Report'){
+//            steps{
+//                script {
+//                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+//                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+//                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+//                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+//                    def jobResult = jobBuild.getResult()
+//                    echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+//                    buildResults['opensource-license'] = jobResult
+//                }
+//            }
+//        }
 
         stage('Validation: Build validation image  Report'){
             steps{
