@@ -105,7 +105,7 @@ pipeline {
                                     helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
                                     --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
                                     --wait $RELEASE_NAME ./cd/helm/capif/ \
-                                    --set nef_hostname=$HOSTNAME --set env=$DEPLOYMENT \
+                                    --set capif_hostname=$HOSTNAME --set env=$DEPLOYMENT \
                                     --set version=$VERSION \
                                     --atomic
                                 fi
@@ -124,7 +124,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     helm upgrade --install --debug -n evol5-$RELEASE_NAME \
-                    --wait $RELEASE_NAME ./cd/helm/capif/ --set nef_hostname=$HOSTNAME \
+                    --wait $RELEASE_NAME ./cd/helm/capif/ --set capif_hostname=$HOSTNAME \
                     --set env=$DEPLOYMENT --set version=$VERSION \
                     --atomic
                     '''
