@@ -98,7 +98,6 @@ pipeline {
                            echo "$OUTPUT"
                            ARRAY=$(declare -p OUTPUT | grep -q '^declare -a' && echo array || echo no array)
                             if [[ $ARRAY == "array" ]]; then
-                                echo "this is array"
                                 if [[ " ${OUTPUT[@]} " =~ " ${RELEASE_NAME} " ]]; then
                                     echo "Release name $RELEASE_NAME already exists, use another release name"
                                     exit 1
