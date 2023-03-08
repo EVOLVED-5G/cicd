@@ -18,6 +18,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'HOSTNAME', defaultValue: 'dummy-network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'RELEASE_NAME', defaultValue: 'dummy-network-app', description: 'Name to NetworkApp')
         string(name: 'FOLDER_NETWORK_APP', defaultValue: 'dummy-network-app', description: 'Folder where the NetworkApp is')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
@@ -27,6 +28,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         RELEASE_NAME = "${params.RELEASE_NAME}"
+        HOSTNAME = "${params.HOSTNAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -86,7 +88,7 @@ pipeline {
                                     helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
                                     --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
                                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
-                                    --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                                    --set hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
                                     --set env=$DEPLOYMENT \
                                     --atomic
                                 fi
@@ -107,7 +109,7 @@ pipeline {
                     sh '''
                     helm upgrade --install --debug -n evol5-netapp \
                     --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
-                    --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                    --set hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
                     --set env=$DEPLOYMENT \
                     --atomic
                     '''
