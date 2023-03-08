@@ -55,7 +55,7 @@ pipeline {
                     }
                 }
             steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                withCredentials([string(credentialsId: 'openshiftv4-nef', variable: 'TOKEN')]) {
                     sh '''
                         oc login --insecure-skip-tls-verify --token=$TOKEN 
                     '''
