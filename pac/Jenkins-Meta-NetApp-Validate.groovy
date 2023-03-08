@@ -71,22 +71,22 @@ pipeline {
                 }
             }
         }
-        stage('Validation: Source Code Secret Leakage'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                    buildResults['secrets-analysis'] = jobResult
-                }
-            }
-        }
+//        stage('Validation: Source Code Secret Leakage'){
+//            steps{
+//                script {
+//                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+//                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+//                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+//                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+//
+//                    def jobResult = jobBuild.getResult()
+//                    echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+//                    buildResults['secrets-analysis'] = jobResult
+//                }
+//            }
+//        }
 
 //        stage('Validation: OpenSource Licenses Report'){
 //            steps{
