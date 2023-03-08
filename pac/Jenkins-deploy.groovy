@@ -17,17 +17,16 @@ pipeline {
     }
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
-        string(name: 'DEPLOY_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
+        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-network-app', description: 'Name to NetworkApp')
+        string(name: 'FOLDER_NETWORK_APP', defaultValue: 'dummy-network-app', description: 'Folder where the NetworkApp is')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
-        DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOY_NAME}"
-        NAMESPACE_NAME = "fogus" //Parametrized here and create an universal pipeline for building
+        RELEASE_NAME = "${params.RELEASE_NAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -55,10 +54,10 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$RELEASE_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$NAMESPACE_NAME                                                     \
+                    --namespace=$RELEASE_NAME-${BUILD_NUMBER}                                                 \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     '''
@@ -73,9 +72,25 @@ pipeline {
             }
             steps {
                 dir ("${env.WORKSPACE}") {
-                    sh '''
-                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config --create-namespace -n $NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    sh '''#!/bin/bash
+                           OUTPUT=($(helm ls --all-namespaces -q -f $RELEASE_NAME))
+                           echo "$OUTPUT"
+                           ARRAY=$(declare -p OUTPUT | grep -q '^declare -a' && echo array || echo no array)
+                            if [[ $ARRAY == "array" ]]; then
+                                if [[ " ${OUTPUT[@]} " =~ " ${RELEASE_NAME} " ]]; then
+                                    echo "Release name $RELEASE_NAME already exists, use another release name"
+                                    exit 1
+                                else
+                                    echo "applying helm"
+                                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
+                                    --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
+                                    --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
+                                    --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                                    --atomic
+                                fi
+                            fi
                     '''
+
                 }
             }
         }
@@ -88,7 +103,10 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm upgrade --install --debug --create-namespace -n evol5-$NAMESPACE_NAME --wait $DEPLOYMENT_NAME ./cd/helm/$DEPLOYMENT_NAME/ --set nef_hostname=$HOSTNAME --atomic
+                    helm upgrade --install --debug -n evol5-$RELEASE_NAME \
+                    --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
+                    --set nef_hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                    --atomic
                     '''
                 }
             }
