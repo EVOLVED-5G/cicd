@@ -49,8 +49,9 @@ pipeline {
         }
         stage ('Log into AWS ECR') {
             when {
-                allOf {
+                anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens"}
+                    expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
             steps {
@@ -69,8 +70,9 @@ pipeline {
         }
         stage ('Upgrade app in kubernetes') {
             when {
-                allOf {
+                anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
+                    expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
             steps {
