@@ -30,7 +30,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'DEPLOY_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -38,7 +38,7 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOY_NAME}"
+        RELEASE_NAME = "${params.RELEASE_NAME}"
         NAMESPACE_NAME = "fogus"
         DEPLOYMENT = "${params.DEPLOYMENT}"
 
@@ -68,7 +68,9 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $DEPLOYMENT_NAME -n $NAMESPACE_NAME --wait
+                    NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
+                    echo $NAMESPACE
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME -n $NAMESPACE --wait
                     '''
                 }
             }
@@ -82,7 +84,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm uninstall --debug $DEPLOYMENT_NAME -n evol5-$NAMESPACE_NAME --wait
+                    helm uninstall --debug $RELEASE_NAME -n evol5-$NAMESPACE_NAME --wait
                     '''
                 }
             }
