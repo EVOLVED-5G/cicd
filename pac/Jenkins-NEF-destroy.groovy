@@ -87,7 +87,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm uninstall --debug $RELEASE_NAME -n evol5-$NAMESPACE_NAME --wait
+                    helm uninstall --debug $RELEASE_NAME -n evol5-$RELEASE_NAME --wait
                     '''
                 }
             }
