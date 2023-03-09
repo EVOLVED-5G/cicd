@@ -365,8 +365,7 @@ pipeline {
                 def get_emails = '''json=$(curl https://evolvedpipes.apps.ocp-epg.tid.es/job/info/${JOB_ID} -H "Accept: application/json" -H "username: administrator" -H "password: Pachetaa");echo $json | jq -r | jq '.emails[]' | jq -r;'''
                 def emails = sh(returnStdout: true, script: get_emails)
                 emails.tokenize().each() {
-                    email -> emailext body: 'Hola cara bola',
-                             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    email -> emailext subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                              from: 'jenkins-evolved5G@tid.es',
                              to: email
                 }
