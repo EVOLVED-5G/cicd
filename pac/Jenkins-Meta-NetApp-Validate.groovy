@@ -22,13 +22,13 @@ pipeline {
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
-        string(name: 'HOSTNAME_NETAPP', defaultValue: 'dummy-network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
+        string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment netapp name')
         string(name: 'VERSION_CAPIF', defaultValue: '3.0', description: 'Version CAPIF')
-        string(name: 'RELEASE_CAPIF', defaultValue: 'dummy-capif', description: 'Release name to CAPIF')
-        string(name: 'RELEASE_NEF', defaultValue: 'dummy-nef', description: 'Release name to NEF')
-        string(name: 'APP_REPLICAS_NETAPP', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Release name to CAPIF')
+        string(name: 'RELEASE_NEF', defaultValue: 'nef', description: 'Release name to NEF')
+        string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         choice(name: 'ENVIRONMENT', choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
