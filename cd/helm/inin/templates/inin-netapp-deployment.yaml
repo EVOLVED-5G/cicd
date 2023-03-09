@@ -24,8 +24,16 @@ spec:
       labels:
         io.kompose.service: inin-netapp
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:ininrmonnetapp-latest
+        {{- else }}
         - image: dockerhub.hi.inet/evolved-5g/ininrmonnetapp:latest
+        {{- end }}
           env:
             - name: NET_APP_NAME
               value: {{ .Values.NET_APP_NAME}}
