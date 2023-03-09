@@ -148,7 +148,7 @@ pipeline {
                                                 string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                    //buildResults['deploy-capif'] = jobResult
+                    buildResults['deploy-capif'] = jobResult
                 }
             }
         }
@@ -161,7 +161,7 @@ pipeline {
                                                 string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                    //buildResults['validate-capif'] = jobResult
+                    buildResults['validate-capif'] = jobResult
                 }
             }
         }
