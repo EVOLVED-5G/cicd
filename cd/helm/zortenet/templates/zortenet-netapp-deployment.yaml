@@ -25,8 +25,16 @@ spec:
         io.kompose.network/demo-network: "true"
         io.kompose.service: zortenet-netapp
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:zortenetnetapp-zorte_netapp-latest
+        {{- else }}
         - image: dockerhub.hi.inet/evolved-5g/zortenetnetapp/zortenetnetapp-zorte_netapp:latest
+        {{- end }}
           env:
             - name: CALLBACK_ADDRESS
               value: {{ .Values.callback_address }}
