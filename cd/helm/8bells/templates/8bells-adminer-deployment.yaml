@@ -24,9 +24,17 @@ spec:
       labels:
         io.kompose.service: my-8bells-adminer
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}  
       containers:
         - name: my-8bells-adminer
+          {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_adminer-latest
+          {{- else }}
           image: dockerhub.hi.inet/evolved-5g/8bellsnetapp/8bellsnetapp-8b_netapp_adminer:latest
+          {{- end }}
           ports:
             - containerPort: 8080
           resources: {}
