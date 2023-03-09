@@ -141,26 +141,7 @@ pipeline {
                        }
                    }
                }
-               stage('Validation: Validate CAPIF'){
-                   steps{
-                       script {
-                           def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                          parameters: [string(name: 'BRANCH_NAME', value: "develop"),
-                                                       booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-                                                       string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
-                           def jobResult = jobBuild.getResult()
-                           echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                           buildResults['validate-capif'] = jobResult
-                       }
-                   }
-               }
-            }
-
-        }
-        
-        stage("Validation: NEF"){
-            parallel{
-                stage('Validation: Deploy NEF'){
+               stage('Validation: Deploy NEF'){
                     steps{
                         script {
                             def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: true,
@@ -174,6 +155,26 @@ pipeline {
                             buildResults['deploy-nef'] = jobResult
                         }
                     }
+                }
+               
+            }
+
+        }
+        
+        stage("Validation: NEF"){
+            parallel{
+                stage('Validation: Validate CAPIF'){
+                   steps{
+                       script {
+                           def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                                          parameters: [string(name: 'BRANCH_NAME', value: "develop"),
+                                                       booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
+                                                       string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                           buildResults['validate-capif'] = jobResult
+                       }
+                   }
                 }
                 stage('Validation: Validate NEF'){
                     steps{
