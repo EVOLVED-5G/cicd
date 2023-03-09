@@ -41,7 +41,7 @@ pipeline {
     }
 
     stages {
-        stage("Static Application Securirty Test - SAST"){
+        stage("Validation: Static Application Securirty Test - SAST"){
             parallel{
                 stage('Validation: Source Code Security Analysis'){
                     steps{
@@ -124,70 +124,80 @@ pipeline {
             }
         }
         
-        stage('Validation:Deploy CAPIF'){
-            steps{
-                script {
-                    def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: false,
-                                   parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet"),
-                                                string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
-                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                    buildResults['deploy-capif'] = jobResult
-                }
+        stage("Validation: CAPIF"){
+            parallel{
+                stage('Validation:Deploy CAPIF'){
+                   steps{
+                       script {
+                           def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: true,
+                                          parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                       string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet"),
+                                                       string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
+                                                       string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                       string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
+                           buildResults['deploy-capif'] = jobResult
+                       }
+                   }
+               }
+               stage('Validation: Validate CAPIF'){
+                   steps{
+                       script {
+                           def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                                          parameters: [string(name: 'BRANCH_NAME', value: "develop"),
+                                                       booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
+                                                       string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                           buildResults['validate-capif'] = jobResult
+                       }
+                   }
+               }
             }
-        }
-        stage('Validation: Validate CAPIF'){
-            steps{
-                script {
-                    def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                   parameters: [string(name: 'BRANCH_NAME', value: "develop"),
-                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-                                                string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                    buildResults['validate-capif'] = jobResult
-                }
-            }
-        }
 
-        stage('Validation: Deploy NEF'){
-            steps{
-                script {
-                    def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: false,
-                     parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'HOSTNAME', value: "nef.apps.ocp-epg.hi.inet" ),
-                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
-                                booleanParam(name: 'REPORTING', value: "openshift")]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Deploy NEF' returned result: ${jobResult}"
-                    buildResults['deploy-nef'] = jobResult
+        }
+        
+        stage("Validation: NEF"){
+            parallel{
+                stage('Validation: Deploy NEF'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: true,
+                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'HOSTNAME', value: "nef.apps.ocp-epg.hi.inet" ),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                        string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
+                                        booleanParam(name: 'REPORTING', value: "openshift")]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Deploy NEF' returned result: ${jobResult}"
+                            buildResults['deploy-nef'] = jobResult
+                        }
+                    }
+                }
+                stage('Validation: Validate NEF'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                            buildResults['validate-nef'] = jobResult
+                        }
+                    }
                 }
             }
         }
-        stage('Validation: Validate NEF'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                    buildResults['validate-nef'] = jobResult
-                }
-            }
-        }
+        
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetApp'){
             steps{
                 script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: false,
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: true,
                                 parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(DEPLOY_NAME)),
                                 string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NETAPP)),
