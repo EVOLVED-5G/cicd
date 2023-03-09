@@ -55,7 +55,7 @@ pipeline {
                         report_file="report-sonar-${NETAPP_NAME}-evolved5g.pdf"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                        curl -u $PASSWORD_ARTIFACTORY $url -o report-sonar-${NETAPP_NAME}-evolved5g.pdf
+                        curl  $url -u $PASSWORD_ARTIFACTORY -o report-sonar-${NETAPP_NAME}-evolved5g.pdf
                         '''
                     }
                     emails.tokenize().each() {
