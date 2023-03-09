@@ -1,3 +1,4 @@
+{{- if ne .Values.version "2.1" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -47,3 +48,7 @@ spec:
           resources: {}
       restartPolicy: Always
 status: {}
+
+{{ else }}
+# Default case
+{{- end }}
