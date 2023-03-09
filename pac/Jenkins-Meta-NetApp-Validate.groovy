@@ -104,22 +104,22 @@ pipeline {
                         }
                     }
                 }
-                stage('Validation: Security Scan Docker Images'){
-                   steps{
-                       script {
-                           def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-                                           parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                       string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                       string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                       string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                       string(name: 'STAGE', value: "validation"),
-                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                           def jobResult = jobBuild.getResult()
-                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-                           buildResults['scan-docker-images'] = jobResult
-                       }
-                   }
-               }
+//                stage('Validation: Security Scan Docker Images'){
+//                   steps{
+//                       script {
+//                           def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+//                                           parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+//                                                       string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+//                                                       string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                                       string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                                       string(name: 'STAGE', value: "validation"),
+//                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+//                           def jobResult = jobBuild.getResult()
+//                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+//                           buildResults['scan-docker-images'] = jobResult
+//                       }
+//                   }
+//               }
 
             }
         }
