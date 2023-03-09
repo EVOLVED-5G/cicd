@@ -161,34 +161,19 @@ pipeline {
 
         }
         
-        stage("Validation: Validate CAPIF and NEF"){
-            parallel{
-                stage('Validation: Validate CAPIF'){
-                   steps{
-                       script {
-                           def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                          parameters: [string(name: 'BRANCH_NAME', value: "develop"),
-                                                       booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-                                                       string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
-                           def jobResult = jobBuild.getResult()
-                           echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                           buildResults['validate-capif'] = jobResult
-                       }
+        stage("Validation: Validate CAPIF"){
+            stage('Validation: Validate CAPIF'){
+               steps{
+                   script {
+                       def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                                      parameters: [string(name: 'BRANCH_NAME', value: "develop"),
+                                                   booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
+                                                   string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
+                       def jobResult = jobBuild.getResult()
+                       echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                       buildResults['validate-capif'] = jobResult
                    }
-                }
-                stage('Validation: Validate NEF'){
-                    steps{
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                        booleanParam(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                            buildResults['validate-nef'] = jobResult
-                        }
-                    }
-                }
+               }
             }
         }
         
@@ -210,6 +195,19 @@ pipeline {
                 }
             }
         }
+        stage('Validation: Onboarding NetworkApp to CAPIF'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                        booleanParam(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                            buildResults['validate-nef'] = jobResult
+                        }
+                    }
+                }
 
         //Review Parameters
         //jenkins-dummy
