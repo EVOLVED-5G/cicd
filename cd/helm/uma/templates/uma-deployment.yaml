@@ -24,6 +24,10 @@ spec:
       labels:
         io.kompose.service: uma-netapp
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
       containers:
         - env:
             - name: NEFHOST
@@ -59,7 +63,11 @@ spec:
             - name: PATH_TO_CERTS
               value: : "/usr/src/app/certs"
           name: uma-netapp
+          {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-netapp-latest
+          {{- else }}
           image: dockerhub.hi.inet/evolved-5g/umacsictest/umacsictest-netapp:latest
+          {{- end }}
           ports:
             - containerPort: 10001
           resources: {}
