@@ -124,7 +124,7 @@ pipeline {
             }
         }
         
-        stage("Validation: CAPIF"){
+        stage("Validation: Deploy CAPIF and NEF"){
             parallel{
                 stage('Validation:Deploy CAPIF'){
                    steps{
@@ -161,7 +161,7 @@ pipeline {
 
         }
         
-        stage("Validation: NEF"){
+        stage("Validation: Validate CAPIF and NEF"){
             parallel{
                 stage('Validation: Validate CAPIF'){
                    steps{
