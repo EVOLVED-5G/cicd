@@ -47,12 +47,29 @@ pipeline {
     post {
         always {
             script {
-                def get_emails = '''json=$(curl https://evolvedpipes.apps.ocp-epg.tid.es/job/info/${JOB_ID} -H "Accept: application/json" -H "username: administrator" -H "password: Pachetaa");echo $json | jq -r | jq '.emails[]' | jq -r;'''
-                def emails = sh(returnStdout: true, script: get_emails)
-                emails.tokenize().each() {
-                    email -> emailext subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                             from: 'jenkins-evolved5G@tid.es',
-                             to: email
+                if (emails?.trim()) {
+                    dir ("${WORKSPACE}/") {
+                        sh '''#!/bin/bash
+
+                        report_file="report-sonar-${NETAPP_NAME}-evolved5g.pdf"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+
+                        curl -u $PASSWORD_ARTIFACTORY "$url" -o "report-sonar-${NETAPP_NAME}-evolved5g.pdf"
+                        '''
+                    }
+                    emails.tokenize().each() {
+                        // email -> emailext subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                        //          from: 'jenkins-evolved5G@tid.es',
+                        //          to: email
+                        email -> attachmentsPattern: '**/report-sonar-${NETAPP_NAME}-evolved5g.pdf',
+                                //  attachmentsPattern: '**/report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
+                                 body: '''${SCRIPT, template="groovy-html.template"}''',
+                                 mimeType: 'text/html',
+                                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                 from: 'jenkins-evolved5G@tid.es',
+                                 replyTo: "jenkins-evolved5G",
+                                 to: email
+                    }
                 }
             }
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
