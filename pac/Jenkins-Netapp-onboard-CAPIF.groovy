@@ -20,7 +20,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'RELEASE_NAME', defaultValue: 'nef', description: 'Helm release name')
+        string(name: 'RELEASE_NAME', defaultValue: 'fogus', description: 'Helm release name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 // Parsear información sobre los logs de CAPIF y obtener la traza que demuestra que la NETAPP ha sido onboarded
