@@ -33,6 +33,7 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
     }
 
     stages {
