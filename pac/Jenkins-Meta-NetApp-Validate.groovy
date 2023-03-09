@@ -362,19 +362,14 @@ pipeline {
     post {
         always {
             script {
-                def get_emails = ''' 
-                                    json=$(curl https://evolvedpipes.apps.ocp-epg.tid.es/job/info/6248 -H "Accept: application/json" -H "username: administrator" -H "password: Pachetaa");
-                                    echo $json | jq -r | jq '.emails[]' | jq -r;
-                                 '''
+                def get_emails = '''json=$(curl https://evolvedpipes.apps.ocp-epg.tid.es/job/info/${JOB_ID} -H "Accept: application/json" -H "username: administrator" -H "password: Pachetaa");echo $json | jq -r | jq '.emails[]' | jq -r;'''
                 def emails = sh(returnStdout: true, script: get_emails)
-                emails
-                    .tokenize()
-                    .each() {
-                        x ->    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                                         subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                                         from: 'jenkins-evolved5G@tid.es',
-                                         to: "${x}"
-                    }
+                emails.tokenize().each() {
+                    email -> emailext body: 'Hola cara bola',
+                             subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                             from: 'jenkins-evolved5G@tid.es',
+                             to: email
+                }
             }
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
