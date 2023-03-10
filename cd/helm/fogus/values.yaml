@@ -2,3 +2,12 @@
 app_replicas: 1
 hostname: fogus.apps.ocp-epg.hi.inet
 env: "openshift"
+capif:
+  hostname: capif.apps.ocp-epg.hi.inet
+  http_port: "30048"
+  https_port: "30548"
+
+nef:
+  hostname: nef.apps.ocp-epg.hi.inet
+
+ingress_ip: "10.161.1.117"
