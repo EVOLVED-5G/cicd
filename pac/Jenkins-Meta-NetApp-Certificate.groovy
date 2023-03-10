@@ -427,6 +427,7 @@ pipeline {
     }
     post {
         always {
+            // Nettaps emails to send the report
             if (emails?.trim()) {
                 dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
