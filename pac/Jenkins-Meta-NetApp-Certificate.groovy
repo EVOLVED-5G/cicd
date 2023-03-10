@@ -427,6 +427,30 @@ pipeline {
     }
     post {
         always {
+            if (emails?.trim()) {
+                dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+
+                    report_file="report-sonar-${NETAPP_NAME}-evolved5g.pdf"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+
+                    curl  $url -u $PASSWORD_ARTIFACTORY -o report-sonar-${NETAPP_NAME}-evolved5g.pdf
+                    '''
+                }
+                emails.tokenize().each() {
+                    // email -> emailext subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    //          from: 'jenkins-evolved5G@tid.es',
+                    //          to: email
+                    email -> emailext attachmentsPattern: "**/report-sonar-${NETAPP_NAME}-evolved5g.pdf",
+                            //  attachmentsPattern: '**/report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
+                                body: '''${SCRIPT, template="groovy-html.template"}''',
+                                mimeType: 'text/html',
+                                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                from: 'jenkins-evolved5G@tid.es',
+                                replyTo: "jenkins-evolved5G",
+                                to: email
+                }
+            }
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
