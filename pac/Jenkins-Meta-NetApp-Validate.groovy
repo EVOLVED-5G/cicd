@@ -200,7 +200,7 @@ pipeline {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
                                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
-                                        booleanParam(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Validate NEF' returned result: ${jobResult}"
                             buildResults['validate-nef'] = jobResult
