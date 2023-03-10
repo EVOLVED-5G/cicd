@@ -439,11 +439,7 @@ pipeline {
                     '''
                 }
                 emails.tokenize().each() {
-                    // email -> emailext subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                    //          from: 'jenkins-evolved5G@tid.es',
-                    //          to: email
                     email -> emailext attachmentsPattern: "**/report-sonar-${NETAPP_NAME}-evolved5g.pdf",
-                            //  attachmentsPattern: '**/report_Evolved5g-${NETAPP_NAME}-${GIT_NETAPP_BRANCH}.html.txt',
                                 body: '''${SCRIPT, template="groovy-html.template"}''',
                                 mimeType: 'text/html',
                                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
