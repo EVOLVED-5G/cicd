@@ -84,11 +84,10 @@ stages {
 
         stage('Verify is NetworkApp is onboarded - Openshift') {
             when {
-                anyOf {
-                    expression { DEPLOYMENT == "kubernetes-athens" }
-                    expression { DEPLOYMENT == "kubernetes-uma" }
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
+                    }
                 }
-            }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
