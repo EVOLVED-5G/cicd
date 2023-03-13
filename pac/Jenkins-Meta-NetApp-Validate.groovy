@@ -359,17 +359,17 @@ pipeline {
                 //jenkins-dummy
                 stage('Validation: NEF Services as SessionWithQoS'){
                     steps{
-                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
-                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                        def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                            buildResults['nef-services-as-sessionwithqos'] = jobResult
-
-
+                        script{
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                                buildResults['nef-services-as-sessionwithqos'] = jobResult
+                        }
                     }
                 }       
 
@@ -377,15 +377,17 @@ pipeline {
                 //jenkins-dummy
                 stage('Validation: NEF Services MonitoringEvent API'){
                     steps{
-                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
-                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                        def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                            buildResults['nef-services-monitoringevent-api'] = jobResult
+                        script {
+                           def jobBuild = build job: '/003-NETAPPS/003-Helpers/011-NEF Services MonitoringEvent API', wait: true, propagate: false,
+                               parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                           string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                           string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                           string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                           booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                           buildResults['nef-services-monitoringevent-api'] = jobResult
+                        }
                     }
                 }       
 
@@ -393,15 +395,17 @@ pipeline {
                 //jenkins-dummy
                 stage('Validation: NEF Services MonitoringEvent'){
                     steps{
-                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
-                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                        def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                            buildResults['nef-services-monitoringevent'] = jobResult
+                        script{
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                                buildResults['nef-services-monitoringevent'] = jobResult
+                        }
                     }
                 }
 
