@@ -24,7 +24,7 @@ spec:
       labels:
         io.kompose.service: infolysis-netapp
     spec:
-    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
       imagePullSecrets:
         - name: regcred
       {{- end }}
