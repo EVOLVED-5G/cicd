@@ -175,18 +175,16 @@ pipeline {
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
                }
-               dir ("${env.WORKSPACE}") {
-                      if (${jobResult} == "FAILURE" ) {
-                       sh '''
+               if (${jobResult} == "FAILURE" ) {
+                sh '''
                        NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_CAPIF | awk 'NR==2{print $2}')
                        echo $NAMESPACE
                        helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_CAPIF -n $NAMESPACE --wait
                        '''
-                      } else {
+               } else {
                         echo "Dentro del If en el else: ${jobResult}"
 
                     }
-                }
            }
 
         }
