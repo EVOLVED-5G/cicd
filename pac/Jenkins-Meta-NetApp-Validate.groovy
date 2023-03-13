@@ -180,8 +180,8 @@ pipeline {
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                            string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                           def destroyJob = destroyJob.getResult()
-                           echo "Build of 'Destroy CAPIF' returned result: ${destroyJob}"
+                    def destroyJob = destroyJob.getResult()
+                    echo "Build of 'Destroy CAPIF' returned result: ${destroyJob}"
                    }else{
                     echo "All was OK"
                    }
