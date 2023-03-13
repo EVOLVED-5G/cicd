@@ -31,19 +31,19 @@ spec:
       containers:
         - env:
             - name: NEFHOST
-              value: http://evol5-capif-nef.apps.ocp-epg.hi.inet
+              value: "http://evol5-capif-nef.apps.ocp-epg.hi.inet"
             - name: FLASK_APP 
               value: "main.py"
             - name: SECRET_KEY 
-              value: '7110c8ae51a4b5af97be6534caefs0e4bb9bdcb3380af00sr50b23a5d1616bf319bc298105da20fe'
+              value: "7110c8ae51a4b5af97be6534caefs0e4bb9bdcb3380af00sr50b23a5d1616bf319bc298105da20fe"
             - name: SQLALCHEMY_DATABASE_URI 
-              value: "postgresql://netapp:secret@postgres_container:5433/netappdb" 
+              value: "postgresql://netapp:secret@postgres-container:5433/netappdb" 
             - name: SQLALCHEMY_TRACK_MODIFICATIONS 
-              value: False
+              value: "False"
             - name: SHOW_SQLALCHEMY_LOG_MESSAGES
-              value: False
+              value: "False"
             - name: ERROR_404_HELP 
-              value: False
+              value: "False"
             - name: CAPIFHOST 
               value: {{ .Values.capif_hostname }}
             - name: CAPIFHTTPS 
@@ -51,7 +51,7 @@ spec:
             - name: CAPIFHTTP 
               value: "80"
             - name:  CALLBACK_ADDRESS
-              value: uma.apps.ocp-epg.hi.inet
+              value: "uma.apps.ocp-epg.hi.inet"
             - name: POSTGRES_USER
               value: "netapp"
             - name: POSTGRES_PASSWORD
