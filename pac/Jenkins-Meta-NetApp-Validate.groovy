@@ -167,7 +167,7 @@ pipeline {
         stage('Validation: Validate CAPIF'){
            steps{
                script {
-                   def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                   def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: true,
                                   parameters: [string(name: 'BRANCH_NAME', value: "develop"),
                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
@@ -180,31 +180,13 @@ pipeline {
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                            string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-//                    def destroyJob = destroyJob.getResult()
-//                    echo "Build of 'Destroy CAPIF' returned result: ${destroyJob}"
                    }else{
                     echo "All was OK"
                    }
                }
            }
         }
-        
-//        stage("Validation: Destroying CAPIF"){
-//            steps{
-//                echo "${jobResult}"
-//            }
-//            if (${jobResult} == "FAILURE" ) {
-//                sh '''
-//                       NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_CAPIF | awk 'NR==2{print $2}')
-//                       echo $NAMESPACE
-//                       helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_CAPIF -n $NAMESPACE --wait
-//                       '''
-//            } else {
-//                        echo "Dentro del If en el else: ${jobResult}"
-//            }
-//        }
-        
-        
+
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetworkApp'){
             steps{
@@ -233,6 +215,15 @@ pipeline {
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Validate NEF' returned result: ${jobResult}"
                             buildResults['validate-nef'] = jobResult
+                            if (jobResult == "FAILURE"){
+                            def destroyJob = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
+                                        parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                        ]
+                            }else{
+                                echo "All was OK"
+                            }
                         }
                     }
                 }
