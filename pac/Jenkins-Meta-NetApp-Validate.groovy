@@ -175,14 +175,13 @@ pipeline {
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
                    if (jobResult == "FAILURE"){
-                    def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                    def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                            string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                           def jobResult = jobBuild.getResult()
-                           echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-                           buildResults['destroy-capif'] = jobResult
+                           def destroyJob = destroyJob.getResult()
+                           echo "Build of 'Destroy CAPIF' returned result: ${destroyJob}"
                    }else{
                     echo "All was OK"
                    }
