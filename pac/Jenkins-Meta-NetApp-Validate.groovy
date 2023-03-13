@@ -38,6 +38,9 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
+        RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
+        RELEASE_NEF = "${params.RELEASE_NEF}"
+        RELEASE_NAME = "${params.DEPLOY_NAME}"
     }
 
     stages {
@@ -171,8 +174,16 @@ pipeline {
                    def jobResult = jobBuild.getResult()
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
+                   if (${jobResult} == "FAILURE" ) {
+                    sh '''
+                    NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_CAPIF | awk 'NR==2{print $2}')
+                    echo $NAMESPACE
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_CAPIF -n $NAMESPACE --wait
+                    '''
+                   }
                }
            }
+
         }
         
         
