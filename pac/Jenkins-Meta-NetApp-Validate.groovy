@@ -196,7 +196,7 @@ pipeline {
 //            } else {
 //                        echo "Dentro del If en el else: ${jobResult}"
 //            }
-        }
+//        }
         
         
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
