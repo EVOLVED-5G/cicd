@@ -174,7 +174,7 @@ pipeline {
                    def jobResult = jobBuild.getResult()
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
-                   if (${jobResult} == "FAILURE"){
+                   if (jobResult == "FAILURE"){
                     echo "Result was: ${jobResult}"
                    }else{
                     echo "all OK"
