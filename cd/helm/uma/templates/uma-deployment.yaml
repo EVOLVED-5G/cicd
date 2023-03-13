@@ -61,7 +61,7 @@ spec:
             - name: POSTGRES_DB 
               value: "netappdb"
             - name: PATH_TO_CERTS
-              value: : "/usr/src/app/certs"
+              value: "/usr/src/app/certs"
           name: uma-netapp
           {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
           image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-netapp-latest
