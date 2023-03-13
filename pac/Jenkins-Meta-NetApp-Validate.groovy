@@ -174,14 +174,19 @@ pipeline {
                    def jobResult = jobBuild.getResult()
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
+                   if (${jobResult} == "FAILURE"){
+                    echo "Result was: ${jobResult}"
+                   }else{
+                    echo "all OK"
+                   }
                }
            }
         }
         
-        stage("Validation: Destroying CAPIF"){
-            steps{
-                echo "${jobResult}"
-            }
+//        stage("Validation: Destroying CAPIF"){
+//            steps{
+//                echo "${jobResult}"
+//            }
 //            if (${jobResult} == "FAILURE" ) {
 //                sh '''
 //                       NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_CAPIF | awk 'NR==2{print $2}')
