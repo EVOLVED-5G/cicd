@@ -78,7 +78,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''#!/bin/bash
-                           OUTPUT=($(helm ls --all-namespaces -q -f $RELEASE_NAME))
+                           OUTPUT=($(helm ls --all-namespaces -q -f "^$RELEASE_NAME"))
                            echo "$OUTPUT"
                            ARRAY=$(declare -p OUTPUT | grep -q '^declare -a' && echo array || echo no array)
                             if [[ $ARRAY == "array" ]]; then
