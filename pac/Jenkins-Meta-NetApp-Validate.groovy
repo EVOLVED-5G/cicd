@@ -175,7 +175,9 @@ pipeline {
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
                }
-               if (${jobResult} == "FAILURE" ) {
+           }
+           steps {
+            if (${jobResult} == "FAILURE" ) {
                 sh '''
                        NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_CAPIF | awk 'NR==2{print $2}')
                        echo $NAMESPACE
@@ -184,9 +186,8 @@ pipeline {
                } else {
                         echo "Dentro del If en el else: ${jobResult}"
 
-                    }
+                }
            }
-
         }
         
         
