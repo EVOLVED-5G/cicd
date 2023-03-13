@@ -177,7 +177,7 @@ pipeline {
         
         
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
-        stage('Validation:  Deploy NetApp'){
+        stage('Validation:  Deploy NetworkApp'){
             steps{
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/005-Deploy NetApp', wait: true, propagate: true,
