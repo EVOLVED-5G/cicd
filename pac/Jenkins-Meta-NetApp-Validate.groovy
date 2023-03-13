@@ -180,6 +180,11 @@ pipeline {
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                            string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                    def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                                           parameters: [
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                    }else{
                     echo "All was OK"
                    }
@@ -216,11 +221,21 @@ pipeline {
                             echo "Build of 'Validate NEF' returned result: ${jobResult}"
                             buildResults['validate-nef'] = jobResult
                             if (jobResult == "FAILURE"){
-                            def destroyJob = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
+                            def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                                          parameters: [
+                                           string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                           string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                            def destroyJobNetworApp = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
+                            def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                                           parameters: [
+                                               string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                               string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             }else{
                                 echo "All was OK"
                             }
