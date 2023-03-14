@@ -12,7 +12,49 @@ spec:
     http:
       paths:
       - pathType: Prefix
-        path: "/"
+        path: "/ca-root"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/sign-csr"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/certdata"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/register"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/testdata"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/getauth"
+        backend:
+          service:
+            name: nginx
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: "/test"
         backend:
           service:
             name: nginx
