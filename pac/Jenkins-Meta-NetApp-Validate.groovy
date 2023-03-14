@@ -171,7 +171,7 @@ pipeline {
         stage('Validation: Validate CAPIF'){
            steps{
                script {
-                   def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                   def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: true,
                                   parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
