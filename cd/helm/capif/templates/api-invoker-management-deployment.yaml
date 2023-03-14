@@ -30,7 +30,7 @@ spec:
       {{- end }}
       containers:
         {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
-        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_api-provider-management_1-{{ .Values.version }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_api-invoker-management_1-{{ .Values.version }}
         {{- else }}
         - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-invoker-management_1:{{ .Values.version }}"
         {{- end }}
