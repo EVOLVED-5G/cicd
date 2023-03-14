@@ -175,7 +175,7 @@ pipeline {
                                   parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
-                                               string(name: 'CAPIF_PORT', value: "30048")
+                                               string(name: 'CAPIF_PORT', value: "30048"),
                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
                                                ]
                    def jobResult = jobBuild.getResult()
