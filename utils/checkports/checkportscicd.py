@@ -1,4 +1,4 @@
-import socket, os, sys, shutil, re, git, nmap3, glob
+import socket, os, shutil, re, git, nmap3, glob, sys
 
 def isOpen(host,port):
     #Netstat
@@ -26,10 +26,20 @@ def find_docker_compose(name, path):
 
 
 if __name__ == '__main__':
-    NetApp_ports=[]
 
-    repo = input("Please provide the NetApp repository:\n")
-    git_url = "https://github.com/EVOLVED-5G/"+repo
+    # total arguments
+    n = len(sys.argv)
+    if n != 3:
+            print("expected: " + sys.argv[0] + " <netapp_repository> <netapp_host>")
+            exit(255)
+
+    git_repository = sys.argv[1]
+    netapp_host = sys.argv[2]
+
+    print("Netapp repository: " + git_repository)
+    print("Netapp Host: " + netapp_host )
+
+    NetApp_ports=[]
 
     #Create repository folder (then it'll be removed)
     repo_dir = os.path.abspath(os.getcwd()) + "/ports_tmp/"
@@ -38,7 +48,7 @@ if __name__ == '__main__':
       shutil.rmtree(repo_dir)
 
     try:
-        git.Repo.clone_from(git_url, repo_dir, branch="evolved5g")
+        git.Repo.clone_from(git_repository, repo_dir, branch="evolved5g")
         repo_docker_file = glob.glob(repo_dir + 'docker-compose.y*ml')
         
         # If there is no docker-compose yaml then, the python stops.
@@ -51,7 +61,7 @@ if __name__ == '__main__':
                         NetApp_ports += re.findall(r'\d+:', next(input))
 
             for port in NetApp_ports:
-                isOpen(socket.gethostname(), port.split(":")[0])
+                isOpen(netapp_host, port.split(":")[0])
 
         else:
             print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your NetApp (repository) has a docker-compose yaml file.")
