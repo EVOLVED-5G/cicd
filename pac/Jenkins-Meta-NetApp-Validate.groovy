@@ -192,6 +192,7 @@ pipeline {
                                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                             string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
                                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                    currentBuild.jobBuild='UNSTABLE'                   
                    }else{
                     echo "All was OK"
                    }
