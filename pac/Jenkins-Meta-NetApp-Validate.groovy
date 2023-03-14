@@ -26,9 +26,11 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment NetworkApp name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
+        string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.0', description: 'Version CAPIF')
         string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         string(name: 'RELEASE_NEF', defaultValue: 'nef', description: 'Helm Release name to NEF')
+        string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         choice(name: 'ENVIRONMENT', choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
     }
@@ -39,7 +41,9 @@ pipeline {
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
         RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
+        HOSTNAME_CAPIF = "${params.HOSTNAME_CAPIF}"
         RELEASE_NEF = "${params.RELEASE_NEF}"
+        HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_NAME = "${params.DEPLOY_NAME}"
     }
 
@@ -129,12 +133,12 @@ pipeline {
         
         stage("Validation: Deploy CAPIF and NEF"){
             parallel{
-                stage('Validation:Deploy CAPIF'){
+                stage('Validation: Deploy CAPIF'){
                    steps{
                        script {
                            def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: true,
                                           parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                       string(name: 'HOSTNAME', value: "capif.apps.ocp-epg.hi.inet"),
+                                                       string(name: 'HOSTNAME', value:  String.valueOf(HOSTNAME_CAPIF)),
                                                        string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
                                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                                        string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
@@ -149,7 +153,7 @@ pipeline {
                         script {
                             def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: true,
                              parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'HOSTNAME', value: "nef.apps.ocp-epg.hi.inet" ),
+                                        string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NEF) ),
                                         string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
                                         string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
                                         booleanParam(name: 'REPORTING', value: "openshift")]
@@ -168,9 +172,12 @@ pipeline {
            steps{
                script {
                    def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                  parameters: [string(name: 'BRANCH_NAME', value: "develop"),
+                                  parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-                                               string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
+                                               string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
+                                               string(name: 'CAPIF_PORT', value: "30048")
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+                                               ]
                    def jobResult = jobBuild.getResult()
                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                    buildResults['validate-capif'] = jobResult
