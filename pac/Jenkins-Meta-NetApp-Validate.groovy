@@ -172,7 +172,7 @@ pipeline {
                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
                                                string(name: 'CAPIF_HOSTNAME', value: "capif.apps.ocp-epg.hi.inet" )]
                    def jobResult = jobBuild.getResult()
-                   echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                   catchError(buildResult: 'UNSTABLE',stageResult: 'UNSTABLE')
                    buildResults['validate-capif'] = jobResult
                    if (jobResult == "FAILURE"){
                     def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
@@ -185,7 +185,6 @@ pipeline {
                                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                             string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
                                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                    catchError(buildResult: 'UNSTABLE',stageResult: 'UNSTABLE')
                    }else{
                     echo "All was OK"
                    }
