@@ -30,9 +30,9 @@ spec:
       {{- end }}   
       containers:
         {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
-        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_db_1-1.0
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1-latest
         {{- else }}
-        - image: dockerhub.hi.inet/evolved-5g/nef_emulator_db_1:latest
+        - image: dockerhub.hi.inet/evolved-5g/nef/nef_emulator_db_1:latest
         {{- end }}
           args:
             - -c
