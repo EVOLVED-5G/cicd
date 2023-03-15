@@ -131,42 +131,38 @@ pipeline {
             }
         }
 
-        stage("Validation: Deploy CAPIF"){
-                stage('Validation: Deploy CAPIF'){
-                   steps{
-                       script {
-                           def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: true,
-                                          parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                       string(name: 'HOSTNAME', value:  String.valueOf(HOSTNAME_CAPIF)),
-                                                       string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
-                                                       string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                                       string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                           def jobResult = jobBuild.getResult()
-                           echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                           buildResults['deploy-capif'] = jobResult
-                       }
-                   }
-               }
-        }
-
-        stage("Validation: Deploy NEF"){
-               stage('Validation: Deploy NEF'){
-                    steps{
-                        script {
-                            def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: true,
-                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NEF) ),
-                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                        string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
-                                        booleanParam(name: 'REPORTING', value: "openshift")]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Deploy NEF' returned result: ${jobResult}"
-                            buildResults['deploy-nef'] = jobResult
-                        }
-                    }
+        stage('Validation: Deploy CAPIF'){
+            steps{
+                script {
+                    def jobBuild = build job: '001-CAPIF/deploy', wait: true, propagate: true,
+                                    parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'HOSTNAME', value:  String.valueOf(HOSTNAME_CAPIF)),
+                                                string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
+                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
+                    buildResults['deploy-capif'] = jobResult
                 }
-
+            }
         }
+
+        stage('Validation: Deploy NEF'){
+            steps{
+                script {
+                    def jobBuild = build job: '002-NEF/nef-deploy', wait: true, propagate: true,
+                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NEF) ),
+                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
+                                booleanParam(name: 'REPORTING', value: "openshift")]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Deploy NEF' returned result: ${jobResult}"
+                    buildResults['deploy-nef'] = jobResult
+                }
+            }
+        }
+
         // stage('Validation: Validate CAPIF'){
         //    steps{
         //        script {
