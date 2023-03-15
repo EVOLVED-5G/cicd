@@ -32,10 +32,12 @@ spec:
         {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
         - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1-latest
         {{- else }}
-        - image: dockerhub.hi.inet/evolved-5g/nef/nef_emulator-backend-1:latest
+        - image: dockerhub.hi.inet/evolved-5g/nef_emulator-backend-1:latest
         {{- end }}
           args:
             - /start-reload.sh
+          #   - tail -f /dev/null
+          # command: ["/bin/sh", "-c", "tail -f /dev/null"]
           env:
             - name: BACKEND_CORS_ORIGINS
               value: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
@@ -102,6 +104,8 @@ spec:
               value: "80"
             - name: CAPIF_HTTPS_PORT
               value: "443"
+            - name: USE_PUBLIC_KEY_VERIFICATION
+              value: "True"
           name: backend
           ports:
             - containerPort: 80

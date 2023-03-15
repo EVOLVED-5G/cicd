@@ -32,10 +32,13 @@ spec:
         {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
         - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-reverse_proxy-1-latest
         {{- else }}
-        - image: dockerhub.hi.inet/evolved-5g/nef/nef_emulator-reverse_proxy-1:latest
+        - image: dockerhub.hi.inet/evolved-5g/nef_emulator-reverse_proxy-1:latest
         {{- end }}
+          command: [ "/bin/sh", "-c" ]
           args:
-            - sh -c '/self-signed-crt.sh && /dynamic_ports.sh'
+            - /self-signed-crt.sh && /dynamic_ports.sh
+            # - /docker-entrypoint.sh
+            # - tail -f /dev/null
           env:
             - name: APP_ENV
               value: "prod"
