@@ -24,8 +24,16 @@ spec:
       labels:
         io.kompose.service: api-provider-management
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}   
       containers:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_api-provider-management_1-{{ .Values.version }}
+        {{- else }}
         - image: "dockerhub.hi.inet/evolved-5g/capif/services_api-provider-management_1:{{ .Values.version }}"
+        {{- end }}
           name: api-provider-management
           ports:
             - containerPort: 8080

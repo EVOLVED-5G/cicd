@@ -18,6 +18,6 @@ spec:
     io.kompose.service: redis
 status:
   loadBalancer: {}
-{{ else }}
+{{- else }}
 # Default case
 {{- end }}

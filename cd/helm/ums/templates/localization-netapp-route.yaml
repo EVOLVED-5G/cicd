@@ -32,6 +32,6 @@ status:
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
-{{ else }}
+{{- else }}
 # Default case
 {{- end }}

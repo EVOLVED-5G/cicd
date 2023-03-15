@@ -23,8 +23,16 @@ spec:
       labels:
         io.kompose.service: easy-rsa
     spec:
+      {{- if eq .Values.env "kubernetes" }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }} 
       containers:
+        {{- if eq .Values.env "kubernetes" }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_easy-rsa_1-{{ .Values.version }}
+        {{- else }}
         - image: "dockerhub.hi.inet/evolved-5g/capif/services_easy-rsa_1:{{ .Values.version }}"
+        {{- end }}
           name: easy-rsa
           ports:
             - containerPort: 8080

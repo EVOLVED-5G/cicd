@@ -1,3 +1,4 @@
+{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -29,3 +30,4 @@ status:
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
+{{- end }}
