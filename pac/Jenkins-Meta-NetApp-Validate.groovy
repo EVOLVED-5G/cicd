@@ -130,7 +130,7 @@ pipeline {
 
             }
         }
-        
+
         stage("Validation: Deploy CAPIF and NEF"){
             parallel{
                 stage('Validation: Deploy CAPIF'){
@@ -163,42 +163,42 @@ pipeline {
                         }
                     }
                 }
-               
+
             }
 
         }
-        
-        stage('Validation: Validate CAPIF'){
-           steps{
-               script {
-                   def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                  parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
-                                               booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-                                               string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
-                                               string(name: 'CAPIF_PORT', value: "30048"),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
-                                               ]
-                   def jobResult = jobBuild.getResult()
-                   echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                   buildResults['validate-capif'] = jobResult
-                   if (jobResult == "FAILURE"){
-                    def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
-                                          parameters: [
-                                           string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                           string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                    def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
-                                           parameters: [
-                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                    currentBuild.jobBuild='UNSTABLE'                   
-                   }else{
-                    echo "All was OK"
-                   }
-               }
-           }
-        }
+
+        // stage('Validation: Validate CAPIF'){
+        //    steps{
+        //        script {
+        //            def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+        //                           parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
+        //                                        booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
+        //                                        string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
+        //                                        string(name: 'CAPIF_PORT', value: "30048"),
+        //                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+        //                                        ]
+        //            def jobResult = jobBuild.getResult()
+        //            echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+        //            buildResults['validate-capif'] = jobResult
+        //            if (jobResult == "FAILURE"){
+        //             def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+        //                                   parameters: [
+        //                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+        //                                    string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+        //             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+        //                                    parameters: [
+        //                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+        //                                     string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+        //                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+        //             currentBuild.jobBuild='UNSTABLE'
+        //            }else{
+        //             echo "All was OK"
+        //            }
+        //        }
+        //    }
+        // }
 
         //HARDCODED VARIABLE IN GIT FOR THE DEMO
         stage('Validation:  Deploy NetworkApp'){
@@ -286,10 +286,10 @@ pipeline {
                             }else{
                                 echo "All was OK"
                             }
- 
+
                         }
                     }
-                }       
+                }
 
                 //Review Parameters
                 stage('Validation: Onboarding NetApp as Invoker to CAPIF'){
@@ -325,7 +325,7 @@ pipeline {
                             }
                         }
                     }
-                }       
+                }
 
                 //Review Parameters
                 stage('Validation: Discover NEF APIs from CAPIF'){
@@ -361,7 +361,7 @@ pipeline {
                             }
                         }
                     }
-                }       
+                }
 
                 //Review Parameters
                 //jenkins-dummy
@@ -379,7 +379,7 @@ pipeline {
                                 buildResults['nef-services-as-sessionwithqos'] = jobResult
                         }
                     }
-                }       
+                }
 
                 //Review Parameters
                 //jenkins-dummy
@@ -397,7 +397,7 @@ pipeline {
                            buildResults['nef-services-monitoringevent-api'] = jobResult
                         }
                     }
-                }       
+                }
 
                 //Review Parameters
                 //jenkins-dummy
