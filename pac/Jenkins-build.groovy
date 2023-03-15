@@ -58,7 +58,7 @@ pipeline {
                     docker system prune -a -f --volumes
                     sudo rm -rf $WORKSPACE/$NETAPP_NAME/
                     docker network create services_default
-                    echo ${env.PATH_AWS}
+                    echo $PATH_AWS
                     '''
                 }
             }
