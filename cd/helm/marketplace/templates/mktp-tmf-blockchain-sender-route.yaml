@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2023-03-08T15:27:12Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: mktp-blockchain-sender
+  name: mktp-blockchain-sender
+  namespace: evol5-capif
+  resourceVersion: "984972908"
+  uid: 89371da4-4a2e-4c45-a5c2-64d750f37b4b
+spec:
+  host: mktp-blockchain-sender.apps.ocp-epg.hi.inet
+  port:
+    targetPort: port-mktp-blockchain-sender
+  to:
+    kind: Service
+    name: mktp-blockchain-sender
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2023-03-08T15:27:12Z"
+      status: "True"
+      type: Admitted
+    host: mktp-blockchain-sender.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None

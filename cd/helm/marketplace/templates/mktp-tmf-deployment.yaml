@@ -28,6 +28,9 @@ spec:
       containers:
         - image: "dockerhub.hi.inet/evolved-5g/marketplace/marketplace-tmf-4.0.0:1.0"
           name: {{ .Values.mktp_tmf_service }}
+          env:
+            - name: MONGO_URL
+              value: mongodb://{{ .Values.mktp_tmf_db_service }}:27017/
           ports:
             - containerPort: 8080
           securityContext:
