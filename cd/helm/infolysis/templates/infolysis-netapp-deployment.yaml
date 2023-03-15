@@ -44,6 +44,9 @@ spec:
             - name: CAPIF_PORT_HTTP
               value: "80"
           name: infolysis-netapp
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 0
           ports:
             - containerPort: 8000
             - containerPort: 80
