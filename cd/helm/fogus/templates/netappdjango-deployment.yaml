@@ -41,9 +41,9 @@ spec:
             - sh
             - docker_start_up.sh
           {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
-          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango-latest
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango-{{ .Values.version }}
           {{- else }}
-          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
+          image: dockerhub.hi.inet/evolved-5g/fogusnetapp/fogusnetapp-netappdjango:{{ .Values.version }}
           {{- end }}
           name: netappdjango
           env:
