@@ -24,12 +24,12 @@ spec:
       labels:
         io.kompose.service: nginx
     spec:
-      {{- if eq .Values.env "kubernetes" }}
+      {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
       imagePullSecrets:
         - name: regcred
       {{- end }}
       containers:
-        {{- if eq .Values.env "kubernetes" }}
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
         - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_nginx_1-{{ .Values.version }} 
         {{- else }}
         - image: "dockerhub.hi.inet/evolved-5g/capif/services_nginx_1:{{ .Values.version }}"

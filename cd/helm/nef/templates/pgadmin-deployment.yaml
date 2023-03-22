@@ -24,15 +24,15 @@ spec:
       labels:
         io.kompose.service: pgadmin
     spec:
-      {{- if eq .Values.env "kubernetes" }}
+      {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
       imagePullSecrets:
         - name: regcred
       {{- end }}   
       containers:
-        {{- if eq .Values.env "kubernetes" }}
-        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator_pgadmin_1-latest
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-pgadmin-1-latest
         {{- else }}
-        - image: dockerhub.hi.inet/evolved-5g/nef_emulator_pgadmin_1:latest
+        - image: dockerhub.hi.inet/evolved-5g/nef/nef_emulator-pgadmin-1:latest
         {{- end }}
           env:
             - name: BACKEND_CORS_ORIGINS

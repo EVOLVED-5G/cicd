@@ -17,96 +17,106 @@ pipeline {
     }
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of Dummy NetApp pods to run')
-        string(name: 'DEPLOY_NAME', defaultValue: 'dummy-netapp', description: 'Netapp hostname')
+        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'HOSTNAME', defaultValue: 'dummy-network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-network-app', description: 'Name to NetworkApp')
+        string(name: 'FOLDER_NETWORK_APP', defaultValue: 'dummy-network-app', description: 'Folder where the NetworkApp is')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
         GIT_BRANCH="${params.GIT_CICD_BRANCH}"
-        DUMMY_NETAPP_HOSTNAME="${params.DUMMY_NETAPP_HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "${params.DEPLOY_NAME}"
-        NAMESPACE_NAME = "fogus" //Parametrized here and create an universal pipeline for building
+        RELEASE_NAME = "${params.RELEASE_NAME}"
+        HOSTNAME = "${params.HOSTNAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
     stages {        
-        stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+        stage ("Login in openshift"){
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN -n evol5-capif
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
         }
-        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
         stage ('Log into AWS ECR') {
             when {
-                allOf {
-                    expression { DEPLOYMENT == "evol5-athens"}
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens"}
+                    expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$RELEASE_NAME-${BUILD_NUMBER}
+                    kubectl create namespace $RELEASE_NAME-${BUILD_NUMBER}
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$NAMESPACE_NAME                                                     \
+                    --namespace=$RELEASE_NAME-${BUILD_NUMBER}                                                 \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     '''
                 }    
             }    
         }
-        stage ('Initiate and configure app in kubernetes') {
+        stage ('Upgrade app in kubernetes') {
+            when {
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
+                    expression { DEPLOYMENT == "kubernetes-uma" }
+                }
+            }
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''#!/bin/bash
+                           OUTPUT=($(helm ls --all-namespaces -q -f "^$RELEASE_NAME"))
+                           echo "$OUTPUT"
+                           ARRAY=$(declare -p OUTPUT | grep -q '^declare -a' && echo array || echo no array)
+                            if [[ $ARRAY == "array" ]]; then
+                                if [[ " ${OUTPUT[@]} " =~ " ${RELEASE_NAME} " ]]; then
+                                    echo "Release name $RELEASE_NAME already exists, use another release name"
+                                    exit 1
+                                else
+                                    echo "applying helm"
+                                    echo "$RELEASE_NAME"
+                                    echo "$FOLDER_NETWORK_APP"
+                                    echo "$DEPLOYMENT"
+                                    helm upgrade --install --debug --kubeconfig /home/contint/.kube/config \
+                                    --create-namespace -n $RELEASE_NAME-${BUILD_NUMBER} \
+                                    --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
+                                    --set hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                                    --set env=$DEPLOYMENT \
+                                    --atomic
+                                fi
+                            fi
+                    '''
+
+                }
+            }
+        }
+        stage ('Upgrade app in Openshift') {
+            when {
+                allOf {
+                    expression { DEPLOYMENT == "openshift"}
+                }
+            }
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    helm install $DEPLOY_NAME ./cd/helm/$DEPLOY_NAME/
-                    sleep 100
+                    helm upgrade --install --debug -n evol5-netapp \
+                    --wait $RELEASE_NAME ./cd/helm/$FOLDER_NETWORK_APP/ \
+                    --set hostname=$HOSTNAME --set app_replicas=$APP_REPLICAS \
+                    --set env=$DEPLOYMENT \
+                    --atomic
                     '''
                 }
             }

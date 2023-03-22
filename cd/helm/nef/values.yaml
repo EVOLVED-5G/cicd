@@ -2,3 +2,4 @@
 nef_hostname: nef.apps.ocp-epg.hi.inet
 capif_hostname: capif.apps.ocp-epg.hi.inet
 env: openshift
+version: "latest"
