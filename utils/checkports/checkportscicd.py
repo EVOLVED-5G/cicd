@@ -14,9 +14,11 @@ def isOpen(host,port):
       resultstcp = nmap.nmap_tcp_scan(host, args="-p " + port)
       tcp.shutdown(2)
       print (f"NetApp TCP Port {int(port)}, is LISTENING/OPENED")
+      return True
 
    except:
        print(f"NetApp TCP Port {int(port)}, is NOT LISTENING/NOT OPENED.")
+       return False
 
 
 def find_docker_compose(name, path):
@@ -52,6 +54,7 @@ if __name__ == '__main__':
         git.Repo.clone_from(git_repository, repo_dir, branch=netapp_branch)
         repo_docker_compose_file = glob.glob(repo_dir + 'docker-compose.y*ml')
         repo_docker_file = glob.glob(repo_dir + 'Dockerfile')
+        success = True
         
         # If there is no docker-compose yaml then, the python stops.
         if (bool(repo_docker_compose_file)):
@@ -62,7 +65,8 @@ if __name__ == '__main__':
                         NetApp_ports += re.findall(r'\d+:', next(input))
 
             for port in NetApp_ports:
-                isOpen(netapp_host, port.split(":")[0])
+                if( not isOpen(netapp_host, port.split(":")[0])):
+                    success=False
         elif (bool(repo_docker_file)):
             repo_dir_docker = find_docker_compose(os.path.basename(repo_docker_file[0]), repo_dir)
             with open(repo_dir_docker) as input:
@@ -70,13 +74,16 @@ if __name__ == '__main__':
                     NetApp_ports += re.findall(r'EXPOSE \d+ ?\d*', line)
 
             for port in NetApp_ports:
-                isOpen(netapp_host, port.split(" ")[1])
+                if( not isOpen(netapp_host, port.split(" ")[1])):
+                    success=False
 
         else:
             print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your NetApp (repository) has a docker-compose yaml file.")
 
         # Repository folder removed
         shutil.rmtree(repo_dir)
+        if (not success):
+            exit(1)
     
     except git.exc.GitError as err:
         print(str(err))
