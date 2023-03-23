@@ -30,11 +30,12 @@ if __name__ == '__main__':
     # total arguments
     n = len(sys.argv)
     if n != 3:
-            print("expected: " + sys.argv[0] + " <netapp_repository> <netapp_host>")
+            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository>")
             exit(255)
-
-    git_repository = sys.argv[1]
-    netapp_host = sys.argv[2]
+    
+    netapp_branch = sys.argv[1]
+    git_repository = sys.argv[2]
+    netapp_host = 'localhost'
 
     print("Netapp repository: " + git_repository)
     print("Netapp Host: " + netapp_host )
@@ -48,7 +49,7 @@ if __name__ == '__main__':
       shutil.rmtree(repo_dir)
 
     try:
-        git.Repo.clone_from(git_repository, repo_dir, branch="evolved5g")
+        git.Repo.clone_from(git_repository, repo_dir, branch=netapp_branch)
         repo_docker_file = glob.glob(repo_dir + 'docker-compose.y*ml')
         
         # If there is no docker-compose yaml then, the python stops.
