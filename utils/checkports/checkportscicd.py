@@ -108,7 +108,9 @@ if __name__ == '__main__':
                     key_port_without_protocol = container_port.split("/")[0]
                     if key_port_without_protocol == dockerfile_port:
                         mapped_ports[dockerfile_port] = container_ports_info[container_port][0]['HostPort']
-
+            
+            print("Mapped ports:")
+            print(mapped_ports)
             if len(list(mapped_ports.keys())) != len(NetApp_ports):
                 raise Exception("Netapp ports on Dockerfile not match ports map with running image")
 
