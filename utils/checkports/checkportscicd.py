@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
             if len(containers_list) == 1:
                 container = containers_list[0]
-                print("Container " + container.attrs['Config']['Image'] + "found")
+                print("Container " + container.attrs['Config']['Image'] + " found")
             else:
                 raise Exception("Netapp " + netapp_image_name + " container not found")
 
@@ -123,7 +123,6 @@ if __name__ == '__main__':
         shutil.rmtree(repo_dir)
         if (not success):
             raise Exception("Netapp ports not found")
-            # exit(1)
     
     except git.exc.GitError as err:
         print(str(err))
