@@ -77,38 +77,44 @@ if __name__ == '__main__':
             repo_dir_docker = find_file(os.path.basename(repo_docker_file[0]), repo_dir)
             with open(repo_dir_docker) as input:
                 for line in input:
-                    NetApp_ports += re.findall(r'EXPOSE \d+ ?\d*', line).split(" ")[1]
+                    NetApp_ports += re.findall(r'EXPOSE \d+ ?\d*', line)
+            
+            port_list = list()
+            for port in NetApp_ports:
+                port_list.append(port.split(" ")[1])
+            
+            NetApp_ports = port_list
 
             # Get docker ports information
             client = docker.from_env()
-            containers_list=client.containers.list(filters={"ancestor":netapp_image_name})
-            container=dict()
+            containers_list = client.containers.list(filters={"ancestor":netapp_image_name})
+            container = dict()
 
             if len(containers_list) == 1:
-                container=containers_list[0]
+                container = containers_list[0]
                 print("Container " + container.attrs['Config']['Image'] + "found")
             else:
                 raise Exception("Netapp " + netapp_image_name + " container not found")
 
-            container_ports_info=container.ports
-            container_ports_list=list(container_ports_info.keys())
+            container_ports_info = container.ports
+            container_ports_list = list(container_ports_info.keys())
 
             if len(NetApp_ports) != len(container_ports_list):
                 raise Exception("Netapp ports on Dockerfile not match ports exposed on running image")
             
-            mapped_keys=dict()
+            mapped_ports = dict()
             for dockerfile_port in NetApp_ports:
                 for container_port in container_ports_list:
-                    key_port_without_protocol=container_port.split("/")[0]
+                    key_port_without_protocol = container_port.split("/")[0]
                     if key_port_without_protocol == dockerfile_port:
-                        mapped_keys[dockerfile_port]=container_ports_info[container_port][0]['HostPort']
+                        mapped_ports[dockerfile_port] = container_ports_info[container_port][0]['HostPort']
 
-            if len(list(mapped_keys.keys())) != len(NetApp_ports):
+            if len(list(mapped_ports.keys())) != len(NetApp_ports):
                 raise Exception("Netapp ports on Dockerfile not match ports map with running image")
 
             for port in NetApp_ports:
-                if( not isOpen(netapp_host, mapped_keys[port])):
-                    success=False
+                if( not isOpen(netapp_host, mapped_ports[port])):
+                    success = False
 
         else:
             print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your NetApp (repository) has a docker-compose yaml file.")
