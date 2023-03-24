@@ -1,24 +1,35 @@
 import socket, os, shutil, re, git, nmap3, glob, sys, docker
 
-def isOpen(host,port):
+def isOpen(host,port,mapped_ports=None):
     #Netstat
-   tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     #Nmap
-   nmap = nmap3.NmapScanTechniques()
+    nmap = nmap3.NmapScanTechniques()
+    port_to_check = port
 
-   try:
-      #Checking ports with Netstat
-      tcp.connect((host, int(port)))
-      #Checking ports with Nmap
-      resultstcp = nmap.nmap_tcp_scan(host, args="-p " + port)
-      tcp.shutdown(2)
-      print (f"NetApp TCP Port {int(port)}, is LISTENING/OPENED")
-      return True
+    if mapped_ports != None:
+        port_to_check = mapped_ports[port]
 
-   except:
-       print(f"NetApp TCP Port {int(port)}, is NOT LISTENING/NOT OPENED.")
-       return False
+
+    try:
+        #Checking ports with Netstat
+        tcp.connect((host, int(port_to_check)))
+        #Checking ports with Nmap
+        resultstcp = nmap.nmap_tcp_scan(host, args="-p " + port_to_check)
+        tcp.shutdown(2)
+        if mapped_ports != None:
+            print (f"NetApp TCP Port {int(port_to_check)} (Original Port {int(port)}), is LISTENING/OPENED")
+        else:
+            print (f"NetApp TCP Port {int(port_to_check)}, is LISTENING/OPENED")
+        return True
+
+    except:
+        if mapped_ports != None:
+            print(f"NetApp TCP Port {int(port_to_check)} (Original Port {int(port)}), is NOT LISTENING/NOT OPENED.")
+        else:
+            print(f"NetApp TCP Port {int(port_to_check)}, is NOT LISTENING/NOT OPENED.")
+        return False
 
 
 def find_file(name, path):
@@ -115,7 +126,7 @@ if __name__ == '__main__':
                 raise Exception("Netapp ports on Dockerfile not match ports map with running image")
 
             for port in NetApp_ports:
-                if( not isOpen(netapp_host, mapped_ports[port])):
+                if( not isOpen(netapp_host, port, mapped_ports)):
                     success = False
 
         else:
