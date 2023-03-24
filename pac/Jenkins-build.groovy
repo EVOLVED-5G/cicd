@@ -100,6 +100,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME} .
+                    docker run -d -P ${NETAPP_NAME}
                     '''
                 }
             }
@@ -125,7 +126,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${CHECKPORTS_PATH}/") {
                     sh '''
-                    python3 checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL
+                    pip install -r requirements.txt
+                    python3 checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
                     '''
                 }
             }
