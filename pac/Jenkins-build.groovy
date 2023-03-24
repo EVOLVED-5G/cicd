@@ -48,6 +48,7 @@ pipeline {
         DOCKER_VAR = false
         PATH_DOCKER = getPath("${params.STAGE}")
         PATH_AWS = getPathAWS("${params.STAGE}")
+        CHECKPORTS_PATH = 'utils/checkports'
     }
     stages {
         stage('Clean workspace') {
@@ -99,6 +100,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME} .
+                    docker run -d -P ${NETAPP_NAME}
                     '''
                 }
             }
@@ -119,6 +121,18 @@ pipeline {
                 }
             }
         }
+        //Check Ports on running images
+        stage('Check Ports of images generated') {
+            steps {
+                dir ("${env.WORKSPACE}/${CHECKPORTS_PATH}/") {
+                    sh '''
+                    pip install -r requirements.txt
+                    python3 checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
+                    '''
+                }
+            }
+        }
+        //----
         stage('Modify image name and upload to AWS') {
             when {
                 expression {
