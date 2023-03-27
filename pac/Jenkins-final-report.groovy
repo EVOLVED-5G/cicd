@@ -4,8 +4,19 @@ String netappName(String url) {
     return var ;
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
