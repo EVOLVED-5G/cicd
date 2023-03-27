@@ -7,12 +7,19 @@ String netappName(String url) {
     return var ;
 }
 
-pipeline {
-    agent {
-        node {
-            label 'evol5-slave'
-        }
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
     }
+}
+
+pipeline {
+    agent {node {label getAgent("${params.ENVIRONMENT}") == "any" ? "" : getAgent("${params.ENVIRONMENT}")}}
     options {
         timeout(time: 60, unit: 'MINUTES')
         retry(1)
@@ -23,6 +30,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
+        string(name: 'VERSION_NETAPP', defaultValue: '1.0', description: 'Version NetworkApp')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment NetworkApp name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
@@ -45,6 +53,7 @@ pipeline {
         RELEASE_NEF = "${params.RELEASE_NEF}"
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_NAME = "${params.DEPLOY_NAME}"
+        VERSION_NETAPP = "${params.VERSION_NETAPP}"
     }
 
     stages {
@@ -58,6 +67,7 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
@@ -73,6 +83,7 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 
                             def jobResult = jobBuild.getResult()
@@ -89,6 +100,7 @@ pipeline {
 //                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
 //                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
 //                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
 //                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 //                            def jobResult = jobBuild.getResult()
 //                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
@@ -96,14 +108,15 @@ pipeline {
 //                        }
 //                    }
 //                }
-                stage('Validation: Build validation image  Report'){
+                stage('Validation: Build validation image Report'){
                     steps{
                         script {
                             def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
-                                            parameters: [string(name: 'VERSION', value: '1.0'),
+                                            parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
                                                         string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         string(name: 'STAGE', value: "validation") ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Netapp' returned result: ${jobResult}"
@@ -120,6 +133,7 @@ pipeline {
 //                                                       string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
 //                                                       string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
 //                                                       string(name: 'STAGE', value: "validation"),
+//                                                       string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
 //                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 //                           def jobResult = jobBuild.getResult()
 //                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
