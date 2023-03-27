@@ -19,7 +19,7 @@ def getAgent(deployment) {
 }
 
 pipeline {
-    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
+    agent {node {label getAgent("${params.ENVIRONMENT}") == "any" ? "" : getAgent("${params.ENVIRONMENT}")}}
     options {
         timeout(time: 60, unit: 'MINUTES')
         retry(1)
@@ -39,7 +39,7 @@ pipeline {
         string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         string(name: 'RELEASE_NEF', defaultValue: 'nef', description: 'Helm Release name to NEF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
-        choice(name: 'DEPLOYMENT', choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
+        choice(name: 'ENVIRONMENT', choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
     }
 
@@ -67,7 +67,7 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
@@ -83,7 +83,7 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 
                             def jobResult = jobBuild.getResult()
@@ -100,7 +100,7 @@ pipeline {
 //                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
 //                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
 //                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-//                                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+//                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
 //                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 //                            def jobResult = jobBuild.getResult()
 //                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
@@ -116,7 +116,7 @@ pipeline {
                                                         string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                         string(name: 'STAGE', value: "validation") ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Netapp' returned result: ${jobResult}"
@@ -133,7 +133,7 @@ pipeline {
 //                                                       string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
 //                                                       string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
 //                                                       string(name: 'STAGE', value: "validation"),
-//                                                       string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+//                                                       string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
 //                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 //                           def jobResult = jobBuild.getResult()
 //                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
@@ -153,7 +153,7 @@ pipeline {
                                                 string(name: 'HOSTNAME', value:  String.valueOf(HOSTNAME_CAPIF)),
                                                 string(name: 'VERSION', value: String.valueOf(VERSION_CAPIF)),
                                                 string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                                string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
                     buildResults['deploy-capif'] = jobResult
@@ -168,7 +168,7 @@ pipeline {
                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NEF) ),
                                 string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT)),
+                                string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT)),
                                 booleanParam(name: 'REPORTING', value: "openshift")]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy NEF' returned result: ${jobResult}"
@@ -186,7 +186,7 @@ pipeline {
         //                                        string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
         //                                        string(name: 'CAPIF_PORT', value: "30048"),
         //                                        string(name: 'CAPIF_TLS_PORT', value: "30548"),
-        //                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))
+        //                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
         //                                        ]
         //            def jobResult = jobBuild.getResult()
         //            echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
@@ -196,12 +196,12 @@ pipeline {
         //                                   parameters: [
         //                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
         //                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-        //                                    string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+        //                                    string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
         //             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
         //                                    parameters: [
         //                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
         //                                     string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-        //                                     string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+        //                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
         //             currentBuild.jobBuild='UNSTABLE'
         //            }else{
         //             echo "All was OK"
@@ -220,7 +220,7 @@ pipeline {
                                 string(name: 'HOSTNAME', value: String.valueOf(HOSTNAME_NETAPP)),
                                 string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))
+                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
                                 ]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy Netapp' returned result: ${jobResult}"
@@ -236,7 +236,7 @@ pipeline {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
                                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Validate NEF' returned result: ${jobResult}"
                             buildResults['validate-nef'] = jobResult
@@ -245,17 +245,17 @@ pipeline {
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                             def destroyJobNetworApp = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
                             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                            parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             }else{
                                 echo "All was OK"
                             }
@@ -282,17 +282,17 @@ pipeline {
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                             def destroyJobNetworApp = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
                             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                            parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             }else{
                                 echo "All was OK"
                             }
@@ -319,17 +319,17 @@ pipeline {
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                             def destroyJobNetworApp = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
                             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                            parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             }else{
                                 echo "All was OK"
                             }
@@ -355,17 +355,17 @@ pipeline {
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                             def destroyJobNetworApp = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
                             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                            parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             }else{
                                 echo "All was OK"
                             }
@@ -437,7 +437,7 @@ pipeline {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
@@ -452,7 +452,7 @@ pipeline {
                                            parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-                                               string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                            def jobResult = jobBuild.getResult()
                            echo "Build of 'Destroy NEF' returned result: ${jobResult}"
                            buildResults['destroy-nef'] = jobResult
@@ -466,7 +466,7 @@ pipeline {
                                           parameters: [
                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                           string(name: "DEPLOYMENT",value: String.valueOf(DEPLOYMENT))]
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
                            def jobResult = jobBuild.getResult()
                            echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
                            buildResults['destroy-capif'] = jobResult
