@@ -143,6 +143,7 @@ if __name__ == '__main__':
                     if key_port_without_protocol == dockerfile_port:
                         mapped_ports[dockerfile_port] = container_ports_info[container_port][0]['HostPort']
             
+            
             print("Mapped ports:")
             print(mapped_ports)
             if len(list(mapped_ports.keys())) != len(NetApp_ports[netapp_image_name]['ports']):
