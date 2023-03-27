@@ -30,6 +30,7 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-capif', description: 'Release name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
@@ -37,88 +38,55 @@ pipeline {
         GIT_BRANCH="${params.GIT_BRANCH}"
         HOSTNAME="${params.HOSTNAME}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        DEPLOYMENT_NAME = "capif"
-        NAMESPACE_NAME = "capif"
+        RELEASE_NAME = "${params.RELEASE_NAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
 
     }
 
     stages {        
-        stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+        stage ("Login in openshift"){
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
         }
-        //WORK IN PROGRESS FOR THE ATHENS DEPLOYEMENT    
-        stage ('Log into AWS ECR') {
+        stage ('Destroy/Uninstall app in kubernetes') {
+            when {
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
+                    expression { DEPLOYMENT == "kubernetes-uma" }
+                }
+            }
+            steps {
+                dir ("${env.WORKSPACE}") {
+                    sh '''
+                    NAMESPACE=$(helm ls --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+                    echo $NAMESPACE
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME -n $NAMESPACE --wait
+                    '''
+                }
+            }
+        }
+        stage ('Destroy/Uninstall app in Openshift') {
             when {
                 allOf {
-                    expression { DEPLOYMENT == "evol5-athens"}
+                    expression { DEPLOYMENT == "openshift"}
                 }
             }
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-pull', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                dir ("${env.WORKSPACE}") {
                     sh '''
-                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$NAMESPACE_NAME
-                    kubectl create secret docker-registry regcred                                   \
-                    --docker-password=$(aws ecr get-login-password)                                 \
-                    --namespace=$NAMESPACE_NAME                                                     \
-                    --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
-                    --docker-username=AWS
+                    helm uninstall --debug $RELEASE_NAME -n evol5-$RELEASE_NAME --wait
                     '''
-                }    
-            }    
-        }
-        stage ('Initiate and configure app in kubernetes') {
-            steps {
-                sh '''
-                helm uninstall $DEPLOYMENT_NAME
-                sleep 30
-                '''
+                }
             }
         }
     }                

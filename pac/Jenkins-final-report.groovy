@@ -84,12 +84,12 @@ pipeline {
                     done
 
                     today=$(date +'%d/%m/%Y')
-                    mv *-licenses*.pdf executive_summary/
+                    [ -e *-licenses*.pdf ] && mv *-licenses*.pdf executive_summary/ || echo "No licenses file found"
                     pdfunite *.pdf mid_report1.pdf
-                    pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf
+                    [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
-                    
+
                     # Remember install PDFTK for watermarking
                     pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
                     pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf

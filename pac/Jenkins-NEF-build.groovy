@@ -39,8 +39,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
                     make prepare-dev-env
-
-
+                    sed -i "s,EXTERNAL_NET=.*,EXTERNAL_NET=false,g" .env
                     EXTERNAL_NET=false
                     '''
                 }
@@ -95,9 +94,9 @@ pipeline {
                         def name  = sh(returnStdout: true, script: cmd2).trim()
                         sh '''$(aws ecr get-login --no-include-email)'''
                         [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":${VERSION}.${BUILD_NUMBER} """
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":latest"""
-                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/"${x[1]}" """
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/nef/"${x[1]}":${VERSION}.${BUILD_NUMBER} """
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/nef/"${x[1]}":latest"""
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/nef/"${x[1]}" """
                         }
                     }
                 }               
@@ -109,7 +108,7 @@ pipeline {
             sh '''
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
-            sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+            sudo rm -rf $WORKSPACE/$FOLDER_NAME/
             '''
         }
         cleanup{

@@ -24,6 +24,15 @@ spec:
       labels:
         io.kompose.service: netappdjango
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip }}"
+          hostnames:
+            - "{{ .Values.capif.hostname }}"
+            - "{{ .Values.nef.hostname }}"
+      {{- end }}
       containers:
         - args:
             - ./wait_db.sh
@@ -31,7 +40,11 @@ spec:
             - --
             - sh
             - docker_start_up.sh
-          image: dockerhub.hi.inet/evolved-5g/fogusnetapp-netappdjango:latest
+          {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+          image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango-{{ .Values.version }}
+          {{- else }}
+          image: dockerhub.hi.inet/evolved-5g/fogusnetapp/fogusnetapp-netappdjango:{{ .Values.version }}
+          {{- end }}
           name: netappdjango
           env:
             - name: POSTGRES_PASSWORD
@@ -43,11 +56,11 @@ spec:
             - name: CALLBACK_ADDRESS
               value: "backend-fogus.apps.ocp-epg.hi.inet"
             - name: CAPIF_PORT_HTTPS
-              value: "443"
+              value: "{{ .Values.capif.https_port }}"
             - name: CAPIF_PORT_HTTP
-              value: "80"
+              value: "{{ .Values.capif.http_port }}"
             - name: CAPIF_HOSTNAME
-              value: "capif.apps.ocp-epg.hi.inet"
+              value: "{{ .Values.capif.hostname }}"
             - name: PATH_TO_CERTS
               value: /code/capif_onboarding
             - name: VAPP_ADDRESS
@@ -57,9 +70,9 @@ spec:
             - name: NEF_USER
               value: "admin@my-email.com"
             - name: NEF_ADDRESS
-              value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
+              value: "{{ .Values.nef.hostname }}"
             - name:  FRONTEND_ADDRESS
-              value: "fogus.apps.ocp-epg.hi.inet"
+              value: "{{ .Values.hostname }}"
           ports:
             - containerPort: 8000
           resources: {}

@@ -34,7 +34,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])       
+        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])
     }
 
     environment {
@@ -48,6 +48,7 @@ pipeline {
         DOCKER_VAR = false
         PATH_DOCKER = getPath("${params.STAGE}")
         PATH_AWS = getPathAWS("${params.STAGE}")
+        CHECKPORTS_PATH = 'utils/checkports'
     }
     stages {
         stage('Clean workspace') {
@@ -58,7 +59,7 @@ pipeline {
                     docker system prune -a -f --volumes
                     sudo rm -rf $WORKSPACE/$NETAPP_NAME/
                     docker network create services_default
-                    echo ${env.PATH_AWS}
+                    echo $PATH_AWS
                     '''
                 }
             }
@@ -71,8 +72,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf $NETAPP_NAME 
-                    mkdir $NETAPP_NAME 
+                    rm -rf $NETAPP_NAME
+                    mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     '''
@@ -85,20 +86,21 @@ pipeline {
                     DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
                 }
                 echo "env DOCKER VAR is ${DOCKER_VAR}"
-                
+
             }
         }
         //NICE TO HAVE: Makefile to encapsulate docker and docker-compose commands
         stage('Build') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }                
+            }
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME} .
+                    docker run -d -P ${NETAPP_NAME}
                     '''
                 }
             }
@@ -108,25 +110,38 @@ pipeline {
                 expression {
                     return "${DOCKER_VAR}".toBoolean()
                 }
-            }  
+            }
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker network create demo-network
+                    make run-dev || true
                     docker-compose up --build --force-recreate -d
                     '''
                 }
             }
         }
+        //Check Ports on running images
+        stage('Check Ports of images generated') {
+            steps {
+                dir ("${env.WORKSPACE}/${CHECKPORTS_PATH}/") {
+                    sh '''
+                    pip install -r requirements.txt
+                    python3 checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
+                    '''
+                }
+            }
+        }
+        //----
         stage('Modify image name and upload to AWS') {
             when {
                 expression {
-                    return "${DOCKER_VAR}".toBoolean() 
+                    return "${DOCKER_VAR}".toBoolean()
                 }
-            }     
+            }
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
-                    script {    
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    script {
                         def cmd = "docker ps --format '{{.Image}}'"
                         def cmd2 = "docker ps --format '{{.Names}}'"
                         def image = sh(returnStdout: true, script: cmd).trim()
@@ -154,9 +169,9 @@ pipeline {
         stage('Publish in AWS - Dockerfile') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }    
+            }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
@@ -173,20 +188,20 @@ pipeline {
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
                     fi
-                    '''  
-                }   
+                    '''
+                }
             }
         }
         stage('Modify container name to upload Docker-compose to Artifactory') {
             when {
                 expression {
-                    return "${DOCKER_VAR}".toBoolean()  
+                    return "${DOCKER_VAR}".toBoolean()
                 }
-            }  
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(1){
-                        script {   
+                        script {
                             sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
@@ -206,15 +221,15 @@ pipeline {
                             }
                         }
                     }
-                }               
+                }
             }
-        }   
+        }
         stage('Publish in Artefactory') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }   
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(1){
@@ -240,7 +255,7 @@ pipeline {
     post {
         always {
             sh '''
-            docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q) 
+            docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf $WORKSPACE/$NETAPP_NAME/
             '''

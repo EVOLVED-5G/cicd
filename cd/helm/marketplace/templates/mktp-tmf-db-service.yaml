@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: {{ .Values.mktp_tmf_db_service }}
+  name: {{ .Values.mktp_tmf_db_service }}
+spec:
+  ports:
+    - name: "port-mktp-tmf-db"
+      port: 27017
+      targetPort: 27017
+  selector:
+    io.kompose.service: {{ .Values.mktp_tmf_db_service }}
+status:
+  loadBalancer: {}

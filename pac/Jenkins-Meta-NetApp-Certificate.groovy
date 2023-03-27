@@ -13,6 +13,9 @@ pipeline {
             label 'evol5-slave'
         }
     }
+//    triggers{
+//        cron("40 15 * * *")
+//    }
     options {
         timeout(time: 60, unit: 'MINUTES')
         retry(1)

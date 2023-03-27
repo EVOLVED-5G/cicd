@@ -1,0 +1,30 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  creationTimestamp: "2023-03-08T15:25:32Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: mktp-tmf
+  name: mktp-tmf
+  namespace: evol5-capif
+  resourceVersion: "984971610"
+  uid: a8d23d27-d3ee-4bbb-a19e-6e1beebfc7f6
+spec:
+  host: mktp-tmf.apps.ocp-epg.hi.inet
+  port:
+    targetPort: port-mktp-tmf
+  to:
+    kind: Service
+    name: mktp-tmf
+    weight: 100
+  wildcardPolicy: None
+status:
+  ingress:
+  - conditions:
+    - lastTransitionTime: "2023-03-08T15:25:32Z"
+      status: "True"
+      type: Admitted
+    host: mktp-tmf.apps.ocp-epg.hi.inet
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+    routerName: default
+    wildcardPolicy: None
