@@ -49,6 +49,7 @@ pipeline {
         PATH_DOCKER = getPath("${params.STAGE}")
         PATH_AWS = getPathAWS("${params.STAGE}")
         CHECKPORTS_PATH = 'utils/checkports'
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
     }
     stages {
         stage('Clean workspace') {
@@ -124,7 +125,7 @@ pipeline {
         //Check Ports on running images
         stage('Check Ports of images generated') {
             steps {
-                dir ("${env.WORKSPACE}/${CHECKPORTS_PATH}/") {
+                dir ("${env.WORKSPACE}/") {
                     sh '''
                     pip install -r ${CHECKPORTS_PATH}/requirements.txt
                     python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
