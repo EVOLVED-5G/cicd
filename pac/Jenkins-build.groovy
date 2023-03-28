@@ -34,7 +34,8 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])
+        choice(name: 'STAGE', choices: ["verification", "validation", "certification"],
+        string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution'))
     }
 
     environment {
