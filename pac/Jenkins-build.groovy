@@ -50,6 +50,7 @@ pipeline {
         PATH_AWS = getPathAWS("${params.STAGE}")
         CHECKPORTS_PATH = 'utils/checkports'
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        DOCKER_PATH="/usr/src/app"
     }
     stages {
         stage('Clean workspace') {
