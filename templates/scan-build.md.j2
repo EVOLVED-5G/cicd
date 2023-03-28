@@ -1,0 +1,48 @@
+
+# Build Step report
+***
+
+This step build needed images for current netapp.
+
+{{repo}} Network App is compound next services:
+{% for service_name, service_info in services.items()%}
+- service_name
+{% endfor %}
+
+Each individual service that exposes a port are checked:
+
+| Service Name | Port | Status |
+|---|---|---|
+{%- for service_name,service_info in services.items() %}
+| {{service_name}}| | |
+  {%- for port in service_info.ports %}
+    {%- if port.listening %}
+| | {{port.port}} | OK |
+    {%- else %}
+| | {{port.port}} | NOK |
+    {% endif %}
+  {%- endfor %}  
+{%- endfor %}
+
+
+Urls of Images pushed:
+{%- for service_name,service_info in services.items() %}
+## {{service_name}}:
+* Aws:
+  {%- for image in service_info.docker_hub_images %}
+  * {{image}}
+  {%- endfor %}
+* Artifact:
+  {%- for image in service_info.aws_images %}
+  * {{image}}
+  {%- endfor %} 
+{%- endfor %}
+
+
+
+
+
+
+
+
+

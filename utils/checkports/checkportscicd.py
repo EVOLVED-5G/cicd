@@ -3,8 +3,6 @@ import yaml
 from yaml.loader import SafeLoader
 import json
 
-report=dict()
-
 
 def isOpen(host,port,mapped_ports=None):
     #Netstat
@@ -55,8 +53,8 @@ if __name__ == '__main__':
     # total arguments
     n = len(sys.argv)
     
-    if n < 3 or n > 4:
-            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository> [<netapp_image_name>]")
+    if n != 4:
+            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository> <netapp_image_name>")
             exit(255)
     
     netapp_branch = sys.argv[1]
@@ -73,6 +71,7 @@ if __name__ == '__main__':
         print("Netapp Image Name: " + netapp_image_name )
 
     NetApp_ports=dict()
+    NetApp_ports['services']=dict()
 
     #Create repository folder (then it'll be removed)
     repo_dir = os.path.abspath(os.getcwd()) + "/ports_tmp/"
@@ -97,14 +96,14 @@ if __name__ == '__main__':
                     # print(service)
                     ports = service.get('ports',None)
                     if ports is not None:
-                        NetApp_ports[service_name]=dict()
-                        NetApp_ports[service_name]['ports']=list()
+                        NetApp_ports['services'][service_name]=dict()
+                        NetApp_ports['services'][service_name]['ports']=list()
                         for port_docker_compose in ports:
                             port=port_docker_compose.split(':')[0]
                             result=isOpen(netapp_host, port)
                             if not result:
                                 success=False
-                            NetApp_ports[service_name]['ports'].append({"port":port,"listening":result})
+                            NetApp_ports['services'][service_name]['ports'].append({"port":port,"listening":result})
 
         elif (bool(repo_docker_file)):
             repo_dir_docker = find_file(os.path.basename(repo_docker_file[0]), repo_dir)
@@ -113,10 +112,10 @@ if __name__ == '__main__':
                 for line in input:
                     expose_list += re.findall(r'EXPOSE \d+ ?\d*', line)
                 print(expose_list)
-                NetApp_ports[netapp_image_name]=dict()
-                NetApp_ports[netapp_image_name]['ports']=list()
+                NetApp_ports['services'][netapp_image_name]=dict()
+                NetApp_ports['services'][netapp_image_name]['ports']=list()
                 for port in expose_list:
-                    NetApp_ports[netapp_image_name]['ports'].append(port.split(" ")[1])
+                    NetApp_ports['services'][netapp_image_name]['ports'].append(port.split(" ")[1])
 
             # Get docker ports information
             client = docker.from_env()
@@ -131,44 +130,42 @@ if __name__ == '__main__':
 
             container_ports_info = container.ports
             container_ports_list = list(container_ports_info.keys())
-            print(json.dumps(NetApp_ports, indent=2))
+            print(json.dumps(NetApp_ports['services'], indent=2))
 
-            if len(NetApp_ports[netapp_image_name]['ports']) != len(container_ports_list):
+            if len(NetApp_ports['services'][netapp_image_name]['ports']) != len(container_ports_list):
                 raise Exception("Netapp ports on Dockerfile not match ports exposed on running image")
             
             mapped_ports = dict()
-            for dockerfile_port in NetApp_ports[netapp_image_name]['ports']:
+            for dockerfile_port in NetApp_ports['services'][netapp_image_name]['ports']:
                 for container_port in container_ports_list:
                     key_port_without_protocol = container_port.split("/")[0]
                     if key_port_without_protocol == dockerfile_port:
                         mapped_ports[dockerfile_port] = container_ports_info[container_port][0]['HostPort']
             
-            
+
             print("Mapped ports:")
             print(mapped_ports)
-            if len(list(mapped_ports.keys())) != len(NetApp_ports[netapp_image_name]['ports']):
+            if len(list(mapped_ports.keys())) != len(NetApp_ports['services'][netapp_image_name]['ports']):
                 raise Exception("Netapp ports on Dockerfile not match ports map with running image")
 
             ports_checked=list()
-            for port in NetApp_ports[netapp_image_name]['ports']:
+            for port in NetApp_ports['services'][netapp_image_name]['ports']:
                 result=isOpen(netapp_host, port, mapped_ports)
                 if not result:
                     success = False
                 ports_checked.append({"port":port,"mapped_port":mapped_ports[port],"listening":result})
 
-            NetApp_ports[netapp_image_name]['ports']=ports_checked
+            NetApp_ports['services'][netapp_image_name]['ports']=ports_checked
             
 
         else:
             print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your NetApp (repository) has a docker-compose yaml file.")
 
         json_formatted_str = json.dumps(NetApp_ports, indent=2)
-
+        print('Final Result:')
         print(json_formatted_str)
 
-        netapp_name = git_repository.split('/')[-1].lower()
-
-        with open('report-build-ports-'+ netapp_name +'.json', 'w', encoding='utf-8') as f:
+        with open('report-build-'+ netapp_image_name +'.json', 'w', encoding='utf-8') as f:
             json.dump(NetApp_ports, f, ensure_ascii=False)
 
         # Repository folder removed
