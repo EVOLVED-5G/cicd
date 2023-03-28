@@ -1,11 +1,23 @@
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'GIT_MARKET_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace', description: 'URL of the NEF Github Repository')
         string(name: 'GIT_MARKET_BRANCH', defaultValue: 'main', description: 'Marketplace branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
     }
 
     environment {
