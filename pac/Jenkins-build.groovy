@@ -288,7 +288,7 @@ pipeline {
 
                         for x in "${files[@]}"
                             do
-                                report_file="report-tr-repo-$NETAPP_NAME.$x"
+                                report_file="report-build-$NETAPP_NAME.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
