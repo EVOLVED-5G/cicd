@@ -2,7 +2,7 @@ import json,sys
 
 # total arguments
 n = len(sys.argv)
-print(n)
+
 if n != 5:
     print("expected: " + sys.argv[0] + " <json_file> <netapp_image_name> <tag> <image_url>")
     exit(255)
