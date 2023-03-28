@@ -126,9 +126,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/${CHECKPORTS_PATH}/") {
                     sh '''
-                    pip install -r requirements.txt
-                    python3 checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
-                    // report-build-${NETAPP_NAME}.json
+                    pip install -r ${CHECKPORTS_PATH}/requirements.txt
+                    python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
                     '''
                 }
             }

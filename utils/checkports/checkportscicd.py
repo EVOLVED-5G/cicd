@@ -15,15 +15,12 @@ def isOpen(host,port,mapped_ports=None):
     if mapped_ports != None:
         port_to_check = mapped_ports[port]
 
-
     try:
-        print(port_to_check)
         #Checking ports with Netstat
         tcp.connect((host, int(port_to_check)))
         tcp.shutdown(2)
         #Checking ports with Nmap
         resultstcp = nmap.nmap_tcp_scan(host, args="-p " + str(port_to_check))
-        print(json.dumps(resultstcp,indent=2))
         if resultstcp['127.0.0.1']['ports'][0]['state'] != 'open':
             raise Exception('Port ' + port_to_check + ' not open')
         
@@ -93,7 +90,6 @@ if __name__ == '__main__':
                 data = yaml.load(f, Loader=SafeLoader)
                 for service_name in data['services']:
                     service=data['services'][service_name]
-                    # print(service)
                     ports = service.get('ports',None)
                     if ports is not None:
                         NetApp_ports['services'][service_name]=dict()
@@ -111,7 +107,6 @@ if __name__ == '__main__':
                 expose_list=list()
                 for line in input:
                     expose_list += re.findall(r'EXPOSE \d+ ?\d*', line)
-                print(expose_list)
                 NetApp_ports['services'][netapp_image_name]=dict()
                 NetApp_ports['services'][netapp_image_name]['ports']=list()
                 for port in expose_list:
@@ -130,7 +125,6 @@ if __name__ == '__main__':
 
             container_ports_info = container.ports
             container_ports_list = list(container_ports_info.keys())
-            print(json.dumps(NetApp_ports['services'], indent=2))
 
             if len(NetApp_ports['services'][netapp_image_name]['ports']) != len(container_ports_list):
                 raise Exception("Netapp ports on Dockerfile not match ports exposed on running image")
