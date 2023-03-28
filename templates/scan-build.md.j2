@@ -37,7 +37,7 @@ Urls of Images pushed:
 Aws:
   {%- for image in service_info.docker_hub_images %}
 * {{image}}
-  {% endfor %}
+  {%- endfor %}
 
 Artifact:
   {%- for image in service_info.aws_images %}
