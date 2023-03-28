@@ -51,6 +51,7 @@ pipeline {
         CHECKPORTS_PATH = 'utils/checkports'
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         DOCKER_PATH="/usr/src/app"
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
     stages {
         stage('Clean workspace') {
