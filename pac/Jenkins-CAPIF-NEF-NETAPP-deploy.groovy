@@ -56,7 +56,6 @@ pipeline {
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        RELEASE_NAME = "${params.RELEASE_NAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
