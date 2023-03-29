@@ -2,7 +2,7 @@
   "releases": [
     {
       "name": "\($RELEASE_NAME)",
-      "chart": "../\($CHART_NAME)/",
+      "chart": "../cd/helm/\($CHART_NAME)/",
       "namespace": "\($NAMESPACE)",
       "atomic": true,
       "wait": true,
