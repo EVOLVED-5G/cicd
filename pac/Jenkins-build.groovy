@@ -26,15 +26,28 @@ String getPath(deployment) {
     }
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
-        string(name: 'VERSION', defaultValue: '1.0', description: '')
+        string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
-        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])       
+        string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        choice(name: 'STAGE', choices: ["verification", "validation", "certification"])
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
     }
 
     environment {
@@ -48,6 +61,10 @@ pipeline {
         DOCKER_VAR = false
         PATH_DOCKER = getPath("${params.STAGE}")
         PATH_AWS = getPathAWS("${params.STAGE}")
+        CHECKPORTS_PATH = 'utils/checkports'
+        ARTIFACTORY_CRED=credentials('artifactory_credentials')
+        DOCKER_PATH="/usr/src/app"
+        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
     }
     stages {
         stage('Clean workspace') {
@@ -58,7 +75,7 @@ pipeline {
                     docker system prune -a -f --volumes
                     sudo rm -rf $WORKSPACE/$NETAPP_NAME/
                     docker network create services_default
-                    echo ${env.PATH_AWS}
+                    echo $PATH_AWS
                     '''
                 }
             }
@@ -71,8 +88,8 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf $NETAPP_NAME 
-                    mkdir $NETAPP_NAME 
+                    rm -rf $NETAPP_NAME
+                    mkdir $NETAPP_NAME
                     cd $NETAPP_NAME
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     '''
@@ -85,20 +102,21 @@ pipeline {
                     DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME}/docker-compose.yml"
                 }
                 echo "env DOCKER VAR is ${DOCKER_VAR}"
-                
+
             }
         }
         //NICE TO HAVE: Makefile to encapsulate docker and docker-compose commands
         stage('Build') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }                
+            }
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME} .
+                    docker run -d -P ${NETAPP_NAME}
                     '''
                 }
             }
@@ -108,25 +126,38 @@ pipeline {
                 expression {
                     return "${DOCKER_VAR}".toBoolean()
                 }
-            }  
+            }
             steps {
                 dir ("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker network create demo-network
+                    make run-dev || true
                     docker-compose up --build --force-recreate -d
                     '''
                 }
             }
         }
+        //Check Ports on running images
+        stage('Check Ports of images generated') {
+            steps {
+                dir ("${env.WORKSPACE}/") {
+                    sh '''
+                    pip install -r ${CHECKPORTS_PATH}/requirements.txt
+                    python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME}
+                    '''
+                }
+            }
+        }
+        //----
         stage('Modify image name and upload to AWS') {
             when {
                 expression {
-                    return "${DOCKER_VAR}".toBoolean() 
+                    return "${DOCKER_VAR}".toBoolean()
                 }
-            }     
+            }
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
-                    script {    
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    script {
                         def cmd = "docker ps --format '{{.Image}}'"
                         def cmd2 = "docker ps --format '{{.Names}}'"
                         def image = sh(returnStdout: true, script: cmd).trim()
@@ -139,12 +170,16 @@ pipeline {
                             sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
                             sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
                             sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
+                            sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+                            sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${x[1]}-latest"""
                             }
                             else{
                             sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
                             sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
                             sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
                             sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
+                            sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-${VERSION}"""
+                            sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${x[1]}-latest"""
                             }
                         }
                     }
@@ -154,9 +189,9 @@ pipeline {
         stage('Publish in AWS - Dockerfile') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }    
+            }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                     sh '''
@@ -167,26 +202,30 @@ pipeline {
                         docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${VERSION}
+                        python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-${VERSION}
+                        python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME}-latest
                     else
                         docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
                         docker image tag ${NETAPP_NAME} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                         docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
+                        python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-${VERSION}
+                        python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME}-latest
                     fi
-                    '''  
-                }   
+                    '''
+                }
             }
         }
         stage('Modify container name to upload Docker-compose to Artifactory') {
             when {
                 expression {
-                    return "${DOCKER_VAR}".toBoolean()  
+                    return "${DOCKER_VAR}".toBoolean()
                 }
-            }  
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(1){
-                        script {   
+                        script {
                             sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
@@ -198,23 +237,27 @@ pipeline {
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
                                 sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
+                                sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
+                                sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
                                 } else{
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
                                 sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
                                 sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}" """
+                                sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":${VERSION}"""
+                                sh """ python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}/"${NETAPP_NAME}-${x[1]}":latest"""
                                 }
                             }
                         }
                     }
-                }               
+                }
             }
-        }   
+        }
         stage('Publish in Artefactory') {
             when {
                 expression {
-                    return !"${DOCKER_VAR}".toBoolean() 
+                    return !"${DOCKER_VAR}".toBoolean()
                 }
-            }   
+            }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(1){
@@ -225,10 +268,14 @@ pipeline {
                             docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:${VERSION}
                             docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:latest
                             docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}
+                            python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:${VERSION}
+                            python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME}:latest
                         else
                             docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}
                             docker image tag ${NETAPP_NAME} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
                             docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}
+                            python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:${VERSION}
+                            python3 utils/helpers/add_image_json.py report-build-${NETAPP_NAME}.json ${NETAPP_NAME} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME}:latest
                         fi
 
                         '''
@@ -236,11 +283,42 @@ pipeline {
                 }
             }
         }
+        stage('Upload report to Artifactory') {
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+
+                        # get Commit Information
+                        cd $NETAPP_NAME
+                        commit=$(git rev-parse HEAD)
+                        cd ..
+
+                        urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/Telefonica-Evolved5g-$NETAPP_NAME
+                        versionT=${VERSION}
+
+                        python3 utils/report_generator.py --template templates/scan-build.md.j2 --json report-build-$NETAPP_NAME.json --output report-build-$NETAPP_NAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
+                        docker build  -t pdf_generator utils/docker_generate_pdf/.
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-build-$NETAPP_NAME.pdf $DOCKER_PATH/report-build-$NETAPP_NAME.md
+                        declare -a files=("json" "md" "pdf")
+
+                        for x in "${files[@]}"
+                            do
+                                report_file="report-build-$NETAPP_NAME.$x"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                    --data-binary @"$report_file" \
+                                    "$url"
+                            done
+                    '''
+                }
+            }
+        }
     }
     post {
         always {
             sh '''
-            docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q) 
+            docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf $WORKSPACE/$NETAPP_NAME/
             '''

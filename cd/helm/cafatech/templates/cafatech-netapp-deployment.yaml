@@ -24,8 +24,16 @@ spec:
       labels:
         io.kompose.service: cafa-netapp
     spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}  
       containers:
+      {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:cafatechnetapp3.git-cafatech-netapp-3-latest
+      {{- else }} 
         - image: dockerhub.hi.inet/evolved-5g/cafatechnetapp3.git/cafatechnetapp3.git-cafatech-netapp-3:latest
+      {{- end }}
           env:
               # NetApp variables
             - name: NETAPP_NAME

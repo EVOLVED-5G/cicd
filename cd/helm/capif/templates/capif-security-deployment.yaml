@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: capif-security
+  name: capif-security
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: capif-security
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: capif-security
+    spec:
+      {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}  
+      containers:
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_capif-security_1-{{ .Values.version }}
+        {{- else }}
+        - image: "dockerhub.hi.inet/evolved-5g/capif/services_capif-security_1:{{ .Values.version }}"
+        {{- end }}
+          env:
+            - name: CAPIF_HOSTNAME
+              value: capif.apps.ocp-epg.hi.inet 
+          name: capif-security
+          ports:
+            - containerPort: 8080
+          resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: logs
+  name: logs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: logs
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: logs
+    spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}  
+      containers:
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_logs_1-{{ .Values.version }}
+        {{- else }}
+        - image: dockerhub.hi.inet/evolved-5g/capif/services_logs_1:latest
+        {{- end }}
+          name: logs
+          ports:
+            - containerPort: 8080
+          resources: {}
+status: {}

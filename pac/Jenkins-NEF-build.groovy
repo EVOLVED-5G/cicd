@@ -1,11 +1,23 @@
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'GIT_NEF_URL', defaultValue: 'https://github.com/EVOLVED-5G/NEF_emulator', description: 'URL of the NEF Github Repository')
         string(name: 'GIT_NEF_BRANCH', defaultValue: 'main', description: 'NEF branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
     }
 
     environment {
@@ -39,8 +51,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
                     sh'''
                     make prepare-dev-env
-
-
+                    sed -i "s,EXTERNAL_NET=.*,EXTERNAL_NET=false,g" .env
                     EXTERNAL_NET=false
                     '''
                 }
@@ -95,9 +106,9 @@ pipeline {
                         def name  = sh(returnStdout: true, script: cmd2).trim()
                         sh '''$(aws ecr get-login --no-include-email)'''
                         [image.tokenize(), name.tokenize()].transpose().each { x ->
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":${VERSION}.${BUILD_NUMBER} """
-                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/"${x[1]}":latest"""
-                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/"${x[1]}" """
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/nef/"${x[1]}":${VERSION}.${BUILD_NUMBER} """
+                            sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/nef/"${x[1]}":latest"""
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/nef/"${x[1]}" """
                         }
                     }
                 }               
@@ -109,7 +120,7 @@ pipeline {
             sh '''
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
-            sudo rm -rf $WORKSPACE/$NETAPP_NAME/
+            sudo rm -rf $WORKSPACE/$FOLDER_NAME/
             '''
         }
         cleanup{

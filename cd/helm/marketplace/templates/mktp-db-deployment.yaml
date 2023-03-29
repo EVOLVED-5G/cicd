@@ -35,7 +35,7 @@ spec:
               value: {{ .Values.db_password }}
             - name: MYSQL_USER
               value: {{ .Values.db_user }}
-          image: dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_db:latest
+          image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_db:{{ .Values.version }}"
           name:  {{ .Values.mktp_db_service }}
           ports:
             - containerPort: 3306

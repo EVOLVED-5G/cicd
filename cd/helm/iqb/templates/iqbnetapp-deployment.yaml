@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -c -o fogus
+    kompose.version: 1.26.1 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: iqbnetapp
+  name: iqbnetapp
+spec:
+  replicas: {{ .Values.app_replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: iqbnetapp
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -c -o fogus
+        kompose.version: 1.26.1 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: iqbnetapp
+    spec:
+    {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+      imagePullSecrets:
+        - name: regcred
+      {{- end }}
+      containers:
+        {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
+        - image: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-iqb_netapp-latest
+        {{- else }}
+        - image: dockerhub.hi.inet/evolved-5g/iqb-netapp/iqb-netapp-iqb_netapp:latest
+        {{- end }}
+          name: iqbnetapp
+          env:
+            - name: NETAPP_ID
+              value: myNetapp
+            - name: NETAPP_NAME
+              value: iqb  
+            - name: KEYCLOAK_ADDRESS
+              value: keycloak:8080/auth
+            - name: KEYCLOAK_REALM
+              value: EVOLVED-5G
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: admin
+            - name: CAPIF_PORT_HTTPS
+              value: "443"
+            - name: CAPIF_PORT_HTTP
+              value: "80"
+            - name: CAPIF_HOSTNAME
+              value: "capif.apps.ocp-epg.hi.inet"
+            - name: PATH_TO_CERTS
+              value: /app/capif_onboarding
+            - name: NEF_PASSWORD
+              value: pass
+            - name: NEF_USER
+              value: "admin@my-email.com"
+            - name: NEF_ADDRESS
+              value: "evol5-capif-nef.apps.ocp-epg.hi.inet"
+            - name:  CALLBACK_ADDRESS
+              value: "http://iqb-callback.apps.ocp-epg.hi.inet"
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+status: {}

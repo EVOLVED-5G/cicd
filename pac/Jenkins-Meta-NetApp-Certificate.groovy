@@ -13,6 +13,9 @@ pipeline {
             label 'evol5-slave'
         }
     }
+//    triggers{
+//        cron("40 15 * * *")
+//    }
     options {
         timeout(time: 60, unit: 'MINUTES')
         retry(1)
@@ -23,6 +26,7 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
     environment {
@@ -31,6 +35,7 @@ pipeline {
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/certification"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
+        emails = "${params.EMAILS}".split(',')
     }
 
     stages {

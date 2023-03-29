@@ -4,8 +4,19 @@ String netappName(String url) {
     return var ;
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -84,12 +95,12 @@ pipeline {
                     done
 
                     today=$(date +'%d/%m/%Y')
-                    mv *-licenses*.pdf executive_summary/
+                    [ -e *-licenses*.pdf ] && mv *-licenses*.pdf executive_summary/ || echo "No licenses file found"
                     pdfunite *.pdf mid_report1.pdf
-                    pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf
+                    [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
-                    
+
                     # Remember install PDFTK for watermarking
                     pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
                     pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf

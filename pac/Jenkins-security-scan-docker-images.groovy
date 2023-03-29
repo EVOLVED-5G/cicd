@@ -15,8 +15,19 @@ def getPath(deployment) {
     }
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -28,6 +39,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ["verification", "validation", "certification"])
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -65,32 +77,32 @@ pipeline {
 
                     for x in "${images[@]}"
                     do
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" 
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
                         curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > report-tr-img-$x.json
                     done
                     '''
                 }
             }
         }
-        stage('Get wiki repo and update Evolved Wiki'){
-            options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
-                }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone $GIT_NETAPP_URL.wiki.git
-                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
-                    cd ${NETAPP_NAME}.wiki/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
-                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
-                    '''
-                }
-           }
-        }
+       stage('Get wiki repo and update Evolved Wiki'){
+           options {
+                   timeout(time: 10, unit: 'MINUTES')
+                   retry(1)
+               }
+           steps {
+               dir ("${env.WORKSPACE}/") {
+                   sh '''
+                   git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+                   git clone $GIT_NETAPP_URL.wiki.git
+                   cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+                   cd ${NETAPP_NAME}.wiki/
+                   git add -A .
+                   git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
+                   git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+                   '''
+               }
+          }
+       }
 
 
         stage('Upload report to Artifactory') {
@@ -108,10 +120,10 @@ pipeline {
                     images=($response)
                     docker build  -t pdf_generator utils/docker_generate_pdf/.
                     for x in "${images[@]}"
-                    do  
+                    do
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
                         python3 utils/report_generator.py --template templates/scan-image.md.j2 --json report-tr-img-$x.json --output report-tr-img-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT
-                        
+
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-img-$x.pdf $DOCKER_PATH/report-tr-img-$x.md
 
                         # Check to see if the image has succesfully passed all tests

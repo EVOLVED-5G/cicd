@@ -4,8 +4,19 @@ String netappName(String url) {
     return var ;
 }
 
+def getAgent(deployment) {
+    String var = deployment
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
+    }else {
+        return "evol5-slave";
+    }
+}
+
 pipeline {
-    agent { node {label 'evol5-openshift'}  }
+    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -16,7 +27,8 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
-        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
+        booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
     }
 
     environment {
@@ -34,56 +46,56 @@ pipeline {
         DOCKER_PATH="/usr/src/app"
     }
     stages {
-        stage('Get Repo and clone'){
-            options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
-                }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}                                                
-                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL  
-                    rm -rf Evolved5g-${NETAPP_NAME}/* 
-                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
-                    cd Evolved5g-${NETAPP_NAME}/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
-                    git push -u origin $GIT_NETAPP_BRANCH
-                    '''
-                }
-           }
-        }
+       stage('Get Repo and clone'){
+           options {
+                   timeout(time: 10, unit: 'MINUTES')
+                   retry(1)
+               }
+           steps {
+               dir ("${env.WORKSPACE}/") {
+                   sh '''
+                   git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}
+                   git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL
+                   rm -rf Evolved5g-${NETAPP_NAME}/*
+                   cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
+                   cd Evolved5g-${NETAPP_NAME}/
+                   git add -A .
+                   git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
+                   git push -u origin $GIT_NETAPP_BRANCH
+                   '''
+               }
+          }
+       }
 
         stage('Launch Github Actions command') {
             steps {
-                dir ("${env.WORKSPACE}/") {                                                                                                                                     
-                    sh '''#!/bin/bash                                   
+                dir ("${env.WORKSPACE}/") {
+                    sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCHg&output_format=md"
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&&branch=$GIT_NETAPP_BRANCH&output_format=json" > report-tr-repo-secrets-$NETAPP_NAME_LOWER.json
                     '''
                 }
             }
         }
-        stage('Get wiki repo and update Evolved Wiki'){
-            options {
-                    timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
-                }
-            steps {
-                dir ("${env.WORKSPACE}/") {
-                    sh '''
-                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
-                    git clone $GIT_NETAPP_URL.wiki.git
-                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
-                    cd ${NETAPP_NAME}.wiki/
-                    git add -A .
-                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy secreats leaks scan report'
-                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
-                    '''
-                }
-           }
-        }
+       stage('Get wiki repo and update Evolved Wiki'){
+           options {
+                   timeout(time: 10, unit: 'MINUTES')
+                   retry(1)
+               }
+           steps {
+               dir ("${env.WORKSPACE}/") {
+                   sh '''
+                   git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
+                   git clone $GIT_NETAPP_URL.wiki.git
+                   cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
+                   cd ${NETAPP_NAME}.wiki/
+                   git add -A .
+                   git diff-index --quiet HEAD || git commit -m 'Addig Trivy secreats leaks scan report'
+                   git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
+                   '''
+               }
+          }
+       }
 
         stage('Upload report to Artifactory') {
             when {
@@ -106,7 +118,7 @@ pipeline {
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
                         docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/report-tr-repo-secrets-$NETAPP_NAME_LOWER.md
                         declare -a files=("json" "md" "pdf")
-                        
+
                         for x in "${files[@]}"
                             do
                                 report_file="report-tr-repo-secrets-$NETAPP_NAME_LOWER.$x"
