@@ -76,11 +76,19 @@ pipeline {
                     NAMESPACE_CAPIF=$(helm ls --all-namespaces -f "^$RELEASE_NAME_CAPIF" | awk 'NR==2{print $2}')
                     echo $NAMESPACE_CAPIF
                     helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME_CAPIF -n $NAMESPACE_CAPIF --wait
+                    kubectl --kubeconfig /home/contint/.kube/config delete ns $NAMESPACE_CAPIF
                     
                     echo "#### uninstall nef ####"
                     NAMESPACE_NEF=$(helm ls --all-namespaces -f "^$RELEASE_NAME_NEF" | awk 'NR==2{print $2}')
                     echo $NAMESPACE_NEF
                     helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME_NEF -n $NAMESPACE_NEF --wait
+                    kubectl --kubeconfig /home/contint/.kube/config delete ns $NAMESPACE_NEF
+
+                    echo "#### uninstall network-app ####"
+                    NAMESPACE_NETAPP=$(helm ls --all-namespaces -f "^$RELEASE_NAME_NETAPP" | awk 'NR==2{print $2}')
+                    echo $NAMESPACE_NETAPP
+                    helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME_NETAPP -n $NAMESPACE_NETAPP --wait
+                    kubectl --kubeconfig /home/contint/.kube/config delete ns $NAMESPACE_NETAPP
                     '''
                 }
             }
