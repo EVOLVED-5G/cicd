@@ -35,7 +35,7 @@ pipeline {
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/certification"
         PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
-        emails = "${params.EMAILS}".split(',')
+        emails = "${params.EMAILS}".split(' ')
     }
 
     stages {

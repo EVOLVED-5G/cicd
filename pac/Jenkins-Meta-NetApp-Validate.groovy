@@ -56,7 +56,7 @@ pipeline {
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
-        emails = "${params.EMAILS}".split(',')
+        emails = "${params.EMAILS}".split(' ')
     }
 
     stages {
