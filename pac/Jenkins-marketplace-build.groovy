@@ -16,7 +16,7 @@ pipeline {
         string(name: 'VERSION', defaultValue: '1.0', description: '')
         string(name: 'GIT_MARKET_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace', description: 'URL of the NEF Github Repository')
         string(name: 'GIT_MARKET_BRANCH', defaultValue: 'main', description: 'Marketplace branch name')
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
     }
 

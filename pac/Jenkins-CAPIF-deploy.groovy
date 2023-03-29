@@ -33,7 +33,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'HOSTNAME', defaultValue: 'nginx.apps.ocp-epg.hi.inet', description: 'Hostname')
         string(name: 'VERSION', defaultValue: '3.0', description: 'Version')
         string(name: 'RELEASE_NAME', defaultValue: 'dummy-capif', description: 'Release name')
