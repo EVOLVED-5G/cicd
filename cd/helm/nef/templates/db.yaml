@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  labels:
+    io.kompose.service: db
+  {{- include "nef-kube.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  type: {{ .Values.db.type }}
+  selector:
+    io.kompose.service: db
+  {{- include "nef-kube.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.db.ports | toYaml | nindent 2 -}}

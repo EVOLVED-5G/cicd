@@ -1,14 +1,75 @@
-## variables for the CAPIF
-app_replicas: 1
-hostname: fogus.apps.ocp-epg.hi.inet
-env: "openshift"
-capif:
-  hostname: capif.apps.ocp-epg.hi.inet
-  http_port: "80"
-  https_port: "443"
+environment: "kubernetes-athens"
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "x.x.x.x"
 
-nef:
-  hostname: nef.apps.ocp-epg.hi.inet
-
-ingress_ip: "10.161.1.117"
-version: "4.0"
+dbnetapp:
+  netapppostgres:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netapppostgres"
+      tag: "latest"
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  ports:
+  - name: "5432"
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+  replicas: 1
+django:
+  netappdjango:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango"
+      tag: "latest"
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  ports:
+  - name: "8000"
+    port: 8000
+    targetPort: 8000
+  replicas: 1
+  type: ClusterIP
+env:
+  callbackAddress: 192.168.1.5:8000
+  capifHostname: "my-capif.evolved-5g.eu"
+  capifPortHttp: "30048"
+  capifPortHttps: "30548"
+  frontendAddress: fogus.evolved-5g.eu
+  nefAddress: 192.168.1.5:8888
+  nefPassword: pass
+  nefUser: admin@my-email.com
+  netappAddress: 192.168.1.5:8000
+  pathToCerts: /code/capif_onboarding
+  postgresDb: evolvedb
+  postgresPassword: evolvepass
+  postgresUser: evolveclient
+  vappAddress: 195.134.66.79:8443
+fe:
+  netappfe:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe"
+      tag: "latest"
+    resources: {}
+#     limits:
+#       cpu: 100m
+#       memory: 128Mi
+#     requests:
+#       cpu: 100m
+#       memory: 128Mi
+  ports:
+  - name: "fe"
+    port: 4200
+    targetPort: 4200
+  replicas: 1
+  type: ClusterIP
+kubernetesClusterDomain: cluster.local

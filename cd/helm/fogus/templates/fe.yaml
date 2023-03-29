@@ -1,0 +1,40 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fe
+  labels:
+  {{- include "fogus-kube.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../services/docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "{{ .Values.env.frontendAddress }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: 'fe'
+            port:
+              number: 4200
+        path: /
+        pathType: Prefix
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fe
+  labels:
+    io.kompose.service: netappfe
+  {{- include "fogus-kube.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose convert -c
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  type: {{ .Values.fe.type }}
+  selector:
+    io.kompose.service: netappfe
+  {{- include "fogus-kube.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.fe.ports | toYaml | nindent 2 -}}
