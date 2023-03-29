@@ -1,0 +1,21 @@
+{
+  "releases": [
+    {
+      "name": "\($RELEASE_NAME)",
+      "chart": "../\($CHART_NAME)/",
+      "namespace": "\($NAMESPACE)",
+      "atomic": true,
+      "wait": true,
+      "values": [
+        "../nef-kube/values.yaml",
+        {
+          "backend": {
+            "ingress": {
+              "host": "\($HOSTNAME_NEF)"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

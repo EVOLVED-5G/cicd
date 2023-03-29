@@ -1,0 +1,25 @@
+{
+  "releases": [
+    {
+      "name": "\($RELEASE_NAME)",
+      "chart": "../\($CHART_NAME)/",
+      "namespace": "\($NAMESPACE)",
+      "atomic": true,
+      "wait": true,
+      "values": [
+        "../\($FOLDER_NETWORK_APP)/values.yaml",
+        {
+          "env": {
+            "fogusHostname": "\($HOSTNAME_NETAPP)",
+            "environment": "\($DEPLOYMENT)"
+          }
+        },
+        {
+          "fe": {
+            "replicas": "\($APP_REPLICAS)"
+          }
+        }
+      ]
+    }
+  ]
+}
