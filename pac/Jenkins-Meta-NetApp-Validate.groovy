@@ -455,7 +455,7 @@ pipeline {
         stage('Validation: Destroying CAPIF-NEF-NetworkApp'){
             steps{
                 script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: true,
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: true,
                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
                                         string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
