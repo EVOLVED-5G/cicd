@@ -116,31 +116,43 @@ pipeline {
                     sh '''#!/bin/bash
                             echo "creating temporal folder ${BUILD_NUMBER}.d/"
                             mkdir ${BUILD_NUMBER}.d/
+                            echo "BUILD_NUMBER=${BUILD_NUMBER}"
+
                             echo "setting up capif variables"
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
-                            
+                            echo "LATEST_VERSION=$LATEST_VERSION"
+                            echo "VERSION_CAPIF=$VERSION_CAPIF"
+                            echo "HOSTNAME_CAPIF=$HOSTNAME_CAPIF"
+
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
-                            
+
                             yq -r -j ./cd/helm/helmfile.d/00-capif.yaml \
                             | jq '.releases[].name="capif-${BUILD_NUMBER}"' \
                             | jq '.releases[].namespace="capif-${BUILD_NUMBER}"' \
                             | jq '.releases[].values[1].nginx.nginx.env.capifHostname="$HOSTNAME_CAPIF"' \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
-                            
+
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
-                            
+
                             echo "setting up nef variables"
+                            echo "HOSTNAME_NEF=$HOSTNAME_NEF"
+
                             yq -r -j ./cd/helm/helmfile.d/01-nef.yaml \
                             | jq '.releases[].name="nef-${BUILD_NUMBER}"' \
                             | jq '.releases[].namespace="nef-${BUILD_NUMBER}"' \
                             | jq '.releases[].values[1].backend.ingress.host="$HOSTNAME_NEF"' \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
-                            
+
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
-                            
+
                             echo "setting up network-app variables"
+                            echo "FOLDER_NETWORK_APP=$FOLDER_NETWORK_APP"
+                            echo "HOSTNAME_NETAPP=$HOSTNAME_NETAPP"
+                            echo "APP_REPLICAS=$APP_REPLICAS"
+                            echo "DEPLOYMENT=$DEPLOYMENT"
+
                             yq -r -j ./cd/helm/helmfile.d/02-netapp.yaml \
                             | jq '.releases[].name="$FOLDER_NETWORK_APP-${BUILD_NUMBER}"' \
                             | jq '.releases[].namespace="network-app-${BUILD_NUMBER}"' \
@@ -149,7 +161,7 @@ pipeline {
                             | jq '.releases[].values[1].env.environment="$DEPLOYMENT"' \
                             | jq '.releases[].values[2].fe.replicas="$APP_REPLICAS"' \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
-                            
+
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
                             
