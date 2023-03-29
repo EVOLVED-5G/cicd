@@ -114,7 +114,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''#!/bin/bash
-                            echo "creating temporal folder ${BUILD_NUMBER}.d/"
+                            echo "creating temporal folder"
                             mkdir ${BUILD_NUMBER}.d/
                             echo "BUILD_NUMBER=${BUILD_NUMBER}"
 
