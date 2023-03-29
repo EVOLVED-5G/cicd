@@ -521,14 +521,14 @@ pipeline {
                     dir ("${WORKSPACE}/") {
                         sh '''#!/bin/bash
 
-                        report_file="report-sonar-${NETAPP_NAME}-evolved5g.pdf"
+                        report_file="final_report.pdf"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                        curl  $url -u $PASSWORD_ARTIFACTORY -o report-sonar-${NETAPP_NAME}-evolved5g.pdf
+                        curl  $url -u $PASSWORD_ARTIFACTORY -o final_report.pdf
                         '''
                     }
                     emails.tokenize().each() {
-                        email -> emailext attachmentsPattern: "**/report-sonar-${NETAPP_NAME}-evolved5g.pdf",
+                        email -> emailext attachmentsPattern: "**/final_report.pdf",
                                  body: '''${SCRIPT, template="groovy-html.template"}''',
                                  mimeType: 'text/html',
                                  subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
