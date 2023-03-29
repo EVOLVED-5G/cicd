@@ -7,7 +7,7 @@
       "atomic": true,
       "wait": true,
       "values": [
-        "../nef-kube/values.yaml",
+        "../cd/helm/nef/values.yaml",
         {
           "backend": {
             "ingress": {

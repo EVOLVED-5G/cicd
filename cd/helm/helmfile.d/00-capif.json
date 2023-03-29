@@ -7,7 +7,7 @@
       "atomic": true,
       "wait": true,
       "values": [
-        "../capif/values.yaml",
+        "../cd/helm/capif/values.yaml",
         {
           "nginx": {
             "nginx": {

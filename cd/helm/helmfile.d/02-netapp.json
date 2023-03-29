@@ -7,7 +7,7 @@
       "atomic": true,
       "wait": true,
       "values": [
-        "../\($FOLDER_NETWORK_APP)/values.yaml",
+        "../cd/helm/\($FOLDER_NETWORK_APP)/values.yaml",
         {
           "env": {
             "fogusHostname": "\($HOSTNAME_NETAPP)",
