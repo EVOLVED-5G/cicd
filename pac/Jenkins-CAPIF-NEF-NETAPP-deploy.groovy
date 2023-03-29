@@ -114,6 +114,7 @@ pipeline {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''#!/bin/bash
+                            echo "creating temporal folder ${BUILD_NUMBER}.d/"
                             mkdir ${BUILD_NUMBER}.d/
                             echo "setting up capif variables"
                             sed -i -e "s/appVersion="3.0"/appVersion="$VERSION_CAPIF"/g ./cd/helm/capif/Chart.yaml
