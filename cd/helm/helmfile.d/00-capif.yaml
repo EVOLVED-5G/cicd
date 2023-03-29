@@ -1,0 +1,12 @@
+releases:
+  - name: capif
+    chart: ../capif/
+    namespace: ""
+    atomic: true
+    wait: true
+    values: 
+      - ../capif/values.yaml
+      - nginx:
+            nginx:
+              env:
+                capifHostname: ""

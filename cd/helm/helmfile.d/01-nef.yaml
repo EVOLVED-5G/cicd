@@ -1,0 +1,11 @@
+releases:
+  - name: nef
+    chart: ../nef/
+    namespace: ""
+    atomic: true
+    wait: true
+    values: 
+      - ../nef-kube/values.yaml
+      - backend:
+          ingress:
+            host: ""
