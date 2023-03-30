@@ -16,7 +16,7 @@ pipeline {
         retry(2)
     }
     parameters {
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME', defaultValue: 'dummy-network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'RELEASE_NAME', defaultValue: 'dummy-network-app', description: 'Name to NetworkApp')

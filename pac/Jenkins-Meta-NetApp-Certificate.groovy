@@ -24,8 +24,9 @@ pipeline {
     parameters {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'develop', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
     environment {
@@ -33,6 +34,8 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED=credentials('artifactory_credentials')
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/certification"
+        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
+        emails = "${params.EMAILS}".split(' ')
     }
 
     stages {
@@ -430,6 +433,27 @@ pipeline {
     }
     post {
         always {
+            // Nettaps emails to send the report
+            if (emails?.trim()) {
+                dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+
+                    report_file="final_report.pdf"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+
+                    curl  $url -u $PASSWORD_ARTIFACTORY -o final_report.pdf
+                    '''
+                }
+                emails.tokenize().each() {
+                    email -> emailext attachmentsPattern: "**/final_report.pdf",
+                                body: '''${SCRIPT, template="groovy-html.template"}''',
+                                mimeType: 'text/html',
+                                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                from: 'jenkins-evolved5G@tid.es',
+                                replyTo: "jenkins-evolved5G",
+                                to: email
+                }
+            }
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
