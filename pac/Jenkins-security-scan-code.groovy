@@ -1,22 +1,22 @@
 String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    return var ;
+    String url2 = url ?: ''
+    String var = url2.substring(url2.lastIndexOf('/') + 1)
+    return var
 }
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    }else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
     }else {
-        return "evol5-slave";
+        return 'evol5-slave'
     }
 }
 
 pipeline {
-    agent {node {label getAgent("${params.ENVIRONMENT}") == "any" ? "" : getAgent("${params.ENVIRONMENT}")}}
+    agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -26,32 +26,32 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
     environment {
-        GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
-        GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
-        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
+        GIT_NETAPP_URL = "${params.GIT_NETAPP_URL}"
+        GIT_CICD_BRANCH = "${params.GIT_CICD_BRANCH}"
+        GIT_NETAPP_BRANCH = "${params.GIT_NETAPP_BRANCH}"
+        PASSWORD_ARTIFACTORY = credentials('artifactory_credentials')
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         TOKEN_TRIVY = credentials('token_trivy')
-        ARTIFACTORY_CRED=credentials('artifactory_credentials')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
-        DOCKER_PATH="/usr/src/app"
+        ARTIFACTORY_CRED = credentials('artifactory_credentials')
+        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        DOCKER_PATH = '/usr/src/app'
     }
     stages {
-       stage('Get Repo and clone'){
-           options {
-               timeout(time: 10, unit: 'MINUTES')
-               retry(1)
-           }
-           steps {
-               dir ("${env.WORKSPACE}/") {
-                   sh '''
+        stage('Get Repo and clone') {
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+                retry(2)
+            }
+            steps {
+                dir("${env.WORKSPACE}/") {
+                    sh '''
                    git clone --single-branch --branch $GIT_NETAPP_BRANCH https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}
                    git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL
                    rm -rf Evolved5g-${NETAPP_NAME}/*
@@ -61,13 +61,16 @@ pipeline {
                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
                    git push -u origin $GIT_NETAPP_BRANCH
                    '''
-               }
-           }
-       }
+                }
+            }
+        }
 
         stage('Launch Github Actions command') {
+            options {
+                retry(2)
+            }
             steps {
-                dir ("${env.WORKSPACE}/") {
+                dir("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md"
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json" > report-tr-repo-$NETAPP_NAME_LOWER.json
@@ -75,35 +78,38 @@ pipeline {
                 }
             }
         }
-       stage('Get wiki repo and update Evolved Wiki'){
-           options {
-                   timeout(time: 10, unit: 'MINUTES')
-                   retry(1)
-               }
-           steps {
-               dir ("${env.WORKSPACE}/") {
-                   sh '''
+        stage('Get wiki repo and update Evolved Wiki') {
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+                retry(2)
+            }
+            steps {
+                dir("${env.WORKSPACE}/") {
+                    sh '''
                    git clone https://$TOKEN@github.com/Telefonica/Evolved5g-${NETAPP_NAME}.wiki.git
                    git clone $GIT_NETAPP_URL.wiki.git
                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                    cd ${NETAPP_NAME}.wiki/
                    git add -A .
                    git config user.email "evolved5g@gmail.com"
-                   git config user.name "Evolved5G" 
+                   git config user.name "Evolved5G"
                    git diff-index --quiet HEAD || git commit -m \'Adding Trivy scan report\'
                    git push https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                    '''
-               }
-          }
-       }
+                }
+            }
+        }
         stage('Upload report to Artifactory') {
             when {
                 expression {
-                    return REPORTING;
+                    return REPORTING
                 }
             }
+            options {
+                retry(2)
+            }
             steps {
-                 dir ("${WORKSPACE}/") {
+                dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
 
                         # get Commit Information
@@ -135,11 +141,11 @@ pipeline {
         stage('Check stage status') {
             when {
                 expression {
-                    return REPORTING;
+                    return REPORTING
                 }
             }
             steps {
-                 dir ("${WORKSPACE}/") {
+                dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     if grep -q "failed" report-tr-repo-$NETAPP_NAME_LOWER.md; then
                         result=false
@@ -163,10 +169,10 @@ pipeline {
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: "jenkins-evolved5G",
+                replyTo: 'jenkins-evolved5G',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        cleanup{
+        cleanup {
             /* clean up our workspace */
             deleteDir()
             /* clean up tmp directory */
@@ -180,6 +186,3 @@ pipeline {
         }
     }
 }
-
-
-
