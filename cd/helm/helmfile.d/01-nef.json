@@ -1,0 +1,21 @@
+{
+  "releases": [
+    {
+      "name": "\($RELEASE_NAME)",
+      "chart": "../cd/helm/\($CHART_NAME)/",
+      "namespace": "\($NAMESPACE)",
+      "atomic": true,
+      "wait": true,
+      "values": [
+        "../cd/helm/nef/values.yaml",
+        {
+          "backend": {
+            "ingress": {
+              "host": "\($HOSTNAME_NEF)"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

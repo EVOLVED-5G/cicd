@@ -1,0 +1,23 @@
+{
+  "releases": [
+    {
+      "name": "\($RELEASE_NAME)",
+      "chart": "../cd/helm/\($CHART_NAME)/",
+      "namespace": "\($NAMESPACE)",
+      "atomic": true,
+      "wait": true,
+      "values": [
+        "../cd/helm/capif/values.yaml",
+        {
+          "nginx": {
+            "nginx": {
+              "env": {
+                "capifHostname": "\($HOSTNAME_CAPIF)"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

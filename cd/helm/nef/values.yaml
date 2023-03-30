@@ -1,5 +1,136 @@
-## variables for the CAPIF
-nef_hostname: nef.apps.ocp-epg.hi.inet
-capif_hostname: capif.apps.ocp-epg.hi.inet
-env: openshift
-version: "latest"
+environment: "kubernetes-athens"
+
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "x.x.x.x"
+
+backend:
+  backend:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1"
+      tag: ""
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  ports:
+  - name: backend
+    port: 8888
+    targetPort: 80
+  replicas: 1
+  type: ClusterIP
+  ingress:
+    host: "my-nef.evolved-5g.eu"
+db:
+  db:
+    env:
+      pgdata: /var/lib/postgresql/data/pgdata
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
+      tag: ""
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  replicas: 1
+  ports:
+  - name: "db"
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+env:
+  backendCorsOrigins: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
+  dockerImageBackend: backend
+  dockerImageFrontend: frontend
+  domain: localhost
+  emailsFromEmail: user@my-email.com
+  firstSuperuser: admin@my-email.com
+  firstSuperuserPassword: pass
+  mongoPassword: pass
+  mongoUser: root
+  mongoClient: mongodb://mongo:27017
+  pgadminDefaultEmail: admin@my-email.com
+  pgadminDefaultPassword: pass
+  pgadminListenPort: "5050"
+  postgresDb: app
+  postgresPassword: pass
+  postgresServer: db
+  postgresUser: postgres
+  projectName: NEF_Emulator
+  secretKey: 2D47CF2958CEC7CC86C988E9F9684
+  sentryDsn: ""
+  serverHost: https://localhost
+  serverName: localhost
+  serverPort: "8888"
+  smtpHost: mail.host.com
+  smtpPassword: pass
+  smtpPort: "465"
+  smtpTls: "True"
+  smtpUser: user
+  usersOpenRegistration: "true"
+  usePublicKeyVerification: "True"
+  capifHostname: "my-capif.evolved-5g.eu"
+  capifHttpPort: "30048"
+  capifHttpsPort: "30548"
+
+kubernetesClusterDomain: cluster.local
+mongo:
+  mongo:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo_nef-1"
+      tag: ""
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  replicas: 1
+  ports:
+  - name: "mongo"
+    port: 27017
+    targetPort: 27017
+  type: ClusterIP
+mongoExpress:
+  mongoExpress:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo-express-1"
+      tag: ""
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  ports:
+  - name: "mongo-express"
+    port: 8081
+    targetPort: 8081
+  replicas: 1
+  type: ClusterIP
+pgadmin:
+  pgadmin:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-pgadmin-1"
+      tag: ""
+    resources:
+     limits:
+       cpu: 100m
+       memory: 128Mi
+     requests:
+       cpu: 100m
+       memory: 128Mi
+  ports:
+  - name: "pgadmin"
+    port: 5050
+    targetPort: 5050
+  replicas: 1
+  type: ClusterIP

@@ -1,4 +1,3 @@
-{{- if eq .Values.env "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
@@ -7,13 +6,12 @@ metadata:
     app.kubernetes.io/managed-by: Helm
     io.kompose.service: mongo-express
   name: mongo-express
-  namespace: {{ .Release.Namespace }}
   resourceVersion: "751945857"
   uid: 6d7963ca-3fd7-41a6-a09a-83bc0bc64bc4
 spec:
   host: mongo-express-capif-evol.apps.ocp-epg.hi.inet
   port:
-    targetPort: {{ .Values.mongo_express_port}}
+    targetPort: "8081"
   to:
     kind: Service
     name: mongo-express
@@ -29,4 +27,3 @@ status:
     routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
     routerName: default
     wildcardPolicy: None
-{{- end }}
