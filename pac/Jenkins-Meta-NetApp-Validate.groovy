@@ -239,7 +239,7 @@ pipeline {
         stage('Validation: Deploying CAPIF-NEF-NetworkApp'){
             steps{
                 script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: true,
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/019-CAPIF-NEF-NETAPP-deploy', wait: true, propagate: true,
                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
                                         string(name: 'VERSION_CAPIF', value: String.valueOf(VERSION_CAPIF)),
