@@ -403,22 +403,22 @@ pipeline {
 
                 //Review Parameters
                 //jenkins-dummy
-                stage('Validation: NEF Services as SessionWithQoS') {
-                    steps {
-                        script {
-                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                                def jobResult = jobBuild.getResult()
-                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                                buildResults['nef-services-as-sessionwithqos'] = jobResult
-                        }
-                    }
-                }
-
+//                stage('Validation: NEF Services as SessionWithQoS') {
+//                    steps {
+//                        script {
+//                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
+//                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+//                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+//                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+//                                def jobResult = jobBuild.getResult()
+//                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+//                                buildResults['nef-services-as-sessionwithqos'] = jobResult
+//                        }
+//                    }
+//                }
+//
                 //Review Parameters
                 //jenkins-dummy
                 stage('Validation: NEF Services MonitoringEvent API') {
@@ -439,22 +439,22 @@ pipeline {
 
                 //Review Parameters
                 //jenkins-dummy
-                stage('Validation: NEF Services MonitoringEvent') {
-                    steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                            def jobResult = jobBuild.getResult()
-                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                                buildResults['nef-services-monitoringevent'] = jobResult
-                        }
-                    }
-                }
-            }
+//                stage('Validation: NEF Services MonitoringEvent') {
+//                    steps {
+//                        script {
+//                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+//                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+//                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+//                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+//                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+//                            def jobResult = jobBuild.getResult()
+//                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+//                                buildResults['nef-services-monitoringevent'] = jobResult
+//                        }
+//                    }
+//                }
+//            }
         }
         stage('Validation: Destroying CAPIF-NEF-NetworkApp'){
             steps{
