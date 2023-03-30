@@ -75,6 +75,7 @@ pipeline {
                     NAMESPACE=$(helm ls --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
                     echo $NAMESPACE
                     helm uninstall --debug --kubeconfig /home/contint/.kube/config $RELEASE_NAME -n $NAMESPACE --wait
+                    kubectl --kubeconfig /home/contint/.kube/config delete ns $NAMESPACE
                     '''
                 }
             }
