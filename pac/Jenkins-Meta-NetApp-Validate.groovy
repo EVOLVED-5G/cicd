@@ -439,84 +439,69 @@ pipeline {
 
                 //Review Parameters
                 //jenkins-dummy
-//                stage('Validation: NEF Services MonitoringEvent') {
-//                    steps {
-//                        script {
-//                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
-//                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-//                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-//                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-//                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-//                            def jobResult = jobBuild.getResult()
-//                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-//                                buildResults['nef-services-monitoringevent'] = jobResult
-//                        }
-//                    }
-//                }
-            }
-        }
-        stage('Validation: Destroying CAPIF-NEF-NetworkApp'){
-            steps{
-                script {
-                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: true,
-                            parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
-                                        string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
-                                        string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(DEPLOY_NAME)),
-                                        string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Destroy CAPIF-NEF-NetworkApp' returned result: ${jobResult}"
-                    buildResults['destroy-capif-nef-netapp'] = jobResult
+                stage('Validation: NEF Services MonitoringEvent') {
+                    steps {
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                                buildResults['nef-services-monitoringevent'] = jobResult
+                        }
+                    }
                 }
             }
         }
-//        stage("Validation: Destroying"){
-//            parallel{
-//                stage('Validation: Destroy NetApp'){
-//                    steps{
-//                        script {
-//                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-//                                        parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
-//                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-//                                        ]
-//                            def jobResult = jobBuild.getResult()
-//                            echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-//                            buildResults['destroy-netapp'] = jobResult
-//                        }
-//                    }
-//                }
-//                stage('Validation: Destroy NEF'){
-//                   steps{
-//                       script {
-//                           def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
-//                                           parameters: [
-//                                               string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                               string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-//                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-//                           def jobResult = jobBuild.getResult()
-//                           echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-//                           buildResults['destroy-nef'] = jobResult
-//                       }
-//                   }
-//               }
-//                stage('Validation: Destroy CAPIF'){
-//                   steps{
-//                       script {
-//                           def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
-//                                          parameters: [
-//                                           string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                           string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-//                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-//                           def jobResult = jobBuild.getResult()
-//                           echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-//                           buildResults['destroy-capif'] = jobResult
-//                       }
-//                   }
-//               }
-//            }
-//        }
+        stage("Validation: Destroying"){
+            parallel{
+                stage('Validation: Destroy NetApp'){
+                    steps{
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
+                                        parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                        ]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
+                            buildResults['destroy-netapp'] = jobResult
+                        }
+                    }
+                }
+                stage('Validation: Destroy NEF'){
+                   steps{
+                       script {
+                           def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                                           parameters: [
+                                               string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                               string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'Destroy NEF' returned result: ${jobResult}"
+                           buildResults['destroy-nef'] = jobResult
+                       }
+                   }
+               }
+                stage('Validation: Destroy CAPIF'){
+                   steps{
+                       script {
+                           def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                                          parameters: [
+                                           string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                           string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                           string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                           def jobResult = jobBuild.getResult()
+                           echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
+                           buildResults['destroy-capif'] = jobResult
+                       }
+                   }
+               }
+            }
+        }
 
         stage('Validation: Obtaining information for previous pipelines') {
             steps {
