@@ -454,7 +454,7 @@ pipeline {
 //                        }
 //                    }
 //                }
-//            }
+            }
         }
         stage('Validation: Destroying CAPIF-NEF-NetworkApp'){
             steps{
