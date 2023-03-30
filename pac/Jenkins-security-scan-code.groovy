@@ -88,7 +88,7 @@ pipeline {
                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                    cd ${NETAPP_NAME}.wiki/
                    git add -A .
-                   git diff-index --quiet HEAD || git commit -m 'Adding Trivy scan report'
+                   git diff-index --quiet HEAD || git commit -m \'Adding Trivy scan report\'
                    git push -u origin https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                    '''
                }
