@@ -545,12 +545,15 @@ pipeline {
         //Review Parameters
         stage('Validation: Generate Final Report') {
             steps {
+                retry(3) {
                 build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))],
+                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                }
             }
         }
     }
