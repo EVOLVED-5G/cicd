@@ -236,21 +236,21 @@ pipeline {
 //            }
 //        }
 
-        stage('Validation: Deploying CAPIF-NEF-NetworkApp'){
-            steps{
+        stage('Validation: Deploying CAPIF-NEF-NetworkApp') {
+            steps {
                 script {
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/019-CAPIF-NEF-NETAPP-deploy', wait: true, propagate: true,
                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
                                         string(name: 'VERSION_CAPIF', value: String.valueOf(VERSION_CAPIF)),
                                         string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
-                                        string(name: 'HOSTNAME_NEF', value: String.valueOf(HOSTNAME_NEF) ),
+                                        string(name: 'HOSTNAME_NEF', value: String.valueOf(HOSTNAME_NEF)),
                                         string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
                                         string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
                                         string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
                                         string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(DEPLOY_NAME)),
-                                        string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
                     buildResults['deploy-capif-nef-netapp'] = jobResult
@@ -259,7 +259,7 @@ pipeline {
         }
         stage('Validation: Tests to NetworkApp') {
             options {
-                timeout(time: 5, unit: 'MINUTES') 
+                timeout(time: 5, unit: 'MINUTES')
             }
             parallel {
                 stage('Validation: Onboarding NetworkApp to CAPIF') {
@@ -299,7 +299,7 @@ pipeline {
                 //jenkins-dummy
                 stage('Validation: Test NetApp Networking') {
                     options {
-                       timeout(time: 5, unit: 'MINUTES') 
+                        timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
                         script {
@@ -338,7 +338,7 @@ pipeline {
                 //Review Parameters
                 stage('Validation: Onboarding NetApp as Invoker to CAPIF') {
                     options {
-                        timeout(time: 5, unit: 'MINUTES') 
+                        timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
                         script {
@@ -377,7 +377,7 @@ pipeline {
                 //Review Parameters
                 stage('Validation: Discover NEF APIs from CAPIF') {
                     options {
-                       timeout(time: 5, unit: 'MINUTES') 
+                        timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
                         script {
@@ -415,22 +415,22 @@ pipeline {
 
                 //Review Parameters
                 //jenkins-dummy
-//                stage('Validation: NEF Services as SessionWithQoS') {
-//                    steps {
-//                        script {
-//                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
-//                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-//                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-//                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-//                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-//                                def jobResult = jobBuild.getResult()
-//                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-//                                buildResults['nef-services-as-sessionwithqos'] = jobResult
-//                        }
-//                    }
-//                }
-//
+                //                stage('Validation: NEF Services as SessionWithQoS') {
+                //                    steps {
+                //                        script {
+                //                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
+                //                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                //                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                //                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                //                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                //                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                //                                def jobResult = jobBuild.getResult()
+                //                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                //                                buildResults['nef-services-as-sessionwithqos'] = jobResult
+                //                        }
+                //                    }
+                //                }
+                //
                 //Review Parameters
                 //jenkins-dummy
                 stage('Validation: NEF Services MonitoringEvent API') {
@@ -457,7 +457,7 @@ pipeline {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                              
+
                                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
@@ -469,59 +469,59 @@ pipeline {
                 }
             }
         }
-        stage("Validation: Destroying"){
+        stage('Validation: Destroying') {
             options {
-                timeout(time: 5, unit: 'MINUTES') 
+                timeout(time: 5, unit: 'MINUTES')
             }
-            parallel{
-                stage('Validation: Destroy NetApp'){
-                    steps{
+            parallel {
+                stage('Validation: Destroy NetApp') {
+                    steps {
                         retry(3) {
                             script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                                         parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                         ]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-                            buildResults['destroy-netapp'] = jobResult
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
+                                buildResults['destroy-netapp'] = jobResult
                             }
-                        }                        
+                        }
                     }
                 }
-                stage('Validation: Destroy NEF'){
-                   steps{
+                stage('Validation: Destroy NEF') {
+                    steps {
                         retry(3) {
                             script {
-                               def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
+                                def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                                parameters: [
                                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                               def jobResult = jobBuild.getResult()
-                               echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-                               buildResults['destroy-nef'] = jobResult
-                           }
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Destroy NEF' returned result: ${jobResult}"
+                                buildResults['destroy-nef'] = jobResult
+                            }
                         }
-                   }
-               }
-                stage('Validation: Destroy CAPIF'){
-                   steps{
+                    }
+                }
+                stage('Validation: Destroy CAPIF') {
+                    steps {
                         retry(3) {
                             script {
-                               def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
+                                def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                               parameters: [
                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                               string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-                               def jobResult = jobBuild.getResult()
-                               echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-                               buildResults['destroy-capif'] = jobResult
+                                               string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
+                                buildResults['destroy-capif'] = jobResult
                             }
-                        }  
-                   }
-               }
+                        }
+                    }
+                }
             }
         }
 
@@ -546,12 +546,12 @@ pipeline {
         stage('Validation: Generate Final Report') {
             steps {
                 retry(3) {
-                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+                    build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))],
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                 }
             }
