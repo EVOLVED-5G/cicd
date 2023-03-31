@@ -130,8 +130,7 @@ pipeline {
                 dir("${env.WORKSPACE}/${NETAPP_NAME}/") {
                     sh '''
                     docker network create demo-network
-                    make run-dev || true
-                    docker-compose up --build --force-recreate -d
+                    make run-dev || docker-compose up --build --force-recreate -d
                     '''
                 }
             }
