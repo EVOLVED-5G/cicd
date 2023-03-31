@@ -28,6 +28,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
     }
 
     environment {
