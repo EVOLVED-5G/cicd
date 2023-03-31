@@ -86,7 +86,8 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    sudo apt update && sudo apt install -y poppler-utils pdftk
+                    sudo apt update || echo "Error updating system references"
+                    sudo apt install -y poppler-utils pdftk || echo "error installing Poppler utils and pdftk"
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
@@ -101,6 +102,7 @@ pipeline {
                     pdfunite *.pdf mid_report1.pdf
                     [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
+                    pip install -r requirements.txt
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
 
                     # Remember install PDFTK for watermarking
