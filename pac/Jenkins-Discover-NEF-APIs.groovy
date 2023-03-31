@@ -19,83 +19,50 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
+        string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
-// Parsear información sobre los logs de CAPIF y obtener la traza que demuestra que la NETAPP ha sido onboarded
-// Preguntar NACHO cual es el log que da esta informacion -- Pedir a Nacho una KEY especifica
-// kubectl/oc logs y parsear la salida  --
 
-stages {        
-        stage ('Login in openshift or Kubernetes'){
-            parallel {
-                stage ('Login in Openshift platform') {
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "openshift"}
-                        }
+    environment {
+        RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
+
+    }
+
+    stages {        
+        stage ("Login in openshift"){
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
                     }
-                    stages{
-                        stage('Login openshift') {
-                            steps {
-                                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                                    sh '''
-                                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                                    '''
-                                }
-                            }
-                        }
-                    }
-                }            
-                stage ('Login in Kubernetes Platform'){
-                    when {
-                        allOf {
-                            expression { DEPLOYMENT == "kubernetes-athens"}
-                        }
-                    }
-                    stages{
-                        stage('Login in Kubernetes') {
-                            steps { 
-                                withKubeConfig([credentialsId: 'kubeconfigAthens']) {
-                                    sh '''
-                                    kubectl get all -n kube-system
-                                    '''
-                                }
-                            }
-                        }
-                        stage ('Create namespace in if it does not exist') {
-                            steps {
-                                catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                                    sh '''
-                                    kubectl create namespace evol-$NAMESPACE_NAME
-                                    '''
-                                }
-                            }              
-                        }
-                    }
+                }
+            steps {
+                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
+                    sh '''
+                        oc login --insecure-skip-tls-verify --token=$TOKEN 
+                    '''
                 }
             }
         }
-        stage('Verify if Netapp has discovered NEF APIs') {
+        stage('Verify if NetworkApp has discovered NEF APIs') {
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    result=false
-                    value_pod=$(kubectl get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl exec $value_pod -- python 2_netapp_discover_service.py 
-                    value=$(kubectl get pods | grep ^service-apis | awk '{print $1}')
-                    logs=$(kubectl logs --tail=20 $value)
-                    echo $logs
-                    while IFS= read -r line; do
-                        if [[ $line == *"GET /service-apis/v1/allServiceAPIs?api-invoker-id="* ]]; then
-                            result=true
-                        fi
-                    done <<< "$logs"
-                    if  $result ; then
-                        echo "DISCOVER APIs work correctly"
-                    else
-                        exit 1
-                    fi
-                    '''
+                            result=false
+
+                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_CAPIF" | awk 'NR==2{print $2}')
+                            DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+
+                            if [[ $DISCOVER_LOG ]]; then
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=true
+                                echo "DISCOVER APIs work correctly"
+                            else
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=false
+                                exit 1
+                            fi
+                            '''
                 }
             }
         }
