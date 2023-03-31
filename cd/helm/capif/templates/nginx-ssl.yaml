@@ -11,7 +11,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  ingressClassName: nginx
   rules:
   - host: "{{ .Values.nginx.nginx.env.capifHostname }}"
     http:
