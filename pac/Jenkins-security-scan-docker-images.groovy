@@ -97,6 +97,8 @@ pipeline {
                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                    cd ${NETAPP_NAME}.wiki/
                    git add -A .
+                   git config user.email "evolved5g@gmail.com"
+                   git config user.name "Evolved5G"
                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy report'
                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                    '''
