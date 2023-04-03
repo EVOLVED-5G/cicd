@@ -58,6 +58,8 @@ pipeline {
                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
                    cd Evolved5g-${NETAPP_NAME}/
                    git add -A .
+                   git config user.email "evolved5g@gmail.com"
+                   git config user.name "Evolved5G"
                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
                    git push -u origin $GIT_NETAPP_BRANCH
                    '''
