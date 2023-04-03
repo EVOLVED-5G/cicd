@@ -126,10 +126,16 @@ pipeline {
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
 
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
+                            echo "VERSION_CAPIF: $VERSION_CAPIF"
+
+                            ls -la $WORKSPACE
+                            ls -la $WORKSPACE/cd/helm/helmfile.d/00-capif.json
+                            ls -la $WORKSPACE/cd/helm/helmfile.d/01-nef.json
+                            ls -la $WORKSPACE/cd/helm/helmfile.d/02-netapp.json
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE capif-$BUILD_NUMBER --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
-                            --arg DEPLOYMENT $DEPLOYMENT -f ./cd/helm/helmfile.d/00-capif.json \
+                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
@@ -139,7 +145,7 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF  --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f ./cd/helm/helmfile.d/01-nef.json \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -156,7 +162,7 @@ pipeline {
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg HOSTNAME_NEF $HOSTNAME_NEF --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP \
                             --arg DEPLOYMENT $DEPLOYMENT --arg APP_REPLICAS $APP_REPLICAS \
-                            -f ./cd/helm/helmfile.d/02-netapp.json \
+                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
