@@ -122,12 +122,14 @@ pipeline {
                             echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
                             echo "WORKSPACE: $WORKSPACE"
                             mkdir ${BUILD_NUMBER}.d/
+                            
                             echo "#### setting up capif variables ####"
+                            
+                            CAPIF_HTTP_PORT=80
+                            CAPIF_HTTPS_PORT=443
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
-
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
                             echo "VERSION_CAPIF: $VERSION_CAPIF"
-
                             ls -la $WORKSPACE
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
@@ -137,11 +139,17 @@ pipeline {
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+                            
                             echo "#### setting up nef variables ####"
+                            
+                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
+                            CAPIF_HTTPS_PORT=30548; fi
+                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
+                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
-                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF  --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
@@ -149,8 +157,9 @@ pipeline {
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "#### setting up network-app variables ####"
+                            
                             if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; CAPIF_HTTP_PORT=80; CAPIF_HTTPS_PORT=443; fi
+                            CAPIF_HTTPS_PORT=30548; fi
                             echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
                             echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
