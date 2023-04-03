@@ -1,0 +1,13 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: nginx-ssl
+spec:
+  virtualhost:
+    fqdn: "{{ .Values.nginx.nginx.env.capifHostname }}"
+    tls:
+      passthrough: true
+  tcpproxy:
+    services:
+    - name: nginx
+      port: 443
