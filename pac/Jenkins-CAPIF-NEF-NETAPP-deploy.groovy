@@ -137,7 +137,8 @@ pipeline {
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
-                            -f ./cd/helm/helmfile.d/01-nef.json \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF  --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f ./cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
