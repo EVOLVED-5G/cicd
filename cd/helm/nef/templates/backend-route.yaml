@@ -9,12 +9,11 @@ metadata:
 spec:
   host: "{{ .Values.backend.ingress.host }}"
   port:
-    targetPort: backend-port
+    targetPort: backend
   to:
     kind: Service
     name: backend
     weight: 100
-  wildcardPolicy: None
 status:
   ingress:
   - conditions:
