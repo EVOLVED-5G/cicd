@@ -1,6 +1,7 @@
 import groovy.json.JsonOutput
 
 def buildResults = [:]
+buildResults['steps'] = [:]
 
 String netappName(String url) {
     String url2 = url ?: ''
@@ -74,7 +75,7 @@ pipeline {
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['security-analysis'] = jobResult
+                            buildResults['steps']['security-analysis'] = jobResult
                         }
                     }
                 }
@@ -91,7 +92,7 @@ pipeline {
 
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['secrets-analysis'] = jobResult
+                            buildResults['steps']['secrets-analysis'] = jobResult
                         }
                     }
                 }
@@ -107,7 +108,7 @@ pipeline {
                 //                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                 //                            def jobResult = jobBuild.getResult()
                 //                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                //                            buildResults['opensource-license'] = jobResult
+                //                            buildResults['steps']['opensource-license'] = jobResult
                 //                        }
                 //                    }
                 //                }
@@ -124,7 +125,7 @@ pipeline {
                                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Netapp' returned result: ${jobResult}"
-                            buildResults['build'] = jobResult
+                            buildResults['steps']['build'] = jobResult
                         }
                     }
                 }
@@ -141,7 +142,7 @@ pipeline {
             //                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
             //                           def jobResult = jobBuild.getResult()
             //                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-            //                           buildResults['scan-docker-images'] = jobResult
+            //                           buildResults['steps']['scan-docker-images'] = jobResult
             //                       }
             //                   }
             //               }
@@ -160,7 +161,7 @@ pipeline {
 //                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
 //                        def jobResult = jobBuild.getResult()
 //                        echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-//                        buildResults['deploy-capif'] = jobResult
+//                        buildResults['steps']['deploy-capif'] = jobResult
 //                    }
 //                }
 //            }
@@ -178,7 +179,7 @@ pipeline {
 //                                booleanParam(name: 'REPORTING', value: 'openshift')]
 //                        def jobResult = jobBuild.getResult()
 //                        echo "Build of 'Deploy NEF' returned result: ${jobResult}"
-//                        buildResults['deploy-nef'] = jobResult
+//                        buildResults['steps']['deploy-nef'] = jobResult
 //                    }
 //                }
 //            }
@@ -197,7 +198,7 @@ pipeline {
         //                                        ]
         //            def jobResult = jobBuild.getResult()
         //            echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-        //            buildResults['validate-capif'] = jobResult
+        //            buildResults['steps']['validate-capif'] = jobResult
         //            if (jobResult == "FAILURE"){
         //             def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
         //                                   parameters: [
@@ -231,7 +232,7 @@ pipeline {
 //                                ]
 //                    def jobResult = jobBuild.getResult()
 //                    echo "Build of 'Deploy Netapp' returned result: ${jobResult}"
-//                    buildResults['deploy-netapp'] = jobResult
+//                    buildResults['steps']['deploy-netapp'] = jobResult
 //                }
 //            }
 //        }
@@ -253,7 +254,7 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                    buildResults['deploy-capif-nef-netapp'] = jobResult
+                    buildResults['steps']['deploy-capif-nef-netapp'] = jobResult
                 }
             }
         }
@@ -271,7 +272,7 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                            buildResults['validate-nef'] = jobResult
+                            buildResults['steps']['validate-nef'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                           parameters: [
@@ -311,7 +312,7 @@ pipeline {
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Networking Netapp' returned result: ${jobResult}"
-                            buildResults['network-netapp'] = jobResult
+                            buildResults['steps']['network-netapp'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                           parameters: [
@@ -350,7 +351,7 @@ pipeline {
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboard Netapp' returned result: ${jobResult}"
-                            buildResults['onboard-netapp'] = jobResult
+                            buildResults['steps']['onboard-netapp'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                           parameters: [
@@ -389,7 +390,7 @@ pipeline {
                                                     booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-                            buildResults['discover-apis'] = jobResult
+                            buildResults['steps']['discover-apis'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                           parameters: [
@@ -426,7 +427,7 @@ pipeline {
                 //                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                 //                                def jobResult = jobBuild.getResult()
                 //                                echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                //                                buildResults['nef-services-as-sessionwithqos'] = jobResult
+                //                                buildResults['steps']['nef-services-as-sessionwithqos'] = jobResult
                 //                        }
                 //                    }
                 //                }
@@ -444,7 +445,7 @@ pipeline {
                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                            buildResults['nef-services-monitoringevent-api'] = jobResult
+                            buildResults['steps']['nef-services-monitoringevent-api'] = jobResult
                         }
                     }
                 }
@@ -463,7 +464,7 @@ pipeline {
                                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                                 echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                                buildResults['nef-services-monitoringevent'] = jobResult
+                                buildResults['steps']['nef-services-monitoringevent'] = jobResult
                         }
                     }
                 }
@@ -485,7 +486,7 @@ pipeline {
                                         ]
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-                                buildResults['destroy-netapp'] = jobResult
+                                buildResults['steps']['destroy-netapp'] = jobResult
                             }
                         }
                     }
@@ -501,7 +502,7 @@ pipeline {
                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-                                buildResults['destroy-nef'] = jobResult
+                                buildResults['steps']['destroy-nef'] = jobResult
                             }
                         }
                     }
@@ -517,7 +518,7 @@ pipeline {
                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-                                buildResults['destroy-capif'] = jobResult
+                                buildResults['steps']['destroy-capif'] = jobResult
                             }
                         }
                     }
@@ -525,41 +526,65 @@ pipeline {
             }
         }
 
-        stage('Validation: Obtaining information for previous pipelines') {
-            steps {
-                dir("${env.WORKSPACE}/") {
-                    script {
-                        writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
-                    }
-                    sh '''#!/bin/bash
-                    report_file="report-steps-$NETAPP_NAME_LOWER.json"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                --data-binary @"$report_file" \
-                                "$url"
-                                '''
-                }
-            }
-        }
+        // stage('Validation: Obtaining information for previous pipelines') {
+        //     steps {
+        //         dir("${env.WORKSPACE}/") {
+        //             script {
+        //                 buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
+        //                 writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
+        //             }
+        //             sh '''#!/bin/bash
+        //             report_file="report-steps-$NETAPP_NAME_LOWER.json"
+        //             url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+        //             curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+        //                         --data-binary @"$report_file" \
+        //                         "$url"
+        //                         '''
+        //         }
+        //     }
+        // }
 
-        //Review Parameters
-        stage('Validation: Generate Final Report') {
-            steps {
-                retry(3) {
-                    build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                }
-            }
-        }
+    // //Review Parameters
+    // stage('Validation: Generate Final Report') {
+    //     steps {
+    //         retry(3) {
+    //             build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+    //             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+    //                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+    //                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+    //                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+    //                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+    //                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+    //         }
+    //     }
+    // }
     }
 
     post {
         always {
+            dir("${env.WORKSPACE}/") {
+                script {
+                    buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando','')
+                    writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
+                }
+                sh '''#!/bin/bash
+                report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                            '''
+            }
+            retry(3) {
+                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+            }
+
             script {
                 // Nettaps emails to send the report
                 if (emails?.split(' ')) {
