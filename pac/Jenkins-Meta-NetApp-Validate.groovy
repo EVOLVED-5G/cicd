@@ -544,48 +544,47 @@ pipeline {
         //     }
         // }
 
-        // //Review Parameters
-        // stage('Validation: Generate Final Report') {
-        //     steps {
-        //         retry(3) {
-        //             build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
-        //             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-        //                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-        //                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-        //                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-        //                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-        //         }
-        //     }
-        // }
+    // //Review Parameters
+    // stage('Validation: Generate Final Report') {
+    //     steps {
+    //         retry(3) {
+    //             build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+    //             parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+    //                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+    //                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+    //                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+    //                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+    //                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+    //         }
+    //     }
+    // }
     }
 
     post {
         always {
-             steps {
-                dir("${env.WORKSPACE}/") {
-                    script {
-                        buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
-                        writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
-                    }
-                    sh '''#!/bin/bash
-                    report_file="report-steps-$NETAPP_NAME_LOWER.json"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                --data-binary @"$report_file" \
-                                "$url"
-                                '''
+            dir("${env.WORKSPACE}/") {
+                script {
+                    buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
+                    writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
                 }
-                retry(3) {
-                    build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                }
+                sh '''#!/bin/bash
+                report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$report_file" \
+                            "$url"
+                            '''
             }
+            retry(3) {
+                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+            }
+
             script {
                 // Nettaps emails to send the report
                 if (emails?.split(' ')) {
