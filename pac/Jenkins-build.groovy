@@ -38,7 +38,10 @@ def getAgent(deployment) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
+    options {
+        retry(2)
+    }
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
@@ -112,11 +115,14 @@ pipeline {
                 }
             }
             steps {
-                dir("${env.WORKSPACE}/${NETAPP_NAME}/") {
-                    sh '''
+                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
+                    dir("${env.WORKSPACE}/${NETAPP_NAME}/") {
+                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                        sh '''
                     docker build -t ${NETAPP_NAME} .
                     docker run -d -P ${NETAPP_NAME}
                     '''
+                    }
                 }
             }
         }
@@ -127,11 +133,14 @@ pipeline {
                 }
             }
             steps {
-                dir("${env.WORKSPACE}/${NETAPP_NAME}/") {
-                    sh '''
+                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
+                    dir("${env.WORKSPACE}/${NETAPP_NAME}/") {
+                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                        sh '''
                     docker network create demo-network
                     make run-dev || docker-compose up --build --force-recreate -d
                     '''
+                    }
                 }
             }
         }

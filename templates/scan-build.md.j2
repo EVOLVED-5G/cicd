@@ -34,12 +34,12 @@ Urls of Images pushed:
 {% set service_name = service_name.split(':')[0] %}
 **{{service_name}}**
 
-Aws:
+Artifact:
   {%- for image in service_info.docker_hub_images %}
 * {{image}}
   {%- endfor %}
 
-Artifact:
+Public image:
   {%- for image in service_info.aws_images %}
 * {{image}}
   {%- endfor %} 

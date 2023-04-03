@@ -8,6 +8,7 @@ Process executed over the Netapp {{version}}
 The repo used for Validation has been: {{repo}}
 The branch used for Validation has been: {{branch}}
 The last commit ID has been: {{commit}}
+Total validation time: {{total_duration}}
 
 The result of the Validation Process over the Netapp {{version}} has been: 
 
@@ -15,9 +16,9 @@ The individual result of the validations test has been as show in the following 
 
 {% set vars = {'foo': False} %}
 {% set counter = 0 -%}
-{% for group in key.0 -%}
-  STEP {{ counter + loop.index0 }}: {{ group|upper|replace("-"," ") }} status: {{key.0[group]}}
-    {%- if key.0[group] == "FAILURE" %}
+{% for step_name,step_status in steps.items() %}
+  STEP {{ counter + loop.index0 }}: {{ step_name|upper|replace("-"," ") }} status: {{step_status}}
+    {%- if step_status == "FAILURE" %}
       {% if vars.update({'foo': True}) %} 
       {% endif %}
     {%- endif %}
