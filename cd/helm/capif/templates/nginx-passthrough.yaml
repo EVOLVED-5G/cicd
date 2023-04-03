@@ -1,3 +1,4 @@
+{{- if eq .Values.env "kubernetes-uma" }}
 apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
@@ -11,3 +12,4 @@ spec:
     services:
     - name: nginx
       port: 443
+{{- end }}
