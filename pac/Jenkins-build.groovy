@@ -39,6 +39,10 @@ def getAgent(deployment) {
 
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
+    options {
+        retry(2)
+    }
+
 
     parameters {
         string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
