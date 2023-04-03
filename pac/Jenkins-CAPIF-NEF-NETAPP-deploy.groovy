@@ -130,7 +130,6 @@ pipeline {
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
                             echo "VERSION_CAPIF: $VERSION_CAPIF"
-                            ls -la $WORKSPACE
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE capif-$BUILD_NUMBER --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
@@ -166,9 +165,9 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg HOSTNAME_NEF $HOSTNAME_NEF --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP \
-                            --arg DEPLOYMENT $DEPLOYMENT --arg APP_REPLICAS $APP_REPLICAS \
-                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
+                            --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
+                            --arg APP_REPLICAS $APP_REPLICAS -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
