@@ -120,7 +120,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''#!/bin/bash
                             echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
-                            echo "WORKPACE: $WORKSPACE"
+                            echo "WORKSPACE: $WORKSPACE"
                             mkdir ${BUILD_NUMBER}.d/
                             echo "#### setting up capif variables ####"
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
