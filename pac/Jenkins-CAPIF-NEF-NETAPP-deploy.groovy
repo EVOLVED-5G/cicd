@@ -129,9 +129,6 @@ pipeline {
                             echo "VERSION_CAPIF: $VERSION_CAPIF"
 
                             ls -la $WORKSPACE
-                            ls -la $WORKSPACE/cd/helm/helmfile.d/00-capif.json
-                            ls -la $WORKSPACE/cd/helm/helmfile.d/01-nef.json
-                            ls -la $WORKSPACE/cd/helm/helmfile.d/02-netapp.json
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE capif-$BUILD_NUMBER --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
