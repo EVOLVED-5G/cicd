@@ -531,7 +531,7 @@ pipeline {
         //         dir("${env.WORKSPACE}/") {
         //             script {
         //                 buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
-        //                 writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
+        //                 writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
         //             }
         //             sh '''#!/bin/bash
         //             report_file="report-steps-$NETAPP_NAME_LOWER.json"
@@ -564,8 +564,8 @@ pipeline {
         always {
             dir("${env.WORKSPACE}/") {
                 script {
-                    buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
-                    writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
+                    buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando','')
+                    writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
                 sh '''#!/bin/bash
                 report_file="report-steps-$NETAPP_NAME_LOWER.json"
