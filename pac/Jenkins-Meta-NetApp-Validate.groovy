@@ -530,7 +530,7 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/") {
                     script {
-                        buildResults['total_duration'] = ${currentBuild.durationString.replace(' and counting', '')}
+                        buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '')
                         writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson([key: [buildResults]])
                     }
                     sh '''#!/bin/bash
