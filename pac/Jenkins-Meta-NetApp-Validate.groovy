@@ -56,7 +56,7 @@ pipeline {
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
-        emails = "${params.EMAILS}".split(' ')
+        emails = "${params.EMAILS}".trim()
     }
 
     stages {
@@ -562,7 +562,7 @@ pipeline {
         always {
             script {
                 // Nettaps emails to send the report
-                if (emails?.trim()) {
+                if (emails?.split(' ')) {
                     dir("${WORKSPACE}/") {
                         sh '''#!/bin/bash
 
@@ -582,6 +582,7 @@ pipeline {
                                  to: email
                     }
                 }
+                sh 'echo "Send mail to all developers"'
                 emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                  mimeType: 'text/html',
                  subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",

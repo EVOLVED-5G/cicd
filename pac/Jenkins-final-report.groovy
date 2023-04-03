@@ -1,25 +1,25 @@
 String netappName(String url) {
-    String url2 = url?:'';
-    String var = url2.substring(url2.lastIndexOf("/") + 1);
-    return var ;
+    String url2 = url ?: ''
+    String var = url2.substring(url2.lastIndexOf('/') + 1)
+    return var
 }
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    }else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
     }else {
-        return "evol5-slave";
+        return 'evol5-slave'
     }
 }
 
 pipeline {
-    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
         timeout(time: 10, unit: 'MINUTES')
-        retry(1)
+        retry(3)
     }
 
     parameters {
@@ -32,60 +32,61 @@ pipeline {
     }
 
     environment {
-        GIT_NETAPP_URL="${params.GIT_NETAPP_URL}"
-        GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        GIT_NETAPP_BRANCH="${params.GIT_NETAPP_BRANCH}"
-        PASSWORD_ARTIFACTORY= credentials("artifactory_credentials")
+        GIT_NETAPP_URL = "${params.GIT_NETAPP_URL}"
+        GIT_CICD_BRANCH = "${params.GIT_CICD_BRANCH}"
+        GIT_NETAPP_BRANCH = "${params.GIT_NETAPP_BRANCH}"
+        PASSWORD_ARTIFACTORY = credentials('artifactory_credentials')
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         TOKEN = credentials('github_token_cred')
-        ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/validation"
-        DOCKER_PATH="/usr/src/app"
+        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        DOCKER_PATH = '/usr/src/app'
     }
 
     stages {
-
         stage('Generate steps summary') {
             when {
                 expression {
-                    return REPORTING;
+                    return REPORTING
                 }
             }
             steps {
-                 dir ("${WORKSPACE}/") {
+                dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
 
-                    mkdir executive_summary
-                    cd executive_summary
+                mkdir executive_summary
+                cd executive_summary
 
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
-                    artifacts=($response)
+                response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
+                artifacts=($response)
 
-                    for x in "${artifacts[@]}"
-                    do
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
-                        curl -u $PASSWORD_ARTIFACTORY $url -o $x
-                    done
+                for x in "${artifacts[@]}"
+                do
+                    url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                    curl -u $PASSWORD_ARTIFACTORY $url -o $x
+                done
 
-                    cd ..
+                cd ..
 
-                    commit=$(git ls-remote ${GIT_NETAPP_URL}.git | grep $GIT_NETAPP_BRANCH | awk '{ print $1}')
-                    python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --name $NETAPP_NAME --url url
-                    docker build  -t pdf_generator utils/docker_generate_pdf/.
-                    docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
-                    '''
+                commit=$(git ls-remote ${GIT_NETAPP_URL}.git | grep $GIT_NETAPP_BRANCH | awk '{ print $1}')
+                python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --name $NETAPP_NAME --url url
+                docker build  -t pdf_generator utils/docker_generate_pdf/.
+                docker run --rm -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
+                '''
                 }
             }
         }
         stage('Download jsons report to Artifactory') {
             when {
                 expression {
-                    return REPORTING;
+                    return REPORTING
                 }
             }
             steps {
-                 dir ("${WORKSPACE}/") {
+                dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
+                    sudo apt update || echo "Error updating system references"
+                    sudo apt install -y poppler-utils pdftk || echo "error installing Poppler utils and pdftk"
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
@@ -100,6 +101,7 @@ pipeline {
                     pdfunite *.pdf mid_report1.pdf
                     [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
+                    pip install -r utils/requirements.txt
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
 
                     # Remember install PDFTK for watermarking
@@ -114,11 +116,11 @@ pipeline {
         stage('Upload documents to Artifactory') {
             when {
                 expression {
-                    return REPORTING;
+                    return REPORTING
                 }
             }
             steps {
-                 dir ("${WORKSPACE}/") {
+                dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
 
                     report_file="final_report.pdf"
@@ -134,14 +136,19 @@ pipeline {
     }
     post {
         always {
+            script {
+                sh '''
+                docker image prune -a -f
+                '''
+            }
             emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: "jenkins-evolved5G",
+                replyTo: 'jenkins-evolved5G',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
         }
-        cleanup{
+        cleanup {
             /* clean up our workspace */
             deleteDir()
             /* clean up tmp directory */

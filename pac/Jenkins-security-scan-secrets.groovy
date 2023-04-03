@@ -60,6 +60,8 @@ pipeline {
                    cp -R ${NETAPP_NAME}/* Evolved5g-${NETAPP_NAME}/
                    cd Evolved5g-${NETAPP_NAME}/
                    git add -A .
+                   git config user.email "evolved5g@gmail.com"
+                   git config user.name "Evolved5G"
                    git diff-index --quiet HEAD || git commit -m 'Update repo in Telefonica repo'
                    git push -u origin $GIT_NETAPP_BRANCH
                    '''
@@ -90,6 +92,8 @@ pipeline {
                    cp -R Evolved5g-${NETAPP_NAME}.wiki/* ${NETAPP_NAME}.wiki/
                    cd ${NETAPP_NAME}.wiki/
                    git add -A .
+                   git config user.email "evolved5g@gmail.com"
+                   git config user.name "Evolved5G"
                    git diff-index --quiet HEAD || git commit -m 'Addig Trivy secreats leaks scan report'
                    git push  https://$TOKEN_EVOLVED@github.com/EVOLVED-5G/$NETAPP_NAME.wiki.git
                    '''
