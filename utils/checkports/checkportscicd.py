@@ -50,8 +50,8 @@ if __name__ == '__main__':
     # total arguments
     n = len(sys.argv)
     
-    if n != 4:
-            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository> <netapp_image_name>")
+    if n != 5:
+            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository> <netapp_image_name> <output_filename>")
             exit(255)
     
     netapp_branch = sys.argv[1]
@@ -62,10 +62,11 @@ if __name__ == '__main__':
     print("Netapp repository: " + git_repository)
     print("Netapp Host: " + netapp_host )
     
-    netapp_image_name=''
-    if n==4:
-        netapp_image_name=sys.argv[3]
-        print("Netapp Image Name: " + netapp_image_name )
+    netapp_image_name=sys.argv[3]
+    print("Netapp Image Name: " + netapp_image_name )
+
+    output_filename=sys.argv[4]
+    print("Output filename: " + output_filename )
 
     NetApp_ports=dict()
     NetApp_ports['services']=dict()
@@ -159,7 +160,7 @@ if __name__ == '__main__':
         print('Final Result:')
         print(json_formatted_str)
 
-        with open('report-build-'+ netapp_image_name +'.json', 'w', encoding='utf-8') as f:
+        with open(output_filename, 'w', encoding='utf-8') as f:
             json.dump(NetApp_ports, f, ensure_ascii=False)
 
         # Repository folder removed
