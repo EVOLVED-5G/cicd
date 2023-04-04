@@ -112,6 +112,9 @@ pipeline {
                     return REPORTING;
                 }
             }
+            options {
+                retry(2)
+            }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
@@ -124,8 +127,8 @@ pipeline {
                         versionT=0.35.0
 
                         python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json ${REPORT_FILENAME}.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
-                        docker build  -t pdf_generator utils/docker_generate_pdf/.
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
+                        docker build  -t pdf_generator utils/docker_generate_pdf/. || exit 1
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md || exit 1
                         declare -a files=("json" "md" "pdf")
 
                         for x in "${files[@]}"

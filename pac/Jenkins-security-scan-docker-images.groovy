@@ -114,6 +114,9 @@ pipeline {
                     return REPORTING;
                 }
             }
+            options {
+                retry(2)
+            }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
@@ -121,13 +124,13 @@ pipeline {
                     versionT=0.35.0
                     declare -a files=("json" "md" "pdf")
                     images=($response)
-                    docker build  -t pdf_generator utils/docker_generate_pdf/.
+                    docker build  -t pdf_generator utils/docker_generate_pdf/. || exit 1
                     for x in "${images[@]}"
                     do
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
                         python3 utils/report_generator.py --template templates/scan-image.md.j2 --json ${REPORT_FILENAME}-$x.json --output ${REPORT_FILENAME}-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT
 
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md || exit 1
 
                         # Check to see if the image has succesfully passed all tests
                         if grep -q "failed" ${REPORT_FILENAME}-$x.md; then
