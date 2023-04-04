@@ -1,3 +1,4 @@
+{{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -11,7 +12,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  ingressClassName: nginx
   rules:
   - host: "{{ .Values.nginx.nginx.env.capifHostname }}"
     http:
@@ -23,3 +23,4 @@ spec:
               number: 443
         path: /
         pathType: Prefix
+{{- end }}

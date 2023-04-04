@@ -10,14 +10,20 @@
         "../cd/helm/\($FOLDER_NETWORK_APP)/values.yaml",
         {
           "env": {
-            "fogusHostname": "\($HOSTNAME_NETAPP)",
-            "environment": "\($DEPLOYMENT)"
+            "capifHostname": "\($HOSTNAME_CAPIF)",
+            "capifPortHttp": "\($CAPIF_HTTP_PORT)",
+            "capifPortHttps": "\($CAPIF_HTTPS_PORT)",
+            "nefAddress": "\($HOSTNAME_NEF)",
+            "frontendAddress": "\($HOSTNAME_NETAPP)"
           }
         },
         {
           "fe": {
             "replicas": "\($APP_REPLICAS)"
           }
+        },
+        {
+          "environment": "\($DEPLOYMENT)"
         }
       ]
     }

@@ -35,6 +35,7 @@ spec:
         {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
       containers:
       - env:
         - name: CALLBACK_ADDRESS
@@ -153,6 +154,7 @@ spec:
         {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
       containers:
       - args:
         - ./wait_db.sh
@@ -279,6 +281,7 @@ spec:
         {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
       containers:
       - env:
         - name: CALLBACK_ADDRESS

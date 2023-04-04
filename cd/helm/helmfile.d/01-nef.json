@@ -14,6 +14,16 @@
               "host": "\($HOSTNAME_NEF)"
             }
           }
+        },
+        {
+          "environment": "kubernetes-uma"
+        },
+        {
+          "env": {
+            "capifHostname": "\($HOSTNAME_CAPIF)",
+            "capifHttpPort": "\($CAPIF_HTTP_PORT)",
+            "capifHttpsPort": "\($CAPIF_HTTPS_PORT)"
+          }
         }
       ]
     }
