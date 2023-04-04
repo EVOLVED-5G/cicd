@@ -1,0 +1,22 @@
+{{- if eq .Values.environment "openshift" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    io.kompose.service: netappfe
+  name: fe
+spec:
+  host: "{{ .Values.env.frontendAddress }}"
+  port:
+    targetPort: fe
+  to:
+    kind: Service
+    name: fe
+    weight: 100
+status:
+  ingress:
+  - conditions:
+    host: "{{ .Values.env.frontendAddress }}"
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+{{- end }}

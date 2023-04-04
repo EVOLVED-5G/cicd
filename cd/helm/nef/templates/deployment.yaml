@@ -35,11 +35,12 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - args:
         - /start-reload.sh
@@ -258,6 +259,7 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
@@ -481,6 +483,7 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}  
       {{- if eq .Values.environment "kubernetes-uma" }}  
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
@@ -702,6 +705,7 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
@@ -760,6 +764,7 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
