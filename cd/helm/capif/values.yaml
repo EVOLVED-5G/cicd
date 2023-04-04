@@ -3,7 +3,7 @@ env: "openshift"
 
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing 
 ingress_ip: 
-    athens: "10.161.1.117"
+    athens: "10.161.1.126"
     uma: "10.11.23.49"
 
 apiInvocationLogs:
