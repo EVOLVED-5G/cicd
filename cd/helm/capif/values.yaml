@@ -1,5 +1,5 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
-env: "kubernetes-athens"
+env: "openshift"
 
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing 
 ingress_ip: 
@@ -254,7 +254,7 @@ nginx:
   nginx:
     env:
       # -- Ingress's host to Capif
-      capifHostname: "my-capif.evolved-5g.eu"
+      capifHostname: "my-capif.apps.ocp-epg.hi.inet"
     image:
       # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_nginx_1"
