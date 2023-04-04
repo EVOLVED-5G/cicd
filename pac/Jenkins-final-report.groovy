@@ -100,7 +100,7 @@ pipeline {
                     today=$(date +'%d/%m/%Y')
                     [ -e *-licenses*.pdf ] && mv *-licenses*.pdf executive_summary/ || echo "No licenses file found"
                     pdfunite *.pdf mid_report1.pdf
-                    [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
+                    [ -e executive_summary/*-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     pip install -r utils/requirements.txt
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
