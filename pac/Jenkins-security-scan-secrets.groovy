@@ -20,7 +20,7 @@ def getReportFilename(String netappNameLower) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -171,13 +171,15 @@ pipeline {
     }
     post {
         always {
-            if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
-                emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
                 replyTo: 'jenkins-evolved5G@tid.es',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
             }
         }
         cleanup {
