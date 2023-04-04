@@ -114,18 +114,20 @@ pipeline {
                 //                }
                 stage('Validation: Build validation image Report') {
                     steps {
-                        script {
-                            def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
-                                            parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                                                        string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'STAGE', value: 'validation'),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Netapp' returned result: ${jobResult}"
-                            buildResults['steps']['build'] = jobResult
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
+                                                parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                                                            string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                            string(name: 'STAGE', value: 'validation'),
+                                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Netapp' returned result: ${jobResult}"
+                                buildResults['steps']['build'] = jobResult
+                            }
                         }
                     }
                 }
