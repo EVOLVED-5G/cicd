@@ -580,7 +580,7 @@ pipeline {
                             '''
             }
             retry(3) {
-                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
