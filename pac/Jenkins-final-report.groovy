@@ -53,20 +53,22 @@ pipeline {
                     return REPORTING
                 }
             }
-            retry(2) {
-                steps {
-                    dir("${env.WORKSPACE}") {
-                        withCredentials([usernamePassword(
-                       credentialsId: 'docker_pull_cred',
-                       usernameVariable: 'USER',
-                       passwordVariable: 'PASS'
-                   )]) {
-                            sh '''
-                            docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
-                            docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
-                           '''
-                   }
-                    }
+            options {
+                retry(2)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    withCredentials([usernamePassword(
+                    credentialsId: 'docker_pull_cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                        sh '''
+                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
+                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        '''
+                }
                 }
             }
         }
