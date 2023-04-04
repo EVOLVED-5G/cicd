@@ -8,9 +8,16 @@ Process executed over the Netapp {{version}}
 The repo used for Validation has been: {{repo}}
 The branch used for Validation has been: {{branch}}
 The last commit ID has been: {{commit}}
-Total validation time: {{total_duration}}
+The environment used has been: {{environment}}
+The build number at Jenkins has been: {{build_number}}
+Total validation time has been: **{{total_duration}}**
 
 The result of the Validation Process over the Netapp {{version}} has been: 
+{%- if result == "SUCCESS" %}
+**<span style="color:green">{{result}}</span>**
+{%- else %}
+**<span style="color:red">{{result}}</span>**
+{% endif %}
 
 The individual result of the validations test has been as show in the following table:
 

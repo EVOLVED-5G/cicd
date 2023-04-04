@@ -57,6 +57,7 @@ pipeline {
         STAGE=getPath("${params.STAGE}")
         ARTIFACTORY_URL="http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH="/usr/src/app"
+        REPORT_FILENAME='005-report-tr-img'
     }
 
     stages {
@@ -78,7 +79,7 @@ pipeline {
                     for x in "${images[@]}"
                     do
                         curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > report-tr-img-$x.json
+                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > $REPORT_FILENAME-$x.json
                     done
                     '''
                 }
@@ -124,12 +125,12 @@ pipeline {
                     for x in "${images[@]}"
                     do
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
-                        python3 utils/report_generator.py --template templates/scan-image.md.j2 --json report-tr-img-$x.json --output report-tr-img-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT
+                        python3 utils/report_generator.py --template templates/scan-image.md.j2 --json $REPORT_FILENAME-$x.json --output $REPORT_FILENAME-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT
 
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-tr-img-$x.pdf $DOCKER_PATH/report-tr-img-$x.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME-$x.pdf $DOCKER_PATH/$REPORT_FILENAME-$x.md
 
                         # Check to see if the image has succesfully passed all tests
-                        if grep -q "failed" report-tr-img-$x.md; then
+                        if grep -q "failed" $REPORT_FILENAME-$x.md; then
                             result=false
                         else
                             result=true
@@ -142,7 +143,7 @@ pipeline {
 
                         for y in "${files[@]}"
                         do
-                            report_file="report-tr-img-$x.$y"
+                            report_file="$REPORT_FILENAME-$x.$y"
                             url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                             curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
