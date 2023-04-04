@@ -27,7 +27,7 @@ def getAgent(deployment) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -59,9 +59,36 @@ pipeline {
         ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = '005-report-tr-img'
+        PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
+        PDF_GENERATOR_VERSION = 'latest'
     }
 
     stages {
+        stage('Prepare pdf generator tools') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(2)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    withCredentials([usernamePassword(
+                    credentialsId: 'docker_pull_cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                        sh '''
+                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
+                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        '''
+                }
+                }
+            }
+        }
         stage('Launch Github Actions command') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
@@ -122,13 +149,12 @@ pipeline {
                     versionT=0.35.0
                     declare -a files=("json" "md" "pdf")
                     images=($response)
-                    docker build  -t pdf_generator utils/docker_generate_pdf/. || exit 1
                     for x in "${images[@]}"
                     do
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
                         python3 utils/report_generator.py --template templates/scan-image.md.j2 --json ${REPORT_FILENAME}-$x.json --output ${REPORT_FILENAME}-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT
 
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md || exit 1
+                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md || exit 1
 
                         # Check to see if the image has succesfully passed all tests
                         if grep -q "failed" ${REPORT_FILENAME}-$x.md; then

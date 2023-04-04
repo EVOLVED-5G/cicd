@@ -20,7 +20,7 @@ def getReportFilename(String netappNameLower) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
 
     options {
         timeout(time: 30, unit: 'MINUTES')
@@ -50,9 +50,36 @@ pipeline {
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
+        PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
+        PDF_GENERATOR_VERSION = 'latest'
     }
 
     stages {
+        stage('Prepare pdf generator tools') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(2)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    withCredentials([usernamePassword(
+                    credentialsId: 'docker_pull_cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                        sh '''
+                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
+                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        '''
+                }
+                }
+            }
+        }
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
@@ -100,8 +127,7 @@ pipeline {
                         cd ..
 
                         python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
-                        docker build  -t pdf_generator utils/docker_generate_pdf/.
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
                         declare -a files=("md" "pdf")
 
                         for x in "${files[@]}"

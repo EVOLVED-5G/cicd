@@ -567,6 +567,7 @@ pipeline {
                     buildResults['environment'] = String.valueOf(ENVIRONMENT)
                     buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
                     buildResults['result'] = currentBuild.currentResult
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription + " / " + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }

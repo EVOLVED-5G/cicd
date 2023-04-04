@@ -23,15 +23,18 @@ pipeline {
         CACHE = forceDockerCleanBuild("${params.FORCE_DOCKER_CLEAN_BUILD}")
         PDF_GENERATOR_VERSION = dockerVersion("${params.PDF_GENERATOR_VERSION}")
         GENERATE_PDF_GENERATOR = "${params.GENERATE_PDF_GENERATOR}"
-        PDF_GENERATOR_IMAGE_NAME="dockerhub.hi.inet/evolved-5g/evolved-pdf-generator"
+        PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
     }
     stages {
-        stage ('Generate Evolved Robot Docker tool') {
+        stage('Generate Evolved Robot Docker tool') {
             when {
                 expression { GENERATE_PDF_GENERATOR == 'true' }
             }
+            options {
+                retry(2)
+            }
             steps {
-                dir ("${WORKSPACE}/utils/docker_generate_pdf") {
+                dir("${WORKSPACE}/utils/docker_generate_pdf") {
                     withCredentials([usernamePassword(
                     credentialsId: 'docker_pull_cred',
                     usernameVariable: 'USER',
