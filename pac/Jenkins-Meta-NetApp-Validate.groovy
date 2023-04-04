@@ -137,7 +137,7 @@ pipeline {
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
                                 def jobResult = jobBuild.getResult()
-                                echo "Build of 'Netapp' returned result: ${jobResult}"
+                                echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
                                 buildResults['steps']['build'] = jobResult
                             }
                         }
