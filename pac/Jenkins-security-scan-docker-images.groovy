@@ -91,7 +91,7 @@ pipeline {
         }
         stage('Launch Github Actions command') {
             options {
-                    timeout(time: 10, unit: 'MINUTES')
+                    timeout(time: 30, unit: 'MINUTES')
                     retry(3)
             }
             steps {
