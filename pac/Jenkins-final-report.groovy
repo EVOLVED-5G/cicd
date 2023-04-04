@@ -27,8 +27,9 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'Netapp branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
-        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
 
     environment {
@@ -141,12 +142,16 @@ pipeline {
                 docker image prune -a -f
                 '''
             }
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: 'jenkins-evolved5G',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    mimeType: 'text/html',
+                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    from: 'jenkins-evolved5G@tid.es',
+                    replyTo: 'jenkins-evolved5G',
+                    recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
+            }
         }
         cleanup {
             /* clean up our workspace */

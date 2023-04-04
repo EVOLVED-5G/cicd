@@ -32,6 +32,7 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
     environment {
         GIT_NETAPP_URL = "${params.GIT_NETAPP_URL}"
@@ -172,12 +173,16 @@ pipeline {
 
     post {
         always {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: 'jenkins-evolved5G',
+                replyTo: 'jenkins-evolved5G@tid.es',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
+            }
         }
         cleanup {
             /* clean up our workspace */

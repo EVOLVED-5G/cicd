@@ -55,6 +55,8 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
 
     environment {
@@ -299,6 +301,14 @@ pipeline {
             }
         }
         stage('Upload report to Artifactory') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(2)
+            }
             steps {
                 dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
@@ -337,6 +347,16 @@ pipeline {
             docker system prune -a -f --volumes
             sudo rm -rf $WORKSPACE/$NETAPP_NAME/
             '''
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                mimeType: 'text/html',
+                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                from: 'jenkins-evolved5G@tid.es',
+                replyTo: 'jenkins-evolved5G@tid.es',
+                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
+            }
         }
         cleanup {
             /* clean up our workspace */
