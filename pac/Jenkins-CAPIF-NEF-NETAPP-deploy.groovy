@@ -192,28 +192,30 @@ pipeline {
                             echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
                             
                             mkdir ${BUILD_NUMBER}.d/
-                            
-                            echo "#### setting up capif variables ####"
-                            
-                            LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
+                            CREATE_NS=false
                             TMP_NS_CAPIF=evol5-capif
                             TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
+
+                            echo "#### setting up capif variables ####"
+                            
+                            LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
 
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE $TMP_NS_CAPIF --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
-                            -f ./cd/helm/helmfile.d/00-capif.json \
+                            --arg CREATE_NS $CREATE_NS -f ./cd/helm/helmfile.d/00-capif.json \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
-                            echo "setting up nef variables"
+                            
+                            echo "#### setting up nef variables ####"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE $TMP_NS_NEF --arg HOSTNAME_NEF $HOSTNAME_NEF \
-                            -f ./cd/helm/helmfile.d/01-nef.json \
+                            --arg CREATE_NS $CREATE_NS -f ./cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -224,7 +226,8 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg APP_REPLICAS $APP_REPLICAS -f ./cd/helm/helmfile.d/02-netapp.json \
+                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
+                            -f ./cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
