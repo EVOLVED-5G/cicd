@@ -26,17 +26,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases: 
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: CAPIF_HOSTNAME
@@ -81,17 +82,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -135,17 +137,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -189,17 +192,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -242,17 +246,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -295,17 +300,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: CAPIF_HOSTNAME
@@ -360,17 +366,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -413,17 +420,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -476,17 +484,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -529,17 +538,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: MONGO_INITDB_ROOT_PASSWORD
@@ -586,17 +596,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: ME_CONFIG_MONGODB_ADMINPASSWORD
@@ -647,17 +658,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: CAPIF_HOSTNAME
@@ -703,17 +715,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
@@ -756,17 +769,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - args:
         - redis-server
@@ -818,17 +832,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.env "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
-        {{- if eq .Values.env "kubernetes-uma" }}
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
-        {{- end }}
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
