@@ -171,7 +171,7 @@ pipeline {
     }
     post {
         always {
-            if (SEND_DEV_MAIL == true) {
+            if (${params.SEND_DEV_MAIL} == true) {
                 emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
