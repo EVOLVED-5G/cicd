@@ -549,7 +549,7 @@ pipeline {
                 script {
                     buildResults['environment'] = String.valueOf(ENVIRONMENT)
                     buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
-                    buildResults['result'] = ${ currentBuild.currentResult }
+                    buildResults['result'] = currentBuild.currentResult
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
