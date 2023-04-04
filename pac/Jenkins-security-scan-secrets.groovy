@@ -20,7 +20,7 @@ def getReportFilename(String netappNameLower) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
@@ -171,9 +171,8 @@ pipeline {
     }
     post {
         always {
-            step('Send Mail To Developers') {
-                if (${ params.SEND_DEV_MAIL } == true) {
-                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
@@ -181,7 +180,6 @@ pipeline {
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
             }
         }
-    }
         cleanup {
             /* clean up our workspace */
             deleteDir()
@@ -194,5 +192,5 @@ pipeline {
                 deleteDir()
             }
         }
-}
+    }
 }
