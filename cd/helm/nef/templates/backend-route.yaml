@@ -1,4 +1,4 @@
-{{- if eq .Values.env "openshift" }}
+{{- if eq .Values.environment "openshift" }}
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
