@@ -67,12 +67,12 @@ pipeline {
                     steps {
                         script {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
                             buildResults['steps']['security-analysis'] = jobResult
@@ -83,12 +83,12 @@ pipeline {
                     steps {
                         script {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
 
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
@@ -96,22 +96,22 @@ pipeline {
                         }
                     }
                 }
-                //                stage('Validation: OpenSource Licenses Report'){
-                //                    steps{
-                //                        script {
-                //                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                //                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                //                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                //                            def jobResult = jobBuild.getResult()
-                //                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                //                            buildResults['steps']['opensource-license'] = jobResult
-                //                        }
-                //                    }
-                //                }
+                stage('Validation: OpenSource Licenses Report') {
+                    steps {
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                            buildResults['steps']['opensource-license'] = jobResult
+                        }
+                    }
+                }
                 stage('Validation: Build validation image Report') {
                     steps {
                         retry(2) {
