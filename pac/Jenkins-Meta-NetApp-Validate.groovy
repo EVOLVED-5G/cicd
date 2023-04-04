@@ -66,8 +66,9 @@ pipeline {
             parallel {
                 stage('Validation: Source Code Security Analysis') {
                     steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -75,16 +76,18 @@ pipeline {
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['steps']['security-analysis'] = jobResult
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
+                                buildResults['steps']['security-analysis'] = jobResult
+                            }
                         }
                     }
                 }
                 stage('Validation: Source Code Secret Leakage') {
                     steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -93,16 +96,18 @@ pipeline {
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
 
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['steps']['secrets-analysis'] = jobResult
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+                                buildResults['steps']['secrets-analysis'] = jobResult
+                            }
                         }
                     }
                 }
                 stage('Validation: OpenSource Licenses Report') {
                     steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -110,9 +115,10 @@ pipeline {
                                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                             booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                            buildResults['steps']['opensource-license'] = jobResult
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                                buildResults['steps']['opensource-license'] = jobResult
+                            }
                         }
                     }
                 }
