@@ -79,7 +79,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/") {
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCHg&output_format=md"
-                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&&branch=$GIT_NETAPP_BRANCH&output_format=json" > $REPORT_FILENAME.json
+                    curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-secrets?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&&branch=$GIT_NETAPP_BRANCH&output_format=json" > ${REPORT_FILENAME}.json
                     '''
                 }
             }
@@ -123,14 +123,14 @@ pipeline {
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/secrets-Telefonica-Evolved5g-$NETAPP_NAME
                         versionT=0.35.0
 
-                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json $REPORT_FILENAME.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
+                        python3 utils/report_generator.py --template templates/scan-secrets.md.j2 --json ${REPORT_FILENAME}.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
                         declare -a files=("json" "md" "pdf")
 
                         for x in "${files[@]}"
                             do
-                                report_file="$REPORT_FILENAME.$x"
+                                report_file="${REPORT_FILENAME}.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
@@ -150,7 +150,7 @@ pipeline {
             steps {
                  dir ("${WORKSPACE}") {
                     sh '''#!/bin/bash
-                    if grep -q "failed" $REPORT_FILENAME.md ; then
+                    if grep -q "failed" ${REPORT_FILENAME}.md ; then
                         result=false
                     else
                         result=true

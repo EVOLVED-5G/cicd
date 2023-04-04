@@ -99,14 +99,14 @@ stage('Upload report to Artifactory') {
                         commit=$(git rev-parse HEAD)
                         cd ..
 
-                        python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
+                        python3 utils/report_debricked_generator.py --template templates/scan-licenses.md.j2 --json ${WORKSPACE}/${NETAPP_NAME}/compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit
                         docker build  -t pdf_generator utils/docker_generate_pdf/.
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
                         declare -a files=("md" "pdf")
 
                         for x in "${files[@]}"
                             do
-                                report_file="$REPORT_FILENAME.$x"
+                                report_file="${REPORT_FILENAME}.$x"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
