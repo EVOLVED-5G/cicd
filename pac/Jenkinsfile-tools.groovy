@@ -13,7 +13,7 @@ pipeline {
         ansiColor('xterm')
     }
     parameters {
-        string(name: 'BRANCH_NAME', defaultValue: 'main', description: 'Deployment git branch name')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         choice(name: 'FORCE_DOCKER_CLEAN_BUILD', choices: ['False', 'True'], description: 'Force Docker Clean Build. Default use cached images (False)')
         string(name: 'PDF_GENERATOR_VERSION', defaultValue: 'latest', description: 'Robot Docker image version')
         booleanParam(name: 'GENERATE_PDF_GENERATOR', defaultValue: false, description: 'Check if robot docker image should be generated')
