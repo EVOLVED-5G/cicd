@@ -448,16 +448,6 @@ pipeline {
             }
         }
 
-        stage('Validation: Check Tests results') {
-            steps {
-                script {
-                    if (buildResults['tests_ok'] == false) {
-                        error(message: 'One or More tests FAILS, please check summary')
-                    }
-                }
-            }
-        }
-
         //19
         stage('Validation: Destroying') {
             options {
@@ -523,6 +513,16 @@ pipeline {
                 }
             }
         }
+    }
+
+    stage('Validation: Check Tests results') {
+            steps {
+                script {
+                    if (buildResults['tests_ok'] == false) {
+                    error(message: 'One or More tests FAILS, please check summary')
+                    }
+                }
+            }
     }
 
     post {
