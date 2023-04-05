@@ -449,9 +449,11 @@ pipeline {
         }
 
         stage('Validation: Check Tests results') {
-            script {
-                if (buildResults['tests_ok'] == false) {
-                    error(message: "One or More tests FAILS, please check summary")
+            steps {
+                script {
+                    if (buildResults['tests_ok'] == false) {
+                        error(message: 'One or More tests FAILS, please check summary')
+                    }
                 }
             }
         }
