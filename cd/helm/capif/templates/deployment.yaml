@@ -176,10 +176,23 @@ spec:
           initialDelaySeconds: 20
           periodSeconds: 20
         readinessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 10
+          exec:
+            command:
+            - sh
+            - -c 
+            - |-
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "OUTPUT empty"
+                exit 1;
+              else
+                echo "OUTPUT: $OUTPUT"
+                redis-cli -h redis -p 6379 -n 1 GET  server_pub_key > /usr/src/app/api_provider_management/pubkey.pem
+              fi
+          initialDelaySeconds: 20
           periodSeconds: 5
+          successThreshold: 1
         resources:
             {{- toYaml .Values.apiProviderManagement.apiProviderManagement.resources | nindent 12 }}
       restartPolicy: Always
