@@ -280,6 +280,17 @@ pipeline {
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+
+                            echo "#### applying helmfile capif ####"
+                            
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
                     '''
                 }
             }
