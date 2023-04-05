@@ -122,6 +122,7 @@ pipeline {
                             echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
                             echo "WORKSPACE: $WORKSPACE"
                             mkdir ${BUILD_NUMBER}.d/
+                            CREATE_NS=true
                             
                             if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
                                 CAPIF_HTTP_PORT=30048 
@@ -142,7 +143,8 @@ pipeline {
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE capif-$BUILD_NUMBER --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
-                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
+                            --arg DEPLOYMENT $DEPLOYMENT --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
@@ -154,7 +156,7 @@ pipeline {
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
-                            -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            --arg CREATE_NS $CREATE_NS -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -167,7 +169,8 @@ pipeline {
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg APP_REPLICAS $APP_REPLICAS -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
+                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
@@ -194,7 +197,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
 
                     sh '''#!/bin/bash
-                            CREATE_NS=true
+                            CREATE_NS=false
                             TMP_NS_CAPIF=evol5-capif
                             TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
