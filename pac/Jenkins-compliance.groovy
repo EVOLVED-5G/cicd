@@ -64,7 +64,7 @@ pipeline {
             options {
                 retry(2)
             }
-            sleep(time:30,unit:"SECONDS")
+
             steps {
                 dir("${env.WORKSPACE}") {
                     withCredentials([usernamePassword(
@@ -72,10 +72,15 @@ pipeline {
                     usernameVariable: 'USER',
                     passwordVariable: 'PASS'
                 )]) {
-                        sh '''
+                        try {
+                            sh '''
                         docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
                         docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
                         '''
+                    } catch (Exception e) {
+                            sleep(time:30, unit:'SECONDS')
+                            throw e
+                        }
                 }
                 }
             }
