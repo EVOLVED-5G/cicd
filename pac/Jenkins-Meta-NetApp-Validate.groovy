@@ -280,7 +280,7 @@ pipeline {
                                         string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
-                    echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
+                    echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
                     buildResults['steps'][step_deploy_capif_nef_netapp] = jobResult
                 }
             }
@@ -300,7 +300,7 @@ pipeline {
                                         string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
-                            echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                            echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
                             buildResults['steps']['validate-nef'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
@@ -328,7 +328,7 @@ pipeline {
                 //Review Parameters
                 //jenkins-dummy
                 //13
-                stage('Validation: Test NetApp Networking') {
+                stage('Validation: Test Network App Networking') {
                     options {
                         timeout(time: 5, unit: 'MINUTES')
                     }
@@ -341,7 +341,7 @@ pipeline {
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
-                            echo "Build of 'Networking Netapp' returned result: ${jobResult}"
+                            echo "Build of 'Test Network App Networking' returned result: ${jobResult}"
                             buildResults['steps']['network-netapp'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
@@ -381,7 +381,7 @@ pipeline {
                                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
-                            echo "Build of 'Onboard Netapp' returned result: ${jobResult}"
+                            echo "Build of 'Onboarding NetApp as Invoker to CAPIF' returned result: ${jobResult}"
                             buildResults['steps']['onboard-netapp'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 def destroyJobCapif = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
@@ -476,7 +476,7 @@ pipeline {
                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                             def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+                            echo "Build of 'NEF Services MonitoringEvent API' returned result: ${jobResult}"
                             buildResults['steps']['nef-services-monitoringevent-api'] = jobResult
                         }
                     }
