@@ -184,6 +184,11 @@ pipeline {
                 allOf {
                     expression { DEPLOYMENT == "openshift"}
                 }
+            environment{
+                TOKEN_NS_CAPIF=credentials("token-os-capif")
+                TOKEN_NS_NEF=credentials("openshiftv4-nef")
+                TOKEN_NS_NEF=credentials("token-evol5-netapp")
+            }
             }
             steps {
                 dir ("${env.WORKSPACE}") {
@@ -196,18 +201,24 @@ pipeline {
 
                             echo "#### loging in AWS ECR ####"
 
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
+                            
                             kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_CAPIF
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$TMP_NS_CAPIF                                                   \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
                             kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NEF
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$TMP_NS_NEF                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
                             kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NETAPP
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
