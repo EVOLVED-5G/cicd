@@ -184,11 +184,11 @@ pipeline {
                 allOf {
                     expression { DEPLOYMENT == "openshift"}
                 }
-            environment{
-                TOKEN_NS_CAPIF=credentials("token-os-capif")
-                TOKEN_NS_NEF=credentials("openshiftv4-nef")
-                TOKEN_NS_NEF=credentials("token-evol5-netapp")
             }
+            environment {
+                TOKEN_NS_CAPIF = credentials("token-os-capif")
+                TOKEN_NS_NEF = credentials("openshiftv4-nef")
+                TOKEN_NS_NEF = credentials("token-evol5-netapp")
             }
             steps {
                 dir ("${env.WORKSPACE}") {
