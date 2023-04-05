@@ -111,7 +111,7 @@ spec:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -169,7 +169,7 @@ spec:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
         resources:
             {{- toYaml .Values.apiProviderManagement.apiProviderManagement.resources | nindent 12 }}
       restartPolicy: Always
@@ -340,7 +340,7 @@ spec:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
         readinessProbe:
           exec:
             command:
@@ -349,7 +349,7 @@ spec:
             - |-
               redis-cli -h redis -p 6379 -n 1 GET  server_priv_key > /usr/src/app/capif_security/server.key
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
           successThreshold: 1
       restartPolicy: Always
 ---
@@ -463,7 +463,7 @@ spec:
           tcpSocket:
             port: 8080
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
         readinessProbe:
           exec:
             command:
@@ -472,7 +472,7 @@ spec:
             - |-
               redis-cli -h redis -p 6379 -n 1 GET  server_priv_key  > /usr/src/app/register_service/server.key
           initialDelaySeconds: 20
-          periodSeconds: 20
+          periodSeconds: 5
           successThreshold: 1
       restartPolicy: Always
 ---
@@ -820,12 +820,12 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 6379
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
           tcpSocket:
             port: 6379
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
       restartPolicy: Always
 ---
