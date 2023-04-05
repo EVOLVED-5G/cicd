@@ -194,7 +194,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
 
                     sh '''#!/bin/bash
-                            CREATE_NS=false
+                            CREATE_NS=true
                             TMP_NS_CAPIF=evol5-capif
                             TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
