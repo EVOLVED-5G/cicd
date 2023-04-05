@@ -123,6 +123,17 @@ pipeline {
                             echo "WORKSPACE: $WORKSPACE"
                             mkdir ${BUILD_NUMBER}.d/
                             
+                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
+                                CAPIF_HTTP_PORT=30048 
+                                CAPIF_HTTPS_PORT=30548 
+                            else
+                                CAPIF_HTTP_PORT=80
+                                CAPIF_HTTPS_PORT=443 
+                            fi
+                            
+                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
+                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
+
                             echo "#### setting up capif variables ####"
                             
                             CAPIF_HTTP_PORT=80
@@ -140,11 +151,6 @@ pipeline {
                             cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
                             
                             echo "#### setting up nef variables ####"
-                            
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
@@ -156,17 +162,6 @@ pipeline {
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "#### setting up network-app variables ####"
-                            
-                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
-                                CAPIF_HTTP_PORT=30048 
-                                CAPIF_HTTPS_PORT=30548 
-                            else
-                                CAPIF_HTTP_PORT=80
-                                CAPIF_HTTPS_PORT=443 
-                            fi
-                            
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
