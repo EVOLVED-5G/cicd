@@ -357,7 +357,15 @@ spec:
             - sh
             - -c 
             - |-
-              redis-cli -h redis -p 6379 -n 1 GET  server_priv_key > /usr/src/app/capif_security/server.key
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "OUTPUT empty"
+                exit 1;
+              else
+                echo "OUTPUT: $OUTPUT"
+                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key > /usr/src/app/capif_security/server.key
+              fi
           initialDelaySeconds: 20
           periodSeconds: 5
           successThreshold: 1
@@ -480,7 +488,15 @@ spec:
             - sh
             - -c 
             - |-
-              redis-cli -h redis -p 6379 -n 1 GET  server_priv_key  > /usr/src/app/register_service/server.key
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "OUTPUT empty"
+                exit 1;
+              else
+                echo "OUTPUT: $OUTPUT"
+                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key  > /usr/src/app/register_service/server.key
+              fi
           initialDelaySeconds: 20
           periodSeconds: 5
           successThreshold: 1
@@ -845,6 +861,19 @@ spec:
         readinessProbe:
           tcpSocket:
             port: 6379
+          exec:
+            command:
+            - sh
+            - -c
+            - |-
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "OUTPUT empty"
+                exit 1;
+              else
+                echo "OUTPUT: $OUTPUT"
+              fi
           initialDelaySeconds: 10
           periodSeconds: 5
       restartPolicy: Always
