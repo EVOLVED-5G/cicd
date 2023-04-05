@@ -200,7 +200,18 @@ pipeline {
                             TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
 
-                            echo "#### loging in AWS ECR ####"
+                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
+                                CAPIF_HTTP_PORT=30048 
+                                CAPIF_HTTPS_PORT=30548 
+                            else
+                                CAPIF_HTTP_PORT=80
+                                CAPIF_HTTPS_PORT=443 
+                            fi
+                            
+                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
+                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
+
+                            echo "#### login in AWS ECR ####"
 
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
                             
@@ -247,11 +258,6 @@ pipeline {
                             
                             echo "#### setting up nef variables ####"
 
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
-
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE TMP_NS_NEF --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
@@ -263,11 +269,6 @@ pipeline {
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "#### setting up network-app variables ####"
-                            
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
