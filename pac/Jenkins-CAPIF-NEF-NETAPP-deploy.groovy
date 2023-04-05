@@ -136,8 +136,6 @@ pipeline {
 
                             echo "#### setting up capif variables ####"
                             
-                            CAPIF_HTTP_PORT=80
-                            CAPIF_HTTPS_PORT=443
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
                             echo "VERSION_CAPIF: $VERSION_CAPIF"
