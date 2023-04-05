@@ -157,8 +157,14 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
                             
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
+                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
+                                CAPIF_HTTP_PORT=30048 
+                                CAPIF_HTTPS_PORT=30548 
+                            else
+                                CAPIF_HTTP_PORT=80
+                                CAPIF_HTTPS_PORT=443 
+                            fi
+                            
                             echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
                             echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
@@ -237,7 +243,8 @@ pipeline {
                             
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE $TMP_NS_CAPIF --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
-                            --arg CREATE_NS $CREATE_NS -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
+                            --arg DEPLOYMENT $DEPLOYMENT --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
