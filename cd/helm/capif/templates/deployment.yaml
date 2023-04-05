@@ -864,14 +864,7 @@ spec:
             - sh
             - -c
             - |-
-              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
-              echo "$OUTPUT"
-              if [ -z "$OUTPUT" ]; then
-                echo "OUTPUT empty"
-                exit 1;
-              else
-                echo "OUTPUT: $OUTPUT"
-              fi
+              redis-cli -h redis -p 6379 ping
           initialDelaySeconds: 10
           periodSeconds: 5
       restartPolicy: Always
