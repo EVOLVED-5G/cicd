@@ -196,22 +196,22 @@ pipeline {
 
                             echo "#### loging in AWS ECR ####"
 
-                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_CAPIF
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_CAPIF
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
-                            --namespace=TMP_NS_CAPIF                                                   \
+                            --namespace=$TMP_NS_CAPIF                                                   \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
-                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_NEF
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NEF
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
-                            --namespace=TMP_NS_NEF                                                     \
+                            --namespace=$TMP_NS_NEF                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
-                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_NETAPP
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NETAPP
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
-                            --namespace=TMP_NS_NETAPP                                                     \
+                            --namespace=$TMP_NS_NETAPP                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
                             
