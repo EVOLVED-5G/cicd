@@ -153,7 +153,8 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
+                            -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -257,10 +258,10 @@ pipeline {
                             echo "#### setting up nef variables ####"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
-                            --arg NAMESPACE TMP_NS_NEF --arg HOSTNAME_NEF $HOSTNAME_NEF \
+                            --arg NAMESPACE $TMP_NS_NEF --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg CREATE_NS $CREATE_NS \
-                            -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -269,7 +270,7 @@ pipeline {
                             echo "#### setting up network-app variables ####"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
-                            --arg NAMESPACE TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
+                            --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \

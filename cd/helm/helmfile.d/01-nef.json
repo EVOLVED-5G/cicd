@@ -19,7 +19,7 @@
           }
         },
         {
-          "environment": "kubernetes-uma"
+          "environment": "\($DEPLOYMENT)"
         },
         {
           "env": {
