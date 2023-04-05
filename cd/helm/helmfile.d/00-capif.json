@@ -1,6 +1,6 @@
 {
   "helmDefaults": {
-    "createNamespace": $CREATE_NS | test("false")
+    "createNamespace": $CREATE_NS | test("true")
   },
   "releases": [
     {
