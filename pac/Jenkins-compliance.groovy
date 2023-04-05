@@ -90,7 +90,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(1)
+                    retry(2)
             }
             steps {
                 sh '''
@@ -105,6 +105,10 @@ pipeline {
         stage('Vulnerability scan and license checking') {
             environment {
                 DEBRICKED_CREDENTIALS = credentials('Debricked')
+            }
+            options {
+                    timeout(time: 10, unit: 'MINUTES')
+                    retry(2)
             }
             steps {
                 sh '''
@@ -123,6 +127,10 @@ pipeline {
                 expression {
                     return REPORTING
                 }
+            }
+            options {
+                timeout(time: 10, unit: 'MINUTES')
+                retry(2)
             }
             steps {
                 dir("${WORKSPACE}/") {
