@@ -413,13 +413,11 @@ pipeline {
                         timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
-                        script {
+                        script { 
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                    string(name: 'DEPLOYMENT', value: String.valueOf(DEPLOYMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
                             buildResults['steps']['discover-apis'] = jobResult
