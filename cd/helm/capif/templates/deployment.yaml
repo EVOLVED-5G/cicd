@@ -859,8 +859,6 @@ spec:
           initialDelaySeconds: 10
           periodSeconds: 5
         readinessProbe:
-          tcpSocket:
-            port: 6379
           exec:
             command:
             - sh
