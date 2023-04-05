@@ -64,7 +64,7 @@ pipeline {
             options {
                 retry(2)
             }
-
+            sleep(time:30,unit:"SECONDS")
             steps {
                 dir("${env.WORKSPACE}") {
                     withCredentials([usernamePassword(
