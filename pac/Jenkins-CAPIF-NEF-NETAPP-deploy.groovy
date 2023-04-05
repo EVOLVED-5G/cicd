@@ -79,7 +79,6 @@ pipeline {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens"}
                     expression { DEPLOYMENT == "kubernetes-uma" }
-                    expression { DEPLOYMENT == "openshift" }
                 }
             }
             steps {
@@ -190,12 +189,34 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
 
                     sh '''#!/bin/bash
-                            echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
-                            mkdir ${BUILD_NUMBER}.d/
                             CREATE_NS=false
                             TMP_NS_CAPIF=evol5-capif
                             TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
+
+                            echo "#### loging in AWS ECR ####"
+
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_CAPIF
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=TMP_NS_CAPIF                                                   \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_NEF
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=TMP_NS_NEF                                                     \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=TMP_NS_NETAPP
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=TMP_NS_NETAPP                                                     \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+                            
+                            echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
+                            mkdir ${BUILD_NUMBER}.d/
 
                             echo "#### setting up capif variables ####"
                             
