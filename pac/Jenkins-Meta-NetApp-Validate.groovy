@@ -513,16 +513,16 @@ pipeline {
                 }
             }
         }
-    }
 
-    stage('Validation: Check Tests results') {
+        stage('Validation: Check Tests results') {
             steps {
                 script {
                     if (buildResults['tests_ok'] == false) {
-                    error(message: 'One or More tests FAILS, please check summary')
+                        error(message: 'One or More tests FAILS, please check summary')
                     }
                 }
             }
+        }
     }
 
     post {
