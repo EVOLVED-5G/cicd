@@ -864,7 +864,7 @@ spec:
             - sh
             - -c
             - |-
-              redis-cli -h redis -p 6379 ping
+              redis-cli ping
           initialDelaySeconds: 10
           periodSeconds: 5
       restartPolicy: Always
