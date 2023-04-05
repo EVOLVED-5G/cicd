@@ -62,7 +62,7 @@ pipeline {
                 }
             }
             options {
-                retry(2)
+                retry(3)
             }
 
             steps {
@@ -79,7 +79,7 @@ pipeline {
                                 docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
                                 '''
                     } catch (Exception e) {
-                                sleep(time:30, unit:'SECONDS')
+                                sleep(time:60, unit:'SECONDS')
                                 throw e
                             }
                         }
@@ -90,7 +90,7 @@ pipeline {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(3)
             }
             steps {
                 sh '''
@@ -108,7 +108,7 @@ pipeline {
             }
             options {
                     timeout(time: 10, unit: 'MINUTES')
-                    retry(2)
+                    retry(3)
             }
             steps {
                 sh '''
@@ -130,7 +130,7 @@ pipeline {
             }
             options {
                 timeout(time: 10, unit: 'MINUTES')
-                retry(2)
+                retry(3)
             }
             steps {
                 dir("${WORKSPACE}/") {
