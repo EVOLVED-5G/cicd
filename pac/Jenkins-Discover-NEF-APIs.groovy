@@ -19,12 +19,12 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
+        string(name: 'RELEASE_NAME', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
 
     environment {
-        RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
+        RELEASE_NAME = "${params.RELEASE_NAME}"
 
     }
 
@@ -49,7 +49,7 @@ pipeline {
                     sh '''#!/bin/bash
                             result=false
 
-                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_CAPIF" | awk 'NR==2{print $2}')
+                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
                             DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
                             -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 

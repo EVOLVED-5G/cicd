@@ -20,6 +20,10 @@ def getAgent(deployment) {
     }
 }
 
+def step_security_analysis = 'security-analysis'
+def step_build = 'build'
+def step_deploy_capif_nef_netapp = 'deploy-capif-nef-netapp'
+
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
     options {
@@ -42,6 +46,7 @@ pipeline {
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         choice(name: 'ENVIRONMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
         string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
@@ -65,90 +70,105 @@ pipeline {
             parallel {
                 stage('Validation: Source Code Security Analysis') {
                     steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['steps']['security-analysis'] = jobResult
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/002-Security Scan Code', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Security Scan Code Analysis' returned result: ${jobResult}"
+                                buildResults['steps'][step_security_analysis] = jobResult
+                            }
                         }
                     }
                 }
                 stage('Validation: Source Code Secret Leakage') {
                     steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/003-Security Scan Secrets', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
 
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
-                            buildResults['steps']['secrets-analysis'] = jobResult
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Secrets Scan Code Analysis' returned result: ${jobResult}"
+                                buildResults['steps']['secrets-analysis'] = jobResult
+                            }
                         }
                     }
                 }
-                //                stage('Validation: OpenSource Licenses Report'){
-                //                    steps{
-                //                        script {
-                //                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                //                                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                //                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                //                            def jobResult = jobBuild.getResult()
-                //                            echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                //                            buildResults['steps']['opensource-license'] = jobResult
-                //                        }
-                //                    }
-                //                }
+                stage('Validation: OpenSource Licenses Report') {
+                    steps {
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                                buildResults['steps']['opensource-license'] = jobResult
+                            }
+                        }
+                    }
+                }
                 stage('Validation: Build validation image Report') {
                     steps {
                         retry(2) {
                             script {
-                                def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: false,
-                                                parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                                                            string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                            string(name: 'STAGE', value: 'validation'),
-                                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                buildResults['steps'][step_build] = 'FAILURE'
+                                def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: true,
+                                    parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                                                string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
                                 def jobResult = jobBuild.getResult()
-                                echo "Build of 'Netapp' returned result: ${jobResult}"
-                                buildResults['steps']['build'] = jobResult
+                                echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
+                                buildResults['steps'][step_build] = jobResult
                             }
                         }
                     }
                 }
 
-            //                stage('Validation: Security Scan Docker Images'){
-            //                   steps{
-            //                       script {
-            //                           def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
-            //                                           parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-            //                                                       string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-            //                                                       string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-            //                                                       string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-            //                                                       string(name: 'STAGE', value: "validation"),
-            //                                                       string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-            //                                                       booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-            //                           def jobResult = jobBuild.getResult()
-            //                           echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-            //                           buildResults['steps']['scan-docker-images'] = jobResult
-            //                       }
-            //                   }
-            //               }
+                stage('Validation: Security Scan Docker Images') {
+                    steps {
+                        retry(2) {
+                            script {
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: false,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            string(name: 'STAGE', value: 'validation'),
+                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+                                buildResults['steps']['scan-docker-images'] = jobResult
+                            }
+                        }
+                    }
+                }
             }
         }
 // 6
@@ -246,6 +266,7 @@ pipeline {
         stage('Validation: Deploying CAPIF-NEF-NetworkApp') {
             steps {
                 script {
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/019-CAPIF-NEF-NETAPP-deploy', wait: true, propagate: true,
                             parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
@@ -260,7 +281,7 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF' returned result: ${jobResult}"
-                    buildResults['steps']['deploy-capif-nef-netapp'] = jobResult
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = jobResult
                 }
             }
         }
@@ -392,13 +413,11 @@ pipeline {
                         timeout(time: 5, unit: 'MINUTES')
                     }
                     steps {
-                        script {
+                        script { 
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                    string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
                             buildResults['steps']['discover-apis'] = jobResult
@@ -552,6 +571,7 @@ pipeline {
                     buildResults['environment'] = String.valueOf(ENVIRONMENT)
                     buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
                     buildResults['result'] = currentBuild.currentResult
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription + " / " + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
@@ -564,13 +584,14 @@ pipeline {
                             '''
             }
             retry(3) {
-                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: false,
+                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
             }
 
             script {
@@ -595,13 +616,17 @@ pipeline {
                                  to: email
                     }
                 }
-                sh 'echo "Send mail to all developers"'
-                emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                 mimeType: 'text/html',
-                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                 from: 'jenkins-evolved5G@tid.es',
-                 replyTo: 'jenkins-evolved5G',
-                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+            }
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    sh 'echo "Send mail to all developers"'
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    mimeType: 'text/html',
+                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    from: 'jenkins-evolved5G@tid.es',
+                    replyTo: 'jenkins-evolved5G',
+                    recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
             }
         }
         cleanup {

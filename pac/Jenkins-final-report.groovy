@@ -27,8 +27,9 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'Netapp branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
-        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
 
     environment {
@@ -41,9 +42,36 @@ pipeline {
         TOKEN = credentials('github_token_cred')
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
         DOCKER_PATH = '/usr/src/app'
+        PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
+        PDF_GENERATOR_VERSION = 'latest'
     }
 
     stages {
+        stage('Prepare pdf generator tools') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(2)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    withCredentials([usernamePassword(
+                    credentialsId: 'docker_pull_cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                        sh '''
+                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
+                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        '''
+                }
+                }
+            }
+        }
         stage('Generate steps summary') {
             when {
                 expression {
@@ -70,8 +98,7 @@ pipeline {
 
                 commit=$(git ls-remote ${GIT_NETAPP_URL}.git | grep $GIT_NETAPP_BRANCH | awk '{ print $1}')
                 python3 utils/report_generator.py --template templates/scan-steps.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --name $NETAPP_NAME --url url
-                docker build  -t pdf_generator utils/docker_generate_pdf/.
-                docker run --rm -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
+                docker run --rm -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
                 '''
                 }
             }
@@ -99,7 +126,7 @@ pipeline {
                     today=$(date +'%d/%m/%Y')
                     [ -e *-licenses*.pdf ] && mv *-licenses*.pdf executive_summary/ || echo "No licenses file found"
                     pdfunite *.pdf mid_report1.pdf
-                    [ -e *-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
+                    [ -e executive_summary/*-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     pip install -r utils/requirements.txt
                     python3 utils/cover.py -t "$NETAPP_NAME_LOWER" -d $today
@@ -141,12 +168,16 @@ pipeline {
                 docker image prune -a -f
                 '''
             }
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                mimeType: 'text/html',
-                subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                from: 'jenkins-evolved5G@tid.es',
-                replyTo: 'jenkins-evolved5G',
-                recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    mimeType: 'text/html',
+                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    from: 'jenkins-evolved5G@tid.es',
+                    replyTo: 'jenkins-evolved5G',
+                    recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
+            }
         }
         cleanup {
             /* clean up our workspace */

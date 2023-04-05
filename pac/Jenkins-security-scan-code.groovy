@@ -32,6 +32,7 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
     environment {
         GIT_NETAPP_URL = "${params.GIT_NETAPP_URL}"
@@ -47,8 +48,35 @@ pipeline {
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
+        PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
+        PDF_GENERATOR_VERSION = 'latest'
     }
     stages {
+        stage('Prepare pdf generator tools') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(2)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    withCredentials([usernamePassword(
+                    credentialsId: 'docker_pull_cred',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                        sh '''
+                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
+                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        '''
+                }
+                }
+            }
+        }
         stage('Get Repo and clone') {
             options {
                 timeout(time: 10, unit: 'MINUTES')
@@ -128,8 +156,7 @@ pipeline {
                         versionT=0.35.0
 
                         python3 utils/report_generator.py --template templates/scan-repo.md.j2 --json ${REPORT_FILENAME}.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
-                        docker build  -t pdf_generator utils/docker_generate_pdf/.
-                        docker run -v "$WORKSPACE":$DOCKER_PATH pdf_generator markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md
+                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md || exit 1
                         declare -a files=("json" "md" "pdf")
 
                         for x in "${files[@]}"
@@ -172,12 +199,16 @@ pipeline {
 
     post {
         always {
-            emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+            script {
+                if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
+                    emailext body: '''${SCRIPT, template="groovy-html.template"}''',
                 mimeType: 'text/html',
                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                 from: 'jenkins-evolved5G@tid.es',
-                replyTo: 'jenkins-evolved5G',
+                replyTo: 'jenkins-evolved5G@tid.es',
                 recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']]
+                }
+            }
         }
         cleanup {
             /* clean up our workspace */
