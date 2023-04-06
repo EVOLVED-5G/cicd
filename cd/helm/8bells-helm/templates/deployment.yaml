@@ -1,0 +1,265 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "8bells.fullname" . }}-adminer
+  labels:
+    io.kompose.service: adminer
+  {{- include "8bells.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.adminer.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: adminer
+    {{- include "8bells.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/8bellsnetapp-default: "true"
+        io.kompose.service: adminer
+      {{- include "8bells.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.adminer.8BNetappAdminer.image.repository }}:{{ .Values.adminer.8BNetappAdminer.image.tag
+          | default .Chart.AppVersion }}
+        name: 8b-netapp-adminer
+        ports:
+        - containerPort: 8080
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "8bells.fullname" . }}-netapp
+  labels:
+    io.kompose.service: netapp
+  {{- include "8bells.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: netapp
+    {{- include "8bells.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/8bellsnetapp-default: "true"
+        io.kompose.service: netapp
+      {{- include "8bells.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          value: {{ quote .Values.netapp.8BNetapp.env.callbackAddress }}
+        - name: CALLBACK_ADR
+          value: {{ quote .Values.netapp.8BNetapp.env.callbackAdr }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.netapp.8BNetapp.env.capifHostname }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.netapp.8BNetapp.env.capifPortHttp }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.netapp.8BNetapp.env.capifPortHttps }}
+        - name: DB_NAME
+          value: {{ quote .Values.postgres.8BNetappDb.env.postgresDb }}
+        - name: DB_PASS
+          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPassword }}
+        - name: DB_PORT
+          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPort }}
+        - name: DB_USERNAME
+          value: {{ quote .Values.postgres.8BNetappDb.env.postgresUsername }}
+        - name: HOST
+          value: {{ quote .Values.env.host }}
+        - name: NEF_IP
+          value: {{ quote .Values.netapp.8BNetapp.env.nefAddress }}
+        - name: NEF_PASS
+          value: {{ quote .Values.netapp.8BNetapp.env.nefPassword }}
+        - name: NEF_PORT
+          value: {{ quote .Values.netapp.8BNetapp.env.nefPort }}
+        - name: NEF_USER
+          value: {{ quote .Values.netapp.8BNetapp.env.nefUser }}
+        - name: NETAPP_IP
+          value: {{ quote .Values.netapp.8BNetapp.env.netappIp }}
+        - name: NETAPP_NAME
+          value: {{ quote .Values.netapp.8BNetapp.env.netappName }}
+        - name: VAPP_IP
+          value: {{ quote .Values.netapp.8BNetapp.env.vappIp }}
+        - name: VAPP_PASS
+          value: {{ quote .Values.netapp.8BNetapp.env.vappPass }}
+        - name: VAPP_USER
+          value: {{ quote .Values.netapp.8BNetapp.env.vappUser }}
+        - name: adminer_password
+          valueFrom:
+            configMapKeyRef:
+              key: adminer_password
+              name: {{ include "8bells.fullname" . }}-env
+        - name: adminer_port_one
+          valueFrom:
+            configMapKeyRef:
+              key: adminer_port_one
+              name: {{ include "8bells.fullname" . }}-env
+        - name: adminer_port_two
+          valueFrom:
+            configMapKeyRef:
+              key: adminer_port_two
+              name: {{ include "8bells.fullname" . }}-env
+        - name: callback_address
+          valueFrom:
+            configMapKeyRef:
+              key: callback_address
+              name: {{ include "8bells.fullname" . }}-env
+        - name: capifhost
+          valueFrom:
+            configMapKeyRef:
+              key: capifhost
+              name: {{ include "8bells.fullname" . }}-env
+        - name: host
+          valueFrom:
+            configMapKeyRef:
+              key: host
+              name: {{ include "8bells.fullname" . }}-env
+        - name: host_url
+          valueFrom:
+            configMapKeyRef:
+              key: host_url
+              name: {{ include "8bells.fullname" . }}-env
+        - name: nef_ip
+          valueFrom:
+            configMapKeyRef:
+              key: nef_ip
+              name: {{ include "8bells.fullname" . }}-env
+        - name: nef_password
+          valueFrom:
+            configMapKeyRef:
+              key: nef_password
+              name: {{ include "8bells.fullname" . }}-env
+        - name: nef_port
+          valueFrom:
+            configMapKeyRef:
+              key: nef_port
+              name: {{ include "8bells.fullname" . }}-env
+        - name: nef_user
+          valueFrom:
+            configMapKeyRef:
+              key: nef_user
+              name: {{ include "8bells.fullname" . }}-env
+        - name: netapp_ip
+          valueFrom:
+            configMapKeyRef:
+              key: netapp_ip
+              name: {{ include "8bells.fullname" . }}-env
+        - name: netapp_name
+          valueFrom:
+            configMapKeyRef:
+              key: netapp_name
+              name: {{ include "8bells.fullname" . }}-env
+        - name: netapp_port
+          valueFrom:
+            configMapKeyRef:
+              key: netapp_port
+              name: {{ include "8bells.fullname" . }}-env
+        - name: postgres_db
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_db
+              name: {{ include "8bells.fullname" . }}-env
+        - name: postgres_password
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_password
+              name: {{ include "8bells.fullname" . }}-env
+        - name: postgres_port
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_port
+              name: {{ include "8bells.fullname" . }}-env
+        - name: postgres_username
+          valueFrom:
+            configMapKeyRef:
+              key: postgres_username
+              name: {{ include "8bells.fullname" . }}-env
+        - name: vapp_ip
+          valueFrom:
+            configMapKeyRef:
+              key: vapp_ip
+              name: {{ include "8bells.fullname" . }}-env
+        - name: vapp_pass
+          valueFrom:
+            configMapKeyRef:
+              key: vapp_pass
+              name: {{ include "8bells.fullname" . }}-env
+        - name: vapp_user
+          valueFrom:
+            configMapKeyRef:
+              key: vapp_user
+              name: {{ include "8bells.fullname" . }}-env
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.8BNetapp.image.repository }}:{{ .Values.netapp.8BNetapp.image.tag
+          | default .Chart.AppVersion }}
+        name: 8b-netapp
+        ports:
+        - containerPort: 5000
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "8bells.fullname" . }}-postgres
+  labels:
+    io.kompose.service: postgres
+  {{- include "8bells.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.postgres.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: postgres
+    {{- include "8bells.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/8bellsnetapp-default: "true"
+        io.kompose.service: postgres
+      {{- include "8bells.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_PASSWORD
+          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPassword }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.postgres.8BNetappDb.image.repository }}:{{ .Values.postgres.8BNetappDb.image.tag
+          | default .Chart.AppVersion }}
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready -U postgres
+          failureThreshold: 20
+          periodSeconds: 5
+          timeoutSeconds: 5
+        name: 8b-netapp-db
+        ports:
+        - containerPort: 5432
+        resources: {}
+      restartPolicy: Always
