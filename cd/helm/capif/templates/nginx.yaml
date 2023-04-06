@@ -1,4 +1,3 @@
-{{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-uma") }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,6 +8,9 @@ metadata:
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
 spec:
+  {{- if eq .Values.env "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
   rules:
   - host: "{{ .Values.nginx.nginx.env.capifHostname }}"
     http:
@@ -62,7 +64,6 @@ spec:
               number: 8080
         path: /test
         pathType: Prefix
-{{- end }}
 ---
 apiVersion: v1
 kind: Service

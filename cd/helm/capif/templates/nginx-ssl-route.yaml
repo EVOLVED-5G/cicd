@@ -1,0 +1,22 @@
+{{- if eq .Values.env "openshift" }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+  name: nginx-ssl
+spec:
+  host: {{ .Values.nginx.nginx.env.capifHostname }}
+  port:
+    targetPort: "443"
+  tls:
+    termination: passthrough
+  to:
+    kind: Service
+    name: nginx
+    weight: 100
+status:
+  ingress:
+  - conditions:
+    host: {{ .Values.nginx.nginx.env.capifHostname }}
+    routerCanonicalHostname: router-default.apps.ocp-epg.hi.inet
+{{- end }}

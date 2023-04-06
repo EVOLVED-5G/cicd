@@ -1,4 +1,7 @@
 {
+  "helmDefaults": {
+    "createNamespace": $CREATE_NS | test("true")
+  },
   "releases": [
     {
       "name": "\($RELEASE_NAME)",
@@ -16,7 +19,7 @@
           }
         },
         {
-          "environment": "kubernetes-uma"
+          "environment": "\($DEPLOYMENT)"
         },
         {
           "env": {

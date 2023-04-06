@@ -1,4 +1,7 @@
 {
+  "helmDefaults": {
+    "createNamespace": $CREATE_NS | test("true")
+  },
   "releases": [
     {
       "name": "\($RELEASE_NAME)",
