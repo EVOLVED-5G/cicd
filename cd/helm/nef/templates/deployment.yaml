@@ -27,15 +27,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
-      hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases: 
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.backend.ingress.host }}"
+            - "{{ .Values.env.capifHostname }}"
+      {{- end }}
       containers:
       - args:
         - /start-reload.sh
@@ -209,6 +214,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: backend
         ports:
         - containerPort: 80
@@ -245,15 +251,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.backend.ingress.host }}"
+            - "{{ .Values.env.capifHostname }}"
+      {{- end }}
       containers:
       - env:
         - name: BACKEND_CORS_ORIGINS
@@ -427,6 +438,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.db.db.image.repository }}-{{ .Values.db.db.image.tag | default
           .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: db
         ports:
             - containerPort: 5432
@@ -463,15 +475,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
+      {{- end }}  
+      {{- if eq .Values.environment "kubernetes-uma" }}  
+      hostAliases:  
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.backend.ingress.host }}"
+            - "{{ .Values.env.capifHostname }}"
+      {{- end }}
       containers:
       - env:
         - name: BACKEND_CORS_ORIGINS
@@ -643,6 +660,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.mongo.mongo.image.repository }}-{{ .Values.mongo.mongo.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: mongo
         ports:
             - containerPort: 27017
@@ -679,15 +697,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.backend.ingress.host }}"
+            - "{{ .Values.env.capifHostname }}"
+      {{- end }}
       containers:
       - env:
         - name: ME_CONFIG_MONGODB_URL
@@ -696,6 +719,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.mongoExpress.mongoExpress.image.repository }}-{{ .Values.mongoExpress.mongoExpress.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: mongo-express
         ports:
         - containerPort: 8081
@@ -732,15 +756,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:  
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.backend.ingress.host }}"
+            - "{{ .Values.env.capifHostname }}"
+      {{- end }}
       containers:
       - env:
         - name: BACKEND_CORS_ORIGINS
@@ -912,6 +941,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.pgadmin.pgadmin.image.repository }}-{{ .Values.pgadmin.pgadmin.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: pgadmin
         ports:
         - containerPort: 5050

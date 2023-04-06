@@ -60,20 +60,6 @@ pipeline {
     }
 
     stages {
-        stage ("Login in openshift"){
-            when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
-                    }
-                }
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    sh '''
-                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                    '''
-                }
-            }
-        }
         stage ('Log into AWS ECR') {
             when {
                 anyOf {
@@ -122,52 +108,55 @@ pipeline {
                             echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
                             echo "WORKSPACE: $WORKSPACE"
                             mkdir ${BUILD_NUMBER}.d/
+                            CREATE_NS=true
                             
+                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
+                                CAPIF_HTTP_PORT=30048 
+                                CAPIF_HTTPS_PORT=30548 
+                            else
+                                CAPIF_HTTP_PORT=80
+                                CAPIF_HTTPS_PORT=443 
+                            fi
+                            
+                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
+                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
+
                             echo "#### setting up capif variables ####"
                             
-                            CAPIF_HTTP_PORT=80
-                            CAPIF_HTTPS_PORT=443
                             LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
                             sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
                             echo "VERSION_CAPIF: $VERSION_CAPIF"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
                             --arg NAMESPACE capif-$BUILD_NUMBER --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
-                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
+                            --arg DEPLOYMENT $DEPLOYMENT --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
                             | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
                             
                             echo "#### setting up nef variables ####"
-                            
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
+                            --arg CREATE_NS $CREATE_NS -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "#### setting up network-app variables ####"
-                            
-                            if [ $DEPLOYMENT == "kubernetes-athens" ]; then CAPIF_HTTP_PORT=30048; \
-                            CAPIF_HTTPS_PORT=30548; fi
-                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
-                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg APP_REPLICAS $APP_REPLICAS -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
+                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
@@ -185,13 +174,112 @@ pipeline {
                     expression { DEPLOYMENT == "openshift"}
                 }
             }
+            environment {
+                TOKEN_NS_CAPIF = credentials("token-os-capif")
+                TOKEN_NS_NEF = credentials("openshiftv4-nef")
+                TOKEN_NS_NETAPP = credentials("token-evol5-netapp")
+            }
             steps {
                 dir ("${env.WORKSPACE}") {
-                    sh '''
-                    helm upgrade --install --debug -n evol5-$RELEASE_NAME \
-                    --wait $RELEASE_NAME ./cd/helm/capif/ --set capif_hostname=$HOSTNAME \
-                    --set env=$DEPLOYMENT --set version=$VERSION \
-                    --atomic
+
+                    sh '''#!/bin/bash
+                            CREATE_NS=false
+                            TMP_NS_CAPIF=evol5-capif
+                            TMP_NS_NEF=evol5-nef
+                            TMP_NS_NETAPP=evol5-netapp
+
+                            if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
+                                CAPIF_HTTP_PORT=30048 
+                                CAPIF_HTTPS_PORT=30548 
+                            else
+                                CAPIF_HTTP_PORT=80
+                                CAPIF_HTTPS_PORT=443 
+                            fi
+                            
+                            echo "CAPIF_HTTP_PORT: $CAPIF_HTTP_PORT"
+                            echo "CAPIF_HTTPS_PORT: $CAPIF_HTTPS_PORT"
+
+                            echo "#### login in AWS ECR ####"
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
+                            
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_CAPIF
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=$TMP_NS_CAPIF                                                   \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NEF
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=$TMP_NS_NEF                                                     \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_NETAPP
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=$TMP_NS_NETAPP                                                     \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+                            
+                            echo "#### creating temporal folder ${BUILD_NUMBER}.d/ ####"
+                            mkdir ${BUILD_NUMBER}.d/
+
+                            echo "#### setting up capif variables ####"
+                            
+                            LATEST_VERSION=$(grep appVersion: ./cd/helm/capif/Chart.yaml)
+
+                            sed -i -e "s/$LATEST_VERSION/appVersion: '$VERSION_CAPIF'/g" ./cd/helm/capif/Chart.yaml
+                            
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_CAPIF --arg CHART_NAME capif \
+                            --arg NAMESPACE $TMP_NS_CAPIF --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF \
+                            --arg DEPLOYMENT $DEPLOYMENT --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/00-capif.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+
+                            echo "./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+                            
+                            echo "#### setting up nef variables ####"
+
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NEF --arg CHART_NAME nef \
+                            --arg NAMESPACE $TMP_NS_NEF --arg HOSTNAME_NEF $HOSTNAME_NEF \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg CREATE_NS $CREATE_NS \
+                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+
+                            echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+
+                            echo "#### setting up network-app variables ####"
+
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
+                            --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
+                            --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
+                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
+                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+
+                            echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+
+                            echo "#### applying helmfile ####"
+                            
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
                     '''
                 }
             }

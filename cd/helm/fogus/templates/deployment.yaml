@@ -27,15 +27,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - env:
         - name: CALLBACK_ADDRESS
@@ -146,15 +151,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - args:
         - ./wait_db.sh
@@ -273,15 +283,20 @@ spec:
     spec:
       imagePullSecrets:
         - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
       hostAliases:
-        {{- if eq .Values.environment "kubernetes-athens" }}
         - ip: "{{ .Values.ingress_ip.athens }}"
-        {{- else }}
-        - ip: "{{ .Values.ingress_ip.uma }}"
-        {{- end }}
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - env:
         - name: CALLBACK_ADDRESS
