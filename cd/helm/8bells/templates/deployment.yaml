@@ -24,12 +24,29 @@ spec:
         kompose.cmd: kompose -f docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
     spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.adminer.8BNetappAdminer.image.repository }}:{{ .Values.adminer.8BNetappAdminer.image.tag
+        image: {{ .Values.adminer.NetappAdminer.image.repository }}-{{ .Values.adminer.NetappAdminer.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: 8b-netapp-adminer
         ports:
         - containerPort: 8080
@@ -62,46 +79,62 @@ spec:
         kompose.cmd: kompose -f docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
     spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - env:
         - name: CALLBACK_ADDRESS
-          value: {{ quote .Values.netapp.8BNetapp.env.callbackAddress }}
+          value: {{ quote .Values.netapp.env.callbackAddress }}
         - name: CALLBACK_ADR
-          value: {{ quote .Values.netapp.8BNetapp.env.callbackAdr }}
+          value: {{ quote .Values.netapp.env.callbackAdr }}
         - name: CAPIF_HOSTNAME
-          value: {{ quote .Values.netapp.8BNetapp.env.capifHostname }}
+          value: {{ quote .Values.netapp.env.capifHostname }}
         - name: CAPIF_PORT_HTTP
-          value: {{ quote .Values.netapp.8BNetapp.env.capifPortHttp }}
+          value: {{ quote .Values.netapp.env.capifPortHttp }}
         - name: CAPIF_PORT_HTTPS
-          value: {{ quote .Values.netapp.8BNetapp.env.capifPortHttps }}
+          value: {{ quote .Values.netapp.env.capifPortHttps }}
         - name: DB_NAME
-          value: {{ quote .Values.postgres.8BNetappDb.env.postgresDb }}
+          value: {{ quote .Values.postgres.env.postgresDb }}
         - name: DB_PASS
-          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPassword }}
+          value: {{ quote .Values.postgres.env.postgresPassword }}
         - name: DB_PORT
-          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPort }}
+          value: {{ quote .Values.postgres.env.postgresPort }}
         - name: DB_USERNAME
-          value: {{ quote .Values.postgres.8BNetappDb.env.postgresUsername }}
+          value: {{ quote .Values.postgres.env.postgresUsername }}
         - name: HOST
           value: {{ quote .Values.env.host }}
         - name: NEF_IP
-          value: {{ quote .Values.netapp.8BNetapp.env.nefAddress }}
+          value: {{ quote .Values.netapp.env.nefAddress }}
         - name: NEF_PASS
-          value: {{ quote .Values.netapp.8BNetapp.env.nefPassword }}
+          value: {{ quote .Values.netapp.env.nefPassword }}
         - name: NEF_PORT
-          value: {{ quote .Values.netapp.8BNetapp.env.nefPort }}
+          value: {{ quote .Values.netapp.env.nefPort }}
         - name: NEF_USER
-          value: {{ quote .Values.netapp.8BNetapp.env.nefUser }}
+          value: {{ quote .Values.netapp.env.nefUser }}
         - name: NETAPP_IP
-          value: {{ quote .Values.netapp.8BNetapp.env.netappIp }}
+          value: {{ quote .Values.netapp.env.netappIp }}
         - name: NETAPP_NAME
-          value: {{ quote .Values.netapp.8BNetapp.env.netappName }}
+          value: {{ quote .Values.netapp.env.netappName }}
         - name: VAPP_IP
-          value: {{ quote .Values.netapp.8BNetapp.env.vappIp }}
+          value: {{ quote .Values.netapp.env.vappIp }}
         - name: VAPP_PASS
-          value: {{ quote .Values.netapp.8BNetapp.env.vappPass }}
+          value: {{ quote .Values.netapp.env.vappPass }}
         - name: VAPP_USER
-          value: {{ quote .Values.netapp.8BNetapp.env.vappUser }}
+          value: {{ quote .Values.netapp.env.vappUser }}
         - name: adminer_password
           valueFrom:
             configMapKeyRef:
@@ -209,8 +242,9 @@ spec:
               name: {{ include "8bells.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.8BNetapp.image.repository }}:{{ .Values.netapp.8BNetapp.image.tag
+        image: {{ .Values.netapp.Netapp.image.repository }}-{{ .Values.netapp.Netapp.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: 8b-netapp
         ports:
         - containerPort: 5000
@@ -243,14 +277,31 @@ spec:
         kompose.cmd: kompose -f docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
     spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       containers:
       - env:
         - name: POSTGRES_PASSWORD
-          value: {{ quote .Values.postgres.8BNetappDb.env.postgresPassword }}
+          value: {{ quote .Values.postgres.env.postgresPassword }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.postgres.8BNetappDb.image.repository }}:{{ .Values.postgres.8BNetappDb.image.tag
+        image: {{ .Values.postgres.NetappDb.image.repository }}-{{ .Values.postgres.NetappDb.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         livenessProbe:
           exec:
             command:
