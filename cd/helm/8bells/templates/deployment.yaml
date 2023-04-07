@@ -64,7 +64,7 @@ metadata:
     kompose.cmd: kompose -f docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
 spec:
-  replicas: {{ .Values.netapp.replicas }}
+  replicas: {{ .Values.fe.replicas }}
   selector:
     matchLabels:
       io.kompose.service: netapp
@@ -102,11 +102,11 @@ spec:
         - name: CALLBACK_ADR
           value: {{ quote .Values.netapp.env.callbackAdr }}
         - name: CAPIF_HOSTNAME
-          value: {{ quote .Values.netapp.env.capifHostname }}
+          value: {{ quote .Values.env.capifHostname }}
         - name: CAPIF_PORT_HTTP
-          value: {{ quote .Values.netapp.env.capifPortHttp }}
+          value: {{ quote .Values.env.capifPortHttp }}
         - name: CAPIF_PORT_HTTPS
-          value: {{ quote .Values.netapp.env.capifPortHttps }}
+          value: {{ quote .Values.env.capifPortHttps }}
         - name: DB_NAME
           value: {{ quote .Values.postgres.env.postgresDb }}
         - name: DB_PASS
@@ -118,7 +118,7 @@ spec:
         - name: HOST
           value: {{ quote .Values.env.host }}
         - name: NEF_IP
-          value: {{ quote .Values.netapp.env.nefAddress }}
+          value: {{ quote .Values.env.nefAddress }}
         - name: NEF_PASS
           value: {{ quote .Values.netapp.env.nefPassword }}
         - name: NEF_PORT
