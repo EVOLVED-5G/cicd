@@ -28,7 +28,7 @@ spec:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.adminer.8BNetappAdminer.image.repository }}:{{ .Values.adminer.8BNetappAdminer.image.tag
+        image: {{ .Values.adminer.8BNetappAdminer.image.repository }}-{{ .Values.adminer.8BNetappAdminer.image.tag
           | default .Chart.AppVersion }}
         name: 8b-netapp-adminer
         ports:
@@ -209,7 +209,7 @@ spec:
               name: {{ include "8bells.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.8BNetapp.image.repository }}:{{ .Values.netapp.8BNetapp.image.tag
+        image: {{ .Values.netapp.8BNetapp.image.repository }}-{{ .Values.netapp.8BNetapp.image.tag
           | default .Chart.AppVersion }}
         name: 8b-netapp
         ports:
@@ -249,7 +249,7 @@ spec:
           value: {{ quote .Values.postgres.8BNetappDb.env.postgresPassword }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.postgres.8BNetappDb.image.repository }}:{{ .Values.postgres.8BNetappDb.image.tag
+        image: {{ .Values.postgres.8BNetappDb.image.repository }}-{{ .Values.postgres.8BNetappDb.image.tag
           | default .Chart.AppVersion }}
         livenessProbe:
           exec:
