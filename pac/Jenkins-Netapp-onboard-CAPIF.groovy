@@ -65,7 +65,7 @@ stages {
                     result=false
                     NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
                     echo namespace=$NAMESPACE
-                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs -l io.kompose.service=service-apis | grep "Invoker Created")
+                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
                     echo $logs
 
                     if [[ $logs ]]; then
