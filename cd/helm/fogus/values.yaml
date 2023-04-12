@@ -1,4 +1,4 @@
-environment: "kubernetes-athens"
+environment: "openshift"
 ingress_ip: 
     athens: "10.161.1.126"
     uma: "10.11.23.49"
@@ -41,11 +41,11 @@ django:
   type: ClusterIP
 env:
   callbackAddress: 192.168.1.5:8000
-  capifHostname: "my-capif.evolved-5g.eu"
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "30048"
   capifPortHttps: "30548"
-  frontendAddress: fogus.evolved-5g.eu
-  nefAddress: 192.168.1.5:8888
+  frontendAddress: my-fogus.apps.ocp-epg.hi.inet
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
   nefPassword: pass
   nefUser: admin@my-email.com
   netappAddress: 192.168.1.5:8000

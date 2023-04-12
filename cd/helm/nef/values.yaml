@@ -1,4 +1,4 @@
-environment: "kubernetes-athens"
+environment: "openshift"
 
 ingress_ip: 
     athens: "10.161.1.126"
@@ -23,7 +23,7 @@ backend:
   replicas: 1
   type: ClusterIP
   ingress:
-    host: "my-nef.evolved-5g.eu"
+    host: "nef-test.apps.ocp-epg.hi.inet"
 db:
   db:
     env:
@@ -75,7 +75,7 @@ env:
   smtpUser: user
   usersOpenRegistration: "true"
   usePublicKeyVerification: "True"
-  capifHostname: "my-capif.evolved-5g.eu"
+  capifHostname: "capif.apps.ocp-epg.hi.inet"
   capifHttpPort: "30048"
   capifHttpsPort: "30548"
 

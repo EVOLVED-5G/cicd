@@ -8,6 +8,9 @@ metadata:
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
 spec:
+  {{- if eq .Values.environment "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
   rules:
   - host: "{{ .Values.env.frontendAddress }}"
     http:
