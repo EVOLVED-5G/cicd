@@ -23,7 +23,7 @@ Each individual service that exposes a port are checked:
     {%- if port.listening %}
 | | {{port.port}} | OK |
     {%- else %}
-| | {{port.port}} | NOK |
+| | {{port.port}} | **NOK** |
     {% endif %}
   {%- endfor %}  
 {%- endfor %}
