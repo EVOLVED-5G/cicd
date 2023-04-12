@@ -65,18 +65,16 @@ stages {
                     result=false
                     NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
                     echo namespace=$NAMESPACE
-                    value=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
-                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs --tail=20 $value)
+                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs -l io.kompose.service=service-apis | grep "Invoker Created")
                     echo $logs
-                    while IFS= read -r line; do
-                        if [[ $line == "Invoker Created" ]]; then
-                            result=true
-                        fi
-                    done <<< "$logs"
-                    echo $result
-                    if  $result ; then
-                        echo "NETAPP was onboarded successfuly"
+
+                    if [[ $logs ]]; then
+                        echo "API_INVOKER_LOGS: $logs"
+                        result=true
+                        echo "Onboard of Network App works correctly"
                     else
+                        echo "API_INVOKER_LOGS: $logs"
+                        result=false
                         exit 1
                     fi
                     '''
