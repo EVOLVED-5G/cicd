@@ -61,13 +61,14 @@ stages {
                     result=false
                     NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
                     echo namespace=$NAMESPACE
-                    value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
+                    // value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
+                    // kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
                     value=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
                     logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs --tail=20 $value)
                     echo $logs
                     while IFS= read -r line; do
-                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
+                        // if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
+                        if [[ $line == "Invoker Created" ]]; then
                             result=true
                         fi
                     done <<< "$logs"
@@ -94,8 +95,8 @@ stages {
                     result=false
                     NAMESPACE=evol5-nef
                     echo namespace=$NAMESPACE
-                    value_pod=$(kubectl -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
+                    // value_pod=$(kubectl -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
+                    // kubectl -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
                     value=$(kubectl -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
                     logs=$(kubectl -n $NAMESPACE logs --tail=20 $value)
                     echo $logs
