@@ -21,8 +21,8 @@ def generate_cover(title, date):
 
     if title != None:
         cover.setFont("Georgia", 20)
-        title_width = stringWidth("Validation Report: %s NetApp" %title, "Georgia", 20)
-        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Validation Report: %s NetApp" %title)
+        title_width = stringWidth("Validation Report: %s Network App" %title, "Georgia", 20)
+        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Validation Report: %s Network App" %title)
     if date != None:
         cover.setFont("Georgia", 20)
         cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 720, "Date: %s" %date)
