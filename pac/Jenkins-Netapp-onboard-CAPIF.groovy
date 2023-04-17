@@ -28,22 +28,15 @@ pipeline {
 
     }
 
-    stages {        
-        stage ("Login in openshift"){
+    stages {
+        
+        stage('Verify is Network App is onboarded - Kubernetes') {
             when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
-                    }
-                }
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    sh '''
-                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                    '''
+                anyOf {
+                    expression { DEPLOYMENT == "kubernetes-athens" }
+                    expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
-        }
-        stage('Verify is Network App is onboarded') {
             steps {
                     
                  dir ("${WORKSPACE}/") {
@@ -56,6 +49,42 @@ pipeline {
                             
                             DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
                             -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+
+                            if [[ $DISCOVER_LOG ]]; then
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=true
+                                echo "DISCOVER APIs work correctly"
+                            else
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=false
+                                exit 1
+                            fi
+                            '''
+                }
+            }
+        }
+        stage('Verify is NetworkApp is onboarded - Openshift') {
+            when {
+                    allOf {
+                        expression { DEPLOYMENT == "openshift"}
+                    }
+                }
+            environment {
+                TOKEN_NS_CAPIF = credentials("token-os-capif")
+            }
+            steps {
+                 dir ("${WORKSPACE}/") {
+                    sh '''#!/bin/bash
+                            result=false
+                            TMP_NS_CAPIF=evol5-capif
+
+                            echo "RELEASE_NAME: $RELEASE_NAME"
+                            echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
+                           
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
+
+                            DISCOVER_LOG=$(kubectl logs \
+                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
                             if [[ $DISCOVER_LOG ]]; then
                                 echo "DISCOVER_LOG: $DISCOVER_LOG"
