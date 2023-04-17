@@ -44,21 +44,7 @@ pipeline {
 
     }
 
-    stages {        
-        stage ("Login in openshift"){
-            when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
-                    }
-                }
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    sh '''
-                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                    '''
-                }
-            }
-        }
+    stages {
         stage ('Destroy/Uninstall app in kubernetes') {
             when {
                 anyOf {
@@ -83,9 +69,16 @@ pipeline {
                     expression { DEPLOYMENT == "openshift"}
                 }
             }
+            environment {
+                TOKEN_NS_NETAPP = credentials("token-evol5-netapp")
+            }
             steps {
                 dir ("${env.WORKSPACE}") {
-                    sh '''
+                    sh '''#!/bin/bash
+                    TMP_NS_NETAPP=evol5-netapp
+                    
+                    oc login --insecure-skip-tls-verify --token=$TMP_NS_NETAPP 
+
                     helm uninstall --debug $RELEASE_NAME -n evol5-$NAMESPACE_NAME --wait
                     '''
                 }

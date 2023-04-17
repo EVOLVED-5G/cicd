@@ -45,9 +45,6 @@ pipeline {
         }
         stage('Verify is Network App is onboarded') {
             steps {
-                // value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    // kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
-                    // if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
                     
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
