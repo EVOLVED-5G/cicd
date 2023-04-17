@@ -117,8 +117,6 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''#!/bin/bash
                             CREATE_NS=false
-                            TMP_NS_CAPIF=evol5-capif
-                            TMP_NS_NEF=evol5-nef
                             TMP_NS_NETAPP=evol5-netapp
 
                             if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
@@ -146,6 +144,8 @@ pipeline {
                             mkdir ${BUILD_NUMBER}.d/
 
                             echo "#### setting up network-app variables ####"
+
+                            cat $WORKSPACE/cd/helm/helmfile.d/02-netapp.json
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
