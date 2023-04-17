@@ -265,7 +265,7 @@ metadata:
     kompose.cmd: kompose convert -c
     kompose.version: 1.28.0 (c4137012e)
 spec:
-  replicas: {{ .Values.fe.replicas }}
+  replicas: {{ .Values.netapp.replicas }}
   selector:
     matchLabels:
       io.kompose.service: netappfe
@@ -371,11 +371,11 @@ spec:
               name: env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.fe.netappfe.image.repository }}-{{ .Values.fe.netappfe.image.tag
+        image: {{ .Values.netapp.netappfe.image.repository }}-{{ .Values.netapp.netappfe.image.tag
           | default .Chart.AppVersion }}
         name: netappfe
         ports:
         - containerPort: 4200
         resources:
-            {{- toYaml .Values.fe.netappfe.resources | nindent 12 }}
+            {{- toYaml .Values.netapp.netappfe.resources | nindent 12 }}
       restartPolicy: Always

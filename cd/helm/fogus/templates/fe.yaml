@@ -34,9 +34,9 @@ metadata:
     kompose.cmd: kompose convert -c
     kompose.version: 1.28.0 (c4137012e)
 spec:
-  type: {{ .Values.fe.type }}
+  type: {{ .Values.netapp.type }}
   selector:
     io.kompose.service: netappfe
   {{- include "fogus-kube.selectorLabels" . | nindent 4 }}
   ports:
-	{{- .Values.fe.ports | toYaml | nindent 2 -}}
+	{{- .Values.netapp.ports | toYaml | nindent 2 -}}
