@@ -153,7 +153,7 @@ pipeline {
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
-                            -f $WORKSPACE/cd/helm/helmfile.d/02-netapp.json \
+                            -f ./cd/helm/helmfile.d/02-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
