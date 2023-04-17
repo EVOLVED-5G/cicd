@@ -64,7 +64,7 @@ metadata:
     kompose.cmd: kompose -f docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
 spec:
-  replicas: {{ .Values.fe.replicas }}
+  replicas: {{ .Values.netapp.replicas }}
   selector:
     matchLabels:
       io.kompose.service: netapp
@@ -116,7 +116,7 @@ spec:
         - name: DB_USERNAME
           value: {{ quote .Values.postgres.env.postgresUsername }}
         - name: HOST
-          value: {{ quote .Values.env.host }}
+          value: {{ quote .Values.postgres.env.postgresDb }}
         - name: NEF_IP
           value: {{ quote .Values.env.nefAddress }}
         - name: NEF_PASS

@@ -20,31 +20,28 @@ adminer:
   type: ClusterIP
 env:
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
-  capifPortHttp: "8080"
+  capifPortHttp: "80"
   capifPortHttps: "443"
   nefAddress: "my-nef.apps.ocp-epg.hi.inet"
   frontendAddress: "netapp.app.ocp-epg.hi.inet"
-  host: 172.17.0.1
-  hostUrl: http://172.17.0.1
+  hostUrl: http://netapp
   vappIp: 10.10.10.40
   vappPass: admin8b
   vappUser: admin8b
 kubernetesClusterDomain: cluster.local
 
-fe:
-  replicas: 1
 netapp:
   Netapp:
     image:
       repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp
       tag: ""
   env:
-    callbackAddress:  http://172.17.0.1:5000/monitoring/callback:5000
-    callbackAdr: http://172.17.0.1:5000/monitoring/callback
+    callbackAddress:  http://netapp:5000/monitoring/callback:5000
+    callbackAdr: http://netapp:5000/monitoring/callback
     nefPassword: pass
     nefPort: 4443
     nefUser: "admin@my-email.com"
-    netappIp: http://172.17.0.1:5000
+    netappIp: http://netapp:5000
     netappName: myNetapp
     netappPort: "5000"
     vappIp: "10.10.10.40"
@@ -54,7 +51,9 @@ netapp:
   - name: "5000"
     port: 5000
     targetPort: 5000
+  replicas: 1
   type: ClusterIP
+
 postgres:
   NetappDb:
     image:
