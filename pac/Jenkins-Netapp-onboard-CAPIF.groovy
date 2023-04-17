@@ -49,7 +49,10 @@ pipeline {
                     sh '''#!/bin/bash
                             result=false
 
+                            echo "RELEASE_NAME: $RELEASE_NAME"
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+                            echo "NAMESPACE $NAMESPACE"
+                            
                             DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
                             -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
