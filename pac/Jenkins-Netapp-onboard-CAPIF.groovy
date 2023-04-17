@@ -56,25 +56,25 @@ stages {
                 }
             }
             steps {
+                // value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
+                    // kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
+                    // if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
+                    
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
                     result=false
                     NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
                     echo namespace=$NAMESPACE
-                    value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
-                    value=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
-                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs --tail=20 $value)
+                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
                     echo $logs
-                    while IFS= read -r line; do
-                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
-                            result=true
-                        fi
-                    done <<< "$logs"
-                    echo $result
-                    if  $result ; then
-                        echo "NETAPP was onboarded successfuly"
+
+                    if [[ $logs ]]; then
+                        echo "API_INVOKER_LOGS: $logs"
+                        result=true
+                        echo "Onboard of Network App works correctly"
                     else
+                        echo "API_INVOKER_LOGS: $logs"
+                        result=false
                         exit 1
                     fi
                     '''
@@ -94,8 +94,8 @@ stages {
                     result=false
                     NAMESPACE=evol5-nef
                     echo namespace=$NAMESPACE
-                    value_pod=$(kubectl -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
+                    // value_pod=$(kubectl -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
+                    // kubectl -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
                     value=$(kubectl -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
                     logs=$(kubectl -n $NAMESPACE logs --tail=20 $value)
                     echo $logs
