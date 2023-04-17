@@ -1,12 +1,18 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
     uma: "10.11.23.49"
 
 dbnetapp:
   netapppostgres:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netapppostgres"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: "latest"
     resources:
      limits:
@@ -23,8 +29,11 @@ dbnetapp:
   replicas: 1
 django:
   netappdjango:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: "latest"
     resources:
      limits:
@@ -56,8 +65,11 @@ env:
   vappAddress: 195.134.66.79:8443
 fe:
   netappfe:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: "latest"
     resources: {}
 #     limits:

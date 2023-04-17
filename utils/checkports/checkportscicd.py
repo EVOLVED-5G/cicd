@@ -25,17 +25,17 @@ def isOpen(host,port,mapped_ports=None):
             raise Exception('Port ' + port_to_check + ' not open')
         
         if mapped_ports != None:
-            print (f"NetApp TCP Port {int(port_to_check)} (Original Port {int(port)}), is LISTENING/OPENED")
+            print (f"Network App TCP Port {int(port_to_check)} (Original Port {int(port)}), is LISTENING/OPENED")
         else:
-            print (f"NetApp TCP Port {int(port_to_check)}, is LISTENING/OPENED")
+            print (f"Network App TCP Port {int(port_to_check)}, is LISTENING/OPENED")
         return True
 
     except Exception as e:
         print(e)
         if mapped_ports != None:
-            print(f"NetApp TCP Port {int(port_to_check)} (Original Port {int(port)}), is NOT LISTENING/NOT OPENED.")
+            print(f"Network App TCP Port {int(port_to_check)} (Original Port {int(port)}), is NOT LISTENING/NOT OPENED.")
         else:
-            print(f"NetApp TCP Port {int(port_to_check)}, is NOT LISTENING/NOT OPENED.")
+            print(f"Network App TCP Port {int(port_to_check)}, is NOT LISTENING/NOT OPENED.")
         return False
 
 
@@ -51,25 +51,25 @@ if __name__ == '__main__':
     n = len(sys.argv)
     
     if n != 5:
-            print("expected: " + sys.argv[0] + " <netapp_branch> <netapp_repository> <netapp_image_name> <output_filename>")
+            print("expected: " + sys.argv[0] + " <networkapp_branch> <git_repository> <networkapp_image_name> <output_filename>")
             exit(255)
     
-    netapp_branch = sys.argv[1]
+    networkapp_branch = sys.argv[1]
     git_repository = sys.argv[2]
-    netapp_host = 'localhost'
+    networkapp_host = 'localhost'
 
-    print("Netapp branch: " + netapp_branch)
-    print("Netapp repository: " + git_repository)
-    print("Netapp Host: " + netapp_host )
+    print("Network App branch: " + networkapp_branch)
+    print("Network App repository: " + git_repository)
+    print("Network App Host: " + networkapp_host )
     
-    netapp_image_name=sys.argv[3]
-    print("Netapp Image Name: " + netapp_image_name )
+    networkapp_image_name=sys.argv[3]
+    print("Network App Image Name: " + networkapp_image_name )
 
     output_filename=sys.argv[4]
     print("Output filename: " + output_filename )
 
-    NetApp_ports=dict()
-    NetApp_ports['services']=dict()
+    networkapp_ports=dict()
+    networkapp_ports['services']=dict()
 
     #Create repository folder (then it'll be removed)
     repo_dir = os.path.abspath(os.getcwd()) + "/ports_tmp/"
@@ -78,7 +78,7 @@ if __name__ == '__main__':
       shutil.rmtree(repo_dir)
 
     try:
-        git.Repo.clone_from(git_repository, repo_dir, branch=netapp_branch)
+        git.Repo.clone_from(git_repository, repo_dir, branch=networkapp_branch)
         repo_docker_compose_file = glob.glob(repo_dir + 'docker-compose.y*ml')
         repo_docker_file = glob.glob(repo_dir + 'Dockerfile')
         success = True
@@ -93,14 +93,14 @@ if __name__ == '__main__':
                     service=data['services'][service_name]
                     ports = service.get('ports',None)
                     if ports is not None:
-                        NetApp_ports['services'][service_name]=dict()
-                        NetApp_ports['services'][service_name]['ports']=list()
+                        networkapp_ports['services'][service_name]=dict()
+                        networkapp_ports['services'][service_name]['ports']=list()
                         for port_docker_compose in ports:
                             port=port_docker_compose.split(':')[0]
-                            result=isOpen(netapp_host, port)
+                            result=isOpen(networkapp_host, port)
                             if not result:
                                 success=False
-                            NetApp_ports['services'][service_name]['ports'].append({"port":port,"listening":result})
+                            networkapp_ports['services'][service_name]['ports'].append({"port":port,"listening":result})
 
         elif (bool(repo_docker_file)):
             repo_dir_docker = find_file(os.path.basename(repo_docker_file[0]), repo_dir)
@@ -108,30 +108,30 @@ if __name__ == '__main__':
                 expose_list=list()
                 for line in input:
                     expose_list += re.findall(r'EXPOSE \d+ ?\d*', line)
-                NetApp_ports['services'][netapp_image_name]=dict()
-                NetApp_ports['services'][netapp_image_name]['ports']=list()
+                networkapp_ports['services'][networkapp_image_name]=dict()
+                networkapp_ports['services'][networkapp_image_name]['ports']=list()
                 for port in expose_list:
-                    NetApp_ports['services'][netapp_image_name]['ports'].append(port.split(" ")[1])
+                    networkapp_ports['services'][networkapp_image_name]['ports'].append(port.split(" ")[1])
 
             # Get docker ports information
             client = docker.from_env()
-            containers_list = client.containers.list(filters={"ancestor":netapp_image_name})
+            containers_list = client.containers.list(filters={"ancestor":networkapp_image_name})
             container = dict()
 
             if len(containers_list) == 1:
                 container = containers_list[0]
                 print("Container " + container.attrs['Config']['Image'] + " found")
             else:
-                raise Exception("Netapp " + netapp_image_name + " container not found")
+                raise Exception("Network App " + networkapp_image_name + " container not found")
 
             container_ports_info = container.ports
             container_ports_list = list(container_ports_info.keys())
 
-            if len(NetApp_ports['services'][netapp_image_name]['ports']) != len(container_ports_list):
-                raise Exception("Netapp ports on Dockerfile not match ports exposed on running image")
+            if len(networkapp_ports['services'][networkapp_image_name]['ports']) != len(container_ports_list):
+                raise Exception("Network App ports on Dockerfile not match ports exposed on running image")
             
             mapped_ports = dict()
-            for dockerfile_port in NetApp_ports['services'][netapp_image_name]['ports']:
+            for dockerfile_port in networkapp_ports['services'][networkapp_image_name]['ports']:
                 for container_port in container_ports_list:
                     key_port_without_protocol = container_port.split("/")[0]
                     if key_port_without_protocol == dockerfile_port:
@@ -140,28 +140,28 @@ if __name__ == '__main__':
 
             print("Mapped ports:")
             print(mapped_ports)
-            if len(list(mapped_ports.keys())) != len(NetApp_ports['services'][netapp_image_name]['ports']):
-                raise Exception("Netapp ports on Dockerfile not match ports map with running image")
+            if len(list(mapped_ports.keys())) != len(networkapp_ports['services'][networkapp_image_name]['ports']):
+                raise Exception("Network App ports on Dockerfile not match ports map with running image")
 
             ports_checked=list()
-            for port in NetApp_ports['services'][netapp_image_name]['ports']:
-                result=isOpen(netapp_host, port, mapped_ports)
+            for port in networkapp_ports['services'][networkapp_image_name]['ports']:
+                result=isOpen(networkapp_host, port, mapped_ports)
                 if not result:
                     success = False
                 ports_checked.append({"port":port,"mapped_port":mapped_ports[port],"listening":result})
 
-            NetApp_ports['services'][netapp_image_name]['ports']=ports_checked
+            networkapp_ports['services'][networkapp_image_name]['ports']=ports_checked
             
 
         else:
-            print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your NetApp (repository) has a docker-compose yaml file.")
+            print("\n\nNo docker-compose y(a)ml found in your repository.\nPlease make sure your Network App (repository) has a docker-compose yaml file.")
 
-        json_formatted_str = json.dumps(NetApp_ports, indent=2)
+        json_formatted_str = json.dumps(networkapp_ports, indent=2)
         print('Final Result:')
         print(json_formatted_str)
 
         with open(output_filename, 'w', encoding='utf-8') as f:
-            json.dump(NetApp_ports, f, ensure_ascii=False)
+            json.dump(networkapp_ports, f, ensure_ascii=False)
 
         # Repository folder removed
         shutil.rmtree(repo_dir)

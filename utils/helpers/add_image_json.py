@@ -4,11 +4,11 @@ import json,sys
 n = len(sys.argv)
 
 if n != 5:
-    print("expected: " + sys.argv[0] + " <json_file> <netapp_image_name> <tag> <image_url>")
+    print("expected: " + sys.argv[0] + " <json_file> <networkapp_image_name> <tag> <image_url>")
     exit(255)
 
 json_file = sys.argv[1]
-netapp_image_name = sys.argv[2]
+networkapp_image_name = sys.argv[2]
 tag = sys.argv[3]
 image_url = sys.argv[4]
 
@@ -19,13 +19,13 @@ f = open(json_file)
 # a dictionary
 data = json.load(f)
 
-if data['services'].get(netapp_image_name,None) == None:
-    data['services'][netapp_image_name] = dict()
+if data['services'].get(networkapp_image_name,None) == None:
+    data['services'][networkapp_image_name] = dict()
 
-if data['services'][netapp_image_name].get(tag,None) == None:
-    data['services'][netapp_image_name][tag] = list()
+if data['services'][networkapp_image_name].get(tag,None) == None:
+    data['services'][networkapp_image_name][tag] = list()
 
-data['services'][netapp_image_name][tag].append(image_url)
+data['services'][networkapp_image_name][tag].append(image_url)
 
 f.close()
 

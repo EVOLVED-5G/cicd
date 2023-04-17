@@ -1,5 +1,7 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing 
 ingress_ip: 
     athens: "10.161.1.126"
     uma: "10.11.23.49"
@@ -7,7 +9,10 @@ ingress_ip:
 backend:
   backend:
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     resources:
      limits:
@@ -29,7 +34,10 @@ db:
     env:
       pgdata: /var/lib/postgresql/data/pgdata
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     resources:
      limits:
@@ -83,7 +91,10 @@ kubernetesClusterDomain: cluster.local
 mongo:
   mongo:
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo_nef-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     resources:
      limits:
@@ -101,7 +112,10 @@ mongo:
 mongoExpress:
   mongoExpress:
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo-express-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     resources:
      limits:
@@ -119,7 +133,10 @@ mongoExpress:
 pgadmin:
   pgadmin:
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-pgadmin-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     resources:
      limits:

@@ -27,7 +27,7 @@ def step_open_source_licenses_report = 'opensource-license'
 def step_build = 'build'
 def step_security_scan_docker_images = 'scan-docker-images'
 def step_deploy_capif_nef_netapp = 'deploy-capif-nef-netapp'
-def step_onboard_netApp_to_capif = 'validate-nef'
+def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
 def step_test_network_app_networking = 'network-netapp'
 def step_discover_nef_apis = 'discover-apis'
 def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
@@ -36,20 +36,22 @@ def step_destroy_network_app = 'destroy-netapp'
 def step_destroy_nef = 'destroy-nef'
 def step_destroy_capif = 'destroy-capif'
 
-buildResults['steps'][step_security_scan_code] = 'PENDING'
-buildResults['steps'][step_security_scan_secrets] = 'PENDING'
-buildResults['steps'][step_open_source_licenses_report] = 'PENDING'
-buildResults['steps'][step_build] = 'PENDING'
-buildResults['steps'][step_security_scan_docker_images] = 'PENDING'
-buildResults['steps'][step_deploy_capif_nef_netapp] = 'PENDING'
-buildResults['steps'][step_onboard_netApp_to_capif] = 'PENDING'
-buildResults['steps'][step_test_network_app_networking] = 'PENDING'
-buildResults['steps'][step_discover_nef_apis] = 'PENDING'
-buildResults['steps'][step_nef_services_monitoringevent_api] = 'PENDING'
-buildResults['steps'][step_nef_services_monitoringevent] = 'PENDING'
-buildResults['steps'][step_destroy_network_app] = 'PENDING'
-buildResults['steps'][step_destroy_nef] = 'PENDING'
-buildResults['steps'][step_destroy_capif] = 'PENDING'
+def inital_status = 'PENDING'
+
+buildResults['steps'][step_security_scan_code] = inital_status
+buildResults['steps'][step_security_scan_secrets] = inital_status
+buildResults['steps'][step_open_source_licenses_report] = inital_status
+buildResults['steps'][step_build] = inital_status
+buildResults['steps'][step_security_scan_docker_images] = inital_status
+buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
+buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
+buildResults['steps'][step_test_network_app_networking] = inital_status
+buildResults['steps'][step_discover_nef_apis] = inital_status
+buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
+buildResults['steps'][step_nef_services_monitoringevent] = inital_status
+buildResults['steps'][step_destroy_network_app] = inital_status
+buildResults['steps'][step_destroy_nef] = inital_status
+buildResults['steps'][step_destroy_capif] = inital_status
 
 step_open_source_licenses_report
 
