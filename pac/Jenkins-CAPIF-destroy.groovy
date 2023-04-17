@@ -76,9 +76,9 @@ pipeline {
                     sh '''#!/bin/bash
                     TMP_NS_CAPIF=evol5-capif
                     
-                    oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
-                    
-                    helm uninstall --debug $RELEASE_NAME -n evol5-$RELEASE_NAME --wait
+                    oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF
+
+                    helm uninstall --debug $RELEASE_NAME -n $TMP_NS_CAPIF --wait
                     '''
                 }
             }

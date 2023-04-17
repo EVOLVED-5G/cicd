@@ -80,9 +80,9 @@ pipeline {
                     sh '''#!/bin/bash
                     TMP_NS_NEF=evol5-nef
 
-                    oc login --insecure-skip-tls-verify --token=$TMP_NS_NEF
+                    oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
                     
-                    helm uninstall --debug $RELEASE_NAME -n evol5-$RELEASE_NAME --wait
+                    helm uninstall --debug $RELEASE_NAME -n $TMP_NS_NEF --wait
                     '''
                 }
             }

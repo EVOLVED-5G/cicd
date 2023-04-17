@@ -77,9 +77,9 @@ pipeline {
                     sh '''#!/bin/bash
                     TMP_NS_NETAPP=evol5-netapp
                     
-                    oc login --insecure-skip-tls-verify --token=$TMP_NS_NETAPP 
+                    oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP 
 
-                    helm uninstall --debug $RELEASE_NAME -n evol5-$NAMESPACE_NAME --wait
+                    helm uninstall --debug $RELEASE_NAME -n $TMP_NS_NETAPP --wait
                     '''
                 }
             }
