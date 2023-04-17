@@ -145,7 +145,7 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            cat $WORKSPACE/cd/helm/helmfile.d/02-netapp.json
+                            cat ./cd/helm/helmfile.d/02-netapp.json
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
