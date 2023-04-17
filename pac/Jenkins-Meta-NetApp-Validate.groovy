@@ -297,7 +297,7 @@ pipeline {
                             buildResults['steps'][step_name] = 'FAILURE'
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
                                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
