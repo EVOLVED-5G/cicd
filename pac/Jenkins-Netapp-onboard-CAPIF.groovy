@@ -53,8 +53,9 @@ pipeline {
                             if [[ $DISCOVER_LOG ]]; then
                                 echo "DISCOVER_LOG: $DISCOVER_LOG"
                                 result=true
-                                echo "DISCOVER APIs work correctly"
+                                echo "Network App is onboarded correctly in CAPIF"
                             else
+                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
                                 echo "DISCOVER_LOG: $DISCOVER_LOG"
                                 result=false
                                 exit 1
