@@ -1,4 +1,84 @@
-## variables for the CAPIF
-env: openshift
-app_replicas: 1
-hostname: 8bells.apps.ocp-epg.hi.inet
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+adminer:
+  NetappAdminer:
+     # -- The docker image repository to use
+    image:
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_adminer
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  env:
+    adminerPassword: "1234"
+    adminerPortOne: "8008"
+    adminerPortTwo: "8080"
+  ports:
+  - name: "8008"
+    port: 8008
+    targetPort: 8080
+  replicas: 1
+  type: ClusterIP
+env:
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifPortHttp: "80"
+  capifPortHttps: "443"
+  nefAddress: "my-nef.apps.ocp-epg.hi.inet"
+  frontendAddress: "netapp.app.ocp-epg.hi.inet"
+  hostUrl: http://netapp
+  vappIp: 10.10.10.40
+  vappPass: admin8b
+  vappUser: admin8b
+kubernetesClusterDomain: cluster.local
+
+netapp:
+  Netapp:
+    # -- The docker image repository to use
+    image:
+      # -- The docker image tag to use
+      # -- @default Chart version
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp
+      tag: ""
+  env:
+    callbackAddress:  http://netapp:5000/monitoring/callback:5000
+    callbackAdr: http://netapp:5000/monitoring/callback
+    nefPassword: pass
+    nefPort: 4443
+    nefUser: "admin@my-email.com"
+    netappIp: http://netapp:5000
+    netappName: myNetapp
+    netappPort: "5000"
+    vappIp: "10.10.10.40"
+    vappPass: "admin8b"
+    vappUser: "admin8b"
+  ports:
+  - name: "5000"
+    port: 5000
+    targetPort: 5000
+  replicas: 1
+  type: ClusterIP
+
+postgres:
+  NetappDb:
+     # -- The docker image repository to use
+    image:
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_db
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""  
+  env:
+    postgresPassword: postgres
+    postgresDb: postgres
+    postgresPort: "5432"
+    postgresUsername: postgres
+  ports:
+  - name: "5432"
+    port: 5432
+    targetPort: 5432
+  replicas: 1
+  type: ClusterIP
