@@ -2,10 +2,10 @@
 # Build Step report
 ***
 
-This step build needed images for current netapp.
+This step build needed images for current Network App.
 
 ## SERVICES
-{{repo}} Network App is compound next services:
+{{repo}} Network apps are composed of the following services:
 {%-for service_name, service_info in services.items()%}
 {%- set service_name = service_name.split(':')[0] %}
 * {{service_name}}
@@ -23,7 +23,7 @@ Each individual service that exposes a port are checked:
     {%- if port.listening %}
 | | {{port.port}} | OK |
     {%- else %}
-| | {{port.port}} | NOK |
+| | {{port.port}} | **NOK** |
     {% endif %}
   {%- endfor %}  
 {%- endfor %}

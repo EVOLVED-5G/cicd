@@ -1,16 +1,15 @@
 
 def getAgent(deployment) {
     String var = deployment
-    if ('openshift'.equals(var)) {
-        return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
-        return 'evol5-athens'
+    if("openshift".equals(var)) {
+        return "evol5-openshift";
+    }else if("kubernetes-athens".equals(var)){
+        return "evol5-athens"
     }else {
-        return 'evol5-slave'
+        return "evol5-slave";
     }
 }
 
-//Define a global variable in order to get this result
 pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
@@ -20,35 +19,18 @@ pipeline {
 
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        string(name: 'RELEASE_NAME', defaultValue: 'fogus', description: 'Helm release name')
+        string(name: 'RELEASE_NAME', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
     }
-// Parsear información sobre los logs de CAPIF y obtener la traza que demuestra que la NETAPP ha sido onboarded
-// Preguntar NACHO cual es el log que da esta informacion -- Pedir a Nacho una KEY especifica
-// kubectl/oc logs y parsear la salida  --
 
     environment {
-        GIT_BRANCH="${params.GIT_CICD_BRANCH}"
         RELEASE_NAME = "${params.RELEASE_NAME}"
-        DEPLOYMENT = "${params.DEPLOYMENT}"
+
     }
 
-stages {        
-        stage ("Login in openshift"){
-            when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
-                    }
-                }
-            steps {
-                withCredentials([string(credentialsId: 'openshiftv4', variable: 'TOKEN')]) {
-                    sh '''
-                        oc login --insecure-skip-tls-verify --token=$TOKEN 
-                    '''
-                }
-            }
-        }
-        stage('Verify is NetworkApp is onboarded - Kubernetes') {
+    stages {
+        
+        stage('Verify is Network App is onboarded - Kubernetes') {
             when {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
@@ -56,65 +38,68 @@ stages {
                 }
             }
             steps {
+                    
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    result=false
-                    NAMESPACE=$(helm ls --all-namespaces -f $RELEASE_NAME | awk 'NR==2{print $2}')
-                    echo namespace=$NAMESPACE
-                    value_pod=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
-                    value=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
-                    logs=$(kubectl --kubeconfig /home/contint/.kube/config -n $NAMESPACE logs --tail=20 $value)
-                    echo $logs
-                    while IFS= read -r line; do
-                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
-                            result=true
-                        fi
-                    done <<< "$logs"
-                    echo $result
-                    if  $result ; then
-                        echo "NETAPP was onboarded successfuly"
-                    else
-                        exit 1
-                    fi
-                    '''
+                            result=false
+
+                            echo "RELEASE_NAME: $RELEASE_NAME"
+                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+                            echo "NAMESPACE $NAMESPACE"
+                            
+                            DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+
+                            if [[ $DISCOVER_LOG ]]; then
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=true
+                                echo "Network App is onboarded correctly in CAPIF"
+                            else
+                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=false
+                                exit 1
+                            fi
+                            '''
                 }
             }
         }
-
         stage('Verify is NetworkApp is onboarded - Openshift') {
             when {
                     allOf {
                         expression { DEPLOYMENT == "openshift"}
                     }
                 }
+            environment {
+                TOKEN_NS_CAPIF = credentials("token-os-capif")
+            }
             steps {
                  dir ("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    result=false
-                    NAMESPACE=evol5-nef
-                    echo namespace=$NAMESPACE
-                    value_pod=$(kubectl -n $NAMESPACE get pods | grep ^python-netapp | awk '{print $1}')
-                    kubectl -n $NAMESPACE exec $value_pod -- python 1_netapp_to_capif.py 
-                    value=$(kubectl -n $NAMESPACE get pods | grep ^api-invoker-management | awk '{print $1}')
-                    logs=$(kubectl -n $NAMESPACE logs --tail=20 $value)
-                    echo $logs
-                    while IFS= read -r line; do
-                        if [[ $line == *"POST /api-invoker-management/v1/onboardedInvokers HTTP"* ]]; then
-                            result=true
-                        fi
-                    done <<< "$logs"
-                    echo $result
-                    if  $result ; then
-                        echo "NETAPP was onboarded successfuly"
-                    else
-                        exit 1
-                    fi
-                    '''
+                            result=false
+                            TMP_NS_CAPIF=evol5-capif
+
+                            echo "RELEASE_NAME: $RELEASE_NAME"
+                            echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
+                           
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
+
+                            DISCOVER_LOG=$(kubectl logs \
+                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+
+                            if [[ $DISCOVER_LOG ]]; then
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=true
+                                echo "DISCOVER APIs work correctly"
+                            else
+                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                result=false
+                                exit 1
+                            fi
+                            '''
                 }
             }
         }
-
     }
     post {
         cleanup{
