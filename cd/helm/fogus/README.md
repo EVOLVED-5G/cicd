@@ -51,16 +51,16 @@ A Helm chart of fogus for Kubernetes
 | env.postgresUser | string | `"evolveclient"` |  |
 | env.vappAddress | string | `"195.134.66.79:8443"` |  |
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
-| fe.netappfe.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe","tag":"latest"}` | The docker image repository to use |
-| fe.netappfe.image.tag | string | `"latest"` | @default Chart version |
-| fe.netappfe.resources | object | `{}` |  |
-| fe.ports[0].name | string | `"fe"` |  |
-| fe.ports[0].port | int | `4200` |  |
-| fe.ports[0].targetPort | int | `4200` |  |
-| fe.replicas | int | `1` |  |
-| fe.type | string | `"ClusterIP"` |  |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
+| netapp.netappfe.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe","tag":"latest"}` | The docker image repository to use |
+| netapp.netappfe.image.tag | string | `"latest"` | @default Chart version |
+| netapp.netappfe.resources | object | `{}` |  |
+| netapp.ports[0].name | string | `"fe"` |  |
+| netapp.ports[0].port | int | `4200` |  |
+| netapp.ports[0].targetPort | int | `4200` |  |
+| netapp.replicas | int | `1` |  |
+| netapp.type | string | `"ClusterIP"` |  |
 
 
 
