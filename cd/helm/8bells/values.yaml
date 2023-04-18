@@ -1,12 +1,18 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
     uma: "10.11.23.49"
 
 adminer:
   NetappAdminer:
+     # -- The docker image repository to use
     image:
       repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_adminer
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
   env:
     adminerPassword: "1234"
@@ -32,7 +38,10 @@ kubernetesClusterDomain: cluster.local
 
 netapp:
   Netapp:
+    # -- The docker image repository to use
     image:
+      # -- The docker image tag to use
+      # -- @default Chart version
       repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp
       tag: ""
   env:
@@ -56,8 +65,11 @@ netapp:
 
 postgres:
   NetappDb:
+     # -- The docker image repository to use
     image:
       repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_db
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""  
   env:
     postgresPassword: postgres
