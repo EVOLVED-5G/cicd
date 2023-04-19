@@ -57,6 +57,7 @@ pipeline {
                             else
                                 echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
                                 echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                kubeclt -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
                                 result=false
                                 exit 1
                             fi
