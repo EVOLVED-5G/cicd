@@ -101,7 +101,7 @@ pipeline {
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
                             INVOKER_LOG=$(kubectl logs \
-                            -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
+                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
