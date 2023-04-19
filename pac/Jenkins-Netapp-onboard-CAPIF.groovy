@@ -33,11 +33,13 @@ pipeline {
 
         stage('test status') {
             steps {
-                try {
-                    sh('false')
-                    }  catch (ex) {
-                        unstable('Script failed!')
-                    }
+                script {
+                    try {
+                        sh('false')
+                        }  catch (ex) {
+                            unstable('Script failed!')
+                        }   
+                }
             }
         }
         
