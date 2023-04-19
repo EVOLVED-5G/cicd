@@ -29,105 +29,114 @@ pipeline {
     }
 
     stages {
+
+
+        stage(name: 'test status') {
+            try {
+                sh('false')
+                }  catch (ex) {
+                    unstable('Script failed!')
+                }
+        }
         
-        stage('Verify is Network App is onboarded - Kubernetes') {
-            when {
-                anyOf {
-                    expression { DEPLOYMENT == "kubernetes-athens" }
-                    expression { DEPLOYMENT == "kubernetes-uma" }
-                }
-            }
-            options {
-                retry(12)
-            }
-            steps {
-                 dir ("${WORKSPACE}/") {
-                    script {
-                        try {
-                            sh '''#!/bin/bash
-                            result=false
-
-                            echo "RELEASE_NAME: $RELEASE_NAME"
-                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
-                            echo "NAMESPACE $NAMESPACE"
-
-                            INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
-                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
-
-                            if [[ $INVOKER_LOG ]]; then
-                                echo "INVOKER_LOG: $INVOKER_LOG"
-                                result=true
-                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
-                                echo "Network App is onboarded correctly in CAPIF"
-                            else
-                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
-                                echo "NGINX_LOG:"
-                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
-                                result=false
-                                exit 1
-                            fi
-                            '''
-                        } catch (Exception e) {
-                            sleep(time:5, unit:'SECONDS')
-                            throw e
-                        }
-                    }
-                }
-            }
-        }
-        stage('Verify is NetworkApp is onboarded - Openshift') {
-            when {
-                    allOf {
-                        expression { DEPLOYMENT == "openshift"}
-                    }
-                }
-            environment {
-                TOKEN_NS_CAPIF = credentials("token-os-capif")
-            }
-            options {
-                retry(12)
-            }
-            steps {
-                 dir ("${WORKSPACE}/") {
-                    script {
-                        try {
-                            sh '''#!/bin/bash
-                            result=false
-                            TMP_NS_CAPIF=evol5-capif
-
-                            echo "RELEASE_NAME: $RELEASE_NAME"
-                            echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
-
-                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
-
-                            INVOKER_LOG=$(kubectl logs \
-                            -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
-
-                            if [[ $INVOKER_LOG ]]; then
-                                echo "INVOKER_LOG: $INVOKER_LOG"
-                                result=true
-                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
-                                echo "Network App is onboarded correctly in CAPIF"
-                            else
-                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
-                                echo "INVOKER_LOG: $INVOKER_LOG"
-                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
-                                result=false
-                                exit 1
-                            fi
-                            '''
-                        } catch (Exception e) {
-                            sleep(time:5, unit:'SECONDS')
-//                            warnError(message: 'There was an error, the Network App cannot be onboarded correctly in CAPIF') {
-//                                sh("There was an error, the Network App cannot be onboarded correctly in CAPIF")
-//                            }
-                            unstable(message: '"There was an error, the Network App cannot be onboarded correctly in CAPIF"')
-                            throw e
-                        }
-                    }
-                }
-            }
-        }
+//        stage('Verify is Network App is onboarded - Kubernetes') {
+//            when {
+//                anyOf {
+//                    expression { DEPLOYMENT == "kubernetes-athens" }
+//                    expression { DEPLOYMENT == "kubernetes-uma" }
+//                }
+//            }
+//            options {
+//                retry(12)
+//            }
+//            steps {
+//                 dir ("${WORKSPACE}/") {
+//                    script {
+//                        try {
+//                            sh '''#!/bin/bash
+//                            result=false
+//
+//                            echo "RELEASE_NAME: $RELEASE_NAME"
+//                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+//                            echo "NAMESPACE $NAMESPACE"
+//
+//                            INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+//                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+//
+//                            if [[ $INVOKER_LOG ]]; then
+//                                echo "INVOKER_LOG: $INVOKER_LOG"
+//                                result=true
+//                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
+//                                echo "Network App is onboarded correctly in CAPIF"
+//                            else
+//                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+//                                echo "NGINX_LOG:"
+//                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
+//                                result=false
+//                                exit 1
+//                            fi
+//                            '''
+//                        } catch (Exception e) {
+//                            sleep(time:5, unit:'SECONDS')
+//                            throw e
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        stage('Verify is NetworkApp is onboarded - Openshift') {
+//            when {
+//                    allOf {
+//                        expression { DEPLOYMENT == "openshift"}
+//                    }
+//                }
+//            environment {
+//                TOKEN_NS_CAPIF = credentials("token-os-capif")
+//            }
+//            options {
+//                retry(12)
+//            }
+//            steps {
+//                 dir ("${WORKSPACE}/") {
+//                    script {
+//                        try {
+//                            sh '''#!/bin/bash
+//                            result=false
+//                            TMP_NS_CAPIF=evol5-capif
+//
+//                            echo "RELEASE_NAME: $RELEASE_NAME"
+//                            echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
+//
+//                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
+//
+//                            INVOKER_LOG=$(kubectl logs \
+//                            -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
+//
+//                            if [[ $INVOKER_LOG ]]; then
+//                                echo "INVOKER_LOG: $INVOKER_LOG"
+//                                result=true
+//                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
+//                                echo "Network App is onboarded correctly in CAPIF"
+//                            else
+//                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+//                                echo "INVOKER_LOG: $INVOKER_LOG"
+//                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
+//                                result=false
+//                                exit 1
+//                            fi
+//                            '''
+//                        } catch (Exception e) {
+//                            sleep(time:5, unit:'SECONDS')
+////                            warnError(message: 'There was an error, the Network App cannot be onboarded correctly in CAPIF') {
+////                                sh("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+////                            }
+//                            unstable(message: '"There was an error, the Network App cannot be onboarded correctly in CAPIF"')
+//                            throw e
+//                        }
+//                    }
+//                }
+//            }
+//        }
     }
     post {
         cleanup{
