@@ -118,7 +118,8 @@ pipeline {
                             '''
                         } catch (Exception e) {
                             sleep(time:5, unit:'SECONDS')
-                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+                            warnError(message: '"There was an error, the Network App cannot be onboarded correctly in CAPIF"')
+//                            unstable(message: '"There was an error, the Network App cannot be onboarded correctly in CAPIF"')
                             throw e
                         }
                     }
