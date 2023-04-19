@@ -101,7 +101,7 @@ pipeline {
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
                             INVOKER_LOG=$(kubectl logs \
-                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+                            -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
@@ -118,6 +118,7 @@ pipeline {
                             '''
                         } catch (Exception e) {
                             sleep(time:5, unit:'SECONDS')
+                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
                             throw e
                         }
                     }
