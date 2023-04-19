@@ -124,7 +124,7 @@ spec:
                 echo "cannot get the server public key from redis"
                 exit 1;
               fi
-          initialDelaySeconds: 5
+          initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
 #          exec:
@@ -209,7 +209,7 @@ spec:
                 echo "cannot get the server public key from redis"
                 exit 1;
               fi
-          initialDelaySeconds: 5
+          initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
 #          exec:
@@ -417,7 +417,7 @@ spec:
                 echo "cannot get the server private key from redis"
                 exit 1;
               fi
-          initialDelaySeconds: 5
+          initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
 #          exec:
@@ -562,7 +562,7 @@ spec:
                 echo "cannot get the server private key from redis"
                 exit 1;
               fi
-          initialDelaySeconds: 5
+          initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
 #          exec:
