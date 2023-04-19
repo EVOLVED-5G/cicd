@@ -31,8 +31,8 @@ pipeline {
     stages {
 
 
-        stage(name: 'test status') {
-            script {
+        stage('test status') {
+            steps {
                 try {
                     sh('false')
                     }  catch (ex) {
