@@ -32,11 +32,13 @@ pipeline {
 
 
         stage(name: 'test status') {
-            try {
-                sh('false')
-                }  catch (ex) {
-                    unstable('Script failed!')
-                }
+            script {
+                try {
+                    sh('false')
+                    }  catch (ex) {
+                        unstable('Script failed!')
+                    }
+            }
         }
         
 //        stage('Verify is Network App is onboarded - Kubernetes') {
