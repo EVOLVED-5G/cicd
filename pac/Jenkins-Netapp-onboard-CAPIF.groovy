@@ -106,9 +106,12 @@ pipeline {
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
                                 result=true
-                                echo "INVOKER APIs work correctly"
+                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
+                                echo "Network App is onboarded correctly in CAPIF"
                             else
+                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
                                 echo "INVOKER_LOG: $INVOKER_LOG"
+                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 result=false
                                 exit 1
                             fi
