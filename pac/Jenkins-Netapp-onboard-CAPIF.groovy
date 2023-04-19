@@ -129,9 +129,9 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
+                            throw e
                             unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
                             sleep(time:5, unit:'SECONDS')
-//                            throw e
                         }
                     }
                 }
