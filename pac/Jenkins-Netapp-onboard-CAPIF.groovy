@@ -34,7 +34,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        sh('false')
+                        sh('algo')
                         }  catch (ex) {
                             unstable('Script failed!')
                         }   
@@ -103,7 +103,7 @@ pipeline {
                  dir ("${WORKSPACE}/") {
                     script {
                         try {
-                            sh '''#!/bin/bash
+                            sh ('#!/bin/bash
                             result=false
                             TMP_NS_CAPIF=evol5-capif
 
@@ -125,13 +125,13 @@ pipeline {
                                 echo "INVOKER_LOG: $INVOKER_LOG"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 result=false
-                                #exit 1
+                                exit 1
                             fi
-                            '''
-                        } catch (Exception e) {
+                            ')
+                        } catch (ex) {
                             unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
                             sleep(time:5, unit:'SECONDS')
-                            throw e
+                            throw ex
                         }
                     }
                 }
