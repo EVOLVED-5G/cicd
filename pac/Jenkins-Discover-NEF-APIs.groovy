@@ -50,6 +50,9 @@ pipeline {
                             result=false
 
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+                            COMPLETE_DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+                            -n $NAMESPACE logs -l io.kompose.service=service-apis 
+                            echo "COMPLETE_DISCOVER_LOG: $COMPLETE_DISCOVER_LOG"
                             DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
                             -n $NAMESPACE logs -l io.kompose.service=service-apis | grep "Discovered APIs by ")
 
