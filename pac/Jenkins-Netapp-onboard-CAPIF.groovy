@@ -38,42 +38,40 @@ pipeline {
                 }
             }
             options {
-                retry(3)
+                retry(12)
             }
             steps {
-                    
                  dir ("${WORKSPACE}/") {
                     script {
-                            try {
-                                sh '''#!/bin/bash
-                                        result=false
+                        try {
+                            sh '''#!/bin/bash
+                            result=false
 
-                                        echo "RELEASE_NAME: $RELEASE_NAME"
-                                        NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
-                                        echo "NAMESPACE $NAMESPACE"
-                                        
-                                        INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
-                                        -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+                            echo "RELEASE_NAME: $RELEASE_NAME"
+                            NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
+                            echo "NAMESPACE $NAMESPACE"
 
-                                        if [[ $INVOKER_LOG ]]; then
-                                            echo "INVOKER_LOG: $INVOKER_LOG"
-                                            result=true
-                                            kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
-                                            echo "Network App is onboarded correctly in CAPIF"
-                                        else
-                                            echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
-                                            echo "NGINX_LOG:"
-                                            kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
-                                            result=false
-                                            exit 1
-                                        fi
-                                        '''
-                            } catch (Exception e) {
-                                sleep(time:60, unit:'SECONDS')
-                                throw e
-                            }
+                            INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+
+                            if [[ $INVOKER_LOG ]]; then
+                                echo "INVOKER_LOG: $INVOKER_LOG"
+                                result=true
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
+                                echo "Network App is onboarded correctly in CAPIF"
+                            else
+                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+                                echo "NGINX_LOG:"
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
+                                result=false
+                                exit 1
+                            fi
+                            '''
+                        } catch (Exception e) {
+                            sleep(time:5, unit:'SECONDS')
+                            throw e
                         }
-                        
+                    }
                 }
             }
         }
@@ -86,15 +84,20 @@ pipeline {
             environment {
                 TOKEN_NS_CAPIF = credentials("token-os-capif")
             }
+            options {
+                retry(12)
+            }
             steps {
                  dir ("${WORKSPACE}/") {
-                    sh '''#!/bin/bash
+                    script {
+                        try {
+                            sh '''#!/bin/bash
                             result=false
                             TMP_NS_CAPIF=evol5-capif
 
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
-                           
+
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
                             INVOKER_LOG=$(kubectl logs \
@@ -110,6 +113,11 @@ pipeline {
                                 exit 1
                             fi
                             '''
+                        } catch (Exception e) {
+                            sleep(time:5, unit:'SECONDS')
+                            throw e
+                        }
+                    }
                 }
             }
         }
