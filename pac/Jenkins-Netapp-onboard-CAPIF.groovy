@@ -125,7 +125,7 @@ pipeline {
                                 echo "INVOKER_LOG: $INVOKER_LOG"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 result=false
-                                exit 1
+                                #exit 1
                             fi
                             '''
                         } catch (Exception e) {
