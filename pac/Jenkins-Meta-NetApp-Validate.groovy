@@ -21,14 +21,14 @@ def getAgent(deployment) {
     }
 }
 
-def step_security_scan_code = 'security-analysis'
+def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'secrets-analysis'
-def step_open_source_licenses_report = 'opensource-license'
-def step_build = 'build'
-def step_security_scan_docker_images = 'scan-docker-images'
-def step_deploy_capif_nef_netapp = 'deploy-capif-nef-netapp'
+def step_open_source_licenses_report = 'open-source-licenses-report'
+def step_build = 'network-app-build-and-port-check'
+def step_security_scan_docker_images = 'image-security-analysis'
+def step_deploy_capif_nef_netapp = 'deploy-network-app'
 def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
-def step_test_network_app_networking = 'network-netapp'
+// def step_test_network_app_networking = 'network-netapp'
 def step_discover_nef_apis = 'discover-apis'
 def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
 def step_nef_services_monitoringevent = 'nef-services-monitoringevent'
@@ -38,20 +38,20 @@ def step_destroy_capif = 'destroy-capif'
 
 def inital_status = 'PENDING'
 
-buildResults['steps'][step_security_scan_code] = inital_status
-buildResults['steps'][step_security_scan_secrets] = inital_status
-buildResults['steps'][step_open_source_licenses_report] = inital_status
-buildResults['steps'][step_build] = inital_status
-buildResults['steps'][step_security_scan_docker_images] = inital_status
-buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
-buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
-buildResults['steps'][step_test_network_app_networking] = inital_status
-buildResults['steps'][step_discover_nef_apis] = inital_status
-buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
-buildResults['steps'][step_nef_services_monitoringevent] = inital_status
-buildResults['steps'][step_destroy_network_app] = inital_status
-buildResults['steps'][step_destroy_nef] = inital_status
-buildResults['steps'][step_destroy_capif] = inital_status
+// buildResults['steps'][step_security_scan_code] = inital_status
+// buildResults['steps'][step_security_scan_secrets] = inital_status
+// buildResults['steps'][step_open_source_licenses_report] = inital_status
+// buildResults['steps'][step_build] = inital_status
+// buildResults['steps'][step_security_scan_docker_images] = inital_status
+// buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
+// buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
+// // buildResults['steps'][step_test_network_app_networking] = inital_status
+// buildResults['steps'][step_discover_nef_apis] = inital_status
+// buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
+// buildResults['steps'][step_nef_services_monitoringevent] = inital_status
+// buildResults['steps'][step_destroy_network_app] = inital_status
+// buildResults['steps'][step_destroy_nef] = inital_status
+// buildResults['steps'][step_destroy_capif] = inital_status
 
 step_open_source_licenses_report
 
@@ -66,7 +66,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
-        string(name: 'VERSION_NETAPP', defaultValue: '1.0', description: 'Version NetworkApp')
+        string(name: 'VERSION_NETAPP', defaultValue: '1.0', description: 'Version Network App')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment NetworkApp name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
@@ -97,6 +97,26 @@ pipeline {
     }
 
     stages {
+        stage('Initialize Local Variables') {
+            script {
+                step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
+
+                buildResults['steps'][step_security_scan_code] = inital_status
+                buildResults['steps'][step_security_scan_secrets] = inital_status
+                buildResults['steps'][step_open_source_licenses_report] = inital_status
+                buildResults['steps'][step_build] = inital_status
+                buildResults['steps'][step_security_scan_docker_images] = inital_status
+                buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
+                buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
+                buildResults['steps'][step_discover_nef_apis] = inital_status
+                buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
+                buildResults['steps'][step_nef_services_monitoringevent] = inital_status
+                buildResults['steps'][step_destroy_network_app] = inital_status
+                buildResults['steps'][step_destroy_nef] = inital_status
+                buildResults['steps'][step_destroy_capif] = inital_status
+
+            }
+        }
         stage('Validation: Static Application Securirty Test - SAST') {
             parallel {
                 stage('Validation: Source Code Security Analysis') {
@@ -204,27 +224,6 @@ pipeline {
                         }
                     }
                 }
-
-            // stage('Validation: Security Scan Docker Images') {
-            //     steps {
-            //         retry(2) {
-            //             script {
-            //                 def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: true,
-            //                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-            //                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-            //                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-            //                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-            //                             string(name: 'STAGE', value: 'validation'),
-            //                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-            //                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-            //                             booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-            //                 def jobResult = jobBuild.getResult()
-            //                 echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-            //                 buildResults['steps']['scan-docker-images'] = jobResult
-            //             }
-            //         }
-            //     }
-            // }
             }
         }
 
@@ -310,57 +309,6 @@ pipeline {
                         }
                     }
                 }
-
-                //Review Parameters
-                //jenkins-dummy
-                //13
-                stage('Validation: Test Network App Networking') {
-                    options {
-                        timeout(time: 5, unit: 'MINUTES')
-                    }
-                    steps {
-                        script {
-                            def step_name = step_test_network_app_networking
-                            buildResults['steps'][step_name] = 'FAILURE'
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/006-Test NetApp Networking', wait: true, propagate: false,
-                                           parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Test Network App Networking' returned result: ${jobResult}"
-                            buildResults['steps'][step_name] = jobResult
-                            if (jobResult == 'FAILURE') {
-                                buildResults['tests_ok'] = false
-                            }
-                        }
-                    }
-                }
-
-                //Review Parameters
-                //14
-                // stage('Validation: Onboarding NetApp as Invoker to CAPIF') {
-                //     options {
-                //         timeout(time: 5, unit: 'MINUTES')
-                //     }
-                //     steps {
-                //         script {
-                //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: false,
-                //                            parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                                         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                                         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                                         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                //             def jobResult = jobBuild.getResult()
-                //             echo "Build of 'Onboarding NetApp as Invoker to CAPIF' returned result: ${jobResult}"
-                //             buildResults['steps']['onboard-netapp'] = jobResult
-                //             if (jobResult == 'FAILURE') {
-                //                 buildResults['tests_ok'] = false
-                //             }
-                //         }
-                //     }
-                // }
 
                 //Review Parameters
                 //15
@@ -450,72 +398,6 @@ pipeline {
             }
         }
 
-        //19
-        // stage('Validation: Destroying') {
-        //     options {
-        //         timeout(time: 5, unit: 'MINUTES')
-        //     }
-        //     parallel {
-        //         //20
-        //         stage('Validation: Destroy NetApp') {
-        //             steps {
-        //                 retry(3) {
-        //                     script {
-        //                         def step_name = step_destroy_network_app
-        //                         buildResults['steps'][step_name] = 'FAILURE'
-        //                         def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-        //                                 parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
-        //                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-        //                                 ]
-        //                         def jobResult = jobBuild.getResult()
-        //                         echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-        //                         buildResults['steps'][step_name] = jobResult
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         //21
-        //         stage('Validation: Destroy NEF') {
-        //             steps {
-        //                 retry(3) {
-        //                     script {
-        //                         def step_name = step_destroy_nef
-        //                         buildResults['steps'][step_name] = 'FAILURE'
-        //                         def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
-        //                                        parameters: [
-        //                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-        //                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-        //                         def jobResult = jobBuild.getResult()
-        //                         echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-        //                         buildResults['steps'][step_name] = jobResult
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //         //22
-        //         stage('Validation: Destroy CAPIF') {
-        //             steps {
-        //                 retry(3) {
-        //                     script {
-        //                         def step_name = step_destroy_capif
-        //                         buildResults['steps'][step_name] = 'FAILURE'
-        //                         def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
-        //                                       parameters: [
-        //                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-        //                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-        //                         def jobResult = jobBuild.getResult()
-        //                         echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-        //                         buildResults['steps'][step_name] = jobResult
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         stage('Validation: Check Tests results') {
             steps {
                 script {
@@ -598,6 +480,7 @@ pipeline {
                 build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                            string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),

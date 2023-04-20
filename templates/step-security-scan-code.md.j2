@@ -1,16 +1,16 @@
 # SOURCE CODE SECURITY ANALYSIS 
 # Test Results
 
-Test Description: Trivy is a Code Security Assurance tool that collects and analyzes source code, and provides reports for the code security of your project.
+Test Description: This test detects vulnerabilities in the source code of the Network App repo.
 Network App repository used for the analysis: {{repo}}
 Branch used for the Analysis: {{branch}}
 Last Commit ID: {{commit}}
 
 The security scan has been performed using Trivy version {{version}}
-{% set name = id.split("/") %}
+{% set repo_name = id.split("/") %}
 {% set critical_issues = [] %}
 {% set possible_fixing = [] %}
-# Scan of {{type}}: {{name|last}}
+# Scan of {{type}}: {{repo_name|last}}
 
 
 ***

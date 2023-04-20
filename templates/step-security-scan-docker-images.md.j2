@@ -1,8 +1,8 @@
-# IMAGE SECURITY ANALYSIS 
+# IMAGE SECURITY ANALYSIS OF {{id|last}} 
 # Test Results
 
-Test Description: Trivy is a Code Security Assurance tool that collects and analyzes source code, and provides reports for the code security of your project.
-Network App image under study: **{{id}}**
+Test Description: This test detects vulnerabilities in the Network App docker images built.
+Network App image under study: **{{id|last}}**
 Network App repository used for the analysis: {{repo}}
 Branch used for the Analysis: {{branch}}
 
@@ -27,7 +27,7 @@ Good work. No vulnerabilities found.
 ***
 
 
-## Vulnerabilities
+## Critical Vulnerabilities
 |  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
 |---|---|---|---|---|---|
   {%- for severity in severities %}
@@ -41,5 +41,5 @@ Good work. No vulnerabilities found.
   {%- endfor %}
 {%- endif %}
 ***
-The Source Code Security Analysis has been completed successfuly
+The Docker Images Security Analysis has been completed successfuly
 Information about high, medium, low and unknown issues can be found in the following link: {{url}}

@@ -157,7 +157,7 @@ pipeline {
                     urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/secrets-Telefonica-Evolved5g-$NETAPP_NAME
                     versionT=0.35.0
 
-                    python3 utils/report_generator.py --template templates/step-security-scan-secrets.md.j2 --json ${REPORT_FILENAME}.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT
+                    python3 utils/report_generator.py --template templates/step-security-scan-secrets.md.j2 --json ${REPORT_FILENAME}.json --output ${REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME
                     docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}.pdf $DOCKER_PATH/${REPORT_FILENAME}.md || exit 1
                     declare -a files=("json" "md" "pdf")
 

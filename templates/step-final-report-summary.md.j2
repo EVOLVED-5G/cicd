@@ -1,26 +1,27 @@
 
-# Validation Report Executive Summary
+# VALIDATION REPORT EXECUTIVE SUMMARY
 ***
 
-This Validation Report contains the results of the Validation
-Process executed over the Network App {{version}}
+This Validation Report contains the results of the Validation process executed over the Network App **{{name}}** version **{{version}}**
 
 Validation triggered by {{build_trigger_by}}
-The repo used for Validation has been: {{repo}}
-The branch used for Validation has been: {{branch}}
-The last commit ID has been: {{commit}}
-The environment used has been: {{environment}}
-The build number at Jenkins has been: {{build_number}}
-Total validation time has been: **{{total_duration}}**
+Repo used for Validation: {{repo}}
+Branch used for Validation: {{branch}}
+Last commit ID: {{commit}}
+Environment used: {{environment}}
+Build number at Jenkins: {{build_number}}
+Total validation time: **{{total_duration}}**
 
-The result of the Validation Process over the Network App {{version}} has been: **{{result}}**
+The result of the Validation Process over the Network App **{{name}}** has been: **{{result}}**
 
-The individual result of the validations test has been as show in the following table:
+The individual result of the validations test is displayed in the following table:
 
 {% set vars = {'foo': False} %}
 {% set counter = 0 -%}
+| Step | Step Name | Result |
+|---|---|---|
 {% for step_name,step_status in steps.items() %}
-  STEP {{ counter + loop.index0 }}: {{ step_name|upper|replace("-"," ") }} status: {{step_status}}
+  | {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
     {%- if step_status == "FAILURE" %}
       {% if vars.update({'foo': True}) %} 
       {% endif %}
@@ -29,6 +30,8 @@ The individual result of the validations test has been as show in the following 
 {% endfor -%}
 {% if vars.foo %}
   **Please, take a look to those steps that are failing.**
+{% else %}
+  **Congratulations your Network App {{name}} has been validated**
 {% endif %}
 
 
