@@ -50,7 +50,7 @@ pipeline {
                             echo "NAMESPACE $NAMESPACE"
 
                             INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
-                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
+                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
@@ -81,9 +81,6 @@ pipeline {
             environment {
                 TOKEN_NS_CAPIF = credentials("token-os-capif")
             }
-//            options {
-//                retry(12)
-//            }
             steps {
                  dir ("${WORKSPACE}/") {
                     script {
@@ -99,7 +96,7 @@ pipeline {
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
                             INVOKER_LOG=$(kubectl logs \
-                            -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
+                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
@@ -115,9 +112,7 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
-//                            throw e
                             unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
-//                            sleep(time:5, unit:'SECONDS')
                         }
                     }
                 }
