@@ -288,7 +288,8 @@ pipeline {
         //11
         stage('Validation: Tests to Network App') {
             options {
-                timeout(time: 5, unit: 'MINUTES')
+                timeout(time: 5, unit: 'MINUTES'),
+                skipStagesAfterUnstable()
             }
             parallel {
                 //12
