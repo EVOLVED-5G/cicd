@@ -20,7 +20,7 @@ def getReportFilename(String netappNameLower) {
 }
 
 pipeline {
-    agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
     options {
         timeout(time: 10, unit: 'MINUTES')
         retry(1)
