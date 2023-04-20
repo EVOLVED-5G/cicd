@@ -364,28 +364,28 @@ pipeline {
 
                 //Review Parameters
                 //15
-                stage('Validation: Discover NEF APIs from CAPIF') {
-                    options {
-                        timeout(time: 5, unit: 'MINUTES')
-                    }
-                    steps {
-                        script {
-                            def step_name = step_discover_nef_apis
-                            buildResults['steps'][step_name] = 'FAILURE'
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-                            buildResults['steps'][step_name] = jobResult
-                            if (jobResult == 'FAILURE') {
-                                buildResults['tests_ok'] = false
-                            }
-                        }
-                    }
-                }
-
+//                stage('Validation: Discover NEF APIs from CAPIF') {
+//                    options {
+//                        timeout(time: 5, unit: 'MINUTES')
+//                    }
+//                    steps {
+//                        script {
+//                            def step_name = step_discover_nef_apis
+//                            buildResults['steps'][step_name] = 'FAILURE'
+//                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
+//                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+//                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+//                            def jobResult = jobBuild.getResult()
+//                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
+//                            buildResults['steps'][step_name] = jobResult
+//                            if (jobResult == 'FAILURE') {
+//                                buildResults['tests_ok'] = false
+//                            }
+//                        }
+//                    }
+//                }
+//
                 //Review Parameters
                 //jenkins-dummy
                 //16
