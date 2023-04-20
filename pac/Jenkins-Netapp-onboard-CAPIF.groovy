@@ -50,7 +50,7 @@ pipeline {
                             echo "NAMESPACE $NAMESPACE"
 
                             INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
-                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
+                            -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invokerr Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
@@ -99,7 +99,7 @@ pipeline {
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
                             INVOKER_LOG=$(kubectl logs \
-                            -l io.kompose.service=api-invoker-management | grep "aaaInvoker Created")
+                            -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
                             if [[ $INVOKER_LOG ]]; then
                                 echo "INVOKER_LOG: $INVOKER_LOG"
