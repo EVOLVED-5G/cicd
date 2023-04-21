@@ -17,16 +17,20 @@ output_filename = sys.argv[6]
 
 optional_arguments = dict()
 total_arguments = len(sys.argv)
+print("total arguments: " + str(total_arguments))
 if len(sys.argv) > 7:
     for index in range(7, total_arguments, 2):
-        if index + 1 < total_arguments:
-            print("Parameter without value present con command invocation")
+        print("Index: " + str(index))
+        if index + 1 >= total_arguments:
+            print("Parameter without value present on command invocation")
             break
         value = sys.argv[index+1]
-        print("Add parameter " + parameter_name + ":" + value)
         parameter_name = sys.argv[index].replace('--','')
-        optional_arguments[parameter_name] = value
 
+        print("Add parameter " + parameter_name + ":" + value)
+        optional_arguments[parameter_name] = value
+print("Optional Arguments:")
+print(json.dumps(optional_arguments, indent=4))
 # repo = sys.argv[8]
 # branch = sys.argv[10]
 # commit = sys.argv[12]
@@ -34,13 +38,15 @@ if len(sys.argv) > 7:
 # url = sys.argv[16]
 # name = sys.argv[18]
 
+
+
 # if sys.argv[20]:
 #     counter = sys.argv[20]
 
-def render(template,json_data,arguments):
+def render(template,json_data):
     return jinja2.Environment(
         loader=jinja2.FileSystemLoader(THIS_DIR)
-    ).get_template(template).render(json_data, arguments)
+    ).get_template(template).render(json_data)
 # ).get_template(template).render(json_data, repo=repo, branch=branch, commit=commit, version=version, url=url, name=name, counter=counter)
 
 # load json from file
@@ -48,8 +54,10 @@ jsonConfigName = json_filename
 with open(jsonConfigName) as json_file:
     json_data = json.load(json_file)
 
+json_data.update(optional_arguments)
+
 ##Apply the template
-result =render(template,json_data,optional_arguments)
+result =render(template,json_data)
 
 # write output to a file 
 outFile = open(output_filename, "w")
