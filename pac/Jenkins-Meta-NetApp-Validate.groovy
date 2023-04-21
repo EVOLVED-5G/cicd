@@ -28,7 +28,6 @@ def step_build = 'network-app-build-and-port-check'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
 def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
-// def step_test_network_app_networking = 'network-netapp'
 def step_discover_nef_apis = 'discover-apis'
 def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
 def step_nef_services_monitoringevent = 'nef-services-monitoringevent'
@@ -101,7 +100,8 @@ pipeline {
             steps {
                 script {
                     echo "Setting local variables"
-                    def step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
+                    step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
+                    echo "STEP: ${step_deploy_capif_nef_netapp}"
 
                     buildResults['steps'][step_security_scan_code] = inital_status
                     buildResults['steps'][step_security_scan_secrets] = inital_status
