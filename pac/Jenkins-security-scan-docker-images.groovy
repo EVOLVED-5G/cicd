@@ -153,7 +153,7 @@ pipeline {
                     count=0
                     for x in "${images[@]}"
                     do
-                        count=${let $count+1}
+                        let count=$count+1
                         COUNTER="$count / $total_images"
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
                         python3 utils/report_generator.py --template templates/step-security-scan-docker-images.md.j2 --json ${REPORT_FILENAME}-$x.json --output ${REPORT_FILENAME}-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT --name $NETAPP_NAME --counter $COUNTER
