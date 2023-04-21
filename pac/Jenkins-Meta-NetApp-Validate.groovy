@@ -464,7 +464,7 @@ pipeline {
                     if (buildResults['tests_ok'] == false) {
                         buildResults['result'] = 'FAILURE'
                     }
-                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription + ' / ' + currentBuild.getBuildCauses()[0].userId
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ','') + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }

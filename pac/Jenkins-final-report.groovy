@@ -125,6 +125,7 @@ pipeline {
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
+                    [ -e final_report.pdf ] && rm final_report.pdf || echo "No previous final report generated"
                     today=$(date +'%d/%m/%Y')
                     [ -e *-licenses*.pdf ] && mv *-licenses*.pdf executive_summary/ || echo "No licenses file found"
                     pdfunite *.pdf mid_report1.pdf
