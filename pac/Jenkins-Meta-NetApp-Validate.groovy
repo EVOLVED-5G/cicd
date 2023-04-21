@@ -98,23 +98,25 @@ pipeline {
 
     stages {
         stage('Initialize Local Variables') {
-            script {
-                step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
+            steps {
+                script {
+                    echo "Setting local variables"
+                    step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
 
-                buildResults['steps'][step_security_scan_code] = inital_status
-                buildResults['steps'][step_security_scan_secrets] = inital_status
-                buildResults['steps'][step_open_source_licenses_report] = inital_status
-                buildResults['steps'][step_build] = inital_status
-                buildResults['steps'][step_security_scan_docker_images] = inital_status
-                buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
-                buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
-                buildResults['steps'][step_discover_nef_apis] = inital_status
-                buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
-                buildResults['steps'][step_nef_services_monitoringevent] = inital_status
-                buildResults['steps'][step_destroy_network_app] = inital_status
-                buildResults['steps'][step_destroy_nef] = inital_status
-                buildResults['steps'][step_destroy_capif] = inital_status
-
+                    buildResults['steps'][step_security_scan_code] = inital_status
+                    buildResults['steps'][step_security_scan_secrets] = inital_status
+                    buildResults['steps'][step_open_source_licenses_report] = inital_status
+                    buildResults['steps'][step_build] = inital_status
+                    buildResults['steps'][step_security_scan_docker_images] = inital_status
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
+                    buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
+                    buildResults['steps'][step_discover_nef_apis] = inital_status
+                    buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
+                    buildResults['steps'][step_nef_services_monitoringevent] = inital_status
+                    buildResults['steps'][step_destroy_network_app] = inital_status
+                    buildResults['steps'][step_destroy_nef] = inital_status
+                    buildResults['steps'][step_destroy_capif] = inital_status
+                }
             }
         }
         stage('Validation: Static Application Securirty Test - SAST') {
