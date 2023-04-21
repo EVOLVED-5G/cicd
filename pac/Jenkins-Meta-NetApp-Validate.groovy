@@ -101,7 +101,7 @@ pipeline {
             steps {
                 script {
                     echo "Setting local variables"
-                    step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
+                    def step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
 
                     buildResults['steps'][step_security_scan_code] = inital_status
                     buildResults['steps'][step_security_scan_secrets] = inital_status
