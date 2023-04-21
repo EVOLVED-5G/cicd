@@ -21,12 +21,12 @@ The individual result of the validations test is displayed in the following tabl
 | Step | Step Name | Result |
 |---|---|---|
 {% for step_name,step_status in steps.items() %}
-  | {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
-    {%- if step_status == "FAILURE" %}
-      {% if vars.update({'foo': True}) %} 
-      {% endif %}
+| {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
+    {%- if step_status == "FAILURE" -%}
+      {%- if vars.update({'foo': True}) -%} 
+      {%- endif -%}
     {%- endif %}
-  {% set counter = counter + group|length %}
+  {%- set counter = counter + group|length -%}
 {% endfor -%}
 {% if vars.foo %}
   **Please, take a look to those steps that are failing.**
