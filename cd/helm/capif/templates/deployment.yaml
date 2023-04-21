@@ -52,6 +52,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.apiInvocationLogs.apiInvocationLogs.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -107,29 +112,38 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.apiInvokerManagement.apiInvokerManagement.resources | nindent 12 }}
-#        livenessProbe:
-#          tcpSocket:
-#            port: 8080
-#          initialDelaySeconds: 20
-#          periodSeconds: 5
-        readinessProbe:
+        livenessProbe:
           exec:
             command:
             - sh
             - -c 
             - |-
-              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_pub_key)
               echo "$OUTPUT"
               if [ -z "$OUTPUT" ]; then
-                echo "OUTPUT empty"
+                echo "cannot get the server public key from redis"
                 exit 1;
-              else
-                echo "OUTPUT: $OUTPUT"
-                redis-cli -h redis -p 6379 -n 1 GET  server_pub_key > /usr/src/app/api_invoker_management/pubkey.pem
               fi
-          initialDelaySeconds: 20
+          initialDelaySeconds: 3
           periodSeconds: 5
-          successThreshold: 1
+#        readinessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c 
+#            - |-
+#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_pub_key)
+#              echo "$OUTPUT"
+#              if [ -z "$OUTPUT" ]; then
+#                echo "OUTPUT empty"
+#                exit 1;
+#              else
+#                echo "OUTPUT: $OUTPUT"
+#                redis-cli -h redis -p 6379 -n 1 GET  server_pub_key > /usr/src/app/api_invoker_management/pubkey.pem
+#              fi
+#          initialDelaySeconds: 20
+#          periodSeconds: 5
+#          successThreshold: 1
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -184,11 +198,6 @@ spec:
         ports:
         - containerPort: 8080
         livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 20
-          periodSeconds: 20
-        readinessProbe:
           exec:
             command:
             - sh
@@ -197,15 +206,29 @@ spec:
               OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
               echo "$OUTPUT"
               if [ -z "$OUTPUT" ]; then
-                echo "OUTPUT empty"
+                echo "cannot get the server public key from redis"
                 exit 1;
-              else
-                echo "OUTPUT: $OUTPUT"
-                redis-cli -h redis -p 6379 -n 1 GET  server_pub_key > /usr/src/app/api_provider_management/pubkey.pem
               fi
-          initialDelaySeconds: 20
+          initialDelaySeconds: 3
           periodSeconds: 5
-          successThreshold: 1
+#        readinessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c 
+#            - |-
+#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_pub_key)
+#              echo "$OUTPUT"
+#              if [ -z "$OUTPUT" ]; then
+#                echo "OUTPUT empty"
+#                exit 1;
+#              else
+#                echo "OUTPUT: $OUTPUT"
+#                redis-cli -h redis -p 6379 -n 1 GET  server_pub_key > /usr/src/app/api_provider_management/pubkey.pem
+#              fi
+#          initialDelaySeconds: 20
+#          periodSeconds: 5
+#          successThreshold: 1
         resources:
             {{- toYaml .Values.apiProviderManagement.apiProviderManagement.resources | nindent 12 }}
       restartPolicy: Always
@@ -262,6 +285,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.capifEvents.capifEvents.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -316,6 +344,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.capifRoutingInfo.capifRoutingInfo.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -373,11 +406,6 @@ spec:
         resources:
             {{- toYaml .Values.capifSecurity.capifSecurity.resources | nindent 12 }}
         livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 20
-          periodSeconds: 5
-        readinessProbe:
           exec:
             command:
             - sh
@@ -386,15 +414,29 @@ spec:
               OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
               echo "$OUTPUT"
               if [ -z "$OUTPUT" ]; then
-                echo "OUTPUT empty"
+                echo "cannot get the server private key from redis"
                 exit 1;
-              else
-                echo "OUTPUT: $OUTPUT"
-                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key > /usr/src/app/capif_security/server.key
               fi
-          initialDelaySeconds: 20
+          initialDelaySeconds: 3
           periodSeconds: 5
-          successThreshold: 1
+#        readinessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c 
+#            - |-
+#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+#              echo "$OUTPUT"
+#              if [ -z "$OUTPUT" ]; then
+#                echo "OUTPUT empty"
+#                exit 1;
+#              else
+#                echo "OUTPUT: $OUTPUT"
+#                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key > /usr/src/app/capif_security/server.key
+#              fi
+#          initialDelaySeconds: 20
+#          periodSeconds: 5
+#          successThreshold: 1
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -449,6 +491,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.easyRsa.easyRsa.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+#          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -504,11 +551,6 @@ spec:
         resources:
             {{- toYaml .Values.jwtauth.jwtauth.resources | nindent 12 }}
         livenessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 20
-          periodSeconds: 5
-        readinessProbe:
           exec:
             command:
             - sh
@@ -517,15 +559,29 @@ spec:
               OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
               echo "$OUTPUT"
               if [ -z "$OUTPUT" ]; then
-                echo "OUTPUT empty"
+                echo "cannot get the server private key from redis"
                 exit 1;
-              else
-                echo "OUTPUT: $OUTPUT"
-                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key  > /usr/src/app/register_service/server.key
               fi
-          initialDelaySeconds: 20
+          initialDelaySeconds: 3
           periodSeconds: 5
-          successThreshold: 1
+#        readinessProbe:
+#          exec:
+#            command:
+#            - sh
+#            - -c 
+#            - |-
+#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+#              echo "$OUTPUT"
+#              if [ -z "$OUTPUT" ]; then
+#                echo "OUTPUT empty"
+#                exit 1;
+#              else
+#                echo "OUTPUT: $OUTPUT"
+#                redis-cli -h redis -p 6379 -n 1 GET  server_priv_key  > /usr/src/app/register_service/server.key
+#              fi
+#          initialDelaySeconds: 90
+#          periodSeconds: 5
+#          successThreshold: 1
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -580,6 +636,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.logs.logs.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -638,6 +699,11 @@ spec:
         - containerPort: 27017
         resources:
             {{- toYaml .Values.mongo.mongo.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 27017
+#          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -700,6 +766,11 @@ spec:
         - containerPort: 8081
         resources:
             {{- toYaml .Values.mongoExpress.mongoExpress.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8081
+#          initialDelaySeconds: 0
+          periodSeconds: 5     
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -760,11 +831,11 @@ spec:
             port: 8080
           initialDelaySeconds: 20
           periodSeconds: 5
-        readinessProbe:
-          tcpSocket:
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 5
+#        readinessProbe:
+#          tcpSocket:
+#            port: 8080
+#          initialDelaySeconds: 60
+#          periodSeconds: 5
         resources:
             {{- toYaml .Values.nginx.nginx.resources | nindent 12 }}
       restartPolicy: Always
@@ -821,6 +892,11 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.publishedApis.publishedApis.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -879,19 +955,15 @@ spec:
         - containerPort: 6379
         resources:
             {{- toYaml .Values.redis.redis.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 6379
+#          initialDelaySeconds: 5
+          periodSeconds: 5
         livenessProbe:
           tcpSocket:
             port: 6379
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        readinessProbe:
-          exec:
-            command:
-            - sh
-            - -c
-            - |-
-              redis-cli ping
-          initialDelaySeconds: 10
+          initialDelaySeconds: 5
           periodSeconds: 5
       restartPolicy: Always
 ---
@@ -947,4 +1019,9 @@ spec:
         - containerPort: 8080
         resources:
             {{- toYaml .Values.serviceApis.serviceApis.resources | nindent 12 }}
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
       restartPolicy: Always

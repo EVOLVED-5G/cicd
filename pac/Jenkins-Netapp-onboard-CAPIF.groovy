@@ -38,29 +38,37 @@ pipeline {
                 }
             }
             steps {
-                    
                  dir ("${WORKSPACE}/") {
-                    sh '''#!/bin/bash
+                    script {
+                        try {
+                            sh '''#!/bin/bash
+                            sleep 60
                             result=false
 
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
                             echo "NAMESPACE $NAMESPACE"
-                            
-                            DISCOVER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
+
+                            INVOKER_LOG=$(kubectl --kubeconfig /home/contint/.kube/config \
                             -n $NAMESPACE logs -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
-                            if [[ $DISCOVER_LOG ]]; then
-                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                            if [[ $INVOKER_LOG ]]; then
+                                echo "INVOKER_LOG: $INVOKER_LOG"
                                 result=true
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
                                 echo "Network App is onboarded correctly in CAPIF"
                             else
                                 echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
-                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                echo "NGINX_LOG:"
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
                                 result=false
                                 exit 1
                             fi
                             '''
+                        } catch (e) {
+                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+                        }
+                    }
                 }
             }
         }
@@ -75,28 +83,38 @@ pipeline {
             }
             steps {
                  dir ("${WORKSPACE}/") {
-                    sh '''#!/bin/bash
+                    script {
+                        try {
+                            sh '''#!/bin/bash
+                            sleep 60
                             result=false
                             TMP_NS_CAPIF=evol5-capif
 
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             echo "TMP_NS_CAPIF: $TMP_NS_CAPIF"
-                           
+
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_CAPIF 
 
-                            DISCOVER_LOG=$(kubectl logs \
+                            INVOKER_LOG=$(kubectl logs \
                             -l io.kompose.service=api-invoker-management | grep "Invoker Created")
 
-                            if [[ $DISCOVER_LOG ]]; then
-                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                            if [[ $INVOKER_LOG ]]; then
+                                echo "INVOKER_LOG: $INVOKER_LOG"
                                 result=true
-                                echo "DISCOVER APIs work correctly"
+                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
+                                echo "Network App is onboarded correctly in CAPIF"
                             else
-                                echo "DISCOVER_LOG: $DISCOVER_LOG"
+                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+                                echo "INVOKER_LOG: $INVOKER_LOG"
+                                kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 result=false
                                 exit 1
                             fi
                             '''
+                        } catch (e) {
+                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+                        }
+                    }
                 }
             }
         }
