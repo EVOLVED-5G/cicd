@@ -52,7 +52,7 @@ def inital_status = 'PENDING'
 // buildResults['steps'][step_destroy_nef] = inital_status
 // buildResults['steps'][step_destroy_capif] = inital_status
 
-step_open_source_licenses_report
+
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -103,7 +103,7 @@ pipeline {
                     step_deploy_capif_nef_netapp = 'deploy-' + "${NETAPP_NAME_LOWER}" + '-network-app'
 
                     buildResults['steps'][step_security_scan_code] = inital_status
-                    buildResults['steps'][step_open_source_licenses_report] = inital_status
+                    buildResults['steps'][step_security_scan_secrets] = inital_status
                     buildResults['steps'][step_build] = inital_status
                     buildResults['steps'][step_security_scan_docker_images] = inital_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
@@ -114,7 +114,7 @@ pipeline {
                     buildResults['steps'][step_destroy_network_app] = inital_status
                     buildResults['steps'][step_destroy_nef] = inital_status
                     buildResults['steps'][step_destroy_capif] = inital_status
-                    buildResults['steps'][step_security_scan_secrets] = inital_status
+                    buildResults['steps'][step_open_source_licenses_report] = inital_status
                 }
             }
         }
