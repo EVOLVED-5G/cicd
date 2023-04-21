@@ -100,6 +100,7 @@ pipeline {
             steps {
                 script {
                     echo "Setting local variables"
+                    echo "STEP: ${step_deploy_capif_nef_netapp}"
                     step_deploy_capif_nef_netapp = 'deploy-' + ${NETAPP_NAME_LOWER} + '-network-app'
                     echo "STEP: ${step_deploy_capif_nef_netapp}"
 
