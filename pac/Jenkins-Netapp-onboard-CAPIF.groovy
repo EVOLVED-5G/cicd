@@ -45,6 +45,7 @@ pipeline {
                     script {
                         try {
                             sh '''#!/bin/bash
+                            sleep 60
                             result=false
 
                             echo "RELEASE_NAME: $RELEASE_NAME"
@@ -67,9 +68,8 @@ pipeline {
                                 exit 1
                             fi
                             '''
-                        } catch (Exception e) {
-                            sleep(time:5, unit:'SECONDS')
-                            throw e
+                        } catch (e) {
+                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
                         }
                     }
                 }
@@ -92,6 +92,7 @@ pipeline {
                     script {
                         try {
                             sh '''#!/bin/bash
+                            sleep 60
                             result=false
                             TMP_NS_CAPIF=evol5-capif
 
@@ -116,9 +117,8 @@ pipeline {
                                 exit 1
                             fi
                             '''
-                        } catch (Exception e) {
-                            sleep(time:5, unit:'SECONDS')
-                            throw e
+                        } catch (e) {
+                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
                         }
                     }
                 }
