@@ -22,8 +22,7 @@ def getAgent(deployment) {
 }
 
 def step_security_scan_code = 'source-code-security-analysis'
-def step_security_scan_secrets = 'secrets-analysis'
-def step_open_source_licenses_report = 'open-source-licenses-report'
+def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
@@ -34,6 +33,7 @@ def step_nef_services_monitoringevent = 'nef-services-monitoringevent'
 def step_destroy_network_app = 'destroy-netapp'
 def step_destroy_nef = 'destroy-nef'
 def step_destroy_capif = 'destroy-capif'
+def step_open_source_licenses_report = 'open-source-licenses-report'
 
 def inital_status = 'PENDING'
 
@@ -103,7 +103,6 @@ pipeline {
                     step_deploy_capif_nef_netapp = 'deploy-' + "${NETAPP_NAME_LOWER}" + '-network-app'
 
                     buildResults['steps'][step_security_scan_code] = inital_status
-                    buildResults['steps'][step_security_scan_secrets] = inital_status
                     buildResults['steps'][step_open_source_licenses_report] = inital_status
                     buildResults['steps'][step_build] = inital_status
                     buildResults['steps'][step_security_scan_docker_images] = inital_status
@@ -115,6 +114,7 @@ pipeline {
                     buildResults['steps'][step_destroy_network_app] = inital_status
                     buildResults['steps'][step_destroy_nef] = inital_status
                     buildResults['steps'][step_destroy_capif] = inital_status
+                    buildResults['steps'][step_security_scan_secrets] = inital_status
                 }
             }
         }
