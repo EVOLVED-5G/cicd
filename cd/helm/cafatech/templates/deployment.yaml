@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "cafatech.fullname" . }}-netapp
+  labels:
+    io.kompose.service: cafa-netapp
+  {{- include "cafatech.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: cafa-netapp
+    {{- include "cafatech.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: cafa-netapp
+      {{- include "cafatech.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f ../docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: NETAPP_NAME
+          value: {{ quote .Values.env.netappName }}
+        - name: NETAPP_ID
+          value: {{ quote .Values.env.netappId }}
+        - name: NETAPP_IP
+          value: {{ quote .Values.env.netappIp }}
+        - name: NETAPP_USER
+          value: {{ quote .Values.env.netappUser }}
+        - name: NETAPP_PASS
+          value: {{ quote .Values.env.netappPass }}
+        - name: SERVER_FOR_VAPP
+          value: {{ quote .Values.env.serverForVapp }}
+        - name: CALLBACK_ADDRESS
+          value: {{ quote .Values.env.callbackAddress }}
+        - name: FRONTEND_CALLBACK_ADDRESS
+          value: {{ quote .Values.env.frontencallbackdAddress }}
+        - name: NEF_USER
+          value: {{ quote .Values.env.nefUser }}
+        - name: NEF_PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: NEF_ADDRESS
+          value: {{ quote .Values.env.nefAddress }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.env.capifPortHttp }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.env.capifPortHttps }}
+        - name: PATH_TO_CERTS
+          value: {{ quote .Values.env.capifPathToCerts }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.cafatechNetapp3.image.repository }}-{{ .Values.netapp.cafatechNetapp3.image.tag
+          | default .Chart.AppVersion }}
+        name: cafatech-netapp-3
+        ports:
+        - containerPort: 5555
+        resources: {}
+      restartPolicy: Always
