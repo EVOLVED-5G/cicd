@@ -21,6 +21,24 @@ def getAgent(deployment) {
     }
 }
 
+def getHttpPort(deployment) {
+    String var = deployment
+    if ('kubernetes-athens'.equals(var)) {
+        return '30048'
+    }else {
+        return ''
+    }
+}
+
+def getHttpsPort(deployment) {
+    String var = deployment
+    if ('kubernetes-athens'.equals(var)) {
+        return '30548'
+    }else {
+        return ''
+    }
+}
+
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
@@ -36,23 +54,6 @@ def step_destroy_capif = 'destroy-capif'
 def step_open_source_licenses_report = 'open-source-licenses-report'
 
 def inital_status = 'PENDING'
-
-// buildResults['steps'][step_security_scan_code] = inital_status
-// buildResults['steps'][step_security_scan_secrets] = inital_status
-// buildResults['steps'][step_open_source_licenses_report] = inital_status
-// buildResults['steps'][step_build] = inital_status
-// buildResults['steps'][step_security_scan_docker_images] = inital_status
-// buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
-// buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
-// // buildResults['steps'][step_test_network_app_networking] = inital_status
-// buildResults['steps'][step_discover_nef_apis] = inital_status
-// buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
-// buildResults['steps'][step_nef_services_monitoringevent] = inital_status
-// buildResults['steps'][step_destroy_network_app] = inital_status
-// buildResults['steps'][step_destroy_nef] = inital_status
-// buildResults['steps'][step_destroy_capif] = inital_status
-
-
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -93,6 +94,8 @@ pipeline {
         RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
         emails = "${params.EMAILS}".trim()
+        CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
+        CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
     }
 
     stages {
@@ -253,38 +256,28 @@ pipeline {
             }
         }
 
-        // stage('Validation: Validate CAPIF'){
-        //    steps{
-        //        script {
-        //            def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-        //                           parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
-        //                                        booleanParam(name: 'RUN_LOCAL_CAPIF', value: "False"),
-        //                                        string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
-        //                                        string(name: 'CAPIF_PORT', value: "30048"),
-        //                                        string(name: 'CAPIF_TLS_PORT', value: "30548"),
-        //                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
-        //                                        ]
-        //            def jobResult = jobBuild.getResult()
-        //            echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-        //            buildResults['steps']['validate-capif'] = jobResult
-        //            if (jobResult == "FAILURE"){
-        //             def destroyJob = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
-        //                                   parameters: [
-        //                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-        //                                    string(name: "DEPLOYMENT",value: String.valueOf(ENVIRONMENT))]
-        //             def destroyJobNef = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
-        //                                    parameters: [
-        //                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-        //                                     string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
-        //                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-        //             currentBuild.jobBuild='UNSTABLE'
-        //            }else{
-        //             echo "All was OK"
-        //            }
-        //        }
-        //    }
-        // }
+        stage('Validation: Validate CAPIF'){
+           steps{
+               script {
+                    def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
+                                    parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
+                                                booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
+                                                string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
+                                                string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
+                                                string(name: 'CAPIF_TLS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+                                                ]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+
+                    buildResults['steps'][step_name] = jobResult
+                    if (jobResult == 'FAILURE') {
+                        buildResults['tests_ok'] = false
+                    }
+                    // currentBuild.jobBuild='UNSTABLE'
+               }
+           }
+        }
         //11
         stage('Validation: Tests to Network App') {
             options {
@@ -465,7 +458,7 @@ pipeline {
                     if (buildResults['tests_ok'] == false) {
                         buildResults['result'] = 'FAILURE'
                     }
-                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ','') + ' / ' + currentBuild.getBuildCauses()[0].userId
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ','').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
