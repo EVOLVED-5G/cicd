@@ -25,8 +25,11 @@ env:
 
 netapp:
   gmiNetappContainer:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:gmiaeronetapp-gmi_netapp_container"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
   ports:
   - name: "netapp"

@@ -32,8 +32,8 @@ A Helm chart to GMI Aero Network App in Kubernetes
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.gmiNetappContainer.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:gmiaeronetapp-gmi_netapp_container"` |  |
-| netapp.gmiNetappContainer.image.tag | string | `""` |  |
+| netapp.gmiNetappContainer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:gmiaeronetapp-gmi_netapp_container","tag":""}` | The docker image repository to use |
+| netapp.gmiNetappContainer.image.tag | string | `""` | @default Chart version |
 | netapp.ports[0].name | string | `"netapp"` |  |
 | netapp.ports[0].port | int | `8383` |  |
 | netapp.ports[0].targetPort | int | `8383` |  |
