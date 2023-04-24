@@ -113,19 +113,17 @@ spec:
         resources:
             {{- toYaml .Values.apiInvokerManagement.apiInvokerManagement.resources | nindent 12 }}
         livenessProbe:
-          tcpSocket:
-            port: 8080
-#          exec:
-#            command:
-#            - sh
-#            - -c 
-#            - |-
-#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_pub_key)
-#              echo "$OUTPUT"
-#              if [ -z "$OUTPUT" ]; then
-#                echo "cannot get the server public key from redis"
-#                exit 1;
-#              fi
+          exec:
+            command:
+            - sh
+            - -c 
+            - |-
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_pub_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "cannot get the server public key from redis"
+                exit 1;
+              fi
           initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
@@ -200,19 +198,17 @@ spec:
         ports:
         - containerPort: 8080
         livenessProbe:
-          tcpSocket:
-            port: 8080
-#          exec:
-#            command:
-#            - sh
-#            - -c 
-#            - |-
-#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
-#              echo "$OUTPUT"
-#              if [ -z "$OUTPUT" ]; then
-#                echo "cannot get the server public key from redis"
-#                exit 1;
-#              fi
+          exec:
+            command:
+            - sh
+            - -c 
+            - |-
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "cannot get the server public key from redis"
+                exit 1;
+              fi
           initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
@@ -410,19 +406,17 @@ spec:
         resources:
             {{- toYaml .Values.capifSecurity.capifSecurity.resources | nindent 12 }}
         livenessProbe:
-          tcpSocket:
-            port: 8080
-#          exec:
-#            command:
-#            - sh
-#            - -c 
-#            - |-
-#              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
-#              echo "$OUTPUT"
-#              if [ -z "$OUTPUT" ]; then
-#                echo "cannot get the server private key from redis"
-#                exit 1;
-#              fi
+          exec:
+            command:
+            - sh
+            - -c 
+            - |-
+              OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
+              echo "$OUTPUT"
+              if [ -z "$OUTPUT" ]; then
+                echo "cannot get the server private key from redis"
+                exit 1;
+              fi
           initialDelaySeconds: 3
           periodSeconds: 5
 #        readinessProbe:
