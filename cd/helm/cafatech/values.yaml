@@ -1,3 +1,42 @@
-## variables for the CAPIF
-capif_hostname: capif.apps.ocp-epg.hi.inet
-env: openshift
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+kubernetesClusterDomain: cluster.local
+
+env:
+  netappId: "CAFA-NetApp-3"
+  netappName: "CafaTechNetApp3"
+  netappIp: "http://netapp:5555"
+  netappUser: "netapp_user"
+  netappPass: "netapp_pass"
+  frontendAddress: "netapp.app.ocp-epg.hi.inet"
+  serverForVapp: "netapp:5000"
+  callbackAddress: "http://netapp:55555/nefcallbacks"
+  frontencallbackdAddress: "http://netapp:5555"
+  nefUser: "admin@my-email.com"
+  nefPassword: "pass"
+  nefAddress: "my-nef.apps.ocp-epg.hi.inet"
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifPortHttp: "80"
+  capifPortHttps: "443"
+  capifPathToCerts: "certificates"
+
+netapp:
+  cafatechNetapp3:
+    # -- The docker image repository to use
+    image:
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:cafatechnetapp3
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: netapp
+    port: 5555
+    targetPort: 5555
+  replicas: 1
+  type: ClusterIP
