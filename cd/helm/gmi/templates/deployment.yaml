@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gmi.fullname" . }}-netapp
+  labels:
+    io.kompose.service: gmi-netapp
+  {{- include "gmi.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: gmi-netapp
+    {{- include "gmi.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: gmi-netapp
+      {{- include "gmi.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CAPIF_CALLBACK_URL
+          value: {{ quote .Values.env.capifCallbackUrl }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.env.capifPortHttp }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.env.capifPortHttps }}
+        - name: NEF_ADDRESS
+          value: {{ quote .Values.env.nefAddress }}
+        - name: NEF_CALLBACK_URL
+          value: {{ quote .Values.env.nefCallbackUrl }}
+        - name: NEF_PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: NEF_USER
+          value: {{ quote .Values.env.nefUser }}
+        - name: NETAPP_ID
+          value: {{ quote .Values.env.netappId }}
+        - name: NETAPP_NAME
+          value: {{ quote .Values.env.netappName }}
+        - name: NETAPP_PATH
+          value: {{ quote .Values.env.netappPath }}
+        - name: NETAPP_PORT_VAPP
+          value: {{ quote .Values.env.netappPortVapp }}
+        - name: PATH_TO_CERTS
+          value: {{ quote .Values.env.pathToCerts }}
+        - name: UE_REQUESTED_IP
+          value: {{ quote .Values.env.ueRequestedIp }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.gmiNetappContainer.image.repository }}-{{ .Values.netapp.gmiNetappContainer.image.tag
+          | default .Chart.AppVersion }}
+        name: gmi-netapp-container
+        ports:
+        - containerPort: 8383
+        resources: {}
+      restartPolicy: Always

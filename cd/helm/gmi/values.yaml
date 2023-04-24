@@ -1,8 +1,38 @@
-## variables for the ZORTENET
-env: openshift
-nef_url: http://evol5-capif-nef.apps.ocp-epg.hi.inet
-nef_user: admin@my-email.com
-nef_pass: pass
-netapp_host: zorte_netapp
-netapp_ip: "0.0.0.0"
-netapp_port: 5000
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+env:
+  frontendAddress: "my-gmi.apps.ocp-epg.hi.inet"
+  capifCallbackUrl: "http://localhost:5000"
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifPortHttp: "30048"
+  capifPortHttps: "30548"
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefCallbackUrl: "http://my-nef.apps.ocp-epg.hi.inet/monitoring/callback"
+  nefUser: "admin@my-email.com"
+  nefPassword: "pass"
+  netappId: "gmi_netapp"
+  netappName: "GMI_Netapp"
+  netappPath: "/src"
+  netappPortVapp: 8383
+  pathToCerts: "/code/src/capif_onboarding"
+  ueRequestedIp: "10.0.0.1"
+
+netapp:
+  gmiNetappContainer:
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:gmiaeronetapp-gmi_netapp_container"
+      tag: ""
+  ports:
+  - name: "netapp"
+    port: 8383
+    targetPort: 8383
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local
