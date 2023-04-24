@@ -6,7 +6,7 @@
 
 ## Description
 
-A Helm chart of fogus for Kubernetes
+A Helm chart to fogus Network Appp in Kubernetes
 
 ## Usage
 

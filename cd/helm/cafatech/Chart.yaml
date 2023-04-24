@@ -1,6 +1,6 @@
 apiVersion: v2
 name: cafatech
-description: A Helm chart for CafaTech in Kubernetes
+description: A Helm chart to CafaTech Network App in Kubernetes
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
