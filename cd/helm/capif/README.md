@@ -1,15 +1,14 @@
-# CAPIF
+# Helm of Fogus
 
 ![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=for-the-badge)
 ![Type: application](https://img.shields.io/badge/Type-application-informational?style=for-the-badge) 
-![AppVersion: 3.0](https://img.shields.io/badge/AppVersion-3.0-informational?style=for-the-badge) 
+![AppVersion: 3.1.1.beta](https://img.shields.io/badge/AppVersion-3.1.1.beta-informational?style=for-the-badge) 
 
 ## Description
 
-A CAPIF Helm chart for Kubernetes
+A Helm chart to CAPIF in Kubernetes
 
 ## Usage
-<fill out>
 
 ## Values
 
@@ -92,8 +91,8 @@ A CAPIF Helm chart for Kubernetes
 | easyRsa.ports[0].targetPort | int | `8080` |  |
 | easyRsa.replicas | int | `1` |  |
 | easyRsa.type | string | `"ClusterIP"` |  |
-| env | string | `"kubernetes-athens"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
-| ingress_ip | object | `{"athens":"10.161.1.117","uma":"x.x.x.x"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing  |
+| env | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
+| ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing  |
 | jwtauth.jwtauth.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_jwtauth_1"` | The docker image repository to use |
 | jwtauth.jwtauth.image.tag | string | `""` | The docker image tag to use @default Chart version |
 | jwtauth.jwtauth.resources.limits.cpu | string | `"100m"` |  |
@@ -141,7 +140,7 @@ A CAPIF Helm chart for Kubernetes
 | mongoExpress.ports[0].targetPort | int | `8081` |  |
 | mongoExpress.replicas | int | `1` |  |
 | mongoExpress.type | string | `"ClusterIP"` |  |
-| nginx.nginx.env.capifHostname | string | `"my-capif.evolved-5g.eu"` | Ingress's host to Capif |
+| nginx.nginx.env.capifHostname | string | `"my-capif.apps.ocp-epg.hi.inet"` | Ingress's host to Capif |
 | nginx.nginx.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:capif-services_nginx_1"` | The docker image repository to use |
 | nginx.nginx.image.tag | string | `""` | The docker image tag to use @default Chart version |
 | nginx.nginx.resources.limits.cpu | string | `"100m"` |  |
