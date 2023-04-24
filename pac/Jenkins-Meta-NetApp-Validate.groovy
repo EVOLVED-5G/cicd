@@ -44,6 +44,7 @@ def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
+def step_validate_capif = 'validate-capif'
 def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
 def step_discover_nef_apis = 'discover-apis'
 def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
@@ -53,7 +54,7 @@ def step_destroy_nef = 'destroy-nef'
 def step_destroy_capif = 'destroy-capif'
 def step_open_source_licenses_report = 'open-source-licenses-report'
 
-def inital_status = 'PENDING'
+def initial_status = 'PENDING'
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -105,19 +106,20 @@ pipeline {
                     echo "Setting local variables"
                     step_deploy_capif_nef_netapp = 'deploy-' + "${NETAPP_NAME_LOWER}" + '-network-app'
 
-                    buildResults['steps'][step_security_scan_code] = inital_status
-                    buildResults['steps'][step_security_scan_secrets] = inital_status
-                    buildResults['steps'][step_build] = inital_status
-                    buildResults['steps'][step_security_scan_docker_images] = inital_status
-                    buildResults['steps'][step_deploy_capif_nef_netapp] = inital_status
-                    buildResults['steps'][step_onboard_netApp_to_capif] = inital_status
-                    buildResults['steps'][step_discover_nef_apis] = inital_status
-                    buildResults['steps'][step_nef_services_monitoringevent_api] = inital_status
-                    buildResults['steps'][step_nef_services_monitoringevent] = inital_status
-                    buildResults['steps'][step_destroy_network_app] = inital_status
-                    buildResults['steps'][step_destroy_nef] = inital_status
-                    buildResults['steps'][step_destroy_capif] = inital_status
-                    buildResults['steps'][step_open_source_licenses_report] = inital_status
+                    buildResults['steps'][step_security_scan_code] = initial_status
+                    buildResults['steps'][step_security_scan_secrets] = initial_status
+                    buildResults['steps'][step_build] = initial_status
+                    buildResults['steps'][step_security_scan_docker_images] = initial_status
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
+                    buildResults['steps'][step_validate_capif = initial_status]
+                    buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
+                    buildResults['steps'][step_discover_nef_apis] = initial_status
+                    buildResults['steps'][step_nef_services_monitoringevent_api] = initial_status
+                    buildResults['steps'][step_nef_services_monitoringevent] = initial_status
+                    buildResults['steps'][step_destroy_network_app] = initial_status
+                    buildResults['steps'][step_destroy_nef] = initial_status
+                    buildResults['steps'][step_destroy_capif] = initial_status
+                    buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
             }
         }
@@ -259,6 +261,7 @@ pipeline {
         stage('Validation: Validate CAPIF'){
            steps{
                script {
+                    def step_name = step_validate_capif
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
                                     parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
                                                 booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
@@ -274,7 +277,6 @@ pipeline {
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
                     }
-                    // currentBuild.jobBuild='UNSTABLE'
                }
            }
         }
