@@ -1,4 +1,87 @@
-## variables for the CAPIF
-env: openshift
-app_replicas: 1
-hostname: iqb.apps.ocp-epg.hi.inet
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+callbacks:
+  callbacks:
+    # -- The docker image repository to use
+    image:
+      # -- The docker image tag to use
+      # -- @default Chart version
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-callbacks"
+      tag: ""
+  ports:
+  - name: "netapp-callbacks"
+    port: 5002
+    targetPort: 5002
+  replicas: 1
+  type: ClusterIP
+
+env:
+  callbackAddress: callbacks:5002
+  capifHostname: my-capif.apps.ocp-epg.hi.inet
+  capifPortHttp: 30048
+  capifPortHttps: 30548
+  frontendAddress: my-iqb.apps.ocp-epg.hi.inet
+#  frontendCallbackAddress: my-iqb-callbacks.apps.ocp-epg.hi.inet
+  keycloakAddress: keycloak:8980/auth
+  keycloakAdmin: admin
+  keycloakAdminPassword: admin
+  keycloakRealm: EVOLVED-5G
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefCallbackUrl: ""
+  nefPassword: pass
+  nefUser: admin@my-email.com
+  netappId: myNetapp
+  netappIp: netapp
+  netappName: iqb
+  netappPort5G: 6000
+  netappPortVapp: ""
+  netappPortWeb: 5000
+  netappServerVapp: ""
+  pathToCerts: /app/capif_onboarding
+  vappAddress: NA
+
+netapp:
+  iqbNetapp:
+    image:
+      # -- The docker image repository to use
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-iqb_netapp"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  replicas: 1
+  ports:
+  - name: "netapp-port-web"
+    port: 5000
+    targetPort: 5000
+  - name: "netapp-port-5g"
+    port: 6000
+    targetPort: 6000
+  type: ClusterIP
+
+keycloak:
+  keycloak:
+    env:
+      keycloakImport: /tmp/import/realm-export.json
+      keycloakLoglevel: DEBUG
+      keycloakPassword: admin
+      keycloakUser: admin
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-keycloak"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "keycloak"
+    port: 8980
+    targetPort: 8080
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local
