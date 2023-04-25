@@ -49,7 +49,7 @@ spec:
         - name: ENDPOINT_ADDRESS
           value: {{ quote .Values.env.frontendAddress }}
         - name: HOST_OF_THE_NEF_EMULATOR
-          value: {{ quote .Values.env.nefAddress }}
+          value: "https://{{ .Values.env.nefAddress }}:{{ .Values.env.capifPortHttps }}"
         - name: USERNAME
           value: {{ quote .Values.env.nefUser }}
         - name: PASSWORD
