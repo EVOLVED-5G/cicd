@@ -1,0 +1,277 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "umacsic.fullname" . }}-db
+  labels:
+    io.kompose.service: db
+  {{- include "umacsic.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: db
+    {{- include "umacsic.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/nef-emulator-default: "true"
+        io.kompose.service: db
+      {{- include "umacsic.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: CALLBACK_ADDRESS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHOST
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHOST
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHTTP
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHTTP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHTTPS
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHTTPS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: ERROR_404_HELP
+          valueFrom:
+            configMapKeyRef:
+              key: ERROR_404_HELP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: FLASK_APP
+          valueFrom:
+            configMapKeyRef:
+              key: FLASK_APP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: NEFHOST
+          valueFrom:
+            configMapKeyRef:
+              key: NEFHOST
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: PATH_TO_CERTS
+          valueFrom:
+            configMapKeyRef:
+              key: PATH_TO_CERTS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              key: PGDATA
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SECRET_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: SECRET_KEY
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SHOW_SQLALCHEMY_LOG_MESSAGES
+          valueFrom:
+            configMapKeyRef:
+              key: SHOW_SQLALCHEMY_LOG_MESSAGES
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SQLALCHEMY_DATABASE_URI
+          valueFrom:
+            configMapKeyRef:
+              key: SQLALCHEMY_DATABASE_URI
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SQLALCHEMY_TRACK_MODIFICATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: SQLALCHEMY_TRACK_MODIFICATIONS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.db.postgresContainer.image.repository }}-{{ .Values.db.postgresContainer.image.tag
+          | default .Chart.AppVersion }}
+        name: postgres-container
+        ports:
+        - containerPort: 5432
+        readinessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 5432
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "umacsic.fullname" . }}-netapp
+  labels:
+    io.kompose.service: netapp
+  {{- include "umacsic.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: netapp
+    {{- include "umacsic.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/nef-emulator-default: "true"
+        io.kompose.service: netapp
+      {{- include "umacsic.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: CALLBACK_ADDRESS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHOST
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHOST
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHTTP
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHTTP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: CAPIFHTTPS
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIFHTTPS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: ERROR_404_HELP
+          valueFrom:
+            configMapKeyRef:
+              key: ERROR_404_HELP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: FLASK_APP
+          valueFrom:
+            configMapKeyRef:
+              key: FLASK_APP
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: NEFHOST
+          valueFrom:
+            configMapKeyRef:
+              key: NEFHOST
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: PATH_TO_CERTS
+          valueFrom:
+            configMapKeyRef:
+              key: PATH_TO_CERTS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: PGDATA
+          valueFrom:
+            configMapKeyRef:
+              key: PGDATA
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SECRET_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: SECRET_KEY
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SHOW_SQLALCHEMY_LOG_MESSAGES
+          valueFrom:
+            configMapKeyRef:
+              key: SHOW_SQLALCHEMY_LOG_MESSAGES
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SQLALCHEMY_DATABASE_URI
+          valueFrom:
+            configMapKeyRef:
+              key: SQLALCHEMY_DATABASE_URI
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: SQLALCHEMY_TRACK_MODIFICATIONS
+          valueFrom:
+            configMapKeyRef:
+              key: SQLALCHEMY_TRACK_MODIFICATIONS
+              name: {{ include "umacsic.fullname" . }}-env
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.netapp.image.repository }}-{{ .Values.netapp.netapp.image.tag
+          | default .Chart.AppVersion }}
+        name: netapp
+        ports:
+        - containerPort: 10001
+        resources: {}
+      restartPolicy: Always

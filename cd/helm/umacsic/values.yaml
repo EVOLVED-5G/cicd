@@ -1,0 +1,59 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+db:
+  ports:
+  - name: "db-port"
+    port: 5432
+    targetPort: 5432
+  postgresContainer:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-postgres_container"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  replicas: 1
+  type: ClusterIP
+
+env:
+  frontendAddress: my-umacsic.apps.ocp-epg.hi.inet
+  callbackAddress: ""
+  capifHostname: my-capif.apps.ocp-epg.hi.inet
+  capifPortHttp: 30048
+  capifPortHttps: 30548
+  error404Help: "False"
+  flaskApp: main.py
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  pathToCerts: /usr/src/app/certs
+  pgdata: /var/lib/postgresql/data
+  postgresDb: netappdb
+  postgresHostname: db
+  postgresPort: 5432
+  postgresUser: netapp
+  postgresPassword: secret
+  secretKey: 7110c8ae51a4b5af97be6534caefs0e4bb9bdcb3380af00sr50b23a5d1616bf319bc298105da20fe
+  showSqlalchemyLogMessages: "False"
+  sqlalchemyTrackModifications: "False"
+
+netapp:
+  netapp:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-netapp"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "netapp-port"
+    port: 10001
+    targetPort: 10001
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local
