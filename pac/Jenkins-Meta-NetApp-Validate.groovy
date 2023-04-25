@@ -111,7 +111,7 @@ pipeline {
                     buildResults['steps'][step_build] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
-                    buildResults['steps'][step_validate_capif = initial_status]
+                    buildResults['steps'][step_validate_capif] = initial_status
                     buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
                     buildResults['steps'][step_discover_nef_apis] = initial_status
                     buildResults['steps'][step_nef_services_monitoringevent_api] = initial_status
