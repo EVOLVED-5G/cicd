@@ -46,6 +46,7 @@ pipeline {
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
+        REPORT_FILENAME = '001-report-sonar'
     }
 
     stages {
@@ -135,7 +136,7 @@ pipeline {
                         --sinceleakperiod="false" \
                         --allbugs="true" \
                         --noRulesInReport= "true" \
-                        --saveReportJson "report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json" > report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.html
+                        --saveReportJson "${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json" > ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.html
                     '''
                 }
             }
@@ -158,13 +159,13 @@ pipeline {
                     versionsq=$(curl -u admin:$SONARQB_PASSWORD https://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
                     urlsq=https://sq.mobilesandbox.cloud:9000/dashboard?id=Evolved5g-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}
 
-                    python3 utils/report_generator.py --template templates/step-scan-sonarqube.md.j2 --json report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json --output report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq --name $NETAPP_NAME
-                    docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md
+                    python3 utils/report_generator.py --template templates/step-scan-sonarqube.md.j2 --json ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json --output ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq --name $NETAPP_NAME
+                    docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
 
                     for x in "${files[@]}"
                     do
-                        report_file="report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.$x"
+                        report_file="${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.$x"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
@@ -184,7 +185,7 @@ pipeline {
             steps {
                 dir("${WORKSPACE}/") {
                     sh '''#!/bin/bash
-                    if grep -q "failed" report-sonar-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md; then
+                    if grep -q "failed" ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md; then
                         result=false
                     else
                         result=true
@@ -203,7 +204,7 @@ pipeline {
         always {
             script {
                 if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
-                    emailext attachmentsPattern: '**/sonar-report_Evolved5g-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.html.txt',
+                    emailext attachmentsPattern: '**/${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.html',
                     body: '''${SCRIPT, template="groovy-html.template"}''',
                     mimeType: 'text/html',
                     subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
