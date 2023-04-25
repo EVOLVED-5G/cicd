@@ -53,6 +53,7 @@ spec:
           value: {{ quote .Values.env.capifPortHttps }}
         image: {{ .Values.netapp.infolysisNetappContainer.image.repository }}-{{ .Values.netapp.infolysisNetappContainer.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: infolysis-netapp
         ports:
           - containerPort: 8000
