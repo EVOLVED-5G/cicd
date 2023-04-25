@@ -80,6 +80,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.netapp.immNetappContainer.image.repository }}-{{ .Values.netapp.immNetappContainer.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: imm-netapp-container
         ports:
         - containerPort: 9876

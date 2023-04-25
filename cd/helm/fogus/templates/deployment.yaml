@@ -117,6 +117,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.dbnetapp.netapppostgres.image.repository }}-{{ .Values.dbnetapp.netapppostgres.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: netapppostgres
         resources:
             {{- toYaml .Values.dbnetapp.netapppostgres.resources | nindent 12 }}
@@ -247,6 +248,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.django.netappdjango.image.repository }}-{{ .Values.django.netappdjango.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: netappdjango
         ports:
         - containerPort: 8000
@@ -373,6 +375,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.netapp.netappfe.image.repository }}-{{ .Values.netapp.netappfe.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: netappfe
         ports:
         - containerPort: 4200
