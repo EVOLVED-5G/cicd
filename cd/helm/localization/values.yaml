@@ -1,0 +1,37 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+env:
+  callbackAddress: netapp:8000
+  frontendAddress: "my-localization.apps.ocp-epg.hi.inet"
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifPortHttp: "30048"
+  capifPortHttps: "30548"
+  capifPathToCerts: /evolved5g/cfg/capif_onboarding
+  capifUser: user300
+  vAppAddress: ""
+  netappContainerPort: 8000
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefUser: admin@my-email.com
+  nefPassword: pass
+  euExternalId: "10002@domain.com"
+
+netapp:
+  netapp:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:localizationnetapp"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "netapp"
+    port: 8000
+    targetPort: 8000
+  replicas: 1
+  type: ClusterIP
