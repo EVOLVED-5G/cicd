@@ -39,6 +39,7 @@ def getHttpsPort(deployment) {
     }
 }
 
+def step_static_code_analysis = 'static-code-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
@@ -106,6 +107,7 @@ pipeline {
                     echo "Setting local variables"
                     step_deploy_capif_nef_netapp = 'deploy-' + "${NETAPP_NAME_LOWER}" + '-network-app'
 
+                    buildResults['steps'][step_static_code_analysis] = initial_status
                     buildResults['steps'][step_security_scan_code] = initial_status
                     buildResults['steps'][step_security_scan_secrets] = initial_status
                     buildResults['steps'][step_build] = initial_status
@@ -125,6 +127,27 @@ pipeline {
         }
         stage('Validation: Static Application Securirty Test - SAST') {
             parallel {
+                stage('Validation: Static Code Analysis'){
+                    steps{
+                        retry(2) {
+                            script {
+                                def step_name = step_static_code_analysis
+                                buildResults['steps'][step_name] = 'FAILURE'
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
+                                buildResults['steps'][step_name] = jobResult
+                            }
+                        }
+                    }
+                }
                 stage('Validation: Source Code Security Analysis') {
                     steps {
                         retry(2) {
