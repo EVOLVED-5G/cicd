@@ -36,7 +36,7 @@ netapp:
       # -- @default Chart version
       tag: ""
   ports:
-  - name: "80"
+  - name: "netapp"
     port: 80
     targetPort: 80
   type: ClusterIP
