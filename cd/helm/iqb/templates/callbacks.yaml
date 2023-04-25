@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: netapp-callbacks
+  labels:
+  {{- include "iqb.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../services/docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  {{- if eq .Values.environment "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
+  rules:
+  - host: "{{ .Values.env.frontendAddress }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: 'callbacks'
+            port:
+              number: 5002
+        path: /
+        pathType: Prefix
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: callbacks
+  labels:
+    io.kompose.service: callbacks
+  {{- include "iqb.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  type: {{ .Values.callbacks.type }}
+  selector:
+    io.kompose.service: callbacks
+  {{- include "iqb.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.callbacks.ports | toYaml | nindent 2 -}}

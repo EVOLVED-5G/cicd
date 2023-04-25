@@ -1,0 +1,220 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iqb.fullname" . }}-callbacks
+  labels:
+    io.kompose.service: callbacks
+  {{- include "iqb.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.callbacks.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: callbacks
+    {{- include "iqb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: callbacks
+      {{- include "iqb.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.callbacks.callbacks.image.repository }}-{{ .Values.callbacks.callbacks.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: callbacks
+        ports:
+        - containerPort: 5002
+        resources: {}
+      hostname: callbacks
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iqb.fullname" . }}-iqb-netapp
+  labels:
+    io.kompose.service: iqb-netapp
+  {{- include "iqb.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: iqb-netapp
+    {{- include "iqb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: iqb-netapp
+      {{- include "iqb.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          value: {{ quote .Values.env.callbackAddress }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.env.capifPortHttp }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.env.capifPortHttps }}
+        - name: FRONTEND_ADDRESS
+          value: {{ quote .Values.env.frontendAddress }}
+        - name: KEYCLOAK_ADDRESS
+          value: {{ quote .Values.env.keycloakAddress }}
+        - name: KEYCLOAK_ADMIN
+          value: {{ quote .Values.env.keycloakAdmin }}
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: {{ quote .Values.env.keycloakAdminPassword }}
+        - name: KEYCLOAK_REALM
+          value: {{ quote .Values.env.keycloakRealm }}
+        - name: NEF_ADDRESS
+          value: {{ quote .Values.env.nefAddress }}
+        - name: NEF_CALLBACK_URL
+          value: {{ quote .Values.env.nefCallbackUrl }}
+        - name: NEF_PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: NEF_USER
+          value: {{ quote .Values.env.nefUser }}
+        - name: NETAPP_ID
+          value: {{ quote .Values.env.netappId }}
+        - name: NETAPP_IP
+          value: {{ quote .Values.env.netappIp }}
+        - name: NETAPP_NAME
+          value: {{ quote .Values.env.netappName }}
+        - name: NETAPP_PORT_5G
+          value: {{ quote .Values.env.netappPort5G }}
+        - name: NETAPP_PORT_VAPP
+          value: {{ quote .Values.env.netappPortVapp }}
+        - name: NETAPP_PORT_WEB
+          value: {{ quote .Values.env.netappPortWeb }}
+        - name: NETAPP_SERVER_VAPP
+          value: {{ quote .Values.env.netappServerVapp }}
+        - name: PATH_TO_CERTS
+          value: {{ quote .Values.env.pathToCerts }}
+        - name: VAPP_ADDRESS
+          value: {{ quote .Values.env.vappAddress }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.iqbNetapp.image.repository }}-{{ .Values.netapp.iqbNetapp.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: iqb-netapp
+        ports:
+        - containerPort: 5000
+        - containerPort: 6000
+        resources: {}
+      hostname: iqb-netapp
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "iqb.fullname" . }}-keycloak
+  labels:
+    io.kompose.service: keycloak
+  {{- include "iqb.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.keycloak.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: keycloak
+    {{- include "iqb.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: keycloak
+      {{- include "iqb.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: KEYCLOAK_IMPORT
+          value: {{ quote .Values.keycloak.keycloak.env.keycloakImport }}
+        - name: KEYCLOAK_LOGLEVEL
+          value: {{ quote .Values.keycloak.keycloak.env.keycloakLoglevel }}
+        - name: KEYCLOAK_PASSWORD
+          value: {{ quote .Values.keycloak.keycloak.env.keycloakPassword }}
+        - name: KEYCLOAK_USER
+          value: {{ quote .Values.keycloak.keycloak.env.keycloakUser }}
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.keycloak.keycloak.image.repository }}-{{ .Values.keycloak.keycloak.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: keycloak
+        ports:
+        - containerPort: 8080
+        resources: {}
+      hostname: keycloak
+      restartPolicy: Always
