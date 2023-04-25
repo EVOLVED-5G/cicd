@@ -17,7 +17,7 @@ spec:
       paths:
       - backend:
           service:
-            name: 'netapp'
+            name: 'frontend-config'
             port:
               number: 80
         path: /
