@@ -1,12 +1,52 @@
-## variables for the CAPIF
-capif_hostname: capif.apps.ocp-epg.hi.inet
-nef_host: http://evol5-capif-nef.apps.ocp-epg.hi.inet
-host_front: immersion-web-controller.apps.ocp-epg.hi.inet
-netappid: immnetapp
-netapp_name: IMMNetapp
-netapp_ip: "http://0.0.0.0"
-vapp_ip: "127.0.0.1"
-netapp_port_5g: 9999
-netapp_port_web: 9988
-netapp_port_vapp: 9986
-env: openshift
+
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+env:
+  capifHostname: my-capif.apps.ocp-epg.hi.inet
+  capifPortHttp: 30048
+  capifPortHttps: "30548"
+  pathToCerts: "/usr/src/app/capif_onboarding"
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefUser: "admin@my-email.com"
+  nefPassword: "pass"
+  frontendAddress: my-immersion.apps.ocp-epg.hi.inet
+  netappId: imm_netapp
+  netappIp: "netapp"
+  netappName: IMM_Netapp
+  netappPort5G: 9999
+  netappPortVapp: 9877
+  netappPortWeb: 9998
+  netappServerVapp: 127.0.0.1
+
+
+netapp:
+  immNetappContainer:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:immersionnetapp-imm_netapp_container"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "9876"
+    port: 9876
+    targetPort: 9876
+  - name: "netapp-port-vapp"
+    port: 9877
+    targetPort: 9877
+  - name: "netapp-port-web"
+    port: 9998
+    targetPort: 9998
+  - name: "netapp-port-5g"
+    port: 9999
+    targetPort: 9999
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local

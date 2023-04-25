@@ -76,6 +76,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.netapp.cafatechNetapp3.image.repository }}-{{ .Values.netapp.cafatechNetapp3.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: cafatech-netapp-3
         ports:
         - containerPort: 5555
