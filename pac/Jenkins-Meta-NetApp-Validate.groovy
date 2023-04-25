@@ -113,12 +113,12 @@ pipeline {
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     buildResults['steps'][step_validate_capif] = initial_status
                     buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
-                    buildResults['steps'][step_discover_nef_apis] = initial_status
+                    // buildResults['steps'][step_discover_nef_apis] = initial_status
                     buildResults['steps'][step_nef_services_monitoringevent_api] = initial_status
                     buildResults['steps'][step_nef_services_monitoringevent] = initial_status
-                    buildResults['steps'][step_destroy_network_app] = initial_status
-                    buildResults['steps'][step_destroy_nef] = initial_status
-                    buildResults['steps'][step_destroy_capif] = initial_status
+                    // buildResults['steps'][step_destroy_network_app] = initial_status
+                    // buildResults['steps'][step_destroy_nef] = initial_status
+                    // buildResults['steps'][step_destroy_capif] = initial_status
                     buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
             }
@@ -410,8 +410,8 @@ pipeline {
             retry(3) {
                 script {
                     echo "Destroy Network App"
-                    def step_name = step_destroy_network_app
-                    buildResults['steps'][step_name] = 'FAILURE'
+                    // def step_name = step_destroy_network_app
+                    // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
                             parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -419,14 +419,14 @@ pipeline {
                             ]
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-                    buildResults['steps'][step_name] = jobResult
+                    // buildResults['steps'][step_name] = jobResult
                 }
             }
             retry(3) {
                 script {
                     echo "Destroy NEF"
-                    def step_name = step_destroy_nef
-                    buildResults['steps'][step_name] = 'FAILURE'
+                    // def step_name = step_destroy_nef
+                    // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
                                     parameters: [
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -434,14 +434,14 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-                    buildResults['steps'][step_name] = jobResult
+                    // buildResults['steps'][step_name] = jobResult
                 }
             }
             retry(3) {
                 script {
                     echo "Destroy CAPIF"
-                    def step_name = step_destroy_capif
-                    buildResults['steps'][step_name] = 'FAILURE'
+                    // def step_name = step_destroy_capif
+                    // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
                                     parameters: [
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -449,7 +449,7 @@ pipeline {
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-                    buildResults['steps'][step_name] = jobResult
+                    // buildResults['steps'][step_name] = jobResult
                 }
             }
             dir("${env.WORKSPACE}/") {
