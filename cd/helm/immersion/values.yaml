@@ -12,8 +12,6 @@ env:
   capifPortHttp: 30048
   capifPortHttps: "30548"
   pathToCerts: "/usr/src/app/capif_onboarding"
-#  nefCallbackUrl: http://netapp
-#  nefHost: http://my-nef.apps.ocp-epg.hi.inet
   nefAddress: my-nef.apps.ocp-epg.hi.inet
   nefUser: "admin@my-email.com"
   nefPassword: "pass"
