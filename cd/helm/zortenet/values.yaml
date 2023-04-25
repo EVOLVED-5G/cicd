@@ -1,10 +1,36 @@
-## variables for the ZORTENET
-env: openshift
-nef_user: admin@my-email.com
-nef_pass: pass
-nef_address: evol5-capif-nef.apps.ocp-epg.hi.inet
-netapp_address: zortenet.apps.ocp-epg.tid.es
-netapp_port: 5000
 
-callback_address: zortenet.apps.ocp-epg.tid.es
-capif_hostname: capif.apps.ocp-epg.hi.inet
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+env:
+  frontendAddress: my-immersion.apps.ocp-epg.hi.inet
+  callbackAddress: "app:5000"
+  capifHostname: my-capif.apps.ocp-epg.hi.inet
+  capifPortHttp: 30048
+  capifPortHttps: 30548
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefUser: "admin@my-email.com"
+  nefPassword: "pass"
+  pathToCerts: "/zortenet_netapp/capif_onboarding"
+
+netapp:
+  zorteNetapp:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:zortenetnetapp-zorte_netapp"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "app"
+    port: 5000
+    targetPort: 5000
+  replicas: 1
+  type: ClusterIP
+
+kubernetesClusterDomain: cluster.local

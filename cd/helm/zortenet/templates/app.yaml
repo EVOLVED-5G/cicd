@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: netapp
+  labels:
+  {{- include "zortenet.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../services/docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  {{- if eq .Values.environment "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
+  rules:
+  - host: "{{ .Values.env.frontendAddress }}"
+    http:
+      paths:
+      - backend:
+          service:
+            name: 'app'
+            port:
+              number: 5000
+        path: /
+        pathType: Prefix
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  labels:
+    io.kompose.service: app
+  {{- include "zortenet.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  type: {{ .Values.netapp.type }}
+  selector:
+    io.kompose.service: app
+  {{- include "zortenet.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.netapp.ports | toYaml | nindent 2 -}}
