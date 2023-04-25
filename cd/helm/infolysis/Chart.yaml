@@ -1,5 +1,6 @@
 apiVersion: v2
 name: infolysis
+
 description: A Helm chart to infolysis Network App in Kubernetes
 # A chart can be either an 'application' or a 'library' chart.
 #
