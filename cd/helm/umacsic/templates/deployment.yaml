@@ -128,15 +128,15 @@ spec:
           | default .Chart.AppVersion }}
         name: postgres-container
         ports:
-        - containerPort: 5432
+        - containerPort: {{ .Values.env.postgresPort }}
         readinessProbe:
           tcpSocket:
-            port: 5432
+            port: {{ .Values.env.postgresPort }}
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           tcpSocket:
-            port: 5432
+            port: {{ .Values.env.postgresPort }}
           initialDelaySeconds: 15
           periodSeconds: 20
         resources: {}
