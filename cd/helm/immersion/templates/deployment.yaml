@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "gmi.fullname" . }}-netapp
+  name: {{ include "immersion.fullname" . }}-netapp
   labels:
-    io.kompose.service: gmi-netapp
-  {{- include "gmi.labels" . | nindent 4 }}
+    io.kompose.service: imm-netapp
+  {{- include "immersion.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -12,14 +12,14 @@ spec:
   replicas: {{ .Values.netapp.replicas }}
   selector:
     matchLabels:
-      io.kompose.service: gmi-netapp
-    {{- include "gmi.selectorLabels" . | nindent 6 }}
+      io.kompose.service: imm-netapp
+    {{- include "immersion.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        io.kompose.network/services-default: "true"
-        io.kompose.service: gmi-netapp
-      {{- include "gmi.selectorLabels" . | nindent 8 }}
+        io.kompose.network/nef-emulator-default: "true"
+        io.kompose.service: imm-netapp
+      {{- include "immersion.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -42,41 +42,50 @@ spec:
       {{- end }}
       containers:
       - env:
-        - name: CAPIF_CALLBACK_URL
-          value: {{ quote .Values.env.capifCallbackUrl }}
         - name: CAPIF_HOSTNAME
           value: {{ quote .Values.env.capifHostname }}
         - name: CAPIF_PORT_HTTP
           value: {{ quote .Values.env.capifPortHttp }}
         - name: CAPIF_PORT_HTTPS
           value: {{ quote .Values.env.capifPortHttps }}
-        - name: NEF_ADDRESS
-          value: {{ quote .Values.env.nefAddress }}
-        - name: NEF_CALLBACK_URL
-          value: {{ quote .Values.env.nefCallbackUrl }}
-        - name: NEF_PASSWORD
-          value: {{ quote .Values.env.nefPassword }}
-        - name: NEF_USER
-          value: {{ quote .Values.env.nefUser }}
-        - name: NETAPP_ID
-          value: {{ quote .Values.env.netappId }}
-        - name: NETAPP_NAME
-          value: {{ quote .Values.env.netappName }}
-        - name: NETAPP_PATH
-          value: {{ quote .Values.env.netappPath }}
-        - name: NETAPP_PORT_VAPP
-          value: {{ quote .Values.env.netappPortVapp }}
         - name: PATH_TO_CERTS
           value: {{ quote .Values.env.pathToCerts }}
-        - name: UE_REQUESTED_IP
-          value: {{ quote .Values.env.ueRequestedIp }}
+        - name: NEF_CALLBACK_URL
+          value: http://{{ .Values.env.nefAddress }}
+        - name: CALLBACK_ADDRESS
+          value: http://{{ .Values.env.frontendAddress }}
+        - name: FRONTEND_CALLBACK_ADDRESS
+          value: {{ quote .Values.env.frontendAddress }}
+        - name: NEF_ADDRESS
+          value: {{ quote .Values.env.nefAddress }}
+        - name: NEF_USER
+          value: {{ quote .Values.env.nefUser }}
+        - name: NEF_PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: NETAPP_ID
+          value: {{ quote .Values.env.netappId }}
+        - name: NETAPP_IP
+          value: {{ quote .Values.env.netappIp }}
+        - name: NETAPP_NAME
+          value: {{ quote .Values.env.netappName }}
+        - name: NETAPP_PORT_5G
+          value: {{ quote .Values.env.netappPort5G }}
+        - name: NETAPP_PORT_VAPP
+          value: {{ quote .Values.env.netappPortVapp }}
+        - name: NETAPP_PORT_WEB
+          value: {{ quote .Values.env.netappPortWeb }}
+        - name: NETAPP_SERVER_VAPP
+          value: {{ quote .Values.env.netappServerVapp }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.gmiNetappContainer.image.repository }}-{{ .Values.netapp.gmiNetappContainer.image.tag
+        image: {{ .Values.netapp.immNetappContainer.image.repository }}-{{ .Values.netapp.immNetappContainer.image.tag
           | default .Chart.AppVersion }}
         imagePullPolicy: Always
-        name: gmi-netapp-container
+        name: imm-netapp-container
         ports:
-        - containerPort: 8383
+        - containerPort: 9876
+        - containerPort: 9877
+        - containerPort: 9998
+        - containerPort: 9999
         resources: {}
       restartPolicy: Always
