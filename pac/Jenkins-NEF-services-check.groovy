@@ -1,4 +1,10 @@
 
+String netappName(String url) {
+    String url2 = url ?: ''
+    String var = url2.substring(url2.lastIndexOf('/') + 1)
+    return var
+}
+
 def getAgent(deployment) {
     String var = deployment
     if("openshift".equals(var)) {
