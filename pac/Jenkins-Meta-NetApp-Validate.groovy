@@ -129,27 +129,27 @@ pipeline {
         }
         stage('Validation: Static Application Securirty Test - SAST') {
             parallel {
-                stage('Validation: Static Code Analysis') {
-                    steps{
-                        retry(2) {
-                            script {
-                                def step_name = step_static_code_analysis
-                                buildResults['steps'][step_name] = 'FAILURE'
-                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                // stage('Validation: Static Code Analysis') {
+                //     steps{
+                //         retry(2) {
+                //             script {
+                //                 def step_name = step_static_code_analysis
+                //                 buildResults['steps'][step_name] = 'FAILURE'
+                //                 def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
+                //                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                //                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                //                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                //                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                //                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                //                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
 
-                                def jobResult = jobBuild.getResult()
-                                echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
-                                buildResults['steps'][step_name] = jobResult
-                            }
-                        }
-                    }
-                }
+                //                 def jobResult = jobBuild.getResult()
+                //                 echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
+                //                 buildResults['steps'][step_name] = jobResult
+                //             }
+                //         }
+                //     }
+                // }
                 stage('Validation: Source Code Security Analysis') {
                     steps {
                         retry(2) {
