@@ -17,26 +17,28 @@ The result of the Validation Process over the Network App **{{name}}** has been:
 The individual result of the validations test is displayed in the following table:
 
 {% set vars = {'foo': False} %}
-{% set counter = 0 -%}
+{% set counter = {'counter':0} -%}
 | Step | Step Name | Result |
 |:---:|:---|:---:|
 {%- for step_name,step_status in steps.items() %}
   {%- if step_status != "NOT_REPORT" -%}
-    {%- if step_name == "nef-services-apis" -%}
-      {%- for api_id,api_name in step_status %}
-| {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") + api_name }} | SUCCESS |
-        {%- set counter = counter + group|length -%}
-      {% endfor -%}
-    {%- else -%}
-| {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
+    {% if step_name == "nef-services-apis" %}
+      {%- for api_id,api_name in step_status.items() %}
+| {{ counter.counter }} | {{ step_name|upper|replace("-"," ") + ' ***' + api_name + '***' }} | SUCCESS |
+        {%- if counter.update({'counter':counter.counter + 1}) -%}
+        {%- endif -%}
+      {%- endfor %}
+    {%- else %}
+| {{ counter.counter }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
       {%- if step_status == "FAILURE" -%}
         {%- if vars.update({'foo': True}) -%}
-        {%- endif -%}
+        {%- endif %}
       {%- endif %}
-    {%- set counter = counter + group|length -%}
-    {%- endif -%}
+      {%- if counter.update({'counter':counter.counter + 1}) -%}
+      {%- endif -%}
+    {%- endif %}
   {%- endif -%}
-{% endfor -%}
+{% endfor %}
 {% if vars.foo %}
   **Please, take a look to those steps that are failing.**
 {% else %}
