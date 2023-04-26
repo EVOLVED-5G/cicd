@@ -77,7 +77,7 @@ pipeline {
                                 kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
                                 echo "Network App is onboarded correctly in CAPIF"
                             else
-                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+                                echo "The NEF Services logs are not present in CAPIF"
                                 echo "NGINX_LOG:"
                                 kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
                                 result=false
@@ -85,7 +85,7 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
-                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+                            unstable("The NEF Services logs are not present in CAPIF")
                         }
                     }
                 }
@@ -125,7 +125,7 @@ pipeline {
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
                                 echo "Network App is onboarded correctly in CAPIF"
                             else
-                                echo "There was an error, the Network App cannot be onboarded correctly in CAPIF"
+                                echo "The NEF Services logs are not present in CAPIF"
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 result=false
@@ -133,7 +133,7 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
-                            unstable("There was an error, the Network App cannot be onboarded correctly in CAPIF")
+                            unstable("The NEF Services logs are not present in CAPIF")
                         }
                     }
                 }
