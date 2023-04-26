@@ -72,15 +72,14 @@ pipeline {
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
-                                echo $INVOCATION_LOGS |sed -r 's/^Added log entry to apis: //'|sed -r "s/\'/\"/g"> ${REPORT_FILENAME}.json
-                                result=true
-                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
+                                echo $INVOCATION_LOGS |sed -r \'s/^Added log entry to apis: //\'|sed -r "s/\\'/\\"/g" > ${REPORT_FILENAME}.json
                                 echo "Network App is onboarded correctly in CAPIF"
+                                echo "NGINX_LOGS:"
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs
                             else
                                 echo "The NEF Services logs are not present in CAPIF"
                                 echo "NGINX_LOG:"
-                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs 
-                                result=false
+                                kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs
                                 exit 1
                             fi
                             '''
@@ -121,14 +120,14 @@ pipeline {
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
-                                echo $INVOCATION_LOGS |sed -r 's/^Added log entry to apis: //'|sed -r "s/\'/\"/g"> ${REPORT_FILENAME}.json
+                                echo $INVOCATION_LOGS |sed -r \'s/^Added log entry to apis: //\'|sed -r "s/\\'/\\"/g" > ${REPORT_FILENAME}.json
+                                echo "NGINX_LOG:"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
                                 echo "Network App is onboarded correctly in CAPIF"
                             else
                                 echo "The NEF Services logs are not present in CAPIF"
-                                echo "INVOCATION_LOGS: $INVOCATION_LOGS"
+                                echo "NGINX_LOG:"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
-                                result=false
                                 exit 1
                             fi
                             '''
