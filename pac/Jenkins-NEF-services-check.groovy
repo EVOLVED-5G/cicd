@@ -141,10 +141,10 @@ pipeline {
         }
         stage('Upload report to Artifactory') {
             when {
-                expression {
-                    return REPORTING
+                    allOf {
+                        expression { REPORTING == true}
+                    }
                 }
-            }
             options {
                 retry(2)
             }
@@ -154,10 +154,14 @@ pipeline {
                     report_file="${REPORT_FILENAME}.json"
                     url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                    if [ -f "$report_file" ]; then
+                        echo "$report_file exists. Uploading to artifactory."
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                         --data-binary @"$report_file" \
                         "$url"
-
+                    else
+                        echo "$FILE does not exist."
+                    fi
                 '''
                 }
             }
