@@ -146,7 +146,7 @@ pipeline {
         stage('Upload report to Artifactory') {
             when {
                     allOf {
-                        expression { REPORTING == true}
+                        expression { "${params.REPORTING}".toBoolean() == true }
                     }
                 }
             options {
