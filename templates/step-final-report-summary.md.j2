@@ -21,12 +21,21 @@ The individual result of the validations test is displayed in the following tabl
 | Step | Step Name | Result |
 |:---:|:---|:---:|
 {%- for step_name,step_status in steps.items() %}
+  {%- if step_status != "NOT_REPORT" -%}
+    {%- if step_name == "nef-services-apis" -%}
+      {%- for api_id,api_name in step_status %}
+| {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") + api_name }} | SUCCESS |
+        {%- set counter = counter + group|length -%}
+      {% endfor -%}
+    {%- else -%}
 | {{ counter + loop.index0 }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
-    {%- if step_status == "FAILURE" -%}
-      {%- if vars.update({'foo': True}) -%} 
-      {%- endif -%}
-    {%- endif %}
-  {%- set counter = counter + group|length -%}
+      {%- if step_status == "FAILURE" -%}
+        {%- if vars.update({'foo': True}) -%}
+        {%- endif -%}
+      {%- endif %}
+    {%- set counter = counter + group|length -%}
+    {%- endif -%}
+  {%- endif -%}
 {% endfor -%}
 {% if vars.foo %}
   **Please, take a look to those steps that are failing.**
