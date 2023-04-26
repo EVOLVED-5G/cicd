@@ -358,7 +358,7 @@ pipeline {
                 stage('Validation: NEF Services logged at CAPIF'){
                     steps {
                         script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/010-NEF Services asSessionWithQoS', wait: true, propagate: false,
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-NEF Services Check', wait: true, propagate: false,
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
