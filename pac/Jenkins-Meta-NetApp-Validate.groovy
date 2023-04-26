@@ -105,7 +105,7 @@ pipeline {
         stage('Initialize Local Variables') {
             steps {
                 script {
-                    echo "Setting local variables"
+                    echo 'Setting local variables'
                     step_deploy_capif_nef_netapp = 'deploy-' + "${NETAPP_NAME_LOWER}" + '-network-app'
 
                     buildResults['steps'][step_static_code_analysis] = initial_status
@@ -214,47 +214,47 @@ pipeline {
                         }
                     }
                 }
-                // stage('Validation: Build validation image Report and Security Scan Docker Images Builded') {
-                //     steps {
-                //         retry(2) {
-                //             script {
-                //                 def step_name = step_build
-                //                 buildResults['steps'][step_name] = 'FAILURE'
-                //                 def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: true,
-                //                     parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                //                                 string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                                 string(name: 'STAGE', value: 'validation'),
-                //                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                //                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                //                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                //                 def jobResult = jobBuild.getResult()
-                //                 echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
-                //                 buildResults['steps'][step_name] = jobResult
-                //             }
-                //         }
-                //         retry(2) {
-                //             script {
-                //                 def step_name = step_security_scan_docker_images
-                //                 buildResults['steps'][step_name] = 'FAILURE'
-                //                 def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: true,
-                //                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                             string(name: 'STAGE', value: 'validation'),
-                //                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                //                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                //                             booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                //                 def jobResult = jobBuild.getResult()
-                //                 echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
-                //                 buildResults['steps'][step_name] = jobResult
-                //             }
-                //         }
-                //     }
-                // }
+                stage('Validation: Build validation image Report and Security Scan Docker Images Builded') {
+                    steps {
+                        retry(2) {
+                            script {
+                                def step_name = step_build
+                                buildResults['steps'][step_name] = 'FAILURE'
+                                def jobBuild = build job: '003-NETAPPS/999-ToReview/build', wait: true, propagate: true,
+                                    parameters: [string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                                                string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
+                                buildResults['steps'][step_name] = jobResult
+                            }
+                        }
+                        retry(2) {
+                            script {
+                                def step_name = step_security_scan_docker_images
+                                buildResults['steps'][step_name] = 'FAILURE'
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/004-Security Scan Docker Images', wait: true, propagate: true,
+                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                            string(name: 'STAGE', value: 'validation'),
+                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'Security Scan Docker Images' returned result: ${jobResult}"
+                                buildResults['steps'][step_name] = jobResult
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -282,13 +282,37 @@ pipeline {
                 }
             }
         }
-
-        stage('Validation: Validate CAPIF'){
-           steps{
-               script {
+        stage('Validation: NEF Services logged at CAPIF') {
+            steps {
+                script {
+                    def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-NEF Services Check', wait: true, propagate: false,
+                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                    booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
+                    if (jobResult == 'SUCCESS') {
+                sh '''#!/bin/bash
+                        result_file="006-report-nef-logging.json"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                        curl  $url -u $ARTIFACTORY_CRED -o $result_file
+                        '''
+                def nef_services_check_results = readJSON file: '006-report-nef-logging.json'
+                buildResults['steps'][step_nef_services_apis] = nef_services_check_results
+                    }
+                }
+            }
+        }
+        stage('Validation: Validate CAPIF') {
+            steps {
+                script {
                     def step_name = step_validate_capif
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                                    parameters: [string(name: 'BRANCH_NAME', value: "pipeline-tests"),
+                                    parameters: [string(name: 'BRANCH_NAME', value: 'pipeline-tests'),
                                                 booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
                                                 string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
                                                 string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
@@ -302,8 +326,8 @@ pipeline {
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
                     }
-               }
-           }
+                }
+            }
         }
         //11
         stage('Validation: Tests to Network App') {
@@ -355,31 +379,7 @@ pipeline {
 //                    }
 //                }
 //
-                stage('Validation: NEF Services logged at CAPIF'){
-                    steps {
-                        script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-NEF Services Check', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
-                            if (jobResult == 'SUCCESS') {
-                                sh '''#!/bin/bash
-                                result_file="006-report-nef-logging.json"
-                                url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
-                                curl  $url -u $ARTIFACTORY_CRED -o $result_file
-                                '''
-                                def nef_services_check_results = readJSON file: '006-report-nef-logging.json'
-                                buildResults['steps'][step_nef_services_apis] = nef_services_check_results
-                            }
-                        }
-                    }
-                }
+
                 //Review Parameters
                 //jenkins-dummy
                 //16
@@ -420,26 +420,26 @@ pipeline {
                 //     }
                 // }
 
-                //Review Parameters
-                //jenkins-dummy
-                //18
-                // stage('Validation: NEF Services MonitoringEvent') {
-                //     steps {
-                //         script {
-                //             def step_name = step_nef_services_monitoringevent
-                //             buildResults['steps'][step_name] = 'FAILURE'
-                //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
-                //                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
-                //             def jobResult = jobBuild.getResult()
-                //             echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
-                //             buildResults['steps'][step_name] = jobResult
-                //         }
-                //     }
-                // }
+            //Review Parameters
+            //jenkins-dummy
+            //18
+            // stage('Validation: NEF Services MonitoringEvent') {
+            //     steps {
+            //         script {
+            //             def step_name = step_nef_services_monitoringevent
+            //             buildResults['steps'][step_name] = 'FAILURE'
+            //             def jobBuild = build job: '/003-NETAPPS/003-Helpers/012-NEF MonitoringEvent', wait: true, propagate: false,
+            //                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+            //                             string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+            //                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+            //                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+            //                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
+            //             def jobResult = jobBuild.getResult()
+            //             echo "Build of 'NEF Services as SessionWithQoS' returned result: ${jobResult}"
+            //             buildResults['steps'][step_name] = jobResult
+            //         }
+            //     }
+            // }
             }
         }
 
@@ -458,7 +458,7 @@ pipeline {
         always {
             retry(3) {
                 script {
-                    echo "Destroy Network App"
+                    echo 'Destroy Network App'
                     // def step_name = step_destroy_network_app
                     // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
@@ -468,12 +468,12 @@ pipeline {
                             ]
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
-                    // buildResults['steps'][step_name] = jobResult
+                // buildResults['steps'][step_name] = jobResult
                 }
             }
             retry(3) {
                 script {
-                    echo "Destroy NEF"
+                    echo 'Destroy NEF'
                     // def step_name = step_destroy_nef
                     // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '002-NEF/nef-destroy', wait: true, propagate: false,
@@ -483,12 +483,12 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy NEF' returned result: ${jobResult}"
-                    // buildResults['steps'][step_name] = jobResult
+                // buildResults['steps'][step_name] = jobResult
                 }
             }
             retry(3) {
                 script {
-                    echo "Destroy CAPIF"
+                    echo 'Destroy CAPIF'
                     // def step_name = step_destroy_capif
                     // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/001-CAPIF/destroy', wait: true, propagate: false,
@@ -498,7 +498,7 @@ pipeline {
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Destroy CAPIF' returned result: ${jobResult}"
-                    // buildResults['steps'][step_name] = jobResult
+                // buildResults['steps'][step_name] = jobResult
                 }
             }
             dir("${env.WORKSPACE}/") {
@@ -509,7 +509,7 @@ pipeline {
                     if (buildResults['tests_ok'] == false) {
                         buildResults['result'] = 'FAILURE'
                     }
-                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ','').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
