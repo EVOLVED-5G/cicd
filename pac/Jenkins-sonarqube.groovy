@@ -8,14 +8,15 @@ String netappName(String url) {
 }
 
 def getAgent(deployment) {
-    String var = deployment
-    if ('openshift'.equals(var)) {
-        return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
-        return 'evol5-athens'
-    }else {
-        return 'evol5-slave'
-    }
+    // String var = deployment
+    // if ('openshift'.equals(var)) {
+    //     return 'evol5-openshift'
+    // }else if ('kubernetes-athens'.equals(var)) {
+    //     return 'evol5-athens'
+    // }else {
+    //     return 'evol5-slave'
+    // }
+    return 'evol5-slave2'
 }
 
 pipeline {
