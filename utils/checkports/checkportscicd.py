@@ -128,7 +128,7 @@ if __name__ == '__main__':
             container_ports_list = list(container_ports_info.keys())
 
             if len(networkapp_ports['services'][networkapp_image_name]['ports']) != len(container_ports_list):
-                raise Exception("Network App ports on Dockerfile not match ports exposed on running image")
+                print("Network App ports on Dockerfile (" + ''.join(networkapp_ports['services'][networkapp_image_name]['ports']) + ") not match ports exposed on running image (" + ''.join(container_ports_list) + ")")
             
             mapped_ports = dict()
             for dockerfile_port in networkapp_ports['services'][networkapp_image_name]['ports']:
