@@ -47,7 +47,7 @@ pipeline {
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        REPORT_FILENAME = '001-report-sonar'
+        REPORT_FILENAME = '000-report-sonarqube'
     }
 
     stages {

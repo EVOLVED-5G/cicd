@@ -39,7 +39,7 @@ def getHttpsPort(deployment) {
     }
 }
 
-def step_static_code_analysis = 'static-code-analysis'
+def step_static_code_analysis = 'sonarqube-static-code-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
