@@ -358,43 +358,44 @@ pipeline {
         //                     report_file="${REPORT_FILENAME}.$x"
         //                     url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-        //                     curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-        //                         --data-binary @"$report_file" \
-        //                         "$url"
-        //                 done
-        //         '''
-        //         }
-        //     }
-        // }
+    //                     curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+    //                         --data-binary @"$report_file" \
+    //                         "$url"
+    //                 done
+    //         '''
+    //         }
+    //     }
+    // }
     }
     post {
         always {
             retry(2) {
-                if ("${params.REPORTING}".toBoolean() == true) {
-                     sh '''#!/bin/bash
+                script {
+                    if ("${params.REPORTING}".toBoolean() == true) {
+                        sh '''#!/bin/bash
+                        # get Commit Information
+                        cd $NETAPP_NAME_LOWER
+                        commit=$(git rev-parse HEAD)
+                        cd ..
 
-                    # get Commit Information
-                    cd $NETAPP_NAME_LOWER
-                    commit=$(git rev-parse HEAD)
-                    cd ..
+                        urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME_LOWER/wiki/Telefonica-Evolved5g-$NETAPP_NAME_LOWER
+                        versionT=${VERSION}
 
-                    urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME_LOWER/wiki/Telefonica-Evolved5g-$NETAPP_NAME_LOWER
-                    versionT=${VERSION}
+                        python3 utils/report_generator.py --template templates/step-build.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME
+                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
+                        declare -a files=("json" "md" "pdf")
 
-                    python3 utils/report_generator.py --template templates/step-build.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME
-                    docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
-                    declare -a files=("json" "md" "pdf")
+                        for x in "${files[@]}"
+                            do
+                                report_file="${REPORT_FILENAME}.$x"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                    for x in "${files[@]}"
-                        do
-                            report_file="${REPORT_FILENAME}.$x"
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
-
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                --data-binary @"$report_file" \
-                                "$url"
-                        done
-                    '''
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                    --data-binary @"$report_file" \
+                                    "$url"
+                            done
+                        '''
+                    }
                 }
             }
             sh '''
