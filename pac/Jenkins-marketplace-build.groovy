@@ -20,7 +20,7 @@ pipeline {
         string(name: 'GIT_MARKET_BLOCKCHAIN_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace-blockchain-integration.git', description: 'marketplace Blockchain repository.')
         string(name: 'GIT_MARKET_BLOCKCHAIN_BRANCH', defaultValue: 'main', description: 'Marketplace Blockchain branch name')
         string(name: 'GIT_MARKET_TMF620_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace-tmf620-api.git', description: 'marketplace Tmf620 repository.')
-        string(name: 'GIT_MARKET_TMF620_BRANCH', defaultValue: 'main', description: 'Marketplace TMF620 branch name')
+        string(name: 'GIT_MARKET_TMF620_BRANCH', defaultValue: 'master', description: 'Marketplace TMF620 branch name')
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
     }
 
