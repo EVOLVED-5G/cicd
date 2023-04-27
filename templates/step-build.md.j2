@@ -1,17 +1,16 @@
 
-# Build Step report
+# NETWORK APP BUILD AND PORT CHECK
 ***
 
-This step build needed images for current Network App.
+This step build needed images for current Network App, checks ports exposed and publish docker images.
 
-## SERVICES
 {{repo}} Network apps are composed of the following services:
 {%-for service_name, service_info in services.items()%}
 {%- set service_name = service_name.split(':')[0] %}
 * {{service_name}}
 {%-endfor %}
 
-## PORTS
+## Check Ports Exposed Result
 Each individual service that exposes a port are checked:
 
 | Service Name | Port | Status |
@@ -28,18 +27,18 @@ Each individual service that exposes a port are checked:
   {%- endfor %}  
 {%- endfor %}
 
-## IMAGES
-Urls of Images pushed:
+## Publication of Network App docker images
+Urls of Images published:
 {%- for service_name,service_info in services.items() %}
 {% set service_name = service_name.split(':')[0] %}
-**{{service_name}}**
+Image: **{{service_name}}**
 
-Artifact:
+Evolved-5G open repository:
   {%- for image in service_info.docker_hub_images %}
 * {{image}}
   {%- endfor %}
 
-Public image:
+Evolved-5G AWS Docker Registry:
   {%- for image in service_info.aws_images %}
 * {{image}}
   {%- endfor %} 

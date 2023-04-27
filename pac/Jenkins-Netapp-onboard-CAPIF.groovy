@@ -37,6 +37,9 @@ pipeline {
                     expression { DEPLOYMENT == "kubernetes-uma" }
                 }
             }
+            options {
+                retry(12)
+            }
             steps {
                  dir ("${WORKSPACE}/") {
                     script {
@@ -80,6 +83,9 @@ pipeline {
                 }
             environment {
                 TOKEN_NS_CAPIF = credentials("token-os-capif")
+            }
+            options {
+                retry(12)
             }
             steps {
                  dir ("${WORKSPACE}/") {
