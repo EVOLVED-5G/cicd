@@ -18,12 +18,12 @@ The Source Code analysis has been performed using SonarQube version {{version}}
 |---|---|
 {%- for summary_type in summary %}
 | {{summary_type}} | {{summary[summary_type]}}|
-        {%- if summary_type == "blocker" %}
-          {%- if summary[summary_type] > 0 %}
-            {% if blocker_issues.append(1) %}{% endif %}
-          {%- endif %}
-        {%- endif %}
-  {%- endfor %}
+        {%- if summary_type == "blocker" -%}
+          {%- if summary[summary_type] > 0 -%}
+            {%- if blocker_issues.append(1) -%}{%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+{%- endfor %}
 ***
 {% if not blocker_issues %} 
 Good work. Network App code does not have any blocker issues.
