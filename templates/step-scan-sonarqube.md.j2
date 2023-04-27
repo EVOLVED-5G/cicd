@@ -33,10 +33,10 @@ The Source Code Analysis results have failed because we have found the following
 ### Blocker issues
 | Issue | Status | Line | Component | Description | 
 |---|---|---|---|---|
-{%- for issue_type in issues %}
-  {% if issue_type.severity in ["blocker"] %} 
+{%- for issue_type in issues -%}
+  {%- if issue_type.severity in ["BLOCKER"] %} 
 | {{ loop.index }} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
-  {%- endif %}
+  {%- endif -%}
 {%- endfor %}
 {%- endif %}
 The information for critical, major and minor issues can be found in the following link: {{url}}
