@@ -26,7 +26,7 @@ spec:
         io.kompose.service: {{ .Values.mktp_tmf_service }}
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/marketplace/marketplace-tmf-4.0.0:1.0"
+        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_tmf_api_container:{{ .Values.version }}"
           name: {{ .Values.mktp_tmf_service }}
           env:
             - name: MONGO_URL

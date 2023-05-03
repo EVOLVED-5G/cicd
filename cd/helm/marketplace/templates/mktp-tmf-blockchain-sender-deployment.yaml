@@ -26,7 +26,7 @@ spec:
         io.kompose.service: {{ .Values.mktp_blockchain_sender_service }}
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/marketplace/marketplace-blockchain-sender:1.0"
+        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_blockchain_sender:{{ .Values.version }}"
           name: {{ .Values.mktp_blockchain_sender_service }}
           ports:
             - containerPort: 8000
