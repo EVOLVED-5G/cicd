@@ -76,6 +76,7 @@ pipeline {
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.1.2.beta', description: 'Version CAPIF')
+        string(name: 'CAPIF_TESTS_BRANCH', defaultValue: 'develop', description: 'Branch to use for CAPIF tests')
         string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         string(name: 'RELEASE_NEF', defaultValue: 'nef', description: 'Helm Release name to NEF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
@@ -370,7 +371,7 @@ pipeline {
                 script {
                     // def step_name = step_validate_capif
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                        parameters: [string(name: 'BRANCH_NAME', value: 'pipeline-tests'),
+                        parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(CAPIF_TESTS_BRANCH)),
                                     booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
                                     string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
                                     string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
