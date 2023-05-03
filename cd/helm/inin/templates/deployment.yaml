@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "inin.fullname" . }}-rmonnetapp
+  labels:
+    io.kompose.service: rmonnetapp
+  {{- include "inin.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yaml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: rmonnetapp
+    {{- include "inin.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/ininrmonnetapp-default: "true"
+        io.kompose.service: rmonnetapp
+      {{- include "inin.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yaml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: CALLBACK_ADDRESS
+              name: {{ include "inin.fullname" . }}-env
+        - name: CAPIF_CALLBACK_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_CALLBACK_ADDRESS
+              name: {{ include "inin.fullname" . }}-env
+        - name: CAPIF_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_HOSTNAME
+              name: {{ include "inin.fullname" . }}-env
+        - name: CAPIF_PATH
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_PATH
+              name: {{ include "inin.fullname" . }}-env
+        - name: CAPIF_PORT_HTTP
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_PORT_HTTP
+              name: {{ include "inin.fullname" . }}-env
+        - name: CAPIF_PORT_HTTPS
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_PORT_HTTPS
+              name: {{ include "inin.fullname" . }}-env
+        - name: COLLECTOR_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: COLLECTOR_HOST
+              name: {{ include "inin.fullname" . }}-env
+        - name: COLLECTOR_PASS
+          valueFrom:
+            configMapKeyRef:
+              key: COLLECTOR_PASS
+              name: {{ include "inin.fullname" . }}-env
+        - name: COLLECTOR_USER
+          valueFrom:
+            configMapKeyRef:
+              key: COLLECTOR_USER
+              name: {{ include "inin.fullname" . }}-env
+        - name: MN_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: MN_HOST
+              name: {{ include "inin.fullname" . }}-env
+        - name: MN_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              key: MN_TOKEN
+              name: {{ include "inin.fullname" . }}-env
+        - name: NET_API_ADDRESS
+          valueFrom:
+            configMapKeyRef:
+              key: NET_API_ADDRESS
+              name: {{ include "inin.fullname" . }}-env
+        - name: NET_API_PASS
+          valueFrom:
+            configMapKeyRef:
+              key: NET_API_PASS
+              name: {{ include "inin.fullname" . }}-env
+        - name: NET_API_PROT
+          valueFrom:
+            configMapKeyRef:
+              key: NET_API_PROT
+              name: {{ include "inin.fullname" . }}-env
+        - name: NET_API_USER
+          valueFrom:
+            configMapKeyRef:
+              key: NET_API_USER
+              name: {{ include "inin.fullname" . }}-env
+        - name: NET_APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: NET_APP_NAME
+              name: {{ include "inin.fullname" . }}-env
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.netapp.rmonnetapp.image.repository }}-{{ .Values.netapp.rmonnetapp.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: rmonnetapp
+        ports:
+        - containerPort: 80
+        resources: {}
+      restartPolicy: Always

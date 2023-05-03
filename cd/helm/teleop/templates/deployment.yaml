@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "teleop.fullname" . }}-netapp
+  labels:
+    io.kompose.service: teleop-netapp
+  {{- include "teleop.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: teleop-netapp
+    {{- include "teleop.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: teleop-netapp
+      {{- include "teleop.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: UE_ID
+          value: "10.0.0.3"
+        - name: DESTINATION_ADDRESS
+          value: http://{{ .Values.env.frontendAddress }}/monitoring/callback
+        - name: ENDPOINT_ADDRESS
+          value: {{ quote .Values.env.frontendAddress }}
+        - name: HOST_OF_THE_NEF_EMULATOR
+          value: "https://{{ .Values.env.nefAddress }}:{{ .Values.env.capifPortHttps }}"
+        - name: USERNAME
+          value: {{ quote .Values.env.nefUser }}
+        - name: PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.env.capifPortHttp }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.env.capifPortHttps }}
+        - name: CALLBACK_ADDRESS
+          value: http://{{ .Values.env.frontendAddress }}
+        image: {{ .Values.netapp.teleopNetapp.image.repository }}-{{ .Values.netapp.teleopNetapp.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: teleopnetapp
+        ports:
+          - containerPort: 5000
+        resources: {} 
+      restartPolicy: Always

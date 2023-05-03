@@ -74,6 +74,7 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.netapp.gmiNetappContainer.image.repository }}-{{ .Values.netapp.gmiNetappContainer.image.tag
           | default .Chart.AppVersion }}
+        imagePullPolicy: Always
         name: gmi-netapp-container
         ports:
         - containerPort: 8383

@@ -1,8 +1,0 @@
-name: PAL-teleopnetapp
-description: A generated Helm Chart for nef from Skippbox Kompose
-version: 0.0.1
-apiVersion: v1
-keywords:
-  - teleopnetapp
-sources:
-home:
