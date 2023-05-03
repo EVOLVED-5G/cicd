@@ -39,13 +39,13 @@ def getHttpsPort(deployment) {
     }
 }
 
-def step_static_code_analysis = 'sonarqube-static-code-analysis'
+def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
-def step_validate_capif = 'validate-capif'
+// def step_validate_capif = 'validate-capif'
 def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
 def step_discover_nef_apis = 'discover-apis'
 // def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
@@ -56,7 +56,7 @@ def step_destroy_nef = 'destroy-nef'
 def step_destroy_capif = 'destroy-capif'
 def step_open_source_licenses_report = 'open-source-licenses-report'
 
-def initial_status = 'PENDING'
+def initial_status = 'SKIPPED'
 def not_report = 'NOT_REPORT'
 
 pipeline {
@@ -114,7 +114,7 @@ pipeline {
                     buildResults['steps'][step_build] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
-                    buildResults['steps'][step_validate_capif] = initial_status
+                    // buildResults['steps'][step_validate_capif] = initial_status
                     buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
                     // buildResults['steps'][step_discover_nef_apis] = initial_status
                     // buildResults['steps'][step_nef_services_monitoringevent_api] = initial_status
@@ -310,7 +310,7 @@ pipeline {
         stage('Validation: Validate CAPIF') {
             steps {
                 script {
-                    def step_name = step_validate_capif
+                    // def step_name = step_validate_capif
                     def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
                         parameters: [string(name: 'BRANCH_NAME', value: 'pipeline-tests'),
                                     booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
@@ -321,7 +321,7 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
 
-                    buildResults['steps'][step_name] = jobResult
+                    // buildResults['steps'][step_name] = jobResult
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
                     }
