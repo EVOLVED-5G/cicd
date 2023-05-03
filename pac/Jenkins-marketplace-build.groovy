@@ -168,17 +168,17 @@ pipeline {
     }
     post {
         always {
-            dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
-                sh'''
-                docker-compose down --volumes
-                '''
-            }
             dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
                 sh'''
                 docker-compose down --volumes
                 '''
             }
             dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
+                sh'''
+                docker-compose down --volumes
+                '''
+            }
+            dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                 sh'''
                 docker-compose down --volumes
                 '''
