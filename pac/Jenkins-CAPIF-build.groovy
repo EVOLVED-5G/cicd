@@ -19,7 +19,7 @@ pipeline {
     parameters {
         string(name: 'VERSION', defaultValue: '3.0', description: '')
         string(name: 'GIT_CAPIF_URL', defaultValue: 'https://github.com/EVOLVED-5G/CAPIF_API_Services', description: 'URL of the Github Repository')
-        string(name: 'GIT_CAPIF_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
+        string(name: 'GIT_CAPIF_BRANCH', defaultValue: 'develop', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
     }
