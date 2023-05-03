@@ -11,4 +11,4 @@ mktp_phpmyadmin_service: mktp-phpmyadmin
 mktp_tmf_service: mktp-tmf
 mktp_tmf_db_service: mktp-tmf-db
 mktp_blockchain_sender_service: mktp-blockchain-sender
-version: "1.3.0"
+version: "1.11"
