@@ -1,54 +1,60 @@
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    }else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
     }else {
-        return "evol5-slave";
+        return 'evol5-slave'
     }
 }
 
 pipeline {
-    agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
+    agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }")}}
 
     parameters {
-        string(name: 'VERSION', defaultValue: '1.0', description: '')
+        string(name: 'VERSION', defaultValue: '1.11', description: '')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'GIT_MARKET_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace', description: 'URL of the NEF Github Repository')
         string(name: 'GIT_MARKET_BRANCH', defaultValue: 'main', description: 'Marketplace branch name')
-        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
+        string(name: 'GIT_MARKET_BLOCKCHAIN_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace-blockchain-integration.git', description: 'marketplace Blockchain repository.')
+        string(name: 'GIT_MARKET_BLOCKCHAIN_BRANCH', defaultValue: 'main', description: 'Marketplace Blockchain branch name')
+        string(name: 'GIT_MARKET_TMF620_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace-tmf620-api.git', description: 'marketplace Tmf620 repository.')
+        string(name: 'GIT_MARKET_TMF620_BRANCH', defaultValue: 'master', description: 'Marketplace TMF620 branch name')
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
     }
 
     environment {
-        GIT_MARKET_URL="${params.GIT_MARKET_URL}"
-        GIT_CICD_BRANCH="${params.GIT_CICD_BRANCH}"
-        GIT_MARKET_BRANCH="${params.GIT_MARKET_BRANCH}"
-        VERSION="${params.VERSION}"
+        GIT_MARKET_URL = "${params.GIT_MARKET_URL}"
+        GIT_CICD_BRANCH = "${params.GIT_CICD_BRANCH}"
+        GIT_MARKET_BRANCH = "${params.GIT_MARKET_BRANCH}"
+        VERSION = "${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = '709233559969'
-        FOLDER_NAME = "marketplace"
+        MKTP_FOLDER_NAME = 'marketplace'
+        MKTP_BLOCKCHAIN_FOLDER_NAME = 'marketplace-blockchain-integration'
+        MKTP_TMF620_FOLDER_NAME = 'marketplace-tmf620-integration'
     }
     stages {
         stage('Get the code!') {
             options {
                     timeout(time: 10, unit: 'MINUTES')
                     retry(1)
-                }
+            }
             steps {
-                dir ("${env.WORKSPACE}/") {
+                dir("${env.WORKSPACE}/") {
                     sh '''
-                    mkdir $FOLDER_NAME 
-                    cd $FOLDER_NAME
-                    git clone --single-branch --branch $GIT_MARKET_BRANCH $GIT_MARKET_URL .
+                    git clone --single-branch --branch $GIT_MARKET_BRANCH $GIT_MARKET_URL $MKTP_FOLDER_NAME
+                    git clone --single-branch --branch $GIT_MARKET_BLOCKCHAIN_BRANCH $GIT_MARKET_BLOCKCHAIN_URL $MKTP_BLOCKCHAIN_FOLDER_NAME
+                    git clone --single-branch --branch $GIT_MARKET_TMF620_BRANCH $GIT_MARKET_TMF620_URL $MKTP_TMF620_FOLDER_NAME
                     '''
                 }
-           }
+            }
         }
         // These stages are the indicated by Demokritos to install NEF Emulator
-        stage('Create local .env file') {
+        stage('Select docker-compose yaml to use') {
             steps {
-                dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
+                dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                     mv docker-compose-immutable.yml docker-compose.yml
                     '''
@@ -57,7 +63,7 @@ pipeline {
         }
         stage('Configure container Images') {
             steps {
-                dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
+                dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                         cp .env.example .env
                         uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
@@ -87,16 +93,13 @@ pipeline {
                         sed -i "s,^[ ]*CRYPTO_NETWORK=.*,CRYPTO_NETWORK=goerli,g" .env
                         sed -i "s,^[ ]*FORUM_URL=.*,FORUM_URL=http://evolved5g-marketplace-forum.evolved-5g.gr/,g" .env
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
-                        echo 'MIX_APP_ENV=${APP_ENV}' >> .env
-                        echo 'NETAPP_FINGERPRINT_BASE_URL=http://artifactory.hi.inet/artifactory/misc-evolved5g/certification/' >> .env
-                        echo 'MIX_NETAPP_OPEN_REPOSITORY_DOCKER_IMAGE_BASE_URL=https://dockerhub.hi.inet/evolved5g/certification/' >> .env
                     '''
                 }
             }
         }
         stage('Run the containers') {
             steps {
-                dir ("${env.WORKSPACE}/${FOLDER_NAME}/"){
+                dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                     make build
                     docker exec -i evolved5g_pilot_marketplace_laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
@@ -105,10 +108,28 @@ pipeline {
                 }
             }
         }
-        stage('Modify image name and upload to AWS') {   
+        stage('build blockchain service') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
-                    script {    
+                dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
+                    sh'''
+                    docker-compose up --build -d
+                    '''
+                }
+            }
+        }
+        stage('build tmf620 service') {
+            steps {
+                dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
+                    sh'''
+                    docker-compose up --build -d
+                    '''
+                }
+            }
+        }
+        stage('Modify image name and upload to AWS') {
+            steps {
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    script {
                         def cmd = "docker ps --format '{{.Image}}'"
                         def cmd2 = "docker ps --format '{{.Names}}'"
                         def image = sh(returnStdout: true, script: cmd).trim()
@@ -125,10 +146,10 @@ pipeline {
             }
         }
 
-        stage('Modify container name to upload Docker-compose to Artifactory') { 
+        stage('Modify container name to upload Docker-compose to Artifactory') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    script {  
+                    script {
                         sh ''' echo ${ARTIFACTORY_CREDENTIALS} | docker login --username ${ARTIFACTORY_USER} --password-stdin dockerhub.hi.inet '''
                         def cmd = "docker ps --format '{{.Image}}'"
                         def cmd2 = "docker ps --format '{{.Names}}'"
@@ -141,18 +162,33 @@ pipeline {
                             sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/marketplace/"${x[1]}" """
                         }
                     }
-                }               
+                }
             }
-        }   
+        }
     }
     post {
         always {
+            dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
+                sh'''
+                docker-compose down --volumes
+                '''
+            }
+            dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
+                sh'''
+                docker-compose down --volumes
+                '''
+            }
+            dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
+                sh'''
+                docker-compose down --volumes
+                '''
+            }
             sh '''
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             '''
         }
-        cleanup{
+        cleanup {
             /* clean up our workspace */
             deleteDir()
             /* clean up tmp directory */

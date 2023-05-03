@@ -26,7 +26,7 @@ spec:
         io.kompose.service: {{ .Values.mktp_tmf_db_service }}
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/marketplace/marketplace-tmf-db-4.4.6:1.0"
+        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_tmf_mongo_container:{{ .Values.version }}"
           name: {{ .Values.mktp_tmf_db_service }}
           ports:
             - containerPort: 27017
