@@ -159,6 +159,7 @@ pipeline {
                     sleep 10
                     docker ps|grep ${NETAPP_NAME_LOWER} || echo "Docker exited"
                     docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id
+                    docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id >> ${env.WORKSPACE}/${NETAPP_NAME_LOWER}-build-runtime_error.log
                     docker ps|grep ${NETAPP_NAME_LOWER} || exit 1
                     '''
                     }
@@ -350,7 +351,7 @@ pipeline {
                             urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME_LOWER/wiki/Telefonica-Evolved5g-$NETAPP_NAME_LOWER
                             versionT=${VERSION}
 
-                            python3 utils/report_generator.py --template templates/step-build.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME
+                            python3 utils/report_generator.py --template templates/step-build.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME --logs ${NETAPP_NAME_LOWER}-build-runtime_error.log
                             docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
                             declare -a files=("json" "md" "pdf")
 

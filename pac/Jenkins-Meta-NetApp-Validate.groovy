@@ -330,14 +330,12 @@ pipeline {
                                 sh '''#!/bin/bash
                                 result_file="006-report-nef-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
-                                curl  -f $url -u $ARTIFACTORY_CRED -o $result_file
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
                                     buildResults['steps'][step_nef_services_apis] = nef_services_check_results
-                                } else {
-                                    echo 'No result obtained'
                                 }
                             }
                         }
