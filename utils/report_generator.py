@@ -29,8 +29,12 @@ if len(sys.argv) > 7:
         print("Add parameter " + parameter_name + ":" + value)
         
         if parameter_name == 'logs':
-            with open(value) as file:
-                optional_arguments[parameter_name] = file.readlines()
+            try:
+                with open(value) as file:
+                    optional_arguments[parameter_name] = file.readlines()
+            except FileNotFoundError:
+                print("No error logs present.")
+                optional_arguments[parameter_name] = list()
         else:
             print("Add parameter " + parameter_name + ":" + value)
             optional_arguments[parameter_name] = value
