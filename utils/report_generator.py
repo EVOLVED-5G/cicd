@@ -26,9 +26,14 @@ if len(sys.argv) > 7:
             break
         value = sys.argv[index+1]
         parameter_name = sys.argv[index].replace('--','')
-
         print("Add parameter " + parameter_name + ":" + value)
-        optional_arguments[parameter_name] = value
+        
+        if parameter_name == 'logs':
+            with open(value) as file:
+                optional_arguments[parameter_name] = file.readlines()
+        else:
+            print("Add parameter " + parameter_name + ":" + value)
+            optional_arguments[parameter_name] = value
 print("Optional Arguments:")
 print(json.dumps(optional_arguments, indent=4))
 

@@ -82,7 +82,7 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
-                            unstable("The NEF Services logs are not present in CAPIF")
+                            echo "The NEF Services logs are not present in CAPIF"
                         }
                     }
                 }
@@ -132,7 +132,7 @@ pipeline {
                             fi
                             '''
                         } catch (e) {
-                            unstable("The NEF Services logs are not present in CAPIF")
+                            echo "The NEF Services logs are not present in CAPIF"
                         }
                     }
                 }

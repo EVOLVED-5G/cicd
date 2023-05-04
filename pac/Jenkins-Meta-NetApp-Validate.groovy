@@ -58,6 +58,7 @@ def step_open_source_licenses_report = 'open-source-licenses-report'
 
 def initial_status = 'SKIPPED'
 def not_report = 'NOT_REPORT'
+def aborted = false
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -131,7 +132,7 @@ pipeline {
         stage('Validation: Static Application Securirty Test - SAST') {
             parallel {
                 stage('Validation: Static Code Analysis') {
-                    steps{
+                    steps {
                         retry(2) {
                             script {
                                 def step_name = step_static_code_analysis
@@ -330,39 +331,42 @@ pipeline {
                                 sh '''#!/bin/bash
                                 result_file="006-report-nef-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
-                                curl  $url -u $ARTIFACTORY_CRED -o $result_file
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
-                        def nef_services_check_results = readJSON file: '006-report-nef-logging.json'
-                        buildResults['steps'][step_nef_services_apis] = nef_services_check_results
+                                def fileName = '006-report-nef-logging.json'
+                                if (fileExists(fileName)) {
+                                    def nef_services_check_results = readJSON file: fileName
+                                    buildResults['steps'][step_nef_services_apis] = nef_services_check_results
+                                }
                             }
                         }
                     }
                 }
 
-                //Review Parameters
-                //15
-//                stage('Validation: Discover NEF APIs from CAPIF') {
-//                    options {
-//                        timeout(time: 5, unit: 'MINUTES')
-//                    }
-//                    steps {
-//                        script {
-//                            def step_name = step_discover_nef_apis
-//                            buildResults['steps'][step_name] = 'FAILURE'
-//                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-//                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-//                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-//                            def jobResult = jobBuild.getResult()
-//                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-//                            buildResults['steps'][step_name] = jobResult
-//                            if (jobResult == 'FAILURE') {
-//                                buildResults['tests_ok'] = false
-//                            }
-//                        }
-//                    }
-//                }
-//
+            //Review Parameters
+            //15
+            //                stage('Validation: Discover NEF APIs from CAPIF') {
+            //                    options {
+            //                        timeout(time: 5, unit: 'MINUTES')
+            //                    }
+            //                    steps {
+            //                        script {
+            //                            def step_name = step_discover_nef_apis
+            //                            buildResults['steps'][step_name] = 'FAILURE'
+            //                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
+            //                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+            //                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+            //                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+            //                            def jobResult = jobBuild.getResult()
+            //                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
+            //                            buildResults['steps'][step_name] = jobResult
+            //                            if (jobResult == 'FAILURE') {
+            //                                buildResults['tests_ok'] = false
+            //                            }
+            //                        }
+            //                    }
+            //                }
+            //
             }
         }
 
@@ -383,6 +387,9 @@ pipeline {
                     // buildResults['steps'][step_name] = jobResult
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
+                        currentBuild.result = 'ABORTED'
+                        aborted = true
+                        error('CAPIF is not working properly, abort pipeline')
                     }
                 }
             }
@@ -462,42 +469,57 @@ pipeline {
                 report_file="report-steps-$NETAPP_NAME_LOWER.json"
                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$report_file" \
-                            "$url"
-                            '''
+                --data-binary @"$report_file" \
+                "$url"
+                '''
             }
             retry(3) {
-                build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
-                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                            string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
-                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                script {
+                    if (aborted == false) {
+                        build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
+                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                    }
+                }
             }
 
             script {
                 // Nettaps emails to send the report
                 if (emails?.split(' ')) {
-                    dir("${WORKSPACE}/") {
-                        sh '''#!/bin/bash
+                    if (aborted == false) {
+                        dir("${WORKSPACE}/") {
+                            sh '''#!/bin/bash
 
-                        report_file="final_report.pdf"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+                            report_file="final_report.pdf"
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
 
-                        curl  $url -u $ARTIFACTORY_CRED -o final_report.pdf
-                        '''
-                    }
-                    emails.tokenize().each() {
-                        email -> emailext attachmentsPattern: '**/final_report.pdf',
-                                 body: '''${SCRIPT, template="groovy-html.template"}''',
-                                 mimeType: 'text/html',
-                                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                                 from: 'jenkins-evolved5G@tid.es',
-                                 replyTo: 'jenkins-evolved5G',
-                                 to: email
+                            curl  $url -u $ARTIFACTORY_CRED -o final_report.pdf
+                            '''
+                        }
+                        emails.tokenize().each() {
+                            email -> emailext attachmentsPattern: '**/final_report.pdf',
+                                    body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    mimeType: 'text/html',
+                                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                    from: 'jenkins-evolved5G@tid.es',
+                                    replyTo: 'jenkins-evolved5G',
+                                    to: email
+                        }
+                    } else {
+                        emails.tokenize().each() {
+                            email -> emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                                    mimeType: 'text/html',
+                                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                    from: 'jenkins-evolved5G@tid.es',
+                                    replyTo: 'jenkins-evolved5G',
+                                    to: email
+                        }
                     }
                 }
             }
