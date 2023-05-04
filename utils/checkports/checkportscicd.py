@@ -118,7 +118,8 @@ if __name__ == '__main__':
             containers_list = client.containers.list(filters={"ancestor":networkapp_image_name})
             container = dict()
 
-            print("Container list obtained: " + ' '.join(containers_list))
+            if len(containers_list) > 0:
+                print("Container list obtained: " + ' '.join(containers_list))
             if len(containers_list) == 1:
                 container = containers_list[0]
                 print("Container " + container.attrs['Config']['Image'] + " found")
