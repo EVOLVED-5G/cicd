@@ -454,38 +454,38 @@ pipeline {
                 }
             }
             dir("${env.WORKSPACE}/") {
-                if (aborted == false) {
-                    script {
-                        buildResults['environment'] = String.valueOf(ENVIRONMENT)
-                        buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
-                        buildResults['result'] = currentBuild.currentResult
-                        if (buildResults['tests_ok'] == false) {
-                            buildResults['result'] = 'FAILURE'
-                        }
-                        buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
-                        buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
-                        writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
+                script {
+                    buildResults['environment'] = String.valueOf(ENVIRONMENT)
+                    buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
+                    buildResults['result'] = currentBuild.currentResult
+                    if (buildResults['tests_ok'] == false) {
+                        buildResults['result'] = 'FAILURE'
                     }
-                    sh '''#!/bin/bash
-                    report_file="report-steps-$NETAPP_NAME_LOWER.json"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
-                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                    --data-binary @"$report_file" \
-                    "$url"
-                    '''
+                    buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
+                    buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
+                    writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
                 }
+                sh '''#!/bin/bash
+                report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                --data-binary @"$report_file" \
+                "$url"
+                '''
             }
             retry(3) {
-                if (aborted == false) {
-                    build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
-                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                            string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
-                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                script {
+                    if (aborted == false) {
+                        build job: '/003-NETAPPS/003-Helpers/100-Generate Final Report', wait: true, propagate: true,
+                        parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
+                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                    }
                 }
             }
 
