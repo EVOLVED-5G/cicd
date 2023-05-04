@@ -4,14 +4,14 @@
 
 This step build needed images for current Network App, checks ports exposed and publish docker images.
 
-{%- if logs|length > 0 -%}
+{% if logs|length > 0 %}
 Failure building image. Plase check output of docker containers during build process:
 ```
 {%- for line in logs %}
 {{ line }}
 {%- endfor %}
 ```
-{%- else -%}
+{% else %}
 {{repo}} Network apps are composed of the following services:
 {%-for service_name, service_info in services.items()%}
 {%- set service_name = service_name.split(':')[0] %}
