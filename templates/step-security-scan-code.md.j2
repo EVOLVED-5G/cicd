@@ -7,7 +7,7 @@ Branch used for the Analysis: {{branch}}
 Last Commit ID: {{commit}}
 
 The security scan has been performed using Trivy version {{version}}
-{% set repo_name = id.split("/") %}
+{% set repo_name = repo.split("/") %}
 {% set critical_issues = [] %}
 {% set possible_fixing = [] %}
 # Scan of {{type}}: {{repo_name|last}}
