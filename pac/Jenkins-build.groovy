@@ -157,9 +157,11 @@ pipeline {
                     docker build -t ${NETAPP_NAME_LOWER} .
                     container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
                     sleep 10
+                    cd ..
                     docker ps|grep ${NETAPP_NAME_LOWER} || echo "Docker exited"
                     docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id
-                    docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id >> ${env.WORKSPACE}/${NETAPP_NAME_LOWER}-build-runtime_error.log
+                    docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id > ${NETAPP_NAME_LOWER}-build-runtime_error.log 2>&1
+                    docker ps|grep ${NETAPP_NAME_LOWER} || echo '{"result":false}' | jq . > ${REPORT_FILENAME}.json
                     docker ps|grep ${NETAPP_NAME_LOWER} || exit 1
                     '''
                     }
