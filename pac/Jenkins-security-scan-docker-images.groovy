@@ -29,7 +29,7 @@ def getAgent(deployment) {
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
         retry(1)
     }
 
