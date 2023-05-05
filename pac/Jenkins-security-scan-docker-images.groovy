@@ -104,8 +104,10 @@ pipeline {
 
                     for x in "${images[@]}"
                     do
+                        echo "dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
                         curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
                         curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > ${REPORT_FILENAME}-$x.json
+                        ls -l
                     done
                     '''
                 }
