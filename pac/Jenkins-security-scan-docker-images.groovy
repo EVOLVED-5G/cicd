@@ -92,7 +92,7 @@ pipeline {
         stage('Launch Github Actions command') {
             options {
                     timeout(time: 30, unit: 'MINUTES')
-                    retry(3)
+                    retry(6)
             }
             steps {
                 dir("${env.WORKSPACE}/") {
@@ -101,12 +101,20 @@ pipeline {
 
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/${STAGE}/${NETAPP_NAME_LOWER} -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
                     images=($response)
-
+                    success=true
                     for x in "${images[@]}"
                     do
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=markdown&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
-                        curl -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > ${REPORT_FILENAME}-$x.json
+                        file=${REPORT_FILENAME}-$x.json
+                        echo "dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x"
+                        if [ -s $file ]; then
+                            echo "Report $file previously generated"
+                        else
+                            curl -f -s -H "Content-Type: application/json" -X POST "http://epg-trivy.hi.inet:5000/v1/scan-image?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json&image=dockerhub.hi.inet/evolved-5g/$STAGE/$NETAPP_NAME_LOWER/$x" > $file
+                            [[ -s $file ]] || success=false
+                        fi
+                        ls -l
                     done
+                    [[ "$success" == "true" ]] || exit 1
                     '''
                 }
             }
