@@ -157,7 +157,7 @@ pipeline {
                     sh '''#!/bin/bash
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/${STAGE}/${NETAPP_NAME_LOWER} -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
                     versionT=0.35.0
-                    declare -a files=("json" "md" "pdf")
+                    declare -a files=("json" "md")
                     images=($response)
                     total_images=${#images[@]}
                     count=0
@@ -191,6 +191,17 @@ pipeline {
                                 --data-binary @"$report_file" \
                                 "$url"
                         done
+                        report_pdf_file="${REPORT_FILENAME_PREFIX}${count}${REPORT_FILENAME_SUFFIX}-$x.pdf"
+                        if [[ -s $report_pdf_file ]]; then
+                            echo "Upload PDF: $report_pdf_file"
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_pdf_file"
+
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$report_pdf_file" \
+                                "$url"
+                        else
+                            echo "PDF not generated: $report_pdf_file"
+                        fi
                     done
                     '''
                 }
