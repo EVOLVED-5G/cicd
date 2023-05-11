@@ -26,7 +26,7 @@ def getHttpPort(deployment) {
     if ('kubernetes-athens'.equals(var)) {
         return '30048'
     }else {
-        return ''
+        return '80'
     }
 }
 
@@ -35,7 +35,7 @@ def getHttpsPort(deployment) {
     if ('kubernetes-athens'.equals(var)) {
         return '30548'
     }else {
-        return ''
+        return '443'
     }
 }
 
