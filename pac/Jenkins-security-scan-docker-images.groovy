@@ -59,6 +59,8 @@ pipeline {
         ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = '005-report-tr-img'
+        REPORT_FILENAME_PREFIX = '005'
+        REPORT_FILENAME_SUFFIX = '-report-tr-img'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
     }
@@ -155,7 +157,7 @@ pipeline {
                     sh '''#!/bin/bash
                     response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/docker/evolved-5g/${STAGE}/${NETAPP_NAME_LOWER} -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep "${NETAPP_NAME_LOWER}*" | tr -d '"' )
                     versionT=0.35.0
-                    declare -a files=("json" "md" "pdf")
+                    declare -a files=("json" "md")
                     images=($response)
                     total_images=${#images[@]}
                     count=0
@@ -166,7 +168,7 @@ pipeline {
                         urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME/wiki/dockerhub.hi.inet-evolved-5g-$STAGE-$NETAPP_NAME_LOWER-$x
                         python3 utils/report_generator.py --template templates/step-security-scan-docker-images.md.j2 --json ${REPORT_FILENAME}-$x.json --output ${REPORT_FILENAME}-$x.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit commit --version $versionT --url $urlT --name $NETAPP_NAME --counter "$COUNTER"
 
-                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md || exit 1
+                        docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME_PREFIX}${count}${REPORT_FILENAME_SUFFIX}-$x.pdf $DOCKER_PATH/${REPORT_FILENAME}-$x.md || exit 1
 
                         # Check to see if the image has succesfully passed all tests
                         if grep -q "failed" ${REPORT_FILENAME}-$x.md; then
@@ -189,6 +191,17 @@ pipeline {
                                 --data-binary @"$report_file" \
                                 "$url"
                         done
+                        report_pdf_file="${REPORT_FILENAME_PREFIX}${count}${REPORT_FILENAME_SUFFIX}-$x.pdf"
+                        if [[ -s $report_pdf_file ]]; then
+                            echo "Upload PDF: $report_pdf_file"
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_pdf_file"
+
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$report_pdf_file" \
+                                "$url"
+                        else
+                            echo "PDF not generated: $report_pdf_file"
+                        fi
                     done
                     '''
                 }

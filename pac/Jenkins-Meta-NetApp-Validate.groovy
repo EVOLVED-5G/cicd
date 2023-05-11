@@ -26,7 +26,7 @@ def getHttpPort(deployment) {
     if ('kubernetes-athens'.equals(var)) {
         return '30048'
     }else {
-        return ''
+        return '80'
     }
 }
 
@@ -35,7 +35,7 @@ def getHttpsPort(deployment) {
     if ('kubernetes-athens'.equals(var)) {
         return '30548'
     }else {
-        return ''
+        return '443'
     }
 }
 
@@ -63,7 +63,7 @@ def aborted = false
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
     options {
-        timeout(time: 60, unit: 'MINUTES')
+        timeout(time: 120, unit: 'MINUTES')
         retry(1)
     }
 
