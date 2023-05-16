@@ -52,6 +52,24 @@ pipeline {
                 }
             }
         }
+        stage('build blockchain service') {
+            steps {
+                dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
+                    sh'''
+                    docker-compose up --build -d
+                    '''
+                }
+            }
+        }
+        stage('build tmf620 service') {
+            steps {
+                dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
+                    sh'''
+                    docker-compose up --build -d
+                    '''
+                }
+            }
+        }
         // These stages are the indicated by Demokritos to install NEF Emulator
         stage('Select docker-compose yaml to use') {
             steps {
@@ -111,24 +129,7 @@ pipeline {
                 }
             }
         }
-        stage('build blockchain service') {
-            steps {
-                dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
-                    sh'''
-                    docker-compose up --build -d
-                    '''
-                }
-            }
-        }
-        stage('build tmf620 service') {
-            steps {
-                dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
-                    sh'''
-                    docker-compose up --build -d
-                    '''
-                }
-            }
-        }
+        
         stage('Modify image name and upload to AWS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
