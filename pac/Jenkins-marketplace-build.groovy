@@ -105,7 +105,7 @@ pipeline {
                 dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                     make build
-                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "chown -R laravel:www-data * ; composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
+                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "sudo chown -R laravel:www-data * ; composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
                     docker exec -i evolved5g_pilot_marketplace_laravel bash -c "npm install; npm run production"
                     '''
                 }
