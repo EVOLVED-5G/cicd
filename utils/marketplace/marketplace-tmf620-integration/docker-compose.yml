@@ -21,6 +21,8 @@ services:
       - "host.docker.internal:172.17.0.1"
     networks:
       - docker_evolved5g_net
+    depends_on:
+      - mongo
 
 volumes:
   ctk_data: { }
