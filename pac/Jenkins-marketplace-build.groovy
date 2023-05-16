@@ -94,8 +94,8 @@ pipeline {
                         sed -i "s,^[ ]*CRYPTO_NETWORK=.*,CRYPTO_NETWORK=goerli,g" .env
                         sed -i "s,^[ ]*FORUM_URL=.*,FORUM_URL=http://evolved5g-marketplace-forum.evolved-5g.gr/,g" .env
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
-                        sed -i "s,^[ ]*CRYPTO_SENDER_BASE_URL=.*,CRYPTO_SENDER_BASE_URL=http://mktp-blockchain-sender:8000/,g" .env
-                        sed -i "s,^[ ]*TM_FORUM_API_BASE_URL=.*,TM_FORUM_API_BASE_URL=http://mktp-tmf:8080/tmf-api/,g" .env
+                        sed -i "s,^[ ]*CRYPTO_SENDER_BASE_URL=.*,CRYPTO_SENDER_BASE_URL=http://evolved5g_blockchain_sender:8000/,g" .env
+                        sed -i "s,^[ ]*TM_FORUM_API_BASE_URL=.*,TM_FORUM_API_BASE_URL=http://evolved5g_pilot_tmf_api_container:8080/tmf-api/,g" .env
                     '''
                 }
             }

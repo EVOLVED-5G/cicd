@@ -8,7 +8,7 @@ db_password: secret
 mktp_db_service: mktp-db
 mktp_php_service: mktp-php
 mktp_phpmyadmin_service: mktp-phpmyadmin
-mktp_tmf_service: mktp-tmf
-mktp_tmf_db_service: mktp-tmf-db
-mktp_blockchain_sender_service: mktp-blockchain-sender
+mktp_tmf_service: evolved5g_pilot_tmf_api_container
+mktp_tmf_db_service: evolved5g_pilot_tmf_mongo_container
+mktp_blockchain_sender_service: evolved5g_blockchain_sender
 version: "1.11"

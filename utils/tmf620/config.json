@@ -5,7 +5,7 @@
             "label": "user-provided",
             "tags": [],
             "credentials": {
-                "uri": "mongodb://mktp-tmf-db:27017/",
+                "uri": "mongodb://evolved5g_pilot_tmf_mongo_container:27017/",
             },
         }
     ],
