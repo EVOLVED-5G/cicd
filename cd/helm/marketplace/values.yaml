@@ -5,7 +5,7 @@ mktp_hostname: marketplace-pro.evolved-5g.eu
 db_name: evolved5g_db
 db_user: admin
 db_password: secret
-mktp_db_service: mktp-db
+mktp_db_service: evolved5g_pilot_marketplace_db
 mktp_php_service: mktp-php
 mktp_phpmyadmin_service: mktp-phpmyadmin
 mktp_tmf_service: evolved5g_pilot_tmf_api_container

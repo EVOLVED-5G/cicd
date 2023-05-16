@@ -83,7 +83,7 @@ pipeline {
                         sed -i "s,^[ ]*DOCKER_USER_ID=.*,DOCKER_USER_ID=$uid,g" .env
                         sed -i "s,^[ ]*DOCKER_GROUP_ID=.*,DOCKER_GROUP_ID=$gid,g" .env
                         sed -i "s,^[ ]*DB_CONNECTION=.*,DB_CONNECTION=mysql,g" .env
-                        sed -i "s,^[ ]*DB_HOST=.*,DB_HOST=mktp-db,g" .env
+                        sed -i "s,^[ ]*DB_HOST=.*,DB_HOST=evolved5g_pilot_marketplace_db,g" .env
                         sed -i "s,^[ ]*DB_PORT=.*,DB_PORT=3306,g" .env
                         sed -i "s,^[ ]*DB_DATABASE=.*,DB_DATABASE=evolved5g_db,g" .env
                         sed -i "s,^[ ]*DB_USERNAME=.*,DB_USERNAME=admin,g" .env
