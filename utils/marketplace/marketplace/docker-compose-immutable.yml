@@ -1,0 +1,71 @@
+version: "3.5"
+services:
+
+  db:
+    build:
+      context: docker/db
+    image: evolved5g_marketplace_image_db
+    container_name: evolved5g-pilot-marketplace-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "3316:3306"
+    volumes:
+      - evolved5g_pilot_marketplace_volume:/var/lib/mysql
+    networks:
+      - docker_evolved5g_net
+
+  app:
+    build:
+      context: ./
+      dockerfile: docker/k8s.dockerfile
+      args:
+        DOCKER_GROUP_ID: ${DOCKER_GROUP_ID}
+        DOCKER_USER_ID: ${DOCKER_USER_ID}
+        DOCKER_USER: laravel
+    image: evolved5g_marketplace_image_app
+    container_name: evolved5g-pilot-marketplace-laravel
+    user: "${DOCKER_USER_ID}:${DOCKER_GROUP_ID}" # this is the Laravel user. We need to set it
+    # this way, so that the permissions are applied correctly.
+    ports:
+      - "89:80"
+    volumes:
+      - ~/.composer/auth.json:/root/.composer/auth.json
+    environment:
+      - APP_ROOT=/var/www/html
+      - QUEUE_DRIVER=${QUEUE_CONNECTION}
+      - OPTIONS=${QUEUE_OPTIONS}
+      - NUM_PROCS=${NUM_PROCS}
+    networks:
+      - docker_evolved5g_net
+    depends_on:
+      - db
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  phpmyadmin:
+    container_name: evolved5g-pilot-marketplace-phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8089:80"
+    environment:
+      MYSQL_USERNAME: ${DB_USERNAME}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_LIMIT: 128M
+      PMA_HOST: db
+    networks:
+      - docker_evolved5g_net
+    depends_on:
+      - db
+
+volumes:
+  evolved5g_pilot_marketplace_volume:
+    name: evolved5g_pilot_marketplace_volume
+
+networks:
+  docker_evolved5g_net:
+    external: false
+    name: docker_evolved5g_net

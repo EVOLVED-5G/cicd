@@ -1,0 +1,32 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:4.4.6
+    container_name: evolved5g-pilot-tmf-mongo-container
+    ports: [ '27017:27017' ]
+    volumes: [ 'ri_persistance:/data/db' ]
+    networks:
+      - docker_evolved5g_net
+
+  app:
+    container_name: evolved5g-pilot-tmf-api-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: tmforumorg/api-changemanagement_tmf-655:4.0.0
+    ports: [ '8080:8080' ]
+    stdin_open: true
+    tty: true
+    extra_hosts:
+      - "host.docker.internal:172.17.0.1"
+    networks:
+      - docker_evolved5g_net
+
+volumes:
+  ctk_data: { }
+  ri_persistance:
+
+networks:
+  docker_evolved5g_net:
+    external: true
+    name: docker_evolved5g_net
