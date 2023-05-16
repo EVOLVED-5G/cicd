@@ -4,9 +4,9 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
     kompose.version: 1.26.1 (HEAD)
-    helm.sh/hook: post-install
-    helm.sh/hook-weight: "-5"
-    helm.sh/hook-delete-policy: hook-succeeded
+    # helm.sh/hook: post-install
+    # helm.sh/hook-weight: "5"
+    # helm.sh/hook-delete-policy: hook-succeeded
   creationTimestamp: null
   labels:
     io.kompose.service:  {{ .Values.mktp_php_service }}
@@ -29,7 +29,7 @@ spec:
         io.kompose.service: {{ .Values.mktp_php_service }}
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel:{{ .Values.version }}"
+        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-laravel:{{ .Values.version }}"
           name: {{ .Values.mktp_php_service }}
           env:
             - name: APP_ROOT
@@ -57,10 +57,14 @@ spec:
             runAsUser: 0
             allowPrivilegeEscalation: false
           
-        - name: post-install-job
-          image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel"
-          # command: ["npm", "run", "development"]
-          # command:
+          # command: ["/bin/sh", "-c"]
+          # args:
+          #   - echo "HOLA"
+          
+        # - name: post-install-job
+        #   image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel:{{ .Values.version }}"
+        #   command: ["echo", "HOLA"]
+        #   # command:
           #   - sh
           #   - -c 
           #   - |-
@@ -71,17 +75,9 @@ spec:
               #   exit 1;
               # fi
 
-          command: ["/bin/sh", "-c"]
-          args:
-            - chown -R laravel:www-data *;
-            composer install;
-            composer dump-autoload;
-            php artisan key:generate;
-            php artisan migrate;
-            php artisan db:seed;
-            php artisan storage:link|yes;
-            npm install|yes;
-            npm run development;
+          # command: ["/bin/sh", "-c"]
+          # args:
+          #   - echo "HOLA"
 
 
 
