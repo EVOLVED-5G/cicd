@@ -47,6 +47,7 @@ pipeline {
                     git clone --single-branch --branch $GIT_MARKET_BRANCH $GIT_MARKET_URL $MKTP_FOLDER_NAME
                     git clone --single-branch --branch $GIT_MARKET_BLOCKCHAIN_BRANCH $GIT_MARKET_BLOCKCHAIN_URL $MKTP_BLOCKCHAIN_FOLDER_NAME
                     git clone --single-branch --branch $GIT_MARKET_TMF620_BRANCH $GIT_MARKET_TMF620_URL $MKTP_TMF620_FOLDER_NAME
+                    cp utils/tmf620/* $MKTP_TMF620_FOLDER_NAME/
                     '''
                 }
             }
@@ -93,6 +94,8 @@ pipeline {
                         sed -i "s,^[ ]*CRYPTO_NETWORK=.*,CRYPTO_NETWORK=goerli,g" .env
                         sed -i "s,^[ ]*FORUM_URL=.*,FORUM_URL=http://evolved5g-marketplace-forum.evolved-5g.gr/,g" .env
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
+                        sed -i "s,^[ ]*CRYPTO_SENDER_BASE_URL=.*,CRYPTO_SENDER_BASE_URL=http://mktp-blockchain-sender:8000/,g" .env
+                        sed -i "s,^[ ]*TM_FORUM_API_BASE_URL=.*,TM_FORUM_API_BASE_URL=http://mktp-tmf:8080/tmf-api/,g" .env
                     '''
                 }
             }
@@ -103,7 +106,7 @@ pipeline {
                     sh'''
                     make build
                     docker exec -i evolved5g_pilot_marketplace_laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
-                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "npm install; npm run prod"
+                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "npm install; npm run production"
                     '''
                 }
             }

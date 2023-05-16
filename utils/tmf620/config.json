@@ -1,0 +1,13 @@
+{
+    "user-provided": [
+        {
+            "name": "compose-for-mongodb",
+            "label": "user-provided",
+            "tags": [],
+            "credentials": {
+                "uri": "mongodb://mktp-tmf-db:27017/",
+            },
+        }
+    ],
+    "strict_schema": true
+}
