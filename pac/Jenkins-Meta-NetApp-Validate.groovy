@@ -83,7 +83,7 @@ pipeline {
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         choice(name: 'ENVIRONMENT', choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
-        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
+        booleanParam(name: 'SEND_DEV_MAIL', defaultValue: false, description: 'Send mail to Developers')
         string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
