@@ -45,11 +45,11 @@ pipeline {
                 dir("${env.WORKSPACE}/") {
                     sh '''
                     git clone --single-branch --branch $GIT_MARKET_BRANCH $GIT_MARKET_URL $MKTP_FOLDER_NAME
-                    cp utils/marketplace/$MKTP_FOLDER_NAME/* $MKTP_FOLDER_NAME/
+                    cp -r utils/marketplace/$MKTP_FOLDER_NAME/* $MKTP_FOLDER_NAME/
                     git clone --single-branch --branch $GIT_MARKET_BLOCKCHAIN_BRANCH $GIT_MARKET_BLOCKCHAIN_URL $MKTP_BLOCKCHAIN_FOLDER_NAME
-                    cp utils/marketplace/$MKTP_BLOCKCHAIN_FOLDER_NAME/* $MKTP_BLOCKCHAIN_FOLDER_NAME/
+                    cp -r utils/marketplace/$MKTP_BLOCKCHAIN_FOLDER_NAME/* $MKTP_BLOCKCHAIN_FOLDER_NAME/
                     git clone --single-branch --branch $GIT_MARKET_TMF620_BRANCH $GIT_MARKET_TMF620_URL $MKTP_TMF620_FOLDER_NAME
-                    cp utils/marketplace/$MKTP_TMF620_FOLDER_NAME/* $MKTP_TMF620_FOLDER_NAME/
+                    cp -r utils/marketplace/$MKTP_TMF620_FOLDER_NAME/* $MKTP_TMF620_FOLDER_NAME/
                     '''
                 }
             }
@@ -109,8 +109,6 @@ pipeline {
                 dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                     make build
-                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
-                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "npm install; npm run production"
                     '''
                 }
             }
@@ -133,6 +131,17 @@ pipeline {
                 }
             }
         }
+        stage('Run post commands') {
+            steps {
+                dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
+                    sh'''
+                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
+                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "npm install; npm run production"
+                    '''
+                }
+            }
+        }
+
         stage('Modify image name and upload to AWS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
