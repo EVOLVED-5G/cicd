@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tsn-frontend.fullname" . }}-configmap
+data:
+  config.json: |
+    {
+      "BackEnd": null,
+      "FrontEnd": {
+        "Host": "{{ include "tsn-frontend.fullname" . }}",
+        "Port": {{ .Values.service.port }}
+      },
+      "CAPIF": {
+        "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
+        "SecurityEnabled": {{ default "true" .Values.configMap.capifSecurityEnabled }},
+        "LoggingEnabled": {{ default "true" .Values.configMap.capifLoggingEnabled }},
+        "Host": "{{ .Values.configMap.capifHostname }}",
+        "HttpPort": {{ .Values.configMap.capifPortHttp }},
+        "HttpsPort": {{ .Values.configMap.capifPortHttps }}
+      }
+    }
