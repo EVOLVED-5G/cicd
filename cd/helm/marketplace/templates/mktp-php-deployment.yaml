@@ -4,9 +4,6 @@ metadata:
   annotations:
     kompose.cmd: kompose convert -c -f docker-compose-resolved.yaml -o marketplace
     kompose.version: 1.26.1 (HEAD)
-    # helm.sh/hook: post-install
-    # helm.sh/hook-weight: "5"
-    # helm.sh/hook-delete-policy: hook-succeeded
   creationTimestamp: null
   labels:
     io.kompose.service:  {{ .Values.mktp_php_service }}
@@ -73,30 +70,6 @@ spec:
               php artisan storage:link &&
               npm install &&
               npm run development
-          # command: ["/bin/sh", "-c"]
-          # args:
-          #   - echo "HOLA"
-          
-        # - name: post-install-job
-        #   image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g_pilot_marketplace_laravel:{{ .Values.version }}"
-        #   command: ["echo", "HOLA"]
-        #   # command:
-          #   - sh
-          #   - -c 
-          #   - |-
-          #     OUTPUT=$(redis-cli -h redis -p 6379 -n 1 GET  server_priv_key)
-          #     echo "$OUTPUT"
-              # if [ -z "$OUTPUT" ]; then
-              #   echo "cannot get the server public key from redis"
-              #   exit 1;
-              # fi
-
-          # command: ["/bin/sh", "-c"]
-          # args:
-          #   - echo "HOLA"
-
-
-
       restartPolicy: Always
 
 
