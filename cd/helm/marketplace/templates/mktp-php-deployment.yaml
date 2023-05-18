@@ -29,9 +29,9 @@ spec:
         io.kompose.service: {{ .Values.mktp_php_service }}
     spec:
       containers:
-        - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-laravel:{{ .Values.version }}"
-          name: {{ .Values.mktp_php_service }}
-          env:
+      - name: {{ .Values.mktp_php_service }}
+        image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-laravel:{{ .Values.version }}"
+        env:
             - name: APP_ROOT
               value: /var/www/html
             - name: NUM_PROCS
@@ -50,13 +50,29 @@ spec:
               value: {{ .Values.db_user }}
             - name: DB_PASSWORD
               value: {{ .Values.db_password }}
-
-          ports:
-            - containerPort: 80
-          securityContext:
-            runAsUser: 0
-            allowPrivilegeEscalation: false
-          
+        ports:
+          - containerPort: 80
+        securityContext:
+          runAsUser: 0
+          allowPrivilegeEscalation: false
+        resources: {}
+      initContainers:
+      - name: post-deploy-php
+        image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-laravel:{{ .Values.version }}"
+        command: ["/bin/bash"]
+        args:
+          - -c
+          - >-
+              chown -R laravel:www-data * &&
+              export COMPOSER_ALLOW_SUPERUSER=1 &&
+              composer install &&
+              composer dump-autoload &&
+              php artisan key:generate &&
+              php artisan migrate &&
+              php artisan db:seed &&
+              php artisan storage:link &&
+              npm install &&
+              npm run development
           # command: ["/bin/sh", "-c"]
           # args:
           #   - echo "HOLA"
