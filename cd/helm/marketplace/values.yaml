@@ -5,10 +5,10 @@ mktp_hostname: marketplace-pro.evolved-5g.eu
 db_name: evolved5g_db
 db_user: admin
 db_password: secret
-mktp_db_service: mktp-db
+mktp_db_service: evolved5g-pilot-marketplace-db
 mktp_php_service: mktp-php
 mktp_phpmyadmin_service: mktp-phpmyadmin
-mktp_tmf_service: mktp-tmf
-mktp_tmf_db_service: mktp-tmf-db
-mktp_blockchain_sender_service: mktp-blockchain-sender
+mktp_tmf_service: evolved5g-pilot-tmf-api-container
+mktp_tmf_db_service: evolved5g-pilot-tmf-mongo-container
+mktp_blockchain_sender_service: evolved5g-blockchain-sender
 version: "1.11"

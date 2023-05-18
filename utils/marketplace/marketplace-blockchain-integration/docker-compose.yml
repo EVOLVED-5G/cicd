@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  app:
+    container_name: evolved5g-blockchain-sender
+    image: evolved5g_marketplace_image_blockchain_sender
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/app #bind mount
+      - /app/node_modules
+    networks:
+      - docker_evolved5g_net
+
+networks:
+  docker_evolved5g_net:
+    external: true
+    name: docker_evolved5g_net
+
+volumes:
+  data:

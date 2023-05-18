@@ -1,0 +1,13 @@
+{
+  "services": {
+    "compose-for-mongodb": [
+      {
+        "name": "local-mongodb-connector",
+        "label": "local-mongodb-connector",
+        "credentials": {
+          "uri": "mongodb://evolved5g-pilot-tmf-mongo-container:27017/"
+        }
+      }
+    ]
+  }
+}
