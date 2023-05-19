@@ -92,12 +92,15 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script { 
                         def image = sh(script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"',returnStdout: true)
-                        echo "${image}"
-                        sh '''$(aws ecr get-login --no-include-email)'''
-                        sh '''docker tag ${image} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION'''
-                        sh '''docker tag ${image} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-latest'''
-                        sh '''docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION'''
-                        sh '''docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-latest'''
+                        sh '''
+                        IMAGE=${image}
+                        $(aws ecr get-login --no-include-email)
+                        docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                        docker tag $IMAGE ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-latest
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                        docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-latest
+                        echo "$IMAGE"
+                        '''
                     }
                 }
             }
@@ -109,11 +112,12 @@ pipeline {
                         script{
                             sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet'''
                             def image = sh(script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"',returnStdout: true)
-                            echo "${image}"
-                            sh '''docker tag ${image} dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:$VERSION'''
-                            sh '''docker tag ${image} dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:latest'''
+                            sh '''IMAGE=${image}'''
+                            sh '''docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:$VERSION'''
+                            sh '''docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:latest'''
                             sh '''docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:$VERSION'''
                             sh '''docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:latest'''
+                            echo "$IMAGE"
                         }
                     }
                 }
