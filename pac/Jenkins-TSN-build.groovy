@@ -92,6 +92,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script { 
                         IMAGE = sh(script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"', returnStdout: true).trim()
+                        currentBuild.displayName = "$IMAGE"
                         sh '''
                         echo IMAGE=$IMAGE
                         $(aws ecr get-login --no-include-email)
