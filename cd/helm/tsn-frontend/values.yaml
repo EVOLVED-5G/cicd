@@ -14,7 +14,7 @@ replicaCount: 1
 
 image:
   # -- The docker image repository to use
-  repository: nginx
+  repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:tsn_frontend
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
   # -- @default Chart version
@@ -29,7 +29,7 @@ configMap:
   capifEnabled: true
   capifSecurityEnabled: true
   capifLoggingEnabled: true
-  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifHostname: "andres-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "80"
   capifPortHttps: "443"
 
@@ -57,7 +57,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  port: 8899
 
 ingress:
   enabled: false
