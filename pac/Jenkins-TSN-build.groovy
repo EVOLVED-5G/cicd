@@ -82,7 +82,7 @@ pipeline {
 
                     docker build -t $TSN_NAME .                  
 
-                    echo "Done
+                    echo " ### build has finished ###"
                     '''
                 }
             }
