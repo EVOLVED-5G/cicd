@@ -17,7 +17,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'VERSION', defaultValue: '3.0', description: '')
+        string(name: 'VERSION', defaultValue: '0.0.1', description: '')
         string(name: 'GIT_TSN_URL', defaultValue: 'https://github.com/EVOLVED-5G/TSN_FrontEnd', description: 'URL of the Github Repository')
         string(name: 'GIT_TSN_BRANCH', defaultValue: 'main', description: 'Branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
