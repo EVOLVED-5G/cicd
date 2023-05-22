@@ -95,17 +95,15 @@ pipeline {
                         sh '''
                             echo "### Signing in AWS ECR ###"
                             $(aws ecr get-login --no-include-email)
-                            #aws ecr get-login-password --region $AWS_REGION \
-                            #| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
                             echo "### tagging image latest, $VERSION ###"
                             IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
-                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
-                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$IMAGE-latest
+                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$IMAGE-$VERSION
 
                             echo "### pushing image to (latest, $VERSION) ###"
-                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
-                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
+                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$IMAGE-$VERSION
+                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$IMAGE-latest
 
 
                         '''
@@ -118,7 +116,20 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     dir ("${env.WORKSPACE}/${TSN_NAME}/services") {
                         script{
-                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet'''
+                            sh ''' 
+                            echo "### Signing in Artifactory ###"
+                            docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
+                            IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
+                            
+                            echo "### tagging image latest, $VERSION ###"
+                            docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$VERSION
+                            docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$latest
+
+                            echo "### pushing image to (latest, $VERSION) ###"
+                            docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$VERSION
+                            docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:latest
+                            
+                            '''
                         }
                     }
                 }
