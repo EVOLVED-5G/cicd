@@ -13,10 +13,8 @@ spec:
       {{- include "tsn-frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
         {{- include "tsn-frontend.selectorLabels" . | nindent 8 }}
     spec:
@@ -49,28 +47,20 @@ spec:
             - name: frontend-port
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-#          livenessProbe:
-#            httpGet:
-#              path: /
-#              port: http
-#          readinessProbe:
-#            httpGet:
-#              path: /
-#              port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port:  frontend-port
+          readinessProbe:
+            httpGet:
+              path: /
+              port:  frontend-port
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
           - name: {{ include "tsn-frontend.fullname" . }}-config
-            mountPath: "/config"
-      initContainers:
-      - name: post-deploy-php
-        image: busybox:1.28
-        command: ["sh"]
-        args:
-          - -c
-          - >-
-              echo copy config.json file
-              cp /config/config.json /srv/tsn_af/config.json || { echo 'copy has failed' ; exit 1; }
+            mountPath: "/srv/tsn_af/config.json"
+            subPath: config.json
       volumes:
       - name: {{ include "tsn-frontend.fullname" . }}-config
         configMap:

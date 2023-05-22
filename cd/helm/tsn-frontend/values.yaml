@@ -29,7 +29,7 @@ configMap:
   capifEnabled: true
   capifSecurityEnabled: true
   capifLoggingEnabled: true
-  capifHostname: "andres-capif.apps.ocp-epg.hi.inet"
+  capifHostname: "andres-test-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "80"
   capifPortHttps: "443"
 
@@ -41,8 +41,6 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
-podAnnotations: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
@@ -60,7 +58,7 @@ service:
   port: 8899
 
 ingress:
-  enabled: false
+  enabled: true
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -69,7 +67,7 @@ ingress:
     - host: tsn.apps.ocp-epg.hi.inet
       paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
