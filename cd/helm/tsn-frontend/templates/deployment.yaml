@@ -26,13 +26,13 @@ spec:
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
-            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+            - "{{ .Values.configMap.capifHostname }}"
       {{- end }}
-      {{- if eq .Values.env "kubernetes-uma" }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases: 
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
-            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+            - "{{ .Values.configMap.capifHostname }}"
       {{- end }}
       serviceAccountName: {{ include "tsn-frontend.serviceAccountName" . }}
       securityContext:
