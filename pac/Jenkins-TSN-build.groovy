@@ -111,7 +111,7 @@ pipeline {
                 } 
             }
         }  
-        stage('Publish in Artifacotry') {
+        stage('Publishing in Artifacotry') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     dir ("${env.WORKSPACE}/${TSN_NAME}/services") {
@@ -123,7 +123,7 @@ pipeline {
                             
                             echo "### tagging image latest, $VERSION ###"
                             docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$VERSION
-                            docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$latest
+                            docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:latest
 
                             echo "### pushing image to (latest, $VERSION) ###"
                             docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$IMAGE:$VERSION
