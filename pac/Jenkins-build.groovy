@@ -138,6 +138,9 @@ pipeline {
             steps {
                 script {
                     DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME_LOWER}/docker-compose.yml"
+                    if (DOCKER_VAR == false) {
+                        DOCKER_VAR = fileExists "${env.WORKSPACE}/${NETAPP_NAME_LOWER}/docker-compose.yaml"
+                    }
                 }
                 echo "env DOCKER VAR is ${DOCKER_VAR}"
             }
