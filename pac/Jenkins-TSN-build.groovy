@@ -91,8 +91,9 @@ pipeline {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script { 
-                        IMAGE = sh(returnStdout: true, script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"').trim()
+//                        IMAGE = sh(returnStdout: true, script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"').trim()
                         sh '''
+                            IMAGE = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
                             echo IMAGE=${IMAGE}
                             $(aws ecr get-login --no-include-email)
                             docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
