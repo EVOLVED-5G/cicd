@@ -94,7 +94,7 @@ pipeline {
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} \
                         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                        TSN_LOCAL_IMAGE_NAME = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
+                        TSN_LOCAL_IMAGE_NAME=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
                     '''
                     }                    
             }
