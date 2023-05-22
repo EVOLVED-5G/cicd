@@ -99,7 +99,7 @@ pipeline {
 
                             echo "#### setting up tsn variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn-frontend \
                             --arg NAMESPACE tsn-$BUILD_NUMBER --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
@@ -157,7 +157,7 @@ pipeline {
 
                             echo "#### setting up tsn-frontend variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn-frontend \
                             --arg NAMESPACE $TMP_NS_TSN --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg CREATE_NS $CREATE_NS \
