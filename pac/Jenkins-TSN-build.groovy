@@ -87,18 +87,19 @@ pipeline {
                 }
             }
         }
-        stage('Getting image name and publish in AWS') { 
+        stage('Getting image name and publishing in AWS') { 
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script { 
 //                        IMAGE = sh(returnStdout: true, script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"').trim()
                         sh '''
+                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
+                            | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+
                             IMAGE = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
                             echo IMAGE=${IMAGE}
                             
-                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
-                            | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
-                            
+                            echo "### tagging $IMAGE ###"
                             echo "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
                             docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
                             
