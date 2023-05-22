@@ -29,6 +29,7 @@ pipeline {
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
+        AWS_REGION = "eu-central-1"
         TSN_NAME = "tns-frontend"
     }
     stages {
@@ -87,23 +88,23 @@ pipeline {
                 }
             }
         }
-        stage('Getting image name and publishing in AWS') { 
+        stage('Getting image name and publishing in AWS') {
             steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
+//                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {               
                     script { 
 //                        IMAGE = sh(returnStdout: true, script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"').trim()
                         sh '''
-                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} \
-                            | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+                            aws ecr get-login-password --region ${AWS_REGION} \
+                            | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
                             IMAGE = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
                             echo IMAGE=${IMAGE}
                             
                             echo "### tagging $IMAGE ###"
-                            echo "IMAGE_TAG: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
+                            echo "IMAGE_TAG: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
                             
-                            echo "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
-                            docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                            echo "docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
+                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
                             
                             docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-latest
                             docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
