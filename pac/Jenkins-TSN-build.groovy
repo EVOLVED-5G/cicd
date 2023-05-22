@@ -100,6 +100,8 @@ pipeline {
                             echo IMAGE=${IMAGE}
                             
                             echo "### tagging $IMAGE ###"
+                            echo "IMAGE_TAG: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
+                            
                             echo "docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
                             docker tag ${IMAGE} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
                             
