@@ -94,8 +94,7 @@ pipeline {
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} \
                         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                        IMAGE = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
-                        echo IMAGE=${IMAGE}
+                        TSN_LOCAL_IMAGE_NAME = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
                     '''
                     }                    
             }
@@ -106,13 +105,6 @@ pipeline {
                     dir ("${env.WORKSPACE}/${TSN_NAME}/services") {
                         script{
                             sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet'''
-                            def image = sh(script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"',returnStdout: true)
-                            sh '''IMAGE=${image}'''
-                            sh '''docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:$VERSION'''
-                            sh '''docker tag $IMAGE dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:latest'''
-                            sh '''docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:$VERSION'''
-                            sh '''docker push dockerhub.hi.inet/evolved-5g/tsn-frontend/$TSN_NAME:latest'''
-                            echo "$IMAGE"
                         }
                     }
                 }
