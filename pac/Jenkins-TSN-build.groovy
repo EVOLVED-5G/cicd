@@ -97,10 +97,6 @@ pipeline {
                         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                         IMAGE = $(docker image ls $TSN_NAME --format "{{ .Repository }}")
                         echo IMAGE=${IMAGE}
-                        
-                        echo "### tagging $IMAGE ###"
-                        echo "IMAGE_TAG: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
-                        echo "docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION"
                     '''
                     }                    
             }
