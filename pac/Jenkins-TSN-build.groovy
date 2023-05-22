@@ -91,7 +91,6 @@ pipeline {
         stage('Getting image name and publishing in AWS') {
             steps {
                 script { 
-//                   IMAGE = sh(returnStdout: true, script: 'docker image ls $TSN_NAME --format "{{ .Repository }}"').trim()
                     sh '''
                         aws ecr get-login-password --region ${AWS_REGION} \
                         | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
