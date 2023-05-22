@@ -96,7 +96,7 @@ pipeline {
                         aws ecr get-login-password --region $AWS_REGION \
                         | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
                         
-                        echo "### tagging image latest,$VERSION ###"
+                        echo "### tagging image latest, $VERSION ###"
                         IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
                         docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
                         docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
