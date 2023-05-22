@@ -92,9 +92,20 @@ pipeline {
             steps {
                 script { 
                     sh '''
-                        aws ecr get-login-password --region ${AWS_REGION} \
-                        | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                        TSN_LOCAL_IMAGE_NAME=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
+                        echo "### Signing in AWS ECR ###"
+                        aws ecr get-login-password --region $AWS_REGION \
+                        | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+                        
+                        echo "### tagging image ###"
+                        IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
+                        docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
+                        docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+
+                        echo "### pushing image to (latest, $VERSION) ###"
+                        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
+
+
                     '''
                     }                    
             }
