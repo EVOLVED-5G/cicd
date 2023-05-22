@@ -90,24 +90,27 @@ pipeline {
         }
         stage('Getting image name and publishing in AWS') {
             steps {
-                script { 
-                    sh '''
-                        echo "### Signing in AWS ECR ###"
-                        aws ecr get-login-password --region $AWS_REGION \
-                        | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-                        
-                        echo "### tagging image latest, $VERSION ###"
-                        IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
-                        docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
-                        docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    script { 
+                        sh '''
+                            echo "### Signing in AWS ECR ###"
+                            $(aws ecr get-login --no-include-email)
+                            #aws ecr get-login-password --region $AWS_REGION \
+                            #| docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
 
-                        echo "### pushing image to (latest, $VERSION) ###"
-                        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
-                        docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
+                            echo "### tagging image latest, $VERSION ###"
+                            IMAGE=$(docker image ls $TSN_NAME --format "{{ .Repository }}")
+                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
+                            docker tag $IMAGE $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+
+                            echo "### pushing image to (latest, $VERSION) ###"
+                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-$VERSION
+                            docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/evolved5g:$TSN_NAME-latest
 
 
-                    '''
+                        '''
                     }                    
+                } 
             }
         }  
         stage('Publish in Artifacotry') {
