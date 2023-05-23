@@ -73,7 +73,7 @@ pipeline {
                 }
             }
             environment {
-                TOKEN_NS_NEF = credentials("openshift-evol5-tsn-token")
+                TOKEN_NS_TSN = credentials("openshift-evol5-tsn-token")
             }
             steps {
                 dir ("${env.WORKSPACE}") {
