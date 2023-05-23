@@ -1,0 +1,4 @@
+{
+  "certificationid":"\($CERTIFICATION_ID)",
+  "Version":"\($VERSION)"
+}

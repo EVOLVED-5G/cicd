@@ -472,6 +472,19 @@ pipeline {
                 --data-binary @"$report_file" \
                 "$url"
                 '''
+                sh '''#!/bin/bash
+                fingerprint_file="fingerprint.json"
+                UUID=$(uuidgen)
+                echo $UUID
+                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $fingerprint_file
+
+                cat $fingerprint_file
+
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$fingerprint_file"
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                --data-binary @"$fingerprint_file" \
+                "$url"
+                '''
             }
             retry(3) {
                 script {
