@@ -1,0 +1,42 @@
+{
+  "helmDefaults": {
+    "createNamespace": $CREATE_NS | test("true")
+  },
+  "releases": [
+    {
+      "name": "\($RELEASE_NAME)",
+      "chart": "../cd/helm/\($CHART_NAME)/",
+      "namespace": "\($NAMESPACE)",
+      "atomic": true,
+      "wait": true,
+      "values": [
+        "../cd/helm/tsn-frontend/values.yaml",
+        {
+          "ingress": {
+            "hosts": [
+              {
+                "host": "\($HOSTNAME_TSN)",
+                "paths": [
+                  {
+                    "path": "/",
+                    "pathType": "Prefix"     
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "environment": "\($DEPLOYMENT)"
+        },
+        {
+          "configMap": {
+            "capifHostname": "\($HOSTNAME_CAPIF)",
+            "capifHttpPort": "\($CAPIF_HTTP_PORT)",
+            "capifHttpsPort": "\($CAPIF_HTTPS_PORT)"
+          }
+        }
+      ]
+    }
+  ]
+}
