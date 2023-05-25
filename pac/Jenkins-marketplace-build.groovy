@@ -113,6 +113,11 @@ pipeline {
                 }
             }
         }
+        stage('Leave some time avoid docker pull limit at blockchain sender build') {
+            steps {
+                sleep(time: 5, unit: 'MINUTES')
+            }
+        }
         stage('build blockchain service') {
             steps {
                 dir("${env.WORKSPACE}/${MKTP_BLOCKCHAIN_FOLDER_NAME}/") {
@@ -120,6 +125,11 @@ pipeline {
                     docker-compose up --build -d
                     '''
                 }
+            }
+        }
+        stage('Leave some time avoid docker pull limit at tmf620 build') {
+            steps {
+                sleep(time: 5, unit: 'MINUTES')
             }
         }
         stage('build tmf620 service') {
