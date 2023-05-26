@@ -29,7 +29,7 @@ configMap:
   capifEnabled: true
   capifSecurityEnabled: true
   capifLoggingEnabled: true
-  capifHostname: "andres-test-capif.apps.ocp-epg.hi.inet"
+  capifHostname: "capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "80"
   capifPortHttps: "443"
 

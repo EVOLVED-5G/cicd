@@ -14,7 +14,7 @@ A Helm chart for Kubernetes
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | configMap.capifEnabled | bool | `true` |  |
-| configMap.capifHostname | string | `"andres-test-capif.apps.ocp-epg.hi.inet"` |  |
+| configMap.capifHostname | string | `"capif.apps.ocp-epg.hi.inet"` |  |
 | configMap.capifLoggingEnabled | bool | `true` |  |
 | configMap.capifPortHttp | string | `"80"` |  |
 | configMap.capifPortHttps | string | `"443"` |  |
