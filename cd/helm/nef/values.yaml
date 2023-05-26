@@ -53,7 +53,7 @@ db:
     targetPort: 5432
   type: ClusterIP
 env:
-  backendCorsOrigins: '["http://andres-nef.apps.ocp-epg.hi.inet","http://localhost"]'
+  backendCorsOrigins: '["http://andres-nef.apps.ocp-epg.hi.inet"]'
   backendServerPort: 80
   emailsFromEmail: user@my-email.com
   firstSuperuser: admin@my-email.com
