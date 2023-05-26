@@ -39,6 +39,8 @@ pipeline {
         string(name: 'RELEASE_NAME_CAPIF', defaultValue: 'capif', description: 'Release name Helm to CAPIF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         string(name: 'RELEASE_NAME_NEF', defaultValue: 'nef', description: 'Release name Helm to NEF')
+        string(name: 'HOSTNAME_TSN', defaultValue: 'tsn.apps.ocp-epg.hi.inet', description: 'Hostname to TSN')
+        string(name: 'RELEASE_NAME_TSN', defaultValue: 'tsn', description: 'Release name Helm to TSN Frontend')        
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
@@ -52,6 +54,8 @@ pipeline {
         RELEASE_NAME_CAPIF = "${params.RELEASE_NAME_CAPIF}"
         HOSTNAME_NEF="${params.HOSTNAME_NEF}"
         RELEASE_NAME_NEF = "${params.RELEASE_NAME_NEF}"
+        HOSTNAME_TSN="${params.HOSTNAME_TSN}"
+        RELEASE_NAME_TSN = "${params.RELEASE_NAME_TSN}"
         HOSTNAME_NETAPP="${params.HOSTNAME_NETAPP}"
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
@@ -82,6 +86,13 @@ pipeline {
                     kubectl create secret docker-registry regcred                                   \
                     --docker-password=$(aws ecr get-login-password)                                 \
                     --namespace=nef-${BUILD_NUMBER}                                                     \
+                    --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                    --docker-username=AWS
+                    kubectl delete secret docker-registry regcred --ignore-not-found --namespace=tsn-${BUILD_NUMBER}
+                    kubectl create namespace tsn-${BUILD_NUMBER}
+                    kubectl create secret docker-registry regcred                                   \
+                    --docker-password=$(aws ecr get-login-password)                                 \
+                    --namespace=tsn-${BUILD_NUMBER}                                                     \
                     --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                     --docker-username=AWS
                     kubectl delete secret docker-registry regcred --ignore-not-found --namespace=networt-app-${BUILD_NUMBER}
@@ -148,6 +159,18 @@ pipeline {
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
+                            echo "#### setting up tsn variables ####"
+
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn-frontend \
+                            --arg NAMESPACE tsn-$BUILD_NUMBER --arg HOSTNAME_TSN $HOSTNAME_TSN \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
+                            --arg CREATE_NS $CREATE_NS -f $WORKSPACE/cd/helm/helmfile.d/03-tsn.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+
+                            echo "./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+
                             echo "#### setting up network-app variables ####"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
@@ -177,6 +200,7 @@ pipeline {
             environment {
                 TOKEN_NS_CAPIF = credentials("token-os-capif")
                 TOKEN_NS_NEF = credentials("openshiftv4-nef")
+                TOKEN_NS_TSN = credentials("openshift-evol5-tsn-token")
                 TOKEN_NS_NETAPP = credentials("token-evol5-netapp")
             }
             steps {
@@ -186,6 +210,7 @@ pipeline {
                             CREATE_NS=false
                             TMP_NS_CAPIF=evol5-capif
                             TMP_NS_NEF=evol5-nef
+                            TMP_NS_TSN=evol5-tsn
                             TMP_NS_NETAPP=evol5-netapp
 
                             if [[ $DEPLOYMENT == "kubernetes-athens" ]]; then 
@@ -215,6 +240,14 @@ pipeline {
                             kubectl create secret docker-registry regcred                                   \
                             --docker-password=$(aws ecr get-login-password)                                 \
                             --namespace=$TMP_NS_NEF                                                     \
+                            --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
+                            --docker-username=AWS
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_TSN
+                            kubectl delete secret docker-registry regcred --ignore-not-found --namespace=$TMP_NS_TSN
+                            kubectl create secret docker-registry regcred                                   \
+                            --docker-password=$(aws ecr get-login-password)                                 \
+                            --namespace=$TMP_NS_TSN                                                     \
                             --docker-server=709233559969.dkr.ecr.eu-central-1.amazonaws.com                 \
                             --docker-username=AWS
 
@@ -256,6 +289,18 @@ pipeline {
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
                             cat ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
+                            echo "#### setting up tsn variables ####"
+
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_TSN --arg CHART_NAME tsn-frontend \
+                            --arg NAMESPACE $TMP_NS_TSN --arg HOSTNAME_TSN $HOSTNAME_TSN \
+                            --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg CREATE_NS $CREATE_NS \
+                            --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/03-tsn.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+
+                            echo "./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+
                             echo "#### setting up network-app variables ####"
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
@@ -277,6 +322,9 @@ pipeline {
 
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NEF
                             helmfile sync --debug -f ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+
+                            oc login --insecure-skip-tls-verify --token=$TOKEN_NS_TSN
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
 
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
                             helmfile sync --debug -f ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
