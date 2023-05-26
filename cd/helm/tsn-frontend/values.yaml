@@ -14,7 +14,7 @@ replicaCount: 1
 
 image:
   # -- The docker image repository to use
-  repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:tsn_frontend
+  repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:tsn-frontend
   pullPolicy: Always
   # -- Overrides the image tag whose default is the chart appVersion.
   # -- @default Chart version
