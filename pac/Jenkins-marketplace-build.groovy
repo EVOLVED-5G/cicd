@@ -45,8 +45,11 @@ pipeline {
                 dir("${env.WORKSPACE}/") {
                     sh '''
                     git clone --single-branch --branch $GIT_MARKET_BRANCH $GIT_MARKET_URL $MKTP_FOLDER_NAME
+                    cp -r utils/marketplace/$MKTP_FOLDER_NAME/* $MKTP_FOLDER_NAME/
                     git clone --single-branch --branch $GIT_MARKET_BLOCKCHAIN_BRANCH $GIT_MARKET_BLOCKCHAIN_URL $MKTP_BLOCKCHAIN_FOLDER_NAME
+                    cp -r utils/marketplace/$MKTP_BLOCKCHAIN_FOLDER_NAME/* $MKTP_BLOCKCHAIN_FOLDER_NAME/
                     git clone --single-branch --branch $GIT_MARKET_TMF620_BRANCH $GIT_MARKET_TMF620_URL $MKTP_TMF620_FOLDER_NAME
+                    cp -r utils/marketplace/$MKTP_TMF620_FOLDER_NAME/* $MKTP_TMF620_FOLDER_NAME/
                     '''
                 }
             }
@@ -82,7 +85,7 @@ pipeline {
                         sed -i "s,^[ ]*DOCKER_USER_ID=.*,DOCKER_USER_ID=$uid,g" .env
                         sed -i "s,^[ ]*DOCKER_GROUP_ID=.*,DOCKER_GROUP_ID=$gid,g" .env
                         sed -i "s,^[ ]*DB_CONNECTION=.*,DB_CONNECTION=mysql,g" .env
-                        sed -i "s,^[ ]*DB_HOST=.*,DB_HOST=mktp-db,g" .env
+                        sed -i "s,^[ ]*DB_HOST=.*,DB_HOST=evolved5g-pilot-marketplace-db,g" .env
                         sed -i "s,^[ ]*DB_PORT=.*,DB_PORT=3306,g" .env
                         sed -i "s,^[ ]*DB_DATABASE=.*,DB_DATABASE=evolved5g_db,g" .env
                         sed -i "s,^[ ]*DB_USERNAME=.*,DB_USERNAME=admin,g" .env
@@ -93,6 +96,10 @@ pipeline {
                         sed -i "s,^[ ]*CRYPTO_NETWORK=.*,CRYPTO_NETWORK=goerli,g" .env
                         sed -i "s,^[ ]*FORUM_URL=.*,FORUM_URL=http://evolved5g-marketplace-forum.evolved-5g.gr/,g" .env
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
+                        sed -i "s,^[ ]*CRYPTO_SENDER_BASE_URL=.*,CRYPTO_SENDER_BASE_URL=http://evolved5g-blockchain-sender:8000/,g" .env
+                        sed -i "s,^[ ]*TM_FORUM_API_BASE_URL=.*,TM_FORUM_API_BASE_URL=http://evolved5g-pilot-tmf-api-container:8080/tmf-api/,g" .env
+
+                        cat .env
                     '''
                 }
             }
@@ -102,10 +109,13 @@ pipeline {
                 dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
                     sh'''
                     make build
-                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
-                    docker exec -i evolved5g_pilot_marketplace_laravel bash -c "npm install; npm run prod"
                     '''
                 }
+            }
+        }
+        stage('Leave some time avoid docker pull limit at blockchain sender build') {
+            steps {
+                sleep(time: 5, unit: 'MINUTES')
             }
         }
         stage('build blockchain service') {
@@ -117,6 +127,11 @@ pipeline {
                 }
             }
         }
+        stage('Leave some time avoid docker pull limit at tmf620 build') {
+            steps {
+                sleep(time: 5, unit: 'MINUTES')
+            }
+        }
         stage('build tmf620 service') {
             steps {
                 dir("${env.WORKSPACE}/${MKTP_TMF620_FOLDER_NAME}/") {
@@ -126,6 +141,17 @@ pipeline {
                 }
             }
         }
+        stage('Run post commands') {
+            steps {
+                dir("${env.WORKSPACE}/${MKTP_FOLDER_NAME}/") {
+                    sh'''
+                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "composer install ; composer dump-autoload ; php artisan key:generate ; php artisan migrate ; php artisan db:seed; php artisan storage:link"
+                    docker exec -i evolved5g-pilot-marketplace-laravel bash -c "npm install; npm run production"
+                    '''
+                }
+            }
+        }
+
         stage('Modify image name and upload to AWS') {
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
