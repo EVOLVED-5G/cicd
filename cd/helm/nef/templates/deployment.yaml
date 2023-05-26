@@ -1,10 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-backend
   labels:
     io.kompose.service: backend
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -13,13 +13,13 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: backend
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/nef-emulator-default: "true"
         io.kompose.service: backend
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
+      {{- include "nef.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f ../docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -49,16 +49,6 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
               name: env
         - name: DOMAIN
           valueFrom:
@@ -217,7 +207,7 @@ spec:
         imagePullPolicy: Always
         name: backend
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.env.backendServerPort }}
         resources:
             {{- toYaml .Values.backend.backend.resources | nindent 12 }}
       restartPolicy: Always
@@ -225,10 +215,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: db
+  name: {{ include "nef.fullname" . }}-db
   labels:
     io.kompose.service: db
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -237,13 +227,13 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: db
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/nef-emulator-default: "true"
         io.kompose.service: db
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
+      {{- include "nef.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f ../docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -271,16 +261,6 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
               name: env
         - name: DOMAIN
           valueFrom:
@@ -449,10 +429,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo
+  name: {{ include "nef.fullname" . }}-mongo
   labels:
     io.kompose.service: mongo
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -461,13 +441,13 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: mongo
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/nef-emulator-default: "true"
         io.kompose.service: mongo
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
+      {{- include "nef.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f ../docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -495,16 +475,6 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
               name: env
         - name: DOMAIN
           valueFrom:
@@ -671,10 +641,10 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-express
+  name: {{ include "nef.fullname" . }}-mongo-express
   labels:
     io.kompose.service: mongo-express
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -683,13 +653,13 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: mongo-express
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/nef-emulator-default: "true"
         io.kompose.service: mongo-express
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
+      {{- include "nef.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f ../docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -714,9 +684,10 @@ spec:
       containers:
       - env:
         - name: ME_CONFIG_MONGODB_URL
-          value: {{ quote .Values.env.mongoClient }}
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_CLIENT
+              name: env
         image: {{ .Values.mongoExpress.mongoExpress.image.repository }}-{{ .Values.mongoExpress.mongoExpress.image.tag
           | default .Chart.AppVersion }}
         imagePullPolicy: Always
@@ -730,25 +701,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pgadmin
+  name: {{ include "nef.fullname" . }}-pgadmin
   labels:
     io.kompose.service: pgadmin
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
+    kompose.cmd: kompose -f ../docker-compose.yml sconvert
     kompose.version: 1.28.0 (c4137012e)
 spec:
   replicas: {{ .Values.pgadmin.replicas }}
   selector:
     matchLabels:
       io.kompose.service: pgadmin
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/nef-emulator-default: "true"
         io.kompose.service: pgadmin
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
+      {{- include "nef.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f ../docker-compose.yml convert
         kompose.version: 1.28.0 (c4137012e)
@@ -776,16 +747,6 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
               name: env
         - name: DOMAIN
           valueFrom:

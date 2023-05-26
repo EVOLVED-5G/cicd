@@ -23,12 +23,12 @@ backend:
        memory: 128Mi
   ports:
   - name: backend
-    port: 8888
+    port: 80
     targetPort: 80
   replicas: 1
   type: ClusterIP
   ingress:
-    host: "nef-test.apps.ocp-epg.hi.inet"
+    host: "andres-nef.apps.ocp-epg.hi.inet"
 db:
   db:
     env:
@@ -53,29 +53,23 @@ db:
     targetPort: 5432
   type: ClusterIP
 env:
-  backendCorsOrigins: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
-  dockerImageBackend: backend
-  dockerImageFrontend: frontend
-  domain: localhost
+  backendCorsOrigins: '["http://andres-nef.apps.ocp-epg.hi.inet","http://localhost"]'
+  backendServerPort: 80
   emailsFromEmail: user@my-email.com
   firstSuperuser: admin@my-email.com
   firstSuperuserPassword: pass
   mongoPassword: pass
   mongoUser: root
-  mongoClient: mongodb://mongo:27017
+  mongoPort: 27017
   pgadminDefaultEmail: admin@my-email.com
   pgadminDefaultPassword: pass
-  pgadminListenPort: "5050"
   postgresDb: app
   postgresPassword: pass
-  postgresServer: db
+  postgresListenPort: 5432
   postgresUser: postgres
   projectName: NEF_Emulator
   secretKey: 2D47CF2958CEC7CC86C988E9F9684
   sentryDsn: ""
-  serverHost: https://localhost
-  serverName: localhost
-  serverPort: "8888"
   smtpHost: mail.host.com
   smtpPassword: pass
   smtpPort: "465"
@@ -83,9 +77,9 @@ env:
   smtpUser: user
   usersOpenRegistration: "true"
   usePublicKeyVerification: "True"
-  capifHostname: "capif.apps.ocp-epg.hi.inet"
-  capifHttpPort: "30048"
-  capifHttpsPort: "30548"
+  capifHostname: "andres-test-capif.apps.ocp-epg.hi.inet"
+  capifHttpPort: "80"
+  capifHttpsPort: "443"
 
 kubernetesClusterDomain: cluster.local
 mongo:

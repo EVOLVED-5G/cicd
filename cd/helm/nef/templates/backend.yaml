@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-ingress
   labels:
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
     kompose.version: 1.26.1 (HEAD)
@@ -17,19 +17,19 @@ spec:
       paths:
       - backend:
           service:
-            name: 'backend'
+            name: {{ include "nef.fullname" . }}-backend
             port:
-              number: 8888
+              number: 80
         path: /
         pathType: Prefix
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-backend
   labels:
     io.kompose.service: backend
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
@@ -37,6 +37,6 @@ spec:
   type: {{ .Values.backend.type }}
   selector:
     io.kompose.service: backend
-  {{- include "nef-kube.selectorLabels" . | nindent 4 }}
+  {{- include "nef.selectorLabels" . | nindent 4 }}
   ports:
 	{{- .Values.backend.ports | toYaml | nindent 2 -}}
