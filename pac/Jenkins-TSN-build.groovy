@@ -30,7 +30,7 @@ pipeline {
         AWS_DEFAULT_REGION = 'eu-central-1'
         AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         AWS_REGION = "eu-central-1"
-        TSN_NAME = "tns-frontend"
+        TSN_NAME = "tsn-frontend"
     }
     stages {
         stage('Clean workspace') {
