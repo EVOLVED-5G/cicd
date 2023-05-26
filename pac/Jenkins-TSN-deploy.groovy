@@ -162,15 +162,15 @@ pipeline {
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg CREATE_NS $CREATE_NS \
                             --arg DEPLOYMENT $DEPLOYMENT -f $WORKSPACE/cd/helm/helmfile.d/03-tsn.json \
-                            | yq -P > ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+                            | yq -P > ./${BUILD_NUMBER}.d/01-tmp-tsn-${BUILD_NUMBER}.yaml
 
-                            echo "./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml"
-                            cat ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+                            echo "./${BUILD_NUMBER}.d/01-tmp-tsn-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/01-tmp-tsn-${BUILD_NUMBER}.yaml
 
                             echo "#### applying helmfile ####"
 
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_TSN
-                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/03-tmp-tsn-${BUILD_NUMBER}.yaml
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/01-tmp-tsn-${BUILD_NUMBER}.yaml
 
                     '''
                 }
