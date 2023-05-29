@@ -90,6 +90,8 @@ pipeline {
         string(name: 'RELEASE_CAPIF', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         string(name: 'RELEASE_NEF', defaultValue: 'nef', description: 'Helm Release name to NEF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
+        string(name: 'RELEASE_TSN', defaultValue: 'tsn', description: 'Helm Release name to TSN')
+        string(name: 'HOSTNAME_TSN', defaultValue: 'tsn.apps.ocp-epg.hi.inet', description: 'Hostname to TSN')
         choice(name: 'ENVIRONMENT', choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: false, description: 'Send mail to Developers')
@@ -107,6 +109,8 @@ pipeline {
         HOSTNAME_CAPIF = "${params.HOSTNAME_CAPIF}"
         RELEASE_NEF = "${params.RELEASE_NEF}"
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
+        RELEASE_TSN = "${params.RELEASE_TSN}"
+        HOSTNAME_TSN = "${params.HOSTNAME_TSN}"
         RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
         emails = "${params.EMAILS}".trim()
@@ -272,7 +276,7 @@ pipeline {
         }
 
         //10
-        stage('Validation: Deploying CAPIF-NEF-NetworkApp') {
+        stage('Validation: Deploying CAPIF-NEF-TSN-NetworkApp') {
             steps {
                 script {
                     def step_name = step_deploy_capif_nef_netapp
@@ -284,6 +288,8 @@ pipeline {
                                     string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
                                     string(name: 'HOSTNAME_NEF', value: String.valueOf(HOSTNAME_NEF)),
                                     string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
+                                    string(name: 'HOSTNAME_TSN', value: String.valueOf(HOSTNAME_TSN)),
+                                    string(name: 'RELEASE_NAME_TSN', value: String.valueOf(RELEASE_TSN)),
                                     string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
                                     string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(DEPLOY_NAME)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
