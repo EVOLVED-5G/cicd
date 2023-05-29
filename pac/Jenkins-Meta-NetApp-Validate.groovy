@@ -39,6 +39,14 @@ def getHttpsPort(deployment) {
     }
 }
 
+String getArtifactoryUrl(phase) {
+    return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
+}
+
+String getPhase(){
+    return 'Validation'
+}
+
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
@@ -89,10 +97,12 @@ pipeline {
     }
 
     environment {
+        PHASE = getPhase()
+        PHASE_LOWER = PHASE.toLowerCase()
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = getArtifactoryUrl("${env.PHASE_LOWER}")
         RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
         HOSTNAME_CAPIF = "${params.HOSTNAME_CAPIF}"
         RELEASE_NEF = "${params.RELEASE_NEF}"
@@ -130,7 +140,7 @@ pipeline {
                 }
             }
         }
-        stage('Validation: Static Application Securirty Test - SAST') {
+        stage(${PHASE} + ' Static Application Securirty Test - SAST') {
             parallel {
                 stage('Validation: Static Code Analysis') {
                     steps {
@@ -229,7 +239,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -247,7 +257,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -422,6 +432,18 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of ' Deploy NetApp' returned result: ${jobResult}"
                 // buildResults['steps'][step_name] = jobResult
+                }
+            }
+            retry(3) {
+                script {
+                    echo 'Destroy TSN'
+                    def jobBuild = build job: '005-TSN-FrontEnd/-destroy', wait: true, propagate: false,
+                                    parameters: [
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_NEF)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
                 }
             }
             retry(3) {
