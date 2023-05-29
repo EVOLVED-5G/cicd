@@ -443,7 +443,7 @@ pipeline {
             retry(3) {
                 script {
                     echo 'Destroy TSN'
-                    def jobBuild = build job: '005-TSN-FrontEnd/-destroy', wait: true, propagate: false,
+                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
                                     parameters: [
                                         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
