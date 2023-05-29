@@ -144,7 +144,7 @@ pipeline {
                 }
             }
         }
-        stage(${PHASE} + ' Static Application Securirty Test - SAST') {
+        stage('Validation: Static Application Securirty Test - SAST') {
             parallel {
                 stage('Validation: Static Code Analysis') {
                     steps {
