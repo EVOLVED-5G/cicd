@@ -59,6 +59,7 @@ def step_open_source_licenses_report = 'open-source-licenses-report'
 def initial_status = 'SKIPPED'
 def not_report = 'NOT_REPORT'
 def aborted = false
+def fingerprint_filename = 'fingerprint.json'
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -473,16 +474,15 @@ pipeline {
                 "$url"
                 '''
                 sh '''#!/bin/bash
-                fingerprint_file="fingerprint.json"
                 UUID=$(uuidgen)
                 echo $UUID
-                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $fingerprint_file
+                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > ${fingerprint_filename}
 
-                cat $fingerprint_file
+                cat ${fingerprint_filename}
 
-                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$fingerprint_file"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/${fingerprint_filename}"
                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                --data-binary @"$fingerprint_file" \
+                --data-binary @"${fingerprint_filename}" \
                 "$url"
                 '''
             }
