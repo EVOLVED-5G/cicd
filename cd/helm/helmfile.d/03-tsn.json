@@ -32,8 +32,8 @@
         {
           "configMap": {
             "capifHostname": "\($HOSTNAME_CAPIF)",
-            "capifHttpPort": "\($CAPIF_HTTP_PORT)",
-            "capifHttpsPort": "\($CAPIF_HTTPS_PORT)"
+            "capifPortHttp": "\($CAPIF_HTTP_PORT)",
+            "capifPortHttps": "\($CAPIF_HTTPS_PORT)"
           }
         }
       ]
