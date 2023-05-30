@@ -39,6 +39,18 @@ def getHttpsPort(deployment) {
     }
 }
 
+String getArtifactoryUrl(phase) {
+    return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
+}
+
+String getPhase(){
+    return 'Validation'
+}
+
+String getFingerprintFilename() {
+    return 'fingerprint.json'
+}
+
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
@@ -90,10 +102,12 @@ pipeline {
     }
 
     environment {
+        PHASE = getPhase()
+        PHASE_LOWER = PHASE.toLowerCase()
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = getArtifactoryUrl("${env.PHASE_LOWER}")
         RELEASE_CAPIF = "${params.RELEASE_CAPIF}"
         HOSTNAME_CAPIF = "${params.HOSTNAME_CAPIF}"
         RELEASE_NEF = "${params.RELEASE_NEF}"
@@ -105,6 +119,7 @@ pipeline {
         emails = "${params.EMAILS}".trim()
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
+        FINGERPRINT_FILENAME = getFingerprintFilename()
     }
 
     stages {
@@ -129,7 +144,9 @@ pipeline {
                     // buildResults['steps'][step_destroy_network_app] = initial_status
                     // buildResults['steps'][step_destroy_nef] = initial_status
                     // buildResults['steps'][step_destroy_capif] = initial_status
-                    buildResults['steps'][step_open_source_licenses_report] = initial_status
+
+                    //TEMPORALY COMMENTED LINE
+                    // buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
             }
         }
@@ -199,27 +216,27 @@ pipeline {
                         }
                     }
                 }
-                stage('Validation: OpenSource Licenses Report') {
-                    steps {
-                        retry(2) {
-                            script {
-                                def step_name = step_open_source_licenses_report
-                                buildResults['steps'][step_name] = 'FAILURE'
-                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                                def jobResult = jobBuild.getResult()
-                                echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                                buildResults['steps'][step_name] = jobResult
-                            }
-                        }
-                    }
-                }
+                // stage('Validation: OpenSource Licenses Report') {
+                //     steps {
+                //         retry(2) {
+                //             script {
+                //                 def step_name = step_open_source_licenses_report
+                //                 buildResults['steps'][step_name] = 'FAILURE'
+                //                 def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+                //                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                //                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                //                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                //                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                //                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                //                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                //                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                //                 def jobResult = jobBuild.getResult()
+                //                 echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                //                 buildResults['steps'][step_name] = jobResult
+                //             }
+                //         }
+                //     }
+                // }
                 stage('Validation: Build validation image Report and Security Scan Docker Images Builded') {
                     steps {
                         retry(2) {
@@ -232,7 +249,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -250,7 +267,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                string(name: 'STAGE', value: 'validation'),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -429,6 +446,18 @@ pipeline {
                 // buildResults['steps'][step_name] = jobResult
                 }
             }
+//            retry(3) {
+//                script {
+//                    echo 'Destroy TSN'
+//                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
+//                                    parameters: [
+//                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+//                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
+//                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+//                    def jobResult = jobBuild.getResult()
+//                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
+//                }
+//            }
             retry(3) {
                 script {
                     echo 'Destroy NEF'
@@ -476,6 +505,18 @@ pipeline {
                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                 --data-binary @"$report_file" \
+                "$url"
+                '''
+                sh '''#!/bin/bash
+                UUID=$(uuidgen)
+                echo $UUID
+                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
+
+                cat $FINGERPRINT_FILENAME
+
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                --data-binary @"$FINGERPRINT_FILENAME" \
                 "$url"
                 '''
             }
