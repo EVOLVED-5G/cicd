@@ -270,7 +270,7 @@ pipeline {
                                 url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                                --data-binary deploy-pki.json \
+                                                --data-binary @deploy-pki.json \
                                                 "$url"
                             else
                                     echo "No report file generated"
