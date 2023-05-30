@@ -43,7 +43,7 @@ pipeline {
         string(name: 'RELEASE_NAME_TSN', defaultValue: 'tsn', description: 'Release name Helm to TSN Frontend')        
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
-        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         choice(name: 'FOLDER_NETWORK_APP', choices: ["8bells", "cafatech", "fogus","gmi","immersion","infolysis","inin","iqb","teleop","umacsic","ums","zortenet"])
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
@@ -198,18 +198,18 @@ pipeline {
                             sudo apt-get install dateutils -y
                             sudo install /usr/bin/dateutils.ddiff /usr/local/bin/datediff
                             
-                            DEBUG="false"
+                            DEBUG="true"
                             ns=network-app-$BUILD_NUMBER
                             TMP_STARTTIME="/tmp/tmp.startime"
                             TMP_STARTAT="/tmp/tmp.startat"
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
-                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\t"}{.status.startTime}{"\t"}{.status.containerStatuses[0].state.running.startedAt}{"\n"}{end}'
+                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
                             ) | column -t > $TMP_STARTTIME
 
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
-                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\t"}{.status.startTime}{"\t"}{.status.containerStatuses[0].state.running.startedAt}{"\n"}{end}'
+                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
                             ) | column -t > $TMP_STARTAT
 
                             if [ $DEBUG == "true" ]; then
