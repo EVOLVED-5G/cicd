@@ -67,7 +67,6 @@ pipeline {
         HOSTNAME_NETAPP="${params.HOSTNAME_NETAPP}"
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
-        NETAPP_NAME_LOWER = "${params.NETAPP_NAME_LOWER}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
