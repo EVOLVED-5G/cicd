@@ -107,7 +107,7 @@ pipeline {
                 DEBRICKED_CREDENTIALS = credentials('Debricked')
             }
             options {
-                    timeout(time: 10, unit: 'MINUTES')
+                    timeout(time: 60, unit: 'MINUTES')
                     retry(3)
             }
             steps {
