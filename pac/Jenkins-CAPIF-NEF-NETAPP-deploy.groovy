@@ -25,6 +25,10 @@ def getAgent(deployment) {
     }
 }
 
+def getReportFilename(String netappNameLower) {
+    return '004-report-build-' + netappNameLower
+}
+
 pipeline {
     agent {node {label getAgent("${params.DEPLOYMENT}") == "any" ? "" : getAgent("${params.DEPLOYMENT}")}}
     options {
@@ -41,6 +45,7 @@ pipeline {
         string(name: 'RELEASE_NAME_NEF', defaultValue: 'nef', description: 'Release name Helm to NEF')
         string(name: 'HOSTNAME_TSN', defaultValue: 'tsn.apps.ocp-epg.hi.inet', description: 'Hostname to TSN')
         string(name: 'RELEASE_NAME_TSN', defaultValue: 'tsn', description: 'Release name Helm to TSN Frontend')        
+        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
@@ -57,12 +62,15 @@ pipeline {
         RELEASE_NAME_NEF = "${params.RELEASE_NAME_NEF}"
         HOSTNAME_TSN="${params.HOSTNAME_TSN}"
         RELEASE_NAME_TSN = "${params.RELEASE_NAME_TSN}"
+        GIT_NETAPP_URL = "${params.GIT_NETAPP_URL}"
+        NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
+        NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         HOSTNAME_NETAPP="${params.HOSTNAME_NETAPP}"
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
-        AWS_DEFAULT_REGION = 'eu-central-1'
         FOLDER_NETWORK_APP = "${params.FOLDER_NETWORK_APP}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
+        REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
@@ -263,7 +271,7 @@ pipeline {
                                 x=$(($x + 1))
                             done
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME-pki.json
                     '''
                 }
             }
@@ -477,7 +485,7 @@ pipeline {
                                 x=$(($x + 1))
                             done
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME-pki.json
                     '''
                 }
             }
@@ -489,12 +497,12 @@ pipeline {
                 script{
                     if ("${params.REPORTING}".toBoolean() == true) {
                     sh '''#!/bin/bash
-                    if [ -f "deploy-pki.json" ]; then
-                            echo "The file exists."
-                        url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
+                    if [ -f "${REPORT_FILENAME}-pki.json" ]; then
+                            echo "The file $REPORT_FILENAME-pki.json exists."
+                        url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/$REPORT_FILENAME-pki.json"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                        --data-binary @deploy-pki.json \
+                                        --data-binary @$REPORT_FILENAME-pki.json \
                                         "$url"
                     else
                             echo "No report file generated"
