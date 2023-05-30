@@ -266,7 +266,7 @@ pipeline {
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
 
                             if [ -f "deploy-pki.json" ]; then
-                                    echo "$FILE exists."
+                                    echo "The file exists."
                                 url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
 
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
