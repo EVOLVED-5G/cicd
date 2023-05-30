@@ -268,12 +268,13 @@ pipeline {
                             if [ -f "deploy-pki.json" ]; then
                                     echo "$FILE exists."
                                 url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
-        
+
                                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                                                 --data-binary deploy-pki.json \
                                                 "$url"
                             else
                                     echo "No report file generated"
+                            fi
                     '''
                 }
             }
@@ -500,7 +501,7 @@ pipeline {
                     if ("${params.REPORTING}".toBoolean() == true) {
                     sh '''#!/bin/bash
                     if [ -f "deploy-pki.json" ]; then
-                            echo "$FILE exists."
+                            echo "The file exists."
                         url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
@@ -508,6 +509,7 @@ pipeline {
                                         "$url"
                     else
                             echo "No report file generated"
+                    fi
                     '''
                     }
 
