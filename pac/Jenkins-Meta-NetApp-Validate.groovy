@@ -47,6 +47,10 @@ String getPhase(){
     return 'Validation'
 }
 
+String getFingerprintFilename() {
+    return 'fingerprint.json'
+}
+
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
@@ -67,7 +71,6 @@ def step_open_source_licenses_report = 'open-source-licenses-report'
 def initial_status = 'SKIPPED'
 def not_report = 'NOT_REPORT'
 def aborted = false
-def fingerprint_filename = 'fingerprint.json'
 
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
@@ -116,6 +119,7 @@ pipeline {
         emails = "${params.EMAILS}".trim()
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
+        FINGERPRINT_FILENAME = getFingerprintFilename()
     }
 
     stages {
@@ -504,13 +508,13 @@ pipeline {
                 sh '''#!/bin/bash
                 UUID=$(uuidgen)
                 echo $UUID
-                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > ${fingerprint_filename}
+                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
 
-                cat ${fingerprint_filename}
+                cat $FINGERPRINT_FILENAME
 
-                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/${fingerprint_filename}"
+                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
                 curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                --data-binary @"${fingerprint_filename}" \
+                --data-binary @"$FINGERPRINT_FILENAME" \
                 "$url"
                 '''
             }
