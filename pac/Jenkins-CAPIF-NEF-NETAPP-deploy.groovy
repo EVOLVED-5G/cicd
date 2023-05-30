@@ -41,11 +41,12 @@ pipeline {
         string(name: 'RELEASE_NAME_NEF', defaultValue: 'nef', description: 'Release name Helm to NEF')
         string(name: 'HOSTNAME_TSN', defaultValue: 'tsn.apps.ocp-epg.hi.inet', description: 'Hostname to TSN')
         string(name: 'RELEASE_NAME_TSN', defaultValue: 'tsn', description: 'Release name Helm to TSN Frontend')        
-        string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
+        string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
-        string(name: 'FOLDER_NETWORK_APP', defaultValue: 'dummy-network-app', description: 'Folder where the NetworkApp is')
+        choice(name: 'FOLDER_NETWORK_APP', choices: ["8bells", "cafatech", "fogus","gmi","immersion","infolysis","inin","iqb","teleop","umacsic","ums","zortenet"])
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
+        booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
     environment {
@@ -60,7 +61,10 @@ pipeline {
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
+        FOLDER_NETWORK_APP = "${params.FOLDER_NETWORK_APP}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
+        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
 
     stages {
@@ -173,7 +177,7 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $FOLDER_NETWORK_APP \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
@@ -187,6 +191,75 @@ pipeline {
                             
                             echo "#### applying helmfile ####"
                             helmfile sync --debug -f ${BUILD_NUMBER}.d/
+
+                            echo "#### getting PKI ####"
+                            
+                            echo "# dependencies #"
+                            sudo apt-get install dateutils -y
+                            sudo install /usr/bin/dateutils.ddiff /usr/local/bin/datediff
+                            
+                            DEBUG="false"
+                            ns=network-app-$BUILD_NUMBER
+                            TMP_STARTTIME="/tmp/tmp.startime"
+                            TMP_STARTAT="/tmp/tmp.startat"
+                            (
+                            echo -e "Pod\tnodeName\tstartTime\tstartedAt"
+                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\t"}{.status.startTime}{"\t"}{.status.containerStatuses[0].state.running.startedAt}{"\n"}{end}'
+                            ) | column -t > $TMP_STARTTIME
+
+                            (
+                            echo -e "Pod\tnodeName\tstartTime\tstartedAt"
+                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.nodeName}{"\t"}{.status.startTime}{"\t"}{.status.containerStatuses[0].state.running.startedAt}{"\n"}{end}'
+                            ) | column -t > $TMP_STARTAT
+
+                            if [ $DEBUG == "true" ]; then
+                                echo "### startTime ###" 
+                                cat $TMP_STARTTIME | awk '{if (NR!=1) {print $3}}'
+
+                                echo "### startAt ###"
+                                cat $TMP_STARTAT | awk '{if (NR!=1) {print $4}}'
+                            fi
+
+                            ITEMS=$(cat $TMP_STARTTIME | awk '{if (NR!=1) {print $3}}' | wc -l)
+                            LEN=$(($ITEMS +1))
+
+                            if [ $DEBUG == "true" ]; then
+                                echo "LENGTH: $LEN"
+                            fi
+
+                            x=2
+
+                            while [ $x -le $LEN ]; do
+                                if [ $DEBUG == "true" ]; then
+                                    echo "### startTime individual ###"
+                                fi
+
+                                CMD_STARTIME="cat $TMP_STARTTIME | awk 'NR==$x{if (NR!=1) {print \$3}}'"
+                                DATE_FORMAT_0=$(eval $CMD_STARTIME)
+
+                                if [ $DEBUG == "true" ]; then
+                                    echo "### startAt individual ###"
+                                fi
+
+                                CMD_STARTAT="cat $TMP_STARTAT | awk 'NR==$x{if (NR!=1) {print \$4}}'"
+                                DATE_FORMAT_1=$(eval $CMD_STARTAT)
+
+                                if [ $DEBUG == "true" ]; then
+                                    echo "$DATE_FORMAT_1 - $DATE_FORMAT_0 is:"
+                                fi
+
+                                KPI=$(datediff $DATE_FORMAT_0 $DATE_FORMAT_1 | awk -F 's' '{print $1}')
+                                if [ $DEBUG == "true" ]; then
+                                    echo "$KPI"
+                                fi
+
+                                if [[ $N_KPI -lt $KPI ]]; then
+                                    N_KPI=$KPI
+                                fi
+
+                                x=$(($x + 1))
+                            done
+                                echo "{ \"deploy_kpi\" : \"$N_KPI seconds\"}" | jq > deploy-pki.json
                     '''
                 }
             }
@@ -303,7 +376,7 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $FOLDER_NETWORK_APP \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
@@ -334,6 +407,26 @@ pipeline {
         }
     }                
     post {
+        always {
+            retry(2){
+                script{
+                    if ("${params.REPORTING}".toBoolean() == true) {
+                    sh '''#!/bin/bash
+                    if [ -f "deploy-pki.json" ]; then
+                            echo "$FILE exists."
+                        url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
+
+                        curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                        --data-binary deploy-pki.json \
+                                        "$url"
+                    else
+                            echo "No report file generated"
+                    '''
+                    }
+
+                }
+            }
+        }
         cleanup{
             /* clean up our workspace */
             deleteDir()
