@@ -262,8 +262,8 @@ pipeline {
 
                                 x=$(($x + 1))
                             done
-                                echo "{ \"deploy_kpi\" : \"$N_KPI seconds\"}"
-                                echo "{ \"deploy_kpi\" : \"$N_KPI seconds\"}" | jq > deploy-pki.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
                     '''
                 }
             }
