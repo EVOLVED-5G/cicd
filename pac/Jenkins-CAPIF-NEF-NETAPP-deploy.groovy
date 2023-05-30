@@ -200,27 +200,25 @@ pipeline {
                             
                             DEBUG="true"
                             ns=network-app-$BUILD_NUMBER
-                            TMP_STARTTIME="/tmp/tmp.startime"
-                            TMP_STARTAT="/tmp/tmp.startat"
+                            TMP_PKI="/tmp/tmp.pki"
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
                             kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
-                            ) | column -t > $TMP_STARTTIME
-
+                            ) | column -t
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
                             kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
-                            ) | column -t > $TMP_STARTAT
+                            ) | column -t > $TMP_PKI
 
                             if [ $DEBUG == "true" ]; then
                                 echo "### startTime ###" 
-                                cat $TMP_STARTTIME | awk '{if (NR!=1) {print $3}}'
+                                cat $TMP_PKI | awk '{if (NR!=1) {print $3}}'
 
                                 echo "### startAt ###"
-                                cat $TMP_STARTAT | awk '{if (NR!=1) {print $4}}'
+                                cat $TMP_PKI | awk '{if (NR!=1) {print $4}}'
                             fi
 
-                            ITEMS=$(cat $TMP_STARTTIME | awk '{if (NR!=1) {print $3}}' | wc -l)
+                            ITEMS=$(cat $TMP_PKI | awk '{if (NR!=1) {print $3}}' | wc -l)
                             LEN=$(($ITEMS +1))
 
                             if [ $DEBUG == "true" ]; then
@@ -234,17 +232,23 @@ pipeline {
                                     echo "### startTime individual ###"
                                 fi
 
-                                CMD_STARTIME="cat $TMP_STARTTIME | awk 'NR==$x{if (NR!=1) {print \$3}}'"
+                                CMD_STARTIME="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \$3}}'"
                                 DATE_FORMAT_0=$(eval $CMD_STARTIME)
 
                                 if [ $DEBUG == "true" ]; then
+                                    echo "$CMD_STARTIME"
+                                    echo "$DATE_FORMAT_0"
                                     echo "### startAt individual ###"
                                 fi
 
-                                CMD_STARTAT="cat $TMP_STARTAT | awk 'NR==$x{if (NR!=1) {print \$4}}'"
+                                CMD_STARTAT="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \$4}}'"
                                 DATE_FORMAT_1=$(eval $CMD_STARTAT)
 
                                 if [ $DEBUG == "true" ]; then
+                                    echo "$CMD_STARTAT"
+                                    echo "---"
+                                    echo "$DATE_FORMAT_1"
+                                    echo "---"
                                     echo "$DATE_FORMAT_1 - $DATE_FORMAT_0 is:"
                                 fi
 
