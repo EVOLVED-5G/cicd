@@ -144,9 +144,7 @@ pipeline {
                     // buildResults['steps'][step_destroy_network_app] = initial_status
                     // buildResults['steps'][step_destroy_nef] = initial_status
                     // buildResults['steps'][step_destroy_capif] = initial_status
-
-                    //TEMPORALY COMMENTED LINE
-                    // buildResults['steps'][step_open_source_licenses_report] = initial_status
+                    buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
             }
         }
@@ -216,27 +214,27 @@ pipeline {
                         }
                     }
                 }
-                // stage('Validation: OpenSource Licenses Report') {
-                //     steps {
-                //         retry(2) {
-                //             script {
-                //                 def step_name = step_open_source_licenses_report
-                //                 buildResults['steps'][step_name] = 'FAILURE'
-                //                 def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
-                //                     parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                //                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                //                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                //                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                //                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                //                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                //                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-                //                 def jobResult = jobBuild.getResult()
-                //                 echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
-                //                 buildResults['steps'][step_name] = jobResult
-                //             }
-                //         }
-                //     }
-                // }
+                stage('Validation: OpenSource Licenses Report') {
+                    steps {
+                        retry(2) {
+                            script {
+                                def step_name = step_open_source_licenses_report
+                                buildResults['steps'][step_name] = 'FAILURE'
+                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/015-OpenSource_Licenses_Report', wait: true, propagate: false,
+                                    parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of 'OpenSource Licenses Report' returned result: ${jobResult}"
+                                buildResults['steps'][step_name] = jobResult
+                            }
+                        }
+                    }
+                }
                 stage('Validation: Build validation image Report and Security Scan Docker Images Builded') {
                     steps {
                         retry(2) {
