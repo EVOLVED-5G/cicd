@@ -85,7 +85,6 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'VERSION_NETAPP', defaultValue: '4.0', description: 'Version Network App')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment NetworkApp name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.1.2', description: 'Version CAPIF')
@@ -114,7 +113,6 @@ pipeline {
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_TSN = "${params.RELEASE_TSN}"
         HOSTNAME_TSN = "${params.HOSTNAME_TSN}"
-        RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
         emails = "${params.EMAILS}".trim()
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
@@ -297,9 +295,9 @@ pipeline {
                                     string(name: 'HOSTNAME_TSN', value: String.valueOf(HOSTNAME_TSN)),
                                     string(name: 'RELEASE_NAME_TSN', value: String.valueOf(RELEASE_TSN)),
                                     string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
-                                    string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(DEPLOY_NAME)),
+                                    string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
-                                    string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(DEPLOY_NAME)),
+                                    string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
@@ -437,7 +435,7 @@ pipeline {
                     // def step_name = step_destroy_network_app
                     // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                            parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
+                            parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(NETAPP_NAME_LOWER)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                             ]
