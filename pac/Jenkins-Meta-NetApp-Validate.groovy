@@ -294,10 +294,10 @@ pipeline {
                                     string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
                                     string(name: 'HOSTNAME_TSN', value: String.valueOf(HOSTNAME_TSN)),
                                     string(name: 'RELEASE_NAME_TSN', value: String.valueOf(RELEASE_TSN)),
+                                    string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL))
                                     string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
                                     string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
-                                    string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
