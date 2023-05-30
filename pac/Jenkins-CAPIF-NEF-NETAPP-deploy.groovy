@@ -264,6 +264,16 @@ pipeline {
                             done
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
+
+                            if [ -f "deploy-pki.json" ]; then
+                                    echo "$FILE exists."
+                                url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/deploy-pki.json"
+        
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                                --data-binary deploy-pki.json \
+                                                "$url"
+                            else
+                                    echo "No report file generated"
                     '''
                 }
             }
@@ -405,6 +415,79 @@ pipeline {
 
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
                             helmfile sync --debug -f ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+
+                            echo "#### getting PKI ####"
+                            
+                            echo "# dependencies #"
+                            sudo apt-get install dateutils -y
+                            sudo install /usr/bin/dateutils.ddiff /usr/local/bin/datediff
+                            
+                            DEBUG="true"
+                            NS=network-app-$BUILD_NUMBER
+                            TMP_PKI="/tmp/tmp.pki"
+                            (
+                            echo -e "Pod\tnodeName\tstartTime\tstartedAt"
+                            kubectl -n "$NS" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
+                            ) | column -t
+                            (
+                            echo -e "Pod\tnodeName\tstartTime\tstartedAt"
+                            kubectl -n "$NS" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
+                            ) | column -t > $TMP_PKI
+
+                            if [ $DEBUG == "true" ]; then
+                                echo "### startTime ###" 
+                                cat $TMP_PKI | awk '{if (NR!=1) {print $3}}'
+
+                                echo "### startAt ###"
+                                cat $TMP_PKI | awk '{if (NR!=1) {print $4}}'
+                            fi
+
+                            ITEMS=$(cat $TMP_PKI | awk '{if (NR!=1) {print $3}}' | wc -l)
+                            LEN=$(($ITEMS +1))
+
+                            if [ $DEBUG == "true" ]; then
+                                echo "LENGTH: $LEN"
+                            fi
+
+                            x=2
+
+                            while [ $x -le $LEN ]; do
+                                if [ $DEBUG == "true" ]; then
+                                    echo "### startTime individual ###"
+                                fi
+
+                                CMD_STARTIME="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \\$3}}'"
+                                DATE_FORMAT_0=$(eval $CMD_STARTIME)
+
+                                if [ $DEBUG == "true" ]; then
+                                    echo "$CMD_STARTIME"
+                                    echo "$DATE_FORMAT_0"
+                                    echo "### startAt individual ###"
+                                fi
+
+                                CMD_STARTAT="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \\$4}}'"
+                                DATE_FORMAT_1=$(eval $CMD_STARTAT)
+
+                                if [ $DEBUG == "true" ]; then
+                                    echo "$CMD_STARTAT"
+                                    echo "$DATE_FORMAT_1"
+                                    echo "---"
+                                    echo "$DATE_FORMAT_1 - $DATE_FORMAT_0 is:"
+                                fi
+
+                                KPI=$(datediff $DATE_FORMAT_0 $DATE_FORMAT_1 | awk -F 's' '{print $1}')
+                                if [ $DEBUG == "true" ]; then
+                                    echo "$KPI"
+                                fi
+
+                                if [[ $N_KPI -lt $KPI ]]; then
+                                    N_KPI=$KPI
+                                fi
+
+                                x=$(($x + 1))
+                            done
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > deploy-pki.json
                     '''
                 }
             }
