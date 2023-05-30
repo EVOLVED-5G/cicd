@@ -298,7 +298,8 @@ pipeline {
                                     string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
                                     string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
-                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
                     buildResults['steps'][step_name] = jobResult
