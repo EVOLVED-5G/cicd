@@ -199,15 +199,15 @@ pipeline {
                             sudo install /usr/bin/dateutils.ddiff /usr/local/bin/datediff
                             
                             DEBUG="true"
-                            ns=network-app-$BUILD_NUMBER
+                            NS=network-app-$BUILD_NUMBER
                             TMP_PKI="/tmp/tmp.pki"
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
-                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
+                            kubectl -n "$NS" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
                             ) | column -t
                             (
                             echo -e "Pod\tnodeName\tstartTime\tstartedAt"
-                            kubectl -n "$1" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
+                            kubectl -n "$NS" get pods -o=jsonpath='{range .items[*]}{.metadata.name}{"\\t"}{.spec.nodeName}{"\\t"}{.status.startTime}{"\\t"}{.status.containerStatuses[0].state.running.startedAt}{"\\n"}{end}'
                             ) | column -t > $TMP_PKI
 
                             if [ $DEBUG == "true" ]; then
@@ -232,7 +232,7 @@ pipeline {
                                     echo "### startTime individual ###"
                                 fi
 
-                                CMD_STARTIME="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \$3}}'"
+                                CMD_STARTIME="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \\$3}}'"
                                 DATE_FORMAT_0=$(eval $CMD_STARTIME)
 
                                 if [ $DEBUG == "true" ]; then
@@ -241,12 +241,11 @@ pipeline {
                                     echo "### startAt individual ###"
                                 fi
 
-                                CMD_STARTAT="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \$4}}'"
+                                CMD_STARTAT="cat $TMP_PKI | awk 'NR==$x{if (NR!=1) {print \\$4}}'"
                                 DATE_FORMAT_1=$(eval $CMD_STARTAT)
 
                                 if [ $DEBUG == "true" ]; then
                                     echo "$CMD_STARTAT"
-                                    echo "---"
                                     echo "$DATE_FORMAT_1"
                                     echo "---"
                                     echo "$DATE_FORMAT_1 - $DATE_FORMAT_0 is:"
@@ -263,6 +262,7 @@ pipeline {
 
                                 x=$(($x + 1))
                             done
+                                echo "{ \"deploy_kpi\" : \"$N_KPI seconds\"}"
                                 echo "{ \"deploy_kpi\" : \"$N_KPI seconds\"}" | jq > deploy-pki.json
                     '''
                 }
