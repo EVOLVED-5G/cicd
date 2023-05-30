@@ -49,7 +49,6 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
-        choice(name: 'FOLDER_NETWORK_APP', choices: ["8bells", "cafatech", "fogus","gmi","immersion","infolysis","inin","iqb","teleop","umacsic","ums","zortenet"])
         choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
@@ -68,7 +67,7 @@ pipeline {
         HOSTNAME_NETAPP="${params.HOSTNAME_NETAPP}"
         RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
         VERSION="${params.VERSION}"
-        FOLDER_NETWORK_APP = "${params.FOLDER_NETWORK_APP}"
+        NETAPP_NAME_LOWER = "${params.NETAPP_NAME_LOWER}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
@@ -185,8 +184,8 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $FOLDER_NETWORK_APP \
-                            --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $NETAPP_NAME_LOWER \
+                            --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $NETAPP_NAME_LOWER \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
@@ -388,8 +387,8 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $FOLDER_NETWORK_APP \
-                            --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $NETAPP_NAME_LOWER \
+                            --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $NETAPP_NAME_LOWER \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
@@ -499,7 +498,7 @@ pipeline {
                     sh '''#!/bin/bash
                     if [ -f "${REPORT_FILENAME}-pki.json" ]; then
                             echo "The file $REPORT_FILENAME-pki.json exists."
-                        url="$ARTIFACTORY_URL/$FOLDER_NETWORK_APP/$BUILD_ID/$REPORT_FILENAME-pki.json"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$REPORT_FILENAME-pki.json"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                                         --data-binary @$REPORT_FILENAME-pki.json \
