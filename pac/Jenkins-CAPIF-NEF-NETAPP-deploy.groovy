@@ -498,7 +498,7 @@ pipeline {
                     sh '''#!/bin/bash
                     if [ -f "${REPORT_FILENAME}.json" ]; then
                             echo "The file $REPORT_FILENAME.json exists."
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$REPORT_FILENAME.json"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$REPORT_FILENAME.json"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                                         --data-binary @$REPORT_FILENAME.json \
