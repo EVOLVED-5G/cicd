@@ -290,6 +290,7 @@ pipeline {
                     buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/019-CAPIF-NEF-NETAPP-deploy', wait: true, propagate: true,
                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                     string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
                                     string(name: 'VERSION_CAPIF', value: String.valueOf(VERSION_CAPIF)),
                                     string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
@@ -310,9 +311,11 @@ pipeline {
                         sh '''#!/bin/bash
                         result_file="${DEPLOY_REPORT_FILENAME}.json"
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                        echo "Result File: $result_file"
+                        echo "Destination URL: $url"
                         curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                         '''
-                        def fileName = DEPLOY_REPORT_FILENAME + '.json'
+                        def fileName = "${DEPLOY_REPORT_FILENAME}" + '.json'
                         if (fileExists(fileName)) {
                             def deploy_results = readJSON file: fileName
                             buildResults['deploy_kpi'] = deploy_results['deploy_kpi']
