@@ -26,7 +26,7 @@ def getAgent(deployment) {
 }
 
 def getReportFilename(String netappNameLower) {
-    return '004-report-' + netappNameLower
+    return '019-report-deploy-' + netappNameLower
 }
 
 pipeline {
@@ -269,7 +269,7 @@ pipeline {
                                 x=$(($x + 1))
                             done
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME-pki.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME.json
                     '''
                 }
             }
@@ -483,7 +483,7 @@ pipeline {
                                 x=$(($x + 1))
                             done
                                 echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME-pki.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME.json
                     '''
                 }
             }
@@ -495,12 +495,12 @@ pipeline {
                 script{
                     if ("${params.REPORTING}".toBoolean() == true) {
                     sh '''#!/bin/bash
-                    if [ -f "${REPORT_FILENAME}-pki.json" ]; then
-                            echo "The file $REPORT_FILENAME-pki.json exists."
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$REPORT_FILENAME-pki.json"
+                    if [ -f "${REPORT_FILENAME}.json" ]; then
+                            echo "The file $REPORT_FILENAME.json exists."
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$REPORT_FILENAME.json"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                                        --data-binary @$REPORT_FILENAME-pki.json \
+                                        --data-binary @$REPORT_FILENAME.json \
                                         "$url"
                     else
                             echo "No report file generated"

@@ -51,6 +51,10 @@ String getFingerprintFilename() {
     return 'fingerprint.json'
 }
 
+def getDeployReportFilename(String netappNameLower) {
+    return '019-report-deploy-' + netappNameLower
+}
+
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
@@ -118,6 +122,7 @@ pipeline {
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
         FINGERPRINT_FILENAME = getFingerprintFilename()
+        DEPLOY_REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
     }
 
     stages {
@@ -301,6 +306,18 @@ pipeline {
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
                     buildResults['steps'][step_name] = jobResult
+                    if (jobResult == 'SUCCESS') {
+                        sh '''#!/bin/bash
+                        result_file="${DEPLOY_REPORT_FILENAME}.json"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                        curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
+                        '''
+                        def fileName = DEPLOY_REPORT_FILENAME + '.json'
+                        if (fileExists(fileName)) {
+                            def deploy_results = readJSON file: fileName
+                            buildResults['deploy_kpi'] = deploy_results['deploy_kpi']
+                        }
+                    }
                 }
             }
         }
