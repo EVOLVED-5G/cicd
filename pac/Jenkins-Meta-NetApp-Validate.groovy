@@ -122,7 +122,7 @@ pipeline {
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
         FINGERPRINT_FILENAME = getFingerprintFilename()
-        DEPLOY_REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
+        DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
     }
 
     stages {
