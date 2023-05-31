@@ -27,6 +27,7 @@ spec:
     spec:
       containers:
         - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-blockchain-sender:{{ .Values.version }}"
+          imagePullPolicy: Always
           name: {{ .Values.mktp_blockchain_sender_service }}
           ports:
             - containerPort: 8000

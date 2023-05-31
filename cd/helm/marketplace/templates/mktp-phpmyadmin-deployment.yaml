@@ -35,6 +35,7 @@ spec:
             - name: UPLOAD_LIMIT
               value: 128M
           image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-phpmyadmin:{{ .Values.version }}"
+          imagePullPolicy: Always
           name: {{ .Values.mktp_phpmyadmin_service }}
           ports:
             - containerPort: 80

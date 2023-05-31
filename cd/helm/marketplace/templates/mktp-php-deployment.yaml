@@ -28,6 +28,7 @@ spec:
       containers:
       - name: {{ .Values.mktp_php_service }}
         image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-laravel:{{ .Values.version }}"
+        imagePullPolicy: Always
         env:
             - name: APP_ROOT
               value: /var/www/html

@@ -27,6 +27,7 @@ spec:
     spec:
       containers:
         - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-tmf-mongo-container:{{ .Values.version }}"
+          imagePullPolicy: Always
           name: {{ .Values.mktp_tmf_db_service }}
           ports:
             - containerPort: 27017
