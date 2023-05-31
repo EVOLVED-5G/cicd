@@ -310,7 +310,7 @@ pipeline {
                     if (jobResult == 'SUCCESS') {
                         sh '''#!/bin/bash
                         result_file="${DEPLOY_REPORT_FILENAME}.json"
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$result_file"
                         echo "Result File: $result_file"
                         echo "Destination URL: $url"
                         curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
