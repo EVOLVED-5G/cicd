@@ -36,6 +36,7 @@ spec:
             - name: MYSQL_USER
               value: {{ .Values.db_user }}
           image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-marketplace-db:{{ .Values.version }}"
+          imagePullPolicy: Always
           name:  {{ .Values.mktp_db_service }}
           ports:
             - containerPort: 3306

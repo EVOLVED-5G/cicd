@@ -27,6 +27,7 @@ spec:
     spec:
       containers:
         - image: "dockerhub.hi.inet/evolved-5g/marketplace/evolved5g-pilot-tmf-api-container:{{ .Values.version }}"
+          imagePullPolicy: Always
           name: {{ .Values.mktp_tmf_service }}
           env:
             - name: MONGO_URL
