@@ -269,8 +269,8 @@ pipeline {
 
                                 x=$(($x + 1))
                             done
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI\\"}"
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI\\"}" | jq > $REPORT_FILENAME.json
                     '''
                 }
             }
@@ -483,8 +483,8 @@ pipeline {
 
                                 x=$(($x + 1))
                             done
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}"
-                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI seconds\\"}" | jq > $REPORT_FILENAME.json
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI\\"}"
+                                echo "{ \\"deploy_kpi\\" : \\"$N_KPI\\"}" | jq > $REPORT_FILENAME.json
                     '''
                 }
             }
