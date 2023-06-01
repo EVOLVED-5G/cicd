@@ -1,6 +1,7 @@
 apiVersion: v2
-name: immersion
-description: A Helm chart for Kubernetes
+name: infolysisnetapp
+
+description: A Helm chart to infolysis Network App in Kubernetes
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives

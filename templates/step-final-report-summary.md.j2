@@ -5,11 +5,14 @@
 This Validation Report contains the results of the Validation process executed over the Network App **{{name}}** version **{{version}}**
 
 Validation triggered by {{build_trigger_by}}
-Repo used for Validation: {{repo}}
+Repo used for Validation: **{{repo}}**
 Branch used for Validation: {{branch}}
 Last commit ID: {{commit}}
-Environment used: {{environment}}
+Environment used: **{{environment}}**
 Build number at Jenkins: {{build_number}}
+{%- if deploy_kpi is defined and deploy_kpi|length %}
+Network App deploy time KPI: **{{deploy_kpi}}** **seconds**
+{%- endif %}
 Total validation time: **{{total_duration}}**
 
 The result of the Validation Process over the Network App **{{name}}** has been: **{{result}}**

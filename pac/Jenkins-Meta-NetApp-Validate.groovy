@@ -51,6 +51,10 @@ String getFingerprintFilename() {
     return 'fingerprint.json'
 }
 
+def getDeployReportFilename(String netappNameLower) {
+    return '019-report-deploy-' + netappNameLower
+}
+
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
@@ -85,7 +89,6 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'VERSION_NETAPP', defaultValue: '4.0', description: 'Version Network App')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        string(name: 'DEPLOY_NAME', defaultValue: 'fogus', description: 'Deployment NetworkApp name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.1.2', description: 'Version CAPIF')
@@ -114,12 +117,12 @@ pipeline {
         HOSTNAME_NEF = "${params.HOSTNAME_NEF}"
         RELEASE_TSN = "${params.RELEASE_TSN}"
         HOSTNAME_TSN = "${params.HOSTNAME_TSN}"
-        RELEASE_NAME = "${params.DEPLOY_NAME}"
         VERSION_NETAPP = "${params.VERSION_NETAPP}"
         emails = "${params.EMAILS}".trim()
         CAPIF_PORT = getHttpPort("${params.ENVIRONMENT}")
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
         FINGERPRINT_FILENAME = getFingerprintFilename()
+        DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
     }
 
     stages {
@@ -287,6 +290,7 @@ pipeline {
                     buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/019-CAPIF-NEF-NETAPP-deploy', wait: true, propagate: true,
                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                     string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
                                     string(name: 'VERSION_CAPIF', value: String.valueOf(VERSION_CAPIF)),
                                     string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
@@ -294,14 +298,29 @@ pipeline {
                                     string(name: 'RELEASE_NAME_NEF', value: String.valueOf(RELEASE_NEF)),
                                     string(name: 'HOSTNAME_TSN', value: String.valueOf(HOSTNAME_TSN)),
                                     string(name: 'RELEASE_NAME_TSN', value: String.valueOf(RELEASE_TSN)),
+                                    string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'HOSTNAME_NETAPP', value: String.valueOf(HOSTNAME_NETAPP)),
-                                    string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(DEPLOY_NAME)),
+                                    string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
-                                    string(name: 'FOLDER_NETWORK_APP', value: String.valueOf(DEPLOY_NAME)),
-                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
                     buildResults['steps'][step_name] = jobResult
+                    if (jobResult == 'SUCCESS') {
+                        sh '''#!/bin/bash
+                        result_file="${DEPLOY_REPORT_FILENAME}.json"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$result_file"
+                        echo "Result File: $result_file"
+                        echo "Destination URL: $url"
+                        curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
+                        '''
+                        def fileName = "${DEPLOY_REPORT_FILENAME}" + '.json'
+                        if (fileExists(fileName)) {
+                            def deploy_results = readJSON file: fileName
+                            buildResults['deploy_kpi'] = deploy_results['deploy_kpi']
+                        }
+                    }
                 }
             }
         }
@@ -435,7 +454,7 @@ pipeline {
                     // def step_name = step_destroy_network_app
                     // buildResults['steps'][step_name] = 'FAILURE'
                     def jobBuild = build job: '/003-NETAPPS/003-Helpers/013-Destroy NetApp', wait: true, propagate: false,
-                            parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(DEPLOY_NAME)),
+                            parameters: [string(name: 'RELEASE_NAME', value: String.valueOf(NETAPP_NAME_LOWER)),
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                             ]
