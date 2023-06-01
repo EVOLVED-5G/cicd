@@ -463,18 +463,18 @@ pipeline {
                 // buildResults['steps'][step_name] = jobResult
                 }
             }
-//            retry(3) {
-//                script {
-//                    echo 'Destroy TSN'
-//                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
-//                                    parameters: [
-//                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
-//                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-//                    def jobResult = jobBuild.getResult()
-//                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
-//                }
-//            }
+            retry(3) {
+                script {
+                    echo 'Destroy TSN'
+                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
+                                    parameters: [
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
+                }
+            }
             retry(3) {
                 script {
                     echo 'Destroy NEF'
