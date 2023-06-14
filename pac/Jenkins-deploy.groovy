@@ -19,11 +19,11 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
-        string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
-        string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
-        string(name: 'APP_REPLICAS', defaultValue: '2', description: 'Number of NetworkApp pods to run')
+        string(name: 'HOSTNAME_NETAPP', defaultValue: 'network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
+        string(name: 'RELEASE_NAME', defaultValue: 'dummy-network-application', description: 'Release name Helm to NetworkApp')
+        string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'FOLDER_NETWORK_APP', defaultValue: 'dummy-network-app', description: 'Folder where the NetworkApp is')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
+        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
     }
 
     environment {
@@ -31,7 +31,7 @@ pipeline {
         HOSTNAME_CAPIF="${params.HOSTNAME_CAPIF}"
         HOSTNAME_NEF="${params.HOSTNAME_NEF}"
         HOSTNAME_NETAPP="${params.HOSTNAME_NETAPP}"
-        RELEASE_NAME_NETAPP = "${params.RELEASE_NAME_NETAPP}"
+        RELEASE_NAME = "${params.RELEASE_NAME}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
     }
 
@@ -85,7 +85,7 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME --arg CHART_NAME fogus \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
@@ -147,7 +147,7 @@ pipeline {
 
                             cat ./cd/helm/helmfile.d/02-netapp.json
 
-                            jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME fogus \
+                            jq -n --arg RELEASE_NAME $RELEASE_NAME --arg CHART_NAME fogus \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \

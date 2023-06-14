@@ -35,7 +35,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'HOSTNAME', defaultValue: 'marketplace.apps.ocp-epg.hi.inet', description: 'Hostname')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])  
+        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])  
     }
 
     environment {
