@@ -14,7 +14,7 @@ pipeline {
 
     parameters {
         string(name: 'NETAPP_NAME', defaultValue: '1.0', description: '')
-        choice(name: "DEPLOYMENT", choices: ["openshift", "kubernetes-athens", "kubernetes-uma"])
+        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
     }
 
     environment {
