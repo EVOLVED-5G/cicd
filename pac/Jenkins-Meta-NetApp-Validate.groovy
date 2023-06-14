@@ -84,7 +84,7 @@ pipeline {
     }
 
     parameters {
-        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: '(Required) URL of the Github Repository')
+        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: '(Required) URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
         string(name: 'VERSION_NETAPP', defaultValue: 'latest', description: 'Version Network App')

@@ -73,9 +73,9 @@ pipeline {
                     dir ("${env.WORKSPACE}/") {
                         sh '''
                         docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet
-                        docker image tag evolved-5g/validation/dummy-netapp dockerhub.hi.inet/evolved-5g/validation/dummy-netapp:${VERSION}.${BUILD_NUMBER}
-                        docker image tag evolved-5g/validation/dummy-netapp dockerhub.hi.inet/evolved-5g/validation/dummy-netapp:latest
-                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/validation/dummy-netapp
+                        docker image tag evolved-5g/validation/dummy-network-application dockerhub.hi.inet/evolved-5g/validation/dummy-network-application:${VERSION}.${BUILD_NUMBER}
+                        docker image tag evolved-5g/validation/dummy-network-application dockerhub.hi.inet/evolved-5g/validation/dummy-network-application:latest
+                        docker image push --all-tags dockerhub.hi.inet/evolved-5g/validation/dummy-network-application
                         '''
                     }
                 }
