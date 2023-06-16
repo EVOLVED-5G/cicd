@@ -71,10 +71,11 @@ pipeline {
                         cp .env.example .env
                         uid=$(id `whoami`  | cut -d " " -f1 | cut -d "=" -f2 | cut -d "(" -f1)
                         gid=$(id `whoami`  | cut -d " " -f2 | cut -d "=" -f2 | cut -d "(" -f1)
-                        sed -i "s,^[ ]*APP_ENV=.*,APP_ENV=local,g" .env
+                        sed -i "s,^[ ]*APP_ENV=.*,APP_ENV=production,g" .env
                         sed -i "s,^[ ]*APP_DEBUG=.*,APP_DEBUG=true,g" .env
                         sed -i "s,^[ ]*APP_KEY=.*,APP_KEY=base64:vAaqm+X4+cBPWSabYrcJMPR3yZZw2ljgLjuTN7d4/J8=,g" .env
                         sed -i "s,^[ ]*APP_URL=.*,APP_URL=https://marketplace-pro.evolved-5g.eu,g" .env
+                        sed -i "s,^[ ]*MAIL_HOST=.*,MAIL_HOST=smtp.office365.com,g" .env
                         sed -i "s,^[ ]*MAIL_MAILER=.*,MAIL_MAILER=smtp,g" .env
                         sed -i "s,^[ ]*MAIL_PORT=.*,MAIL_PORT=587,g" .env
                         sed -i "s,^[ ]*MAIL_USERNAME=.*,MAIL_USERNAME=evolved5g-marketplace@maggioli.gr,g" .env
@@ -90,9 +91,9 @@ pipeline {
                         sed -i "s,^[ ]*DB_DATABASE=.*,DB_DATABASE=evolved5g_db,g" .env
                         sed -i "s,^[ ]*DB_USERNAME=.*,DB_USERNAME=admin,g" .env
                         sed -i "s,^[ ]*DB_PASSWORD=.*,DB_PASSWORD=secret,g" .env
-                        sed -i "s,^[ ]*CRYPTO_SENDER_ADDRESS=.*,CRYPTO_SENDER_ADDRESS=72d6019506866a2ca1dc6bfd0f2f65ac0953ba1e,g" .env
-                        sed -i "s,^[ ]*CRYPTO_RECEIVER_ADDRESS=.*,CRYPTO_RECEIVER_ADDRESS=72d6019506866a2ca1dc6bfd0f2f65ac0953ba1e,g" .env
-                        sed -i "s,^[ ]*CRYPTO_WALLET_PRIVATE_KEY=.*,CRYPTO_WALLET_PRIVATE_KEY=36b134f2175656978eeb7821c19a2213d6716a6de2ea297dbf21e100175632d4,g" .env
+                        sed -i "s,^[ ]*CRYPTO_SENDER_ADDRESS=.*,CRYPTO_SENDER_ADDRESS=3c4e0e4985fB45D648428a8af4D0A4dFef7A8744,g" .env
+                        sed -i "s,^[ ]*CRYPTO_RECEIVER_ADDRESS=.*,CRYPTO_RECEIVER_ADDRESS=3c4e0e4985fB45D648428a8af4D0A4dFef7A8744,g" .env
+                        sed -i "s,^[ ]*CRYPTO_WALLET_PRIVATE_KEY=.*,CRYPTO_WALLET_PRIVATE_KEY=9491fa81f7d491e0f6cef6bd7ab1cabe460e29b488874a7137d39de042d29b3f,g" .env
                         sed -i "s,^[ ]*CRYPTO_NETWORK=.*,CRYPTO_NETWORK=goerli,g" .env
                         sed -i "s,^[ ]*FORUM_URL=.*,FORUM_URL=http://evolved5g-marketplace-forum.evolved-5g.gr/,g" .env
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
