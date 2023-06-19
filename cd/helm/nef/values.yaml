@@ -85,6 +85,7 @@ env:
   capifHostname: "capif.apps.ocp-epg.hi.inet"
   capifHttpPort: "30048"
   capifHttpsPort: "30548"
+  nginxHttps: "30548"
 
 kubernetesClusterDomain: cluster.local
 mongo:
