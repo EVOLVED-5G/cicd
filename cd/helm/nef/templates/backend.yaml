@@ -29,18 +29,18 @@ kind: Ingress
 metadata:
   name: backend-ssl
   labels:
-  {{- include "capif.labels" . | nindent 4 }}
+  {{- include "nef-kube.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
-    {{- if eq .Values.env "kubernetes-uma" }}
+    {{- if eq .Values.environment "kubernetes-uma" }}
     ingress.kubernetes.io/force-ssl-redirect: "true"
     kubernetes.io/ingress.class: contour
     kubernetes.io/tls-acme: "true"
     {{- end }}
     cert-manager.io/cluster-issuer: cert-evolved5g-issuer
 spec:
-  {{- if eq .Values.env "kubernetes-athens" }}
+  {{- if eq .Values.environment "kubernetes-athens" }}
   ingressClassName: nginx
   {{- end }}
   tls:

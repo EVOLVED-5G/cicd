@@ -72,7 +72,7 @@ env:
   projectName: NEF_Emulator
   secretKey: 2D47CF2958CEC7CC86C988E9F9684
   sentryDsn: ""
-  serverHost: backend
+  serverHost: http://backend
   serverName: backend
   serverPort: "8888"
   smtpHost: mail.host.com
