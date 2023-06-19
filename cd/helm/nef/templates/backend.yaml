@@ -37,7 +37,7 @@ metadata:
     kubernetes.io/ingress.class: contour
     kubernetes.io/tls-acme: "true"
     {{- end }}
-    cert-manager.io/cluster-issuer: cert-evolved5g
+    cert-manager.io/cluster-issuer: cert-evolved5g-issuer
 spec:
   {{- if eq .Values.env "kubernetes-athens" }}
   ingressClassName: nginx
