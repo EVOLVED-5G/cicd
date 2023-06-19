@@ -56,7 +56,6 @@ env:
   backendCorsOrigins: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
   dockerImageBackend: backend
   dockerImageFrontend: frontend
-  domain: localhost
   emailsFromEmail: user@my-email.com
   firstSuperuser: admin@my-email.com
   firstSuperuserPassword: pass
@@ -73,8 +72,8 @@ env:
   projectName: NEF_Emulator
   secretKey: 2D47CF2958CEC7CC86C988E9F9684
   sentryDsn: ""
-  serverHost: https://localhost
-  serverName: localhost
+  serverHost: backend
+  serverName: backend
   serverPort: "8888"
   smtpHost: mail.host.com
   smtpPassword: pass
