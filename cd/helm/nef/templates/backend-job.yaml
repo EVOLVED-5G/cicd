@@ -27,17 +27,20 @@ spec:
       {{- end }}
       containers:
       - name: db-init
-        image: alpine
-        command: ["/bin/sh", "-c"]
+        image: "{{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag
+          | default .Chart.AppVersion }}"
+        command: ["/bin/bash", "-c"]
         args:
           - sleep 180;
             echo DOMAIN=$DOMAIN;
             echo NGINX_HTTPS=$NGINX_HTTPS;
-            apk add curl jq git;
+            echo FIRST_SUPERUSER=$FIRST_SUPERUSER;
+            echo FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD;
+            apt update;
+            apt install -y jq;
             curl -v -k  https://$DOMAIN:$NGINX_HTTPS;
-            git clone --branch companion_app https://github.com/medianetlab/NEF_emulator.git;
-            sed -i -e "s/source .env//g" NEF_emulator/backend/app/app/db/init_simple.sh;
-            sh ./NEF_emulator/backend/app/app/db/init_simple.sh;
+            sed -i -e "s/source .env//g" app/db/init_simple.sh;
+            bash ./app/db/init_simple.sh;
         env:
         - name: DOMAIN
           valueFrom:
