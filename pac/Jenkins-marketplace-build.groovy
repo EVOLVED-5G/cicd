@@ -74,7 +74,7 @@ pipeline {
                         sed -i "s,^[ ]*APP_ENV=.*,APP_ENV=production,g" .env
                         sed -i "s,^[ ]*APP_DEBUG=.*,APP_DEBUG=true,g" .env
                         sed -i "s,^[ ]*APP_KEY=.*,APP_KEY=base64:vAaqm+X4+cBPWSabYrcJMPR3yZZw2ljgLjuTN7d4/J8=,g" .env
-                        sed -i "s,^[ ]*APP_URL=.*,APP_URL=https://marketplace-pro.evolved-5g.eu,g" .env
+                        sed -i "s,^[ ]*APP_URL=.*,APP_URL=https://marketplace.evolved-5g.eu,g" .env
                         sed -i "s,^[ ]*MAIL_HOST=.*,MAIL_HOST=smtp.office365.com,g" .env
                         sed -i "s,^[ ]*MAIL_MAILER=.*,MAIL_MAILER=smtp,g" .env
                         sed -i "s,^[ ]*MAIL_PORT=.*,MAIL_PORT=587,g" .env
