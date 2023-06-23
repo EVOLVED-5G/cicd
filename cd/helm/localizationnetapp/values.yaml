@@ -7,6 +7,7 @@ ingress_ip:
     uma: "10.11.23.49"
 
 env:
+  callbackAddress: "netapp:8000"
   frontendAddress: "localization.apps.ocp-epg.hi.inet"
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "30048"
@@ -14,9 +15,13 @@ env:
   pathToCerts: "/evolved5g/cfg/capif_onboarding"
   vappAddress: "195.134.66.79:7000"
   nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefPort: "443"
   nefUser: admin@my-email.com
   nefPassword: pass
   ueExternalId: "10002@domain.com"
+  environment: "development"
+  rosDomainId: "1"
+  network: evolved5G_dds
 
 netapp:
   localizationNetapp:

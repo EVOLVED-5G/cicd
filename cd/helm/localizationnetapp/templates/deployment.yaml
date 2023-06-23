@@ -43,7 +43,7 @@ spec:
       containers:
       - env:
         - name: CALLBACK_ADDRESS
-          value: {{ quote .Values.env.frontendAddress }}
+          value: {{ quote .Values.env.callbackAddress }}
         - name: CAPIF_PORT_HTTPS
           value: {{ quote .Values.env.capifPortHttps }}
         - name: CAPIF_PORT_HTTP
@@ -56,17 +56,29 @@ spec:
           value: {{ quote .Values.env.vappAddress }}
         - name: NEF_ADDRESS
           value: {{ quote .Values.env.nefAddress }}
+        - name: NEF_PORT
+          value: {{ quote .Values.env.nefPort }}
         - name: NEF_USER
           value: {{ quote .Values.env.nefUser }}
         - name: NEF_PASSWORD
           value: {{ quote .Values.env.nefPassword }}
         - name: UE_EXTERNAL_ID
           value: {{ quote .Values.env.ueExternalId }}
-        image: {{ .Values.netapp.localizationNetapp.image.repository }}-{{ .Values.netapp.localizationNetapp.image.tag
-          | default .Chart.AppVersion }}
+        - name: ENVIRONMENT
+          value: {{ quote .Values.env.deployment }}
+        - name: ROS_DOMAIN_ID
+          value: {{ quote .Values.env.rosDomainId }}
+        - name: NETWORK
+          value: {{ quote .Values.env.network }}
+        image: {{ .Values.netapp.localizationNetapp.image.repository }}-{{ .Values.netapp.localizationNetapp.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: Always
         name: localizationnetapp
         ports:
           - containerPort: 8000
+          - protocol: UDP
+            containerPort: 7662
+          - protocol: UDP
+            containerPort: 7663
         resources: {} 
+      hostNetwork: true
       restartPolicy: Always
