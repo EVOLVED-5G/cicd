@@ -28,7 +28,7 @@ data:
   NGINX_HTTPS: {{ .Values.env.nginxHttps | quote }}
   PGADMIN_DEFAULT_EMAIL: {{ .Values.env.pgadminDefaultEmail | quote }}
   PGADMIN_DEFAULT_PASSWORD: {{ .Values.env.pgadminDefaultPassword | quote }}
-  PGADMIN_LISTEN_PORT: {{ .Values.env.pgadminListenPort | quote }}
+  PGADMIN_LISTEN_PORT: {{ .Values.env.postgresListenPort | quote }}
   POSTGRES_DB: {{ .Values.env.postgresDb | quote }}
   POSTGRES_PASSWORD: {{ .Values.env.postgresPassword | quote }}
   POSTGRES_SERVER: {{ include "nef.fullname" . }}-db
@@ -37,9 +37,9 @@ data:
   PROXY_TAG: {{ .Values.env.proxyTag | quote }}
   SECRET_KEY: {{ .Values.env.secretKey | quote }}
   SENTRY_DSN: {{ .Values.env.sentryDsn | quote }}
-  SERVER_HOST: {{ .Values.env.serverHost | quote }}
-  SERVER_NAME: {{ .Values.env.serverName | quote }}
-  SERVER_PORT: {{ .Values.env.serverPort | quote }}
+  SERVER_HOST: "http://{{ .Values.backend.ingress.host }}"
+  SERVER_NAME: "{{ include "nef.fullname" . }}-backend"
+  SERVER_PORT: {{ .Values.env.backendServerPort | quote }}
   SMTP_HOST: {{ .Values.env.smtpHost | quote }}
   SMTP_PASSWORD: {{ .Values.env.smtpPassword | quote }}
   SMTP_PORT: {{ .Values.env.smtpPort | quote }}
