@@ -13,6 +13,7 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: localization-netapp
+      io.kompose.service: localization-netapp-udp
     {{- include "localization.selectorLabels" . | nindent 6 }}
   template:
     metadata:
@@ -50,6 +51,8 @@ spec:
           value: {{ quote .Values.env.capifPortHttp }}
         - name: CAPIF_HOSTNAME
           value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_USERNAME
+          value: {{ quote .Values.env.capifUsername }}
         - name: PATH_TO_CERTS
           value: {{ quote .Values.env.pathToCerts }}
         - name: VAPP_ADDRESS
@@ -70,15 +73,24 @@ spec:
           value: {{ quote .Values.env.rosDomainId }}
         - name: NETWORK
           value: {{ quote .Values.env.network }}
+        - name: DDS_EXTERNAL_ADDRESS
+          value: {{ quote .Values.env.ddsExternalAddress }}
         image: {{ .Values.netapp.localizationNetapp.image.repository }}-{{ .Values.netapp.localizationNetapp.image.tag | default .Chart.AppVersion }}
         imagePullPolicy: Always
         name: localizationnetapp
         ports:
           - containerPort: 8000
           - protocol: UDP
+            containerPort: 7660
+          - protocol: UDP
+            containerPort: 7661
+          - protocol: UDP
             containerPort: 7662
           - protocol: UDP
             containerPort: 7663
+          - protocol: UDP
+            containerPort: 7664
+          - protocol: UDP
+            containerPort: 7665
         resources: {} 
-      hostNetwork: true
       restartPolicy: Always

@@ -10,6 +10,7 @@ env:
   callbackAddress: "netapp:8000"
   frontendAddress: "localization.apps.ocp-epg.hi.inet"
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifUsername: "user1"
   capifPortHttp: "30048"
   capifPortHttps: "30548"
   pathToCerts: "/evolved5g/cfg/capif_onboarding"
@@ -22,6 +23,7 @@ env:
   environment: "development"
   rosDomainId: "1"
   network: evolved5G_dds
+  ddsExternalAddress: "10.11.23.53"
 
 netapp:
   localizationNetapp:
@@ -35,5 +37,31 @@ netapp:
   - name: "netapp"
     port: 8000
     targetPort: 8000
-  replicas: 1
   type: ClusterIP
+  portsUdp:
+  - name: "netapp-upd-0"
+    port: 7660
+    targetPort: 7660
+    protocol: UDP
+  - name: "netapp-upd-1"
+    port: 7661
+    targetPort: 7661
+    protocol: UDP
+  - name: "netapp-upd-2"
+    port: 7662
+    targetPort: 7662
+    protocol: UDP
+  - name: "netapp-upd-3"
+    port: 7663
+    targetPort: 7663
+    protocol: UDP
+  - name: "netapp-upd-4"
+    port: 7664
+    targetPort: 7664
+    protocol: UDP
+  - name: "netapp-upd-5"
+    port: 7665
+    targetPort: 7665
+    protocol: UDP
+  typeUdp: LoadBalancer
+  replicas: 1

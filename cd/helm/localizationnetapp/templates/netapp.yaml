@@ -40,3 +40,23 @@ spec:
   {{- include "localization.selectorLabels" . | nindent 4 }}
   ports:
 	{{- .Values.netapp.ports | toYaml | nindent 2 -}}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: netapp-udp
+  labels:
+    io.kompose.service: localization-netapp-udp
+  {{- include "localization.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+    metallb.universe.tf/loadBalancerIPs: 10.11.23.53
+spec:
+  type: {{ .Values.netapp.typeUdp }}
+  selector:
+    io.kompose.service: localization-netapp
+  {{- include "localization.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.netapp.portsUdp | toYaml | nindent 2 -}}
