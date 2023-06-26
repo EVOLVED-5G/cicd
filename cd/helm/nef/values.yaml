@@ -44,6 +44,7 @@ env:
   nginxHttps: "4443"
   pgadminDefaultEmail: admin@my-email.com
   pgadminDefaultPassword: pass
+  pgadminListenPort: "5050"
   postgresDb: app
   postgresPassword: pass
 #  postgresServer: nef-db
