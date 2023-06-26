@@ -1,28 +1,40 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: env
+  name: {{ include "nef.fullname" . }}-configmap
   labels:
-    io.kompose.service: backend-env
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
 data:
   BACKEND_CORS_ORIGINS: {{ .Values.env.backendCorsOrigins | quote }}
+  BACKEND_TAG: {{ .Values.env.backendTag | quote }}
+  CAPIF_HOST: {{ .Values.env.capifHostname | quote }}
+  CAPIF_HTTP_PORT: {{ .Values.env.capifHttpPort | quote }}
+  CAPIF_HTTPS_PORT: {{ .Values.env.capifHttpsPort | quote }}
   DOCKER_IMAGE_BACKEND: {{ .Values.env.dockerImageBackend | quote }}
   DOCKER_IMAGE_FRONTEND: {{ .Values.env.dockerImageFrontend | quote }}
+  DOCKER_IMAGE_PROXY: {{ .Values.env.dockerImageProxy | quote }}
   DOMAIN: {{ .Values.env.domain | quote }}
   EMAILS_FROM_EMAIL: {{ .Values.env.emailsFromEmail | quote }}
+  EXTERNAL_NET: {{ .Values.env.externalNet | quote }}
   FIRST_SUPERUSER: {{ .Values.env.firstSuperuser | quote }}
   FIRST_SUPERUSER_PASSWORD: {{ .Values.env.firstSuperuserPassword | quote }}
+  ME_CONFIG_MONGODB_URL: {{ .Values.env.meConfigMongodbUrl | quote }}
+  MONGO_CLIENT: {{ .Values.env.mongoClient | quote }}
+  MONGO_EXPRESS_ENABLE_ADMIN: {{ .Values.env.mongoExpressEnableAdmin | quote }}
   MONGO_PASSWORD: {{ .Values.env.mongoPassword | quote }}
   MONGO_USER: {{ .Values.env.mongoUser | quote }}
+  NEF_HOST: {{ include "nef.fullname" . }}-backend
+  NGINX_HTTP: {{ .Values.env.nginxHttp | quote }}
+  NGINX_HTTPS: {{ .Values.env.nginxHttps | quote }}
   PGADMIN_DEFAULT_EMAIL: {{ .Values.env.pgadminDefaultEmail | quote }}
   PGADMIN_DEFAULT_PASSWORD: {{ .Values.env.pgadminDefaultPassword | quote }}
   PGADMIN_LISTEN_PORT: {{ .Values.env.pgadminListenPort | quote }}
   POSTGRES_DB: {{ .Values.env.postgresDb | quote }}
   POSTGRES_PASSWORD: {{ .Values.env.postgresPassword | quote }}
-  POSTGRES_SERVER: {{ .Values.env.postgresServer | quote }}
+  POSTGRES_SERVER: {{ include "nef.fullname" . }}-db
   POSTGRES_USER: {{ .Values.env.postgresUser | quote }}
   PROJECT_NAME: {{ .Values.env.projectName | quote }}
+  PROXY_TAG: {{ .Values.env.proxyTag | quote }}
   SECRET_KEY: {{ .Values.env.secretKey | quote }}
   SENTRY_DSN: {{ .Values.env.sentryDsn | quote }}
   SERVER_HOST: {{ .Values.env.serverHost | quote }}
@@ -33,9 +45,5 @@ data:
   SMTP_PORT: {{ .Values.env.smtpPort | quote }}
   SMTP_TLS: {{ .Values.env.smtpTls | quote }}
   SMTP_USER: {{ .Values.env.smtpUser | quote }}
-  USERS_OPEN_REGISTRATION: {{ .Values.env.usersOpenRegistration | quote }}
   USE_PUBLIC_KEY_VERIFICATION: {{ .Values.env.usePublicKeyVerification | quote }}
-  CAPIF_HOST: {{ .Values.env.capifHostname | quote }}
-  CAPIF_HTTP_PORT: {{ .Values.env.capifHttpPort | quote }}
-  CAPIF_HTTPS_PORT: {{ .Values.env.capifHttpsPort | quote }}
-  MONGO_CLIENT: {{ .Values.env.mongoClient | quote }}
+  USERS_OPEN_REGISTRATION: {{ .Values.env.usersOpenRegistration | quote }}

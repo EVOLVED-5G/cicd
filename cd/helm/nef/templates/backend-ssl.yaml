@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "nef.fullname" . }}-backend-ssl
+  labels:
+  {{- include "nef.labels" . | nindent 4 }}
+  annotations:
+    cert-manager.io/cluster-issuer: cert-evolved5g-issuer
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kompose.cmd: kompose -f ../services/docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+    kubernetes.io/ingress.class: contour
+    kubernetes.io/tls-acme: "true"
+spec:
+  rules:
+  - host: localization-nef.apps.ocp-epg.hi.inet
+    http:
+      paths:
+      - backend:
+          service:
+            name: '{{ include "nef.fullname" . }}-backend'
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - localization-nef.apps.ocp-epg.hi.inet
+    secretName: backend-http
