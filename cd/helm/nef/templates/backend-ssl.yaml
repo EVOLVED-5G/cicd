@@ -9,9 +9,14 @@ metadata:
     ingress.kubernetes.io/force-ssl-redirect: "true"
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
+  {{- if eq .Values.environment "kubernetes-uma" }}
     kubernetes.io/ingress.class: contour
+  {{- end }}
     kubernetes.io/tls-acme: "true"
 spec:
+  {{- if eq .Values.environment "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
   rules:
   - host: localization-nef.apps.ocp-epg.hi.inet
     http:
