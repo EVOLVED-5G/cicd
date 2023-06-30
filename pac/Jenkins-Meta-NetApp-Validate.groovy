@@ -84,10 +84,10 @@ pipeline {
     }
 
     parameters {
-        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-netapp', description: 'URL of the Github Repository')
+        string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: '(Required) URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
-        string(name: 'HOSTNAME_NETAPP', defaultValue: 'fogus.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
-        string(name: 'VERSION_NETAPP', defaultValue: '4.0', description: 'Version Network App')
+        string(name: 'HOSTNAME_NETAPP', defaultValue: 'network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
+        string(name: 'VERSION_NETAPP', defaultValue: 'latest', description: 'Version Network App')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
@@ -463,18 +463,18 @@ pipeline {
                 // buildResults['steps'][step_name] = jobResult
                 }
             }
-//            retry(3) {
-//                script {
-//                    echo 'Destroy TSN'
-//                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
-//                                    parameters: [
-//                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-//                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
-//                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-//                    def jobResult = jobBuild.getResult()
-//                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
-//                }
-//            }
+            retry(3) {
+                script {
+                    echo 'Destroy TSN'
+                    def jobBuild = build job: '005-TSN-FrontEnd/destroy', wait: true, propagate: false,
+                                    parameters: [
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_TSN)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Destroy TSN' returned result: ${jobResult}"
+                }
+            }
             retry(3) {
                 script {
                     echo 'Destroy NEF'
