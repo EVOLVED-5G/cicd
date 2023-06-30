@@ -47,16 +47,20 @@ kind: Service
 metadata:
   name: netapp-udp
   labels:
-    io.kompose.service: localization-netapp-udp
+    io.kompose.service-udp: localization-netapp-udp
   {{- include "localization.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
+    {{- if eq .Values.environment "kubernetes-uma" }}
     metallb.universe.tf/loadBalancerIPs: 10.11.23.53
+    {{- end }}
 spec:
+  {{- if eq .Values.environment "kubernetes-uma" }}
   type: {{ .Values.netapp.typeUdp }}
+  {{- end }}
   selector:
-    io.kompose.service: localization-netapp
+    io.kompose.service-udp: localization-netapp-udp
   {{- include "localization.selectorLabels" . | nindent 4 }}
   ports:
 	{{- .Values.netapp.portsUdp | toYaml | nindent 2 -}}

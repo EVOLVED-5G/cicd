@@ -4,6 +4,7 @@ metadata:
   name: {{ include "localization.fullname" . }}-netapp
   labels:
     io.kompose.service: localization-netapp
+    io.kompose.service-udp: localization-netapp-udp
   {{- include "localization.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f docker-compose.yml convert
@@ -13,13 +14,14 @@ spec:
   selector:
     matchLabels:
       io.kompose.service: localization-netapp
-      io.kompose.service: localization-netapp-udp
+      io.kompose.service-udp: localization-netapp-udp
     {{- include "localization.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
         io.kompose.network/services-default: "true"
         io.kompose.service: localization-netapp
+        io.kompose.service-udp: localization-netapp-udp
       {{- include "localization.selectorLabels" . | nindent 8 }}
       annotations:
         kompose.cmd: kompose -f docker-compose.yml convert
