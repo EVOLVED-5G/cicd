@@ -10,7 +10,7 @@ backend:
   backend:
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1"
-      tag: "2.2.2.andres"
+      tag: ""
     imagePullPolicy: Always
   ingress:
     host: localization-nef.apps.ocp-epg.hi.inet
@@ -69,7 +69,7 @@ db:
       pgdata: /var/lib/postgresql/data/pgdata
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
-      tag: "2.2.2.andres"
+      tag: ""
   ports:
   - port: 5432
     protocol: TCP
@@ -92,7 +92,7 @@ mongo:
   nefMongo:
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo_nef-1"
-      tag: "2.2.2.andres"
+      tag: ""
   ports:
   - port: 27017
     protocol: TCP
@@ -103,7 +103,7 @@ mongoExpress:
   mongoExpress:
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo-express-1"
-      tag: "2.2.2.andres"
+      tag: ""
   ports:
   - port: 8081
     protocol: TCP
