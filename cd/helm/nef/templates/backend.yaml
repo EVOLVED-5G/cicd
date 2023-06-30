@@ -22,6 +22,15 @@ spec:
               number: 80
         path: /
         pathType: Prefix
+  {{- if eq .Values.environment "openshift" }}
+  tls:
+  - {}
+  {{ else }}
+  tls:
+  - hosts:
+    - {{ .Values.backend.ingress.host }}
+    secretName: {{ include "nef.fullname" . }}-backend-http
+  {{- end }}
 ---
 apiVersion: v1
 kind: Service

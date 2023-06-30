@@ -34,8 +34,8 @@ env:
   externalNet: "true"
   firstSuperuser: admin@my-email.com
   firstSuperuserPassword: pass
-  meConfigMongodbUrl: mongodb://root:pass@localization-nef-mongo:27017/
-  mongoClient: mongodb://localization-nef-mongo:27017/
+  meConfigMongodbUrl: mongodb://root:pass@nef-mongo:27017/
+  mongoClient: mongodb://nef-mongo:27017/
   mongoExpressEnableAdmin: "true"
   mongoPassword: pass
   mongoUser: root
