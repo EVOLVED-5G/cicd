@@ -16,7 +16,7 @@ env:
   pathToCerts: "/evolved5g/cfg/capif_onboarding"
   vappAddress: "195.134.66.79:7000"
   nefAddress: my-nef.apps.ocp-epg.hi.inet
-  nefPort: "443"
+  nefPort: "30548"
   nefUser: admin@my-email.com
   nefPassword: pass
   ueExternalId: "10002@domain.com"
