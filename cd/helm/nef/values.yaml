@@ -9,7 +9,10 @@ ingress_ip:
 backend:
   backend:
     image:
+      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
     imagePullPolicy: Always
   ingress:
@@ -67,8 +70,11 @@ db:
   db:
     env:
       pgdata: /var/lib/postgresql/data/pgdata
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
   ports:
   - port: 5432
@@ -90,8 +96,11 @@ db:
 kubernetesClusterDomain: cluster.local
 mongo:
   nefMongo:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo_nef-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
   ports:
   - port: 27017
@@ -101,8 +110,11 @@ mongo:
   type: ClusterIP
 mongoExpress:
   mongoExpress:
+    # -- The docker image repository to use
     image:
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo-express-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
       tag: ""
   ports:
   - port: 8081
