@@ -42,15 +42,7 @@ spec:
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       containers:
-      - name: backend
-        image: "{{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag
-          | default .Chart.AppVersion }}"
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
-        resources:
-            {{- toYaml .Values.backend.backend.resources | nindent 12 }}
-        args:
+      - args:
         - /start-reload.sh
         env:
         - name: BACKEND_CORS_ORIGINS
@@ -218,13 +210,16 @@ spec:
             configMapKeyRef:
               key: MONGO_CLIENT
               name: env
-        - name: NGINX_HTTPS
-          valueFrom:
-            configMapKeyRef:
-              key: NGINX_HTTPS
-              name: env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag
+          | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: backend
+        ports:
+        - containerPort: 80
+        resources:
+            {{- toYaml .Values.backend.backend.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
