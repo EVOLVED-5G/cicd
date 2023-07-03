@@ -346,9 +346,10 @@ pipeline {
             }
         }
         stage('Compress and upload images to artifactory') {
-            retry(2) {
-                script {
-                     sh '''#!/bin/bash
+            steps {
+                retry(2) {
+                    script {
+                        sh '''#!/bin/bash
                         image_file=${NETAPP_NAME_LOWER}.tar.gz
 
                         tar czvf ${image_file} ${NETAPP_NAME_LOWER}-images
@@ -364,6 +365,7 @@ pipeline {
                             echo "compressed file was not generated"
                         fi
                         '''
+                    }
                 }
             }
         }
