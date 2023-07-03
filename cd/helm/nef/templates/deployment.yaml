@@ -1,33 +1,61 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-db
   labels:
-    io.kompose.service: backend
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
+  {{- include "nef.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.backend.replicas }}
+  replicas: {{ .Values.db.replicas }}
   selector:
     matchLabels:
-      io.kompose.service: backend
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+      app: db
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        io.kompose.network/nef-emulator-default: "true"
-        io.kompose.service: backend
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
-      annotations:
-        kompose.cmd: kompose -f ../docker-compose.yml convert
-        kompose.version: 1.28.0 (c4137012e)
-        checksum/config: {{ include (print $.Template.BasePath "/env.yaml") . | sha256sum }}
+        app: db
+      {{- include "nef.selectorLabels" . | nindent 8 }}
     spec:
+      containers:
+      - args:
+        - -c
+        - shared_buffers=256MB
+        - -c
+        - max_connections=200
+        env:
+        - name: PGDATA
+          value: {{ quote .Values.db.db.env.pgdata }}
+        - name: POSTGRES_SERVER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_SERVER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.db.db.image.repository }}-{{ .Values.db.db.image.tag | default .Chart.AppVersion }}
+        name: db
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/pgdata
+          name: app-db-data
       imagePullSecrets:
         - name: regcred
-      {{- if eq .Values.environment "kubernetes-athens" }}
+      {{- if eq .Values.environment "kubernetes-athens" }}     
       hostAliases: 
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
@@ -41,910 +69,272 @@ spec:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
-      containers:
-      - args:
-        - /start-reload.sh
-        env:
-        - name: BACKEND_CORS_ORIGINS
-          valueFrom:
-            configMapKeyRef:
-              key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
-              name: env
-        - name: DOMAIN
-          valueFrom:
-            configMapKeyRef:
-              key: DOMAIN
-              name: env
-        - name: EMAILS_FROM_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: EMAILS_FROM_EMAIL
-              name: env
-        - name: FIRST_SUPERUSER
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER
-              name: env
-        - name: FIRST_SUPERUSER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER_PASSWORD
-              name: env
-        - name: MONGO_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_PASSWORD
-              name: env
-        - name: MONGO_USER
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_USER
-              name: env
-        - name: PGADMIN_DEFAULT_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_EMAIL
-              name: env
-        - name: PGADMIN_DEFAULT_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_PASSWORD
-              name: env
-        - name: PGADMIN_LISTEN_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_LISTEN_PORT
-              name: env
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_DB
-              name: env
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_PASSWORD
-              name: env
-        - name: POSTGRES_SERVER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_SERVER
-              name: env
-        - name: POSTGRES_USER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_USER
-              name: env
-        - name: PROJECT_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: PROJECT_NAME
-              name: env
-        - name: SECRET_KEY
-          valueFrom:
-            configMapKeyRef:
-              key: SECRET_KEY
-              name: env
-        - name: SENTRY_DSN
-          valueFrom:
-            configMapKeyRef:
-              key: SENTRY_DSN
-              name: env
-        - name: SERVER_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_HOST
-              name: env
-        - name: SERVER_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_NAME
-              name: env
-        - name: SERVER_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_PORT
-              name: env
-        - name: SMTP_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_HOST
-              name: env
-        - name: SMTP_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PASSWORD
-              name: env
-        - name: SMTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PORT
-              name: env
-        - name: SMTP_TLS
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_TLS
-              name: env
-        - name: SMTP_USER
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_USER
-              name: env
-        - name: USERS_OPEN_REGISTRATION
-          valueFrom:
-            configMapKeyRef:
-              key: USERS_OPEN_REGISTRATION
-              name: env
-        - name: USE_PUBLIC_KEY_VERIFICATION
-          valueFrom:
-            configMapKeyRef:
-              key: USE_PUBLIC_KEY_VERIFICATION
-              name: env
-        - name: CAPIF_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HOST
-              name: env
-        - name: CAPIF_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTP_PORT
-              name: env
-        - name: CAPIF_HTTPS_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTPS_PORT
-              name: env
-        - name: MONGO_CLIENT
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_CLIENT
-              name: env
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag
-          | default .Chart.AppVersion }}
-        imagePullPolicy: Always
-        name: backend
-        ports:
-        - containerPort: 80
-        resources:
-            {{- toYaml .Values.backend.backend.resources | nindent 12 }}
-      restartPolicy: Always
+      volumes:
+      - emptyDir: {}
+        name: app-db-data
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: db
+  name: {{ include "nef.fullname" . }}-mongo
   labels:
-    io.kompose.service: db
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
-spec:
-  replicas: {{ .Values.db.replicas }}
-  selector:
-    matchLabels:
-      io.kompose.service: db
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      labels:
-        io.kompose.network/nef-emulator-default: "true"
-        io.kompose.service: db
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
-      annotations:
-        kompose.cmd: kompose -f ../docker-compose.yml convert
-        kompose.version: 1.28.0 (c4137012e)
-        checksum/config: {{ include (print $.Template.BasePath "/env.yaml") . | sha256sum }}
-    spec:
-      imagePullSecrets:
-        - name: regcred
-      {{- if eq .Values.environment "kubernetes-athens" }}
-      hostAliases:
-        - ip: "{{ .Values.ingress_ip.athens }}"
-          hostnames:
-            - "{{ .Values.backend.ingress.host }}"
-            - "{{ .Values.env.capifHostname }}"
-      {{- end }}
-      {{- if eq .Values.environment "kubernetes-uma" }}
-      hostAliases:  
-        - ip: "{{ .Values.ingress_ip.uma }}"
-          hostnames:
-            - "{{ .Values.backend.ingress.host }}"
-            - "{{ .Values.env.capifHostname }}"
-      {{- end }}
-      containers:
-      - env:
-        - name: BACKEND_CORS_ORIGINS
-          valueFrom:
-            configMapKeyRef:
-              key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
-              name: env
-        - name: DOMAIN
-          valueFrom:
-            configMapKeyRef:
-              key: DOMAIN
-              name: env
-        - name: EMAILS_FROM_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: EMAILS_FROM_EMAIL
-              name: env
-        - name: FIRST_SUPERUSER
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER
-              name: env
-        - name: FIRST_SUPERUSER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER_PASSWORD
-              name: env
-        - name: MONGO_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_PASSWORD
-              name: env
-        - name: MONGO_USER
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_USER
-              name: env
-        - name: PGADMIN_DEFAULT_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_EMAIL
-              name: env
-        - name: PGADMIN_DEFAULT_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_PASSWORD
-              name: env
-        - name: PGADMIN_LISTEN_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_LISTEN_PORT
-              name: env
-        - name: PGDATA
-          value: {{ quote .Values.db.db.env.pgdata }}
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_DB
-              name: env
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_PASSWORD
-              name: env
-        - name: POSTGRES_SERVER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_SERVER
-              name: env
-        - name: POSTGRES_USER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_USER
-              name: env
-        - name: PROJECT_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: PROJECT_NAME
-              name: env
-        - name: SECRET_KEY
-          valueFrom:
-            configMapKeyRef:
-              key: SECRET_KEY
-              name: env
-        - name: SENTRY_DSN
-          valueFrom:
-            configMapKeyRef:
-              key: SENTRY_DSN
-              name: env
-        - name: SERVER_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_HOST
-              name: env
-        - name: SERVER_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_NAME
-              name: env
-        - name: SERVER_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_PORT
-              name: env
-        - name: SMTP_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_HOST
-              name: env
-        - name: SMTP_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PASSWORD
-              name: env
-        - name: SMTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PORT
-              name: env
-        - name: SMTP_TLS
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_TLS
-              name: env
-        - name: SMTP_USER
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_USER
-              name: env
-        - name: USERS_OPEN_REGISTRATION
-          valueFrom:
-            configMapKeyRef:
-              key: USERS_OPEN_REGISTRATION
-              name: env
-        - name: USE_PUBLIC_KEY_VERIFICATION
-          valueFrom:
-            configMapKeyRef:
-              key: USE_PUBLIC_KEY_VERIFICATION
-              name: env
-        - name: CAPIF_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HOST
-              name: env
-        - name: CAPIF_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTP_PORT
-              name: env
-        - name: CAPIF_HTTPS_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTPS_PORT
-              name: env
-        - name: MONGO_CLIENT
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_CLIENT
-              name: env
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.db.db.image.repository }}-{{ .Values.db.db.image.tag | default
-          .Chart.AppVersion }}
-        imagePullPolicy: Always
-        name: db
-        ports:
-            - containerPort: 5432
-        resources:
-            {{- toYaml .Values.db.db.resources | nindent 12 }}
-      restartPolicy: Always
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mongo
-  labels:
-    io.kompose.service: mongo
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
+  {{- include "nef.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.mongo.replicas }}
   selector:
     matchLabels:
-      io.kompose.service: mongo
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+      app: nef-mongo
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        io.kompose.network/nef-emulator-default: "true"
-        io.kompose.service: mongo
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
-      annotations:
-        kompose.cmd: kompose -f ../docker-compose.yml convert
-        kompose.version: 1.28.0 (c4137012e)
-        checksum/config: {{ include (print $.Template.BasePath "/env.yaml") . | sha256sum }}
+        app: nef-mongo
+      {{- include "nef.selectorLabels" . | nindent 8 }}
     spec:
+      containers:
+      - env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_USER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_PASSWORD
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.mongo.nefMongo.image.repository }}-{{ .Values.mongo.nefMongo.image.tag | default .Chart.AppVersion }}
+        name: nef-mongo
+        ports:
+        - containerPort: 27017
+        resources: {}
+        volumeMounts:
+        - mountPath: /data/db
+          name: app-mongo-db-data
       imagePullSecrets:
         - name: regcred
-      {{- if eq .Values.environment "kubernetes-athens" }}
-      hostAliases:
+      {{- if eq .Values.environment "kubernetes-athens" }}     
+      hostAliases: 
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
-      {{- end }}  
-      {{- if eq .Values.environment "kubernetes-uma" }}  
-      hostAliases:  
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
-      containers:
-      - env:
-        - name: BACKEND_CORS_ORIGINS
-          valueFrom:
-            configMapKeyRef:
-              key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
-              name: env
-        - name: DOMAIN
-          valueFrom:
-            configMapKeyRef:
-              key: DOMAIN
-              name: env
-        - name: EMAILS_FROM_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: EMAILS_FROM_EMAIL
-              name: env
-        - name: FIRST_SUPERUSER
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER
-              name: env
-        - name: FIRST_SUPERUSER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER_PASSWORD
-              name: env
-        - name: MONGO_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_PASSWORD
-              name: env
-        - name: MONGO_USER
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_USER
-              name: env
-        - name: PGADMIN_DEFAULT_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_EMAIL
-              name: env
-        - name: PGADMIN_DEFAULT_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_PASSWORD
-              name: env
-        - name: PGADMIN_LISTEN_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_LISTEN_PORT
-              name: env
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_DB
-              name: env
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_PASSWORD
-              name: env
-        - name: POSTGRES_SERVER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_SERVER
-              name: env
-        - name: POSTGRES_USER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_USER
-              name: env
-        - name: PROJECT_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: PROJECT_NAME
-              name: env
-        - name: SECRET_KEY
-          valueFrom:
-            configMapKeyRef:
-              key: SECRET_KEY
-              name: env
-        - name: SENTRY_DSN
-          valueFrom:
-            configMapKeyRef:
-              key: SENTRY_DSN
-              name: env
-        - name: SERVER_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_HOST
-              name: env
-        - name: SERVER_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_NAME
-              name: env
-        - name: SERVER_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_PORT
-              name: env
-        - name: SMTP_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_HOST
-              name: env
-        - name: SMTP_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PASSWORD
-              name: env
-        - name: SMTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PORT
-              name: env
-        - name: SMTP_TLS
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_TLS
-              name: env
-        - name: SMTP_USER
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_USER
-              name: env
-        - name: USERS_OPEN_REGISTRATION
-          valueFrom:
-            configMapKeyRef:
-              key: USERS_OPEN_REGISTRATION
-              name: env
-        - name: USE_PUBLIC_KEY_VERIFICATION
-          valueFrom:
-            configMapKeyRef:
-              key: USE_PUBLIC_KEY_VERIFICATION
-              name: env
-        - name: CAPIF_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HOST
-              name: env
-        - name: CAPIF_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTP_PORT
-              name: env
-        - name: CAPIF_HTTPS_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTPS_PORT
-              name: env
-        - name: MONGO_CLIENT
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_CLIENT
-              name: env
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.mongo.mongo.image.repository }}-{{ .Values.mongo.mongo.image.tag
-          | default .Chart.AppVersion }}
-        imagePullPolicy: Always
-        name: mongo
-        ports:
-            - containerPort: 27017
-        resources:
-            {{- toYaml .Values.mongo.mongo.resources | nindent 12 }}
-      restartPolicy: Always
+      volumes:
+      - emptyDir: {}
+        name: app-mongo-db-data
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-express
+  name: {{ include "nef.fullname" . }}-mongo-express
   labels:
-    io.kompose.service: mongo-express
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
+  {{- include "nef.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.mongoExpress.replicas }}
   selector:
     matchLabels:
-      io.kompose.service: mongo-express
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+      app: mongo-express
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        io.kompose.network/nef-emulator-default: "true"
-        io.kompose.service: mongo-express
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
-      annotations:
-        kompose.cmd: kompose -f ../docker-compose.yml convert
-        kompose.version: 1.28.0 (c4137012e)
-        checksum/config: {{ include (print $.Template.BasePath "/env.yaml") . | sha256sum }}
+        app: mongo-express
+      {{- include "nef.selectorLabels" . | nindent 8 }}
     spec:
+      containers:
+      - env:
+        - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_USER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_PASSWORD
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: ME_CONFIG_MONGODB_URL
+          valueFrom:
+            configMapKeyRef:
+              key: ME_CONFIG_MONGODB_URL
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.mongoExpress.mongoExpress.image.repository }}-{{ .Values.mongoExpress.mongoExpress.image.tag | default .Chart.AppVersion }}
+        name: mongo-express
+        ports:
+        - containerPort: 8081
+        resources: {}
       imagePullSecrets:
         - name: regcred
-      {{- if eq .Values.environment "kubernetes-athens" }}
-      hostAliases:
+      {{- if eq .Values.environment "kubernetes-athens" }}     
+      hostAliases: 
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
-      hostAliases:  
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
-      containers:
-      - env:
-        - name: ME_CONFIG_MONGODB_URL
-          value: {{ quote .Values.env.mongoClient }}
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.mongoExpress.mongoExpress.image.repository }}-{{ .Values.mongoExpress.mongoExpress.image.tag
-          | default .Chart.AppVersion }}
-        imagePullPolicy: Always
-        name: mongo-express
-        ports:
-        - containerPort: 8081
-        resources:
-            {{- toYaml .Values.mongoExpress.mongoExpress.resources | nindent 12 }}
-      restartPolicy: Always
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pgadmin
+  name: {{ include "nef.fullname" . }}-backend
   labels:
-    io.kompose.service: pgadmin
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
+  {{- include "nef.labels" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.pgadmin.replicas }}
+  replicas: {{ .Values.backend.replicas }}
   selector:
     matchLabels:
-      io.kompose.service: pgadmin
-    {{- include "nef-kube.selectorLabels" . | nindent 6 }}
+      app: backend
+    {{- include "nef.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        io.kompose.network/nef-emulator-default: "true"
-        io.kompose.service: pgadmin
-      {{- include "nef-kube.selectorLabels" . | nindent 8 }}
-      annotations:
-        kompose.cmd: kompose -f ../docker-compose.yml convert
-        kompose.version: 1.28.0 (c4137012e)
-        checksum/config: {{ include (print $.Template.BasePath "/env.yaml") . | sha256sum }}
+        app: backend
+      {{- include "nef.selectorLabels" . | nindent 8 }}
     spec:
+      containers:
+      - command:
+        - /start-reload.sh
+        env:
+        - name: SERVER_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: SERVER_NAME
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: SERVER_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: SERVER_HOST
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: SERVER_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: SERVER_PORT
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: SENTRY_DSN
+          valueFrom:
+            configMapKeyRef:
+              key: SENTRY_DSN
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: BACKEND_CORS_ORIGINS
+          valueFrom:
+            configMapKeyRef:
+              key: BACKEND_CORS_ORIGINS
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: SECRET_KEY
+          valueFrom:
+            configMapKeyRef:
+              key: SECRET_KEY
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: FIRST_SUPERUSER
+          valueFrom:
+            configMapKeyRef:
+              key: FIRST_SUPERUSER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: FIRST_SUPERUSER_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: FIRST_SUPERUSER_PASSWORD
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: PROJECT_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: PROJECT_NAME
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: NEF_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_HOST
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_SERVER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_SERVER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_USER
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_USER
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_PASSWORD
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: POSTGRES_DB
+          valueFrom:
+            configMapKeyRef:
+              key: POSTGRES_DB
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: MONGO_CLIENT
+          valueFrom:
+            configMapKeyRef:
+              key: MONGO_CLIENT
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: CAPIF_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_HOST
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: CAPIF_HTTP_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_HTTP_PORT
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: CAPIF_HTTPS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_HTTPS_PORT
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: EXTERNAL_NET
+          valueFrom:
+            configMapKeyRef:
+              key: EXTERNAL_NET
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: USE_PUBLIC_KEY_VERIFICATION
+          valueFrom:
+            configMapKeyRef:
+              key: USE_PUBLIC_KEY_VERIFICATION
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: {{ .Values.backend.backend.imagePullPolicy }}
+        name: backend
+        ports:
+        - containerPort: 80
+        resources: {}
       imagePullSecrets:
         - name: regcred
-      {{- if eq .Values.environment "kubernetes-athens" }}
-      hostAliases:
+      {{- if eq .Values.environment "kubernetes-athens" }}     
+      hostAliases: 
         - ip: "{{ .Values.ingress_ip.athens }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
-      hostAliases:  
+      hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
           hostnames:
             - "{{ .Values.backend.ingress.host }}"
             - "{{ .Values.env.capifHostname }}"
       {{- end }}
-      containers:
-      - env:
-        - name: BACKEND_CORS_ORIGINS
-          valueFrom:
-            configMapKeyRef:
-              key: BACKEND_CORS_ORIGINS
-              name: env
-        - name: DOCKER_IMAGE_BACKEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_BACKEND
-              name: env
-        - name: DOCKER_IMAGE_FRONTEND
-          valueFrom:
-            configMapKeyRef:
-              key: DOCKER_IMAGE_FRONTEND
-              name: env
-        - name: DOMAIN
-          valueFrom:
-            configMapKeyRef:
-              key: DOMAIN
-              name: env
-        - name: EMAILS_FROM_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: EMAILS_FROM_EMAIL
-              name: env
-        - name: FIRST_SUPERUSER
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER
-              name: env
-        - name: FIRST_SUPERUSER_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: FIRST_SUPERUSER_PASSWORD
-              name: env
-        - name: MONGO_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_PASSWORD
-              name: env
-        - name: MONGO_USER
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_USER
-              name: env
-        - name: PGADMIN_DEFAULT_EMAIL
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_EMAIL
-              name: env
-        - name: PGADMIN_DEFAULT_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_DEFAULT_PASSWORD
-              name: env
-        - name: PGADMIN_LISTEN_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: PGADMIN_LISTEN_PORT
-              name: env
-        - name: POSTGRES_DB
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_DB
-              name: env
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_PASSWORD
-              name: env
-        - name: POSTGRES_SERVER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_SERVER
-              name: env
-        - name: POSTGRES_USER
-          valueFrom:
-            configMapKeyRef:
-              key: POSTGRES_USER
-              name: env
-        - name: PROJECT_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: PROJECT_NAME
-              name: env
-        - name: SECRET_KEY
-          valueFrom:
-            configMapKeyRef:
-              key: SECRET_KEY
-              name: env
-        - name: SENTRY_DSN
-          valueFrom:
-            configMapKeyRef:
-              key: SENTRY_DSN
-              name: env
-        - name: SERVER_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_HOST
-              name: env
-        - name: SERVER_NAME
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_NAME
-              name: env
-        - name: SERVER_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SERVER_PORT
-              name: env
-        - name: SMTP_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_HOST
-              name: env
-        - name: SMTP_PASSWORD
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PASSWORD
-              name: env
-        - name: SMTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_PORT
-              name: env
-        - name: SMTP_TLS
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_TLS
-              name: env
-        - name: SMTP_USER
-          valueFrom:
-            configMapKeyRef:
-              key: SMTP_USER
-              name: env
-        - name: USERS_OPEN_REGISTRATION
-          valueFrom:
-            configMapKeyRef:
-              key: USERS_OPEN_REGISTRATION
-              name: env
-        - name: USE_PUBLIC_KEY_VERIFICATION
-          valueFrom:
-            configMapKeyRef:
-              key: USE_PUBLIC_KEY_VERIFICATION
-              name: env
-        - name: CAPIF_HOST
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HOST
-              name: env
-        - name: CAPIF_HTTP_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTP_PORT
-              name: env
-        - name: CAPIF_HTTPS_PORT
-          valueFrom:
-            configMapKeyRef:
-              key: CAPIF_HTTPS_PORT
-              name: env
-        - name: MONGO_CLIENT
-          valueFrom:
-            configMapKeyRef:
-              key: MONGO_CLIENT
-              name: env
-        - name: KUBERNETES_CLUSTER_DOMAIN
-          value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.pgadmin.pgadmin.image.repository }}-{{ .Values.pgadmin.pgadmin.image.tag
-          | default .Chart.AppVersion }}
-        imagePullPolicy: Always
-        name: pgadmin
-        ports:
-        - containerPort: 5050
-        resources:
-            {{- toYaml .Values.pgadmin.pgadmin.resources | nindent 12 }}
-      restartPolicy: Always
