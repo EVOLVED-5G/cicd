@@ -1,5 +1,5 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
-environment: "openshift"
+environment: "kubernetes-uma"
 
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing 
 ingress_ip: 
@@ -14,139 +14,122 @@ backend:
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
+    imagePullPolicy: Always
+  ingress:
+    host: localization-nef.apps.ocp-epg.hi.inet
   ports:
-  - name: backend
-    port: 8888
+  - port: 80
+    protocol: TCP
     targetPort: 80
   replicas: 1
   type: ClusterIP
-  ingress:
-    host: "nef-test.apps.ocp-epg.hi.inet"
-db:
-  db:
-    env:
-      pgdata: /var/lib/postgresql/data/pgdata
-    image:
-      # -- The docker image repository to use
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
-      # -- The docker image tag to use
-      # -- @default Chart version
-      tag: ""
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
-  replicas: 1
-  ports:
-  - name: "db"
-    port: 5432
-    targetPort: 5432
-  type: ClusterIP
 env:
   backendCorsOrigins: '["https://5g-api-emulator.medianetlab.eu","http://localhost"]'
-  dockerImageBackend: backend
+  backendTag: "1.0"
+  capifHostname: localization-capif.apps.ocp-epg.hi.inet
+  capifHttpPort: "80"
+  capifHttpsPort: "443"
+  dockerImageBackend: dimfrag/nef-backend
   dockerImageFrontend: frontend
+  dockerImageProxy: dimfrag/nef-nginx
+  domain: localhost
   emailsFromEmail: user@my-email.com
+  externalNet: "true"
   firstSuperuser: admin@my-email.com
   firstSuperuserPassword: pass
+  meConfigMongodbUrl: mongodb://root:pass@nef-mongo:27017/
+  mongoClient: mongodb://nef-mongo:27017/
+  mongoExpressEnableAdmin: "true"
   mongoPassword: pass
   mongoUser: root
-  mongoClient: mongodb://mongo:27017
+#  nefHost: backend
+  nginxHttp: "8090"
+  nginxHttps: "4443"
   pgadminDefaultEmail: admin@my-email.com
   pgadminDefaultPassword: pass
   pgadminListenPort: "5050"
   postgresDb: app
   postgresPassword: pass
-  postgresServer: db
+#  postgresServer: nef-db
   postgresUser: postgres
   projectName: NEF_Emulator
+  proxyTag: "1.0"
   secretKey: 2D47CF2958CEC7CC86C988E9F9684
   sentryDsn: ""
-  serverHost: http://backend
-  serverName: backend
+  serverHost: http://localhost
+  serverName: localhost
   serverPort: "8888"
   smtpHost: mail.host.com
   smtpPassword: pass
   smtpPort: "465"
   smtpTls: "True"
   smtpUser: user
+  usePublicKeyVerification: "true"
   usersOpenRegistration: "true"
-  usePublicKeyVerification: "True"
-  capifHostname: "capif.apps.ocp-epg.hi.inet"
-  capifHttpPort: "30048"
-  capifHttpsPort: "30548"
-
+db:
+  db:
+    env:
+      pgdata: /var/lib/postgresql/data/pgdata
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-db-1"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - port: 5432
+    protocol: TCP
+    targetPort: 0
+  replicas: 1
+  type: ClusterIP
+#emu:
+#  ports:
+#  - name: http-port
+#    port: 8090
+#    protocol: TCP
+#    targetPort: 80
+#  - name: https-port
+#    port: 4443
+#    protocol: TCP
+#    targetPort: 443
+#  type: ClusterIP
 kubernetesClusterDomain: cluster.local
 mongo:
-  mongo:
+  nefMongo:
+    # -- The docker image repository to use
     image:
-      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo_nef-1"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
-  replicas: 1
   ports:
-  - name: "mongo"
-    port: 27017
-    targetPort: 27017
+  - port: 27017
+    protocol: TCP
+    targetPort: 0
+  replicas: 1
   type: ClusterIP
 mongoExpress:
   mongoExpress:
+    # -- The docker image repository to use
     image:
-      # -- The docker image repository to use
       repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-mongo-express-1"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
   ports:
-  - name: "mongo-express"
-    port: 8081
-    targetPort: 8081
+  - port: 8081
+    protocol: TCP
+    targetPort: 0
   replicas: 1
   type: ClusterIP
-pgadmin:
-  pgadmin:
-    image:
-      # -- The docker image repository to use
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-pgadmin-1"
-      # -- The docker image tag to use
-      # -- @default Chart version
-      tag: ""
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
-  ports:
-  - name: "pgadmin"
-    port: 5050
-    targetPort: 5050
-  replicas: 1
-  type: ClusterIP
+#reverseProxy:
+#  replicas: 1
+#  reverseProxy:
+#    env:
+#      appDebug: "false"
+#      appEnv: prod
+#      appName: webserver
+#      serviceName: webserver
+#    image:
+#      repository: dimfrag/nef-nginx
+#      tag: "1.0"
