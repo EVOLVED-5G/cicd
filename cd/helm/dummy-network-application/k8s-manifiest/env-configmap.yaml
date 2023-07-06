@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: capif-callback-server-env
+  name: env
+data:
+  CAPIF_CALLBACK_PORT: "8080"
+  CAPIF_CALLBACK_URL: "capif_callback_server"
+  CAPIF_HOSTNAME: capif_callback_server
+  CAPIF_PORT: "8080"
+  CAPIF_PORT_HTTPS: "443"
+  NEF_CALLBACK_IP: nef_callback_server
+  NEF_CALLBACK_PORT: "8080"
+  NEF_IP: nef_callback_server
+  NEF_PASS: pass
+  NEF_PORT: "443"
+  NEF_USER: admin@my-email.com
+  PATH_TO_CERTS: /usr/src/app/capif_onboarding
+  REDIS_HOST: redis-db
+  REDIS_PORT: "6379"
+  REQUESTS_CA_BUNDLE: /usr/src/app/ca.crt
+  SSL_CERT_FILE: /usr/src/app/ca.crt
+  TSN_IP: host.docker.internal
+  TSN_PORT: "8899"
