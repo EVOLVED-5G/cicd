@@ -7,7 +7,7 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: nef-callback-server
-  name: nef_callback_server
+  name: nef-callback-server
 spec:
   ports:
     - name: "http-nef"

@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dummy-network-app
+resources:
+  - ./capif_callback_server-service.yaml
+  - ./capif-callback-server-deployment.yaml
+  - ./env-configmap.yaml
+  - ./nef_callback_server-service.yaml
+  - ./nef-callback-server-deployment.yaml
+  - ./python-app-deployment.yaml
+  - ./redis_server-service.yaml
+  - ./redis-db-deployment.yaml

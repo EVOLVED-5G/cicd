@@ -26,99 +26,111 @@ spec:
         io.kompose.service: python-app
     spec:
       containers:
-        - env:
-            - name: CAPIF_CALLBACK_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_CALLBACK_PORT
-                  name: env
-            - name: CAPIF_CALLBACK_URL
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_CALLBACK_URL
-                  name: env
-            - name: CAPIF_HOSTNAME
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_HOSTNAME
-                  name: env
-            - name: CAPIF_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_PORT
-                  name: env
-            - name: CAPIF_PORT_HTTPS
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_PORT_HTTPS
-                  name: env
-            - name: NEF_CALLBACK_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_CALLBACK_IP
-                  name: env
-            - name: NEF_CALLBACK_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_CALLBACK_PORT
-                  name: env
-            - name: NEF_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_IP
-                  name: env
-            - name: NEF_PASS
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_PASS
-                  name: env
-            - name: NEF_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_PORT
-                  name: env
-            - name: NEF_USER
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_USER
-                  name: env
-            - name: PATH_TO_CERTS
-              valueFrom:
-                configMapKeyRef:
-                  key: PATH_TO_CERTS
-                  name: env
-            - name: REDIS_HOST
-              valueFrom:
-                configMapKeyRef:
-                  key: REDIS_HOST
-                  name: env
-            - name: REDIS_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: REDIS_PORT
-                  name: env
-            - name: REQUESTS_CA_BUNDLE
-              valueFrom:
-                configMapKeyRef:
-                  key: REQUESTS_CA_BUNDLE
-                  name: env
-            - name: SSL_CERT_FILE
-              valueFrom:
-                configMapKeyRef:
-                  key: SSL_CERT_FILE
-                  name: env
-            - name: TSN_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: TSN_IP
-                  name: env
-            - name: TSN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: TSN_PORT
-                  name: env
-          image: python_app
-          name: python-app
-          resources: {}
+      - name: python-app
+        image: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-network-app-python-app-0.0.1"
+        env:
+          - name: CAPIF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_PORT
+                name: env
+          - name: CAPIF_CALLBACK_URL
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_URL
+                name: env
+          - name: CAPIF_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_HOSTNAME
+                name: env
+          - name: CAPIF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT
+                name: env
+          - name: CAPIF_PORT_HTTPS
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT_HTTPS
+                name: env
+          - name: NEF_CALLBACK_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_IP
+                name: env
+          - name: NEF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_PORT
+                name: env
+          - name: NEF_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_IP
+                name: env
+          - name: NEF_PASS
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PASS
+                name: env
+          - name: NEF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PORT
+                name: env
+          - name: NEF_USER
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_USER
+                name: env
+          - name: PATH_TO_CERTS
+            valueFrom:
+              configMapKeyRef:
+                key: PATH_TO_CERTS
+                name: env
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_HOST
+                name: env
+          - name: REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_PORT
+                name: env
+          - name: REQUESTS_CA_BUNDLE
+            valueFrom:
+              configMapKeyRef:
+                key: REQUESTS_CA_BUNDLE
+                name: env
+          - name: SSL_CERT_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: SSL_CERT_FILE
+                name: env
+          - name: TSN_IP
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_IP
+                name: env
+          - name: TSN_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_PORT
+                name: env
+        volumeMounts:
+        - name: capif-registration
+          mountPath: /usr/src/app/capif_registration.json
+          subPath: capif-registration.json
+      imagePullSecrets:
+      - name: regcred
+      volumes:
+      - name: capif-registration
+        configMap:
+          name: capif-registration
+          items:
+            - key: capif-registration.json
+              path: capif-registration.json
       restartPolicy: Always
 status: {}

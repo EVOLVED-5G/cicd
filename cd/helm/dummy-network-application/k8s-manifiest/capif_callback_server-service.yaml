@@ -7,11 +7,11 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: capif-callback-server
-  name: capif_callback_server
+  name: capif-callback-server
 spec:
   ports:
     - name: "http-capif"
-      port: 8080
+      port: 80
       targetPort: 8080
     - name: "https-capif"
       port: 443

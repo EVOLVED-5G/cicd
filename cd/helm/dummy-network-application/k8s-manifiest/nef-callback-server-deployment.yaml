@@ -26,102 +26,103 @@ spec:
         io.kompose.service: nef-callback-server
     spec:
       containers:
-        - env:
-            - name: CAPIF_CALLBACK_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_CALLBACK_PORT
-                  name: env
-            - name: CAPIF_CALLBACK_URL
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_CALLBACK_URL
-                  name: env
-            - name: CAPIF_HOSTNAME
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_HOSTNAME
-                  name: env
-            - name: CAPIF_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_PORT
-                  name: env
-            - name: CAPIF_PORT_HTTPS
-              valueFrom:
-                configMapKeyRef:
-                  key: CAPIF_PORT_HTTPS
-                  name: env
-            - name: NEF_CALLBACK_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_CALLBACK_IP
-                  name: env
-            - name: NEF_CALLBACK_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_CALLBACK_PORT
-                  name: env
-            - name: NEF_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_IP
-                  name: env
-            - name: NEF_PASS
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_PASS
-                  name: env
-            - name: NEF_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_PORT
-                  name: env
-            - name: NEF_USER
-              valueFrom:
-                configMapKeyRef:
-                  key: NEF_USER
-                  name: env
-            - name: PATH_TO_CERTS
-              valueFrom:
-                configMapKeyRef:
-                  key: PATH_TO_CERTS
-                  name: env
-            - name: REDIS_HOST
-              valueFrom:
-                configMapKeyRef:
-                  key: REDIS_HOST
-                  name: env
-            - name: REDIS_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: REDIS_PORT
-                  name: env
-            - name: REQUESTS_CA_BUNDLE
-              valueFrom:
-                configMapKeyRef:
-                  key: REQUESTS_CA_BUNDLE
-                  name: env
-            - name: SSL_CERT_FILE
-              valueFrom:
-                configMapKeyRef:
-                  key: SSL_CERT_FILE
-                  name: env
-            - name: TSN_IP
-              valueFrom:
-                configMapKeyRef:
-                  key: TSN_IP
-                  name: env
-            - name: TSN_PORT
-              valueFrom:
-                configMapKeyRef:
-                  key: TSN_PORT
-                  name: env
-          image: nef_callback_server
-          name: nef-callback-server
-          ports:
-            - containerPort: 8080
-            - containerPort: 443
-          resources: {}
+      - name: nef-callback-server
+        image: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-network-app-nef_callback_server-0.0.1"
+        env:
+          - name: CAPIF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_PORT
+                name: env
+          - name: CAPIF_CALLBACK_URL
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_URL
+                name: env
+          - name: CAPIF_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_HOSTNAME
+                name: env
+          - name: CAPIF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT
+                name: env
+          - name: CAPIF_PORT_HTTPS
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT_HTTPS
+                name: env
+          - name: NEF_CALLBACK_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_IP
+                name: env
+          - name: NEF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_PORT
+                name: env
+          - name: NEF_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_IP
+                name: env
+          - name: NEF_PASS
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PASS
+                name: env
+          - name: NEF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PORT
+                name: env
+          - name: NEF_USER
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_USER
+                name: env
+          - name: PATH_TO_CERTS
+            valueFrom:
+              configMapKeyRef:
+                key: PATH_TO_CERTS
+                name: env
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_HOST
+                name: env
+          - name: REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_PORT
+                name: env
+          - name: REQUESTS_CA_BUNDLE
+            valueFrom:
+              configMapKeyRef:
+                key: REQUESTS_CA_BUNDLE
+                name: env
+          - name: SSL_CERT_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: SSL_CERT_FILE
+                name: env
+          - name: TSN_IP
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_IP
+                name: env
+          - name: TSN_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_PORT
+                name: env
+        ports:
+          - containerPort: 8080
+          - containerPort: 443
+      imagePullSecrets:
+      - name: regcred
       restartPolicy: Always
 status: {}

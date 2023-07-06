@@ -26,7 +26,9 @@ spec:
         io.kompose.service: capif-callback-server
     spec:
       containers:
-        - env:
+      - name: capif-callback-server
+        image: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-network-app-nef_callback_server-0.0.1"
+        env:
             - name: CAPIF_CALLBACK_PORT
               valueFrom:
                 configMapKeyRef:
@@ -117,11 +119,10 @@ spec:
                 configMapKeyRef:
                   key: TSN_PORT
                   name: env
-          image: capif_callback_server
-          name: capif-callback-server
-          ports:
+        ports:
             - containerPort: 8080
             - containerPort: 443
-          resources: {}
+      imagePullSecrets:
+      - name: regcred
       restartPolicy: Always
 status: {}
