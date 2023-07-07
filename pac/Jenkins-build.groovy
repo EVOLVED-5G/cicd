@@ -41,6 +41,10 @@ def getReportFilename(String netappNameLower) {
     return '004-report-build-' + netappNameLower
 }
 
+String getArtifactoryUrl(phase) {
+    return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
+}
+
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
@@ -74,6 +78,7 @@ pipeline {
         CHECKPORTS_PATH = 'utils/checkports'
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         DOCKER_PATH = '/usr/src/app'
+        ARTIFACTORY_IMAGE_URL = getArtifactoryUrl("${env.PATH_DOCKER}")
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
@@ -89,6 +94,8 @@ pipeline {
                     sudo rm -rf $WORKSPACE/$NETAPP_NAME_LOWER/
                     docker network create services_default
                     echo $PATH_AWS
+                    sudo rm -rf $WORKSPACE/${NETAPP_NAME_LOWER}-images/
+                    mkdir $WORKSPACE/${NETAPP_NAME_LOWER}-images/
                     '''
                 }
             }
@@ -285,7 +292,6 @@ pipeline {
                             def cmd2 = "docker ps --format '{{.Names}}'"
                             def image = sh(returnStdout: true, script: cmd).trim()
                             def name  = sh(returnStdout: true, script: cmd2).trim()
-                            sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
                                 if (env.PATH_DOCKER != null) {
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
@@ -293,12 +299,14 @@ pipeline {
                                     sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
                                     sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                     sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                    sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                 } else {
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
                                     sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
                                     sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                     sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                    sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                 }
                             }
                         }
@@ -323,14 +331,40 @@ pipeline {
                                 sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}"""
                                 sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
                                 sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:latest"""
+                                sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
                             } else {
                                 sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
                                 sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest"""
                                 sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}"""
                                 sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION} """
                                 sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest """
+                                sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
                             }
                         }
+                    }
+                }
+            }
+        }
+        stage('Compress and upload images to artifactory') {
+            steps {
+                retry(2) {
+                    script {
+                        sh '''#!/bin/bash
+                        image_file=${NETAPP_NAME_LOWER}.tar.gz
+
+                        tar czvf ${image_file} ${NETAPP_NAME_LOWER}-images
+                        
+                        if [ -f "${image_file}" ]; then
+
+                            url="$ARTIFACTORY_IMAGE_URL/$NETAPP_NAME_LOWER/$VERSION/${image_file}"
+
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"${image_file}" \
+                                "$url"
+                        else
+                            echo "compressed file was not generated"
+                        fi
+                        '''
                     }
                 }
             }
