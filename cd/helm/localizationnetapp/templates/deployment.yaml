@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "localization.fullname" . }}-netapp
+  labels:
+    io.kompose.service: localization-netapp
+    io.kompose.service-udp: localization-netapp-udp
+  {{- include "localization.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.netapp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: localization-netapp
+      io.kompose.service-udp: localization-netapp-udp
+    {{- include "localization.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/services-default: "true"
+        io.kompose.service: localization-netapp
+        io.kompose.service-udp: localization-netapp-udp
+      {{- include "localization.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      containers:
+      - env:
+        - name: CALLBACK_ADDRESS
+          value: {{ quote .Values.env.callbackAddress }}
+        - name: CAPIF_PORT_HTTPS
+          value: {{ quote .Values.env.capifPortHttps }}
+        - name: CAPIF_PORT_HTTP
+          value: {{ quote .Values.env.capifPortHttp }}
+        - name: CAPIF_HOSTNAME
+          value: {{ quote .Values.env.capifHostname }}
+        - name: CAPIF_USERNAME
+          value: {{ quote .Values.env.capifUsername }}
+        - name: PATH_TO_CERTS
+          value: {{ quote .Values.env.pathToCerts }}
+        - name: VAPP_ADDRESS
+          value: {{ quote .Values.env.vappAddress }}
+        - name: NEF_ADDRESS
+          value: {{ quote .Values.env.nefAddress }}
+        - name: NEF_PORT
+          value: {{ quote .Values.env.nefPort }}
+        - name: NEF_USER
+          value: {{ quote .Values.env.nefUser }}
+        - name: NEF_PASSWORD
+          value: {{ quote .Values.env.nefPassword }}
+        - name: UE_EXTERNAL_ID
+          value: {{ quote .Values.env.ueExternalId }}
+        - name: ENVIRONMENT
+          value: {{ quote .Values.env.deployment }}
+        - name: ROS_DOMAIN_ID
+          value: {{ quote .Values.env.rosDomainId }}
+        - name: NETWORK
+          value: {{ quote .Values.env.network }}
+        - name: DDS_EXTERNAL_ADDRESS
+          value: {{ quote .Values.env.ddsExternalAddress }}
+        image: {{ .Values.netapp.localizationNetapp.image.repository }}-{{ .Values.netapp.localizationNetapp.image.tag | default .Chart.AppVersion }}
+        imagePullPolicy: Always
+        name: localizationnetapp
+        ports:
+          - containerPort: 8000
+          - protocol: UDP
+            containerPort: 7660
+          - protocol: UDP
+            containerPort: 7661
+          - protocol: UDP
+            containerPort: 7662
+          - protocol: UDP
+            containerPort: 7663
+          - protocol: UDP
+            containerPort: 7664
+          - protocol: UDP
+            containerPort: 7665
+        resources: {} 
+      restartPolicy: Always

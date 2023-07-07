@@ -1,0 +1,67 @@
+# -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
+environment: "openshift"
+
+# -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
+ingress_ip: 
+    athens: "10.161.1.126"
+    uma: "10.11.23.49"
+
+env:
+  callbackAddress: "netapp:8000"
+  frontendAddress: "localization.apps.ocp-epg.hi.inet"
+  capifHostname: "my-capif.apps.ocp-epg.hi.inet"
+  capifUsername: "user1"
+  capifPortHttp: "30048"
+  capifPortHttps: "30548"
+  pathToCerts: "/evolved5g/cfg/capif_onboarding"
+  vappAddress: "195.134.66.79:7000"
+  nefAddress: my-nef.apps.ocp-epg.hi.inet
+  nefPort: "30548"
+  nefUser: admin@my-email.com
+  nefPassword: pass
+  ueExternalId: "10002@domain.com"
+  environment: "development"
+  rosDomainId: "1"
+  network: evolved5G_dds
+  ddsExternalAddress: "10.11.23.53"
+
+netapp:
+  localizationNetapp:
+    # -- The docker image repository to use
+    image:
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:localizationnetapp"
+      # -- The docker image tag to use
+      # -- @default Chart version
+      tag: ""
+  ports:
+  - name: "netapp"
+    port: 8000
+    targetPort: 8000
+  type: ClusterIP
+  portsUdp:
+  - name: "netapp-upd-0"
+    port: 7660
+    targetPort: 7660
+    protocol: UDP
+  - name: "netapp-upd-1"
+    port: 7661
+    targetPort: 7661
+    protocol: UDP
+  - name: "netapp-upd-2"
+    port: 7662
+    targetPort: 7662
+    protocol: UDP
+  - name: "netapp-upd-3"
+    port: 7663
+    targetPort: 7663
+    protocol: UDP
+  - name: "netapp-upd-4"
+    port: 7664
+    targetPort: 7664
+    protocol: UDP
+  - name: "netapp-upd-5"
+    port: 7665
+    targetPort: 7665
+    protocol: UDP
+  typeUdp: LoadBalancer
+  replicas: 1
