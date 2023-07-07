@@ -38,7 +38,7 @@ kind: Ingress
 metadata:
   name: backend-ssl
   labels:
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
