@@ -99,6 +99,7 @@ pipeline {
                         sed -i "s,^[ ]*CRYPTO_INFURA_PROJECT_ID=.*,CRYPTO_INFURA_PROJECT_ID=48e5260693384e9aa0ea22976749ddf7,g" .env
                         sed -i "s,^[ ]*CRYPTO_SENDER_BASE_URL=.*,CRYPTO_SENDER_BASE_URL=http://evolved5g-blockchain-sender:8000/,g" .env
                         sed -i "s,^[ ]*TM_FORUM_API_BASE_URL=.*,TM_FORUM_API_BASE_URL=http://evolved5g-pilot-tmf-api-container:8080/tmf-api/,g" .env
+                        sed -i "s,^[ ]*NETAPP_FINGERPRINT_BASE_URL=.*,NETAPP_FINGERPRINT_BASE_URL=https://artifactory.hi.inet/artifactory/misc-evolved5g/certification/,g" .env
 
                         cat .env
                     '''
