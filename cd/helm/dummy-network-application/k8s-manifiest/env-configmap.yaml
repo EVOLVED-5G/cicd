@@ -4,18 +4,19 @@ metadata:
   creationTimestamp: null
   labels:
     io.kompose.service: capif-callback-server-env
-  name: env
+  name: env-dummy-network-app
+  namespace: dummy-network-app
 data:
   CAPIF_CALLBACK_PORT: "8080"
-  CAPIF_CALLBACK_URL: "capif-callback-server"
-  CAPIF_HOSTNAME: capif-callback-server
-  CAPIF_PORT: "8080"
-  CAPIF_PORT_HTTPS: "443"
-  NEF_CALLBACK_IP: nef-callback-server
+  CAPIF_CALLBACK_URL: "dummy-network-app-capif.apps.ocp-epg.hi.inet"
+  CAPIF_HOSTNAME: dummy-network-app-capif.apps.ocp-epg.hi.inet
+  CAPIF_PORT: "30048"
+  CAPIF_PORT_HTTPS: "30548"
+  NEF_CALLBACK_IP: dummy-network-app-nef.apps.ocp-epg.hi.inet
   NEF_CALLBACK_PORT: "8080"
-  NEF_IP: nef-callback-server
+  NEF_IP: dummy-network-app-nef.apps.ocp-epg.hi.inet
   NEF_PASS: pass
-  NEF_PORT: "443"
+  NEF_PORT: "30548"
   NEF_USER: admin@my-email.com
   PATH_TO_CERTS: /usr/src/app/capif_onboarding
   REDIS_HOST: redis-db
@@ -33,16 +34,17 @@ metadata:
   labels:
     io.kompose.service: capif-callback-server-env
   name: capif-registration
+  namespace: dummy-network-app
 data:
   capif-registration.json: |
     {
       "folder_to_store_certificates": "/usr/src/app/capif_onboarding",
-      "capif_host": "capif-callback-server",
-      "capif_http_port": "80",
-      "capif_https_port": "443",
+      "capif_host": "dummy-network-app-capif.apps.ocp-epg.hi.inet",
+      "capif_http_port": "30048",
+      "capif_https_port": "30548",
       "capif_netapp_username": "test_network_app_23",
       "capif_netapp_password": "test_network_app_password",
-      "capif_callback_url": "http://capif-callback-server:5000",
+      "capif_callback_url": "http://dummy-network-app-capif.apps.ocp-epg.hi.inet:5000",
       "description": ",test_app_description",
       "csr_common_name": "test_app_common_name",
       "csr_organizational_unit": "test_app_ou",

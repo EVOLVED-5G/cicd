@@ -8,6 +8,7 @@ metadata:
   labels:
     io.kompose.service: redis-db
   name: redis-db
+  namespace: dummy-network-app
 spec:
   replicas: 1
   selector:
