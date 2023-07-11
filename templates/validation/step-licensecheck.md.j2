@@ -21,25 +21,26 @@ The licenses scan has been performed using Debricked SaaS.
 
 ## Licenses Summary Results
 
-| License Name | Families | Dependencies |
-|---|---|---|
+| License Name | Dependencies |
+|---|:---:|
 
 {%- for license, value in licenses.items() %}
-| {{license}} | {{value["family"]}} | {{value["count"]}}  |
+| {{license}} | {{value["count"]}} |
 {%- endfor %}
+
 
 ***
 
-## Dependencies Summary Results
+## Dependencies Results
 
-This is the packages list with license families other than Permissive
+|Compatible|Package|Version|License
+|:--:|:--|:--:|:--|
 
-| Dependency Name | Version | Licenses | Families |
-|---|---|---|---|
-
-{%- for dependency, value in dependencies.items() %}
-    {%- if value["families"].find("Unknown") != -1 or value["families"].find("Strong") != -1 or value["families"].find("Weak") != -1%}
-| {{dependency}} | {{value["version"]}} | {{value["licenses"]}}  | {{value["families"]}}  |
-    {%- endif %}
+{%- for package in packages %}
+{%- if package["licenseCompat"] == true %}
+| ✔️ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- else %}
+| ❌ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- endif %}
 {%- endfor %}
 
