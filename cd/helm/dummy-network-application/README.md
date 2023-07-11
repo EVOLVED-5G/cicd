@@ -17,7 +17,7 @@ A Helm chart for Kubernetes
 | env.capifCallbackPort | string | `"8080"` |  |
 | env.capifCallbackUrl | string | `"http://dummy-network-app-capif.apps.ocp-epg.hi.inet:5000"` |  |
 | env.capifHostname | string | `"dummy-network-app-capif.apps.ocp-epg.hi.inet"` |  |
-| env.capifPort | string | `"30048"` |  |
+| env.capifPortHttp | string | `"30048"` |  |
 | env.capifPortHttps | string | `"30548"` |  |
 | env.nefAddress | string | `"dummy-network-app-nef.apps.ocp-epg.hi.inet"` |  |
 | env.nefCallbackIp | string | `"dummy-network-app-nef.apps.ocp-epg.hi.inet"` |  |
