@@ -136,12 +136,7 @@ pipeline {
                     echo "pyproject.toml file exists"
                 else
                     echo "pyproject.toml not exist, generating one for license checking"
-                    cat << __EOF__ >> pyproject.toml
-                [tool.poetry]
-                name = "licensecheck"
-                version = "2023.1.4"
-                license = "mit"
-                __EOF__
+                    cp ${WORKSPACE}/utils/licensecheck/pyproject.toml ./
                     remove=1
                 fi
 
