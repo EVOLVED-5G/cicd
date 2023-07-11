@@ -10,7 +10,7 @@ data:
     {
       "folder_to_store_certificates": "/usr/src/app/capif_onboarding",
       "capif_host": {{ .Values.env.capifHostname | quote }},
-      "capif_http_port": {{ .Values.env.capifPort | quote }},
+      "capif_http_port": {{ .Values.env.capifPortHttp | quote }},
       "capif_https_port": {{ .Values.env.capifPortHttps | quote }},
       "capif_netapp_username": "test_network_app_26",
       "capif_netapp_password": "test_network_app_password",

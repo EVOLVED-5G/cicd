@@ -9,7 +9,7 @@ data:
   CAPIF_CALLBACK_PORT: {{ .Values.env.capifCallbackPort | quote }}
   CAPIF_CALLBACK_URL: {{ .Values.env.capifCallbackUrl | quote }}
   CAPIF_HOSTNAME: {{ .Values.env.capifHostname | quote }}
-  CAPIF_PORT: {{ .Values.env.capifPort | quote }}
+  CAPIF_PORT: {{ .Values.env.capifPortHttp | quote }}
   CAPIF_PORT_HTTPS: {{ .Values.env.capifPortHttps | quote }}
   NEF_CALLBACK_IP: {{ .Values.env.nefCallbackIp | quote }}
   NEF_CALLBACK_PORT: {{ .Values.env.nefCallbackPort | quote }}

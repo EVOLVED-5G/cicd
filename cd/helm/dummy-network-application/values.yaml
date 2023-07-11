@@ -10,7 +10,7 @@ env:
   capifCallbackPort: "8080"
   capifCallbackUrl: http://dummy-network-app-capif.apps.ocp-epg.hi.inet:5000
   capifHostname: dummy-network-app-capif.apps.ocp-epg.hi.inet
-  capifPort: "30048"
+  capifPortHttp: "30048"
   capifPortHttps: "30548"
   nefCallbackIp: dummy-network-app-nef.apps.ocp-epg.hi.inet
   nefCallbackPort: "8080"
