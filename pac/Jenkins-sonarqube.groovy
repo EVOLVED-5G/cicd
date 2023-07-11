@@ -31,6 +31,7 @@ pipeline {
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
@@ -44,6 +45,7 @@ pipeline {
         SONARQB_PASSWORD = credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        STAGE = ${params.STAGE}
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
@@ -160,7 +162,7 @@ pipeline {
                     versionsq=$(curl -u admin:$SONARQB_PASSWORD https://sq.mobilesandbox.cloud:9000/api/system/info | jq ".System.Version")
                     urlsq=https://sq.mobilesandbox.cloud:9000/dashboard?id=Evolved5g-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}
 
-                    python3 utils/report_generator.py --template templates/step-source-code-static-analysis.md.j2 --json ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json --output ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq --name $NETAPP_NAME
+                    python3 utils/report_generator.py --template templates/${STAGE}/step-source-code-static-analysis.md.j2 --json ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.json --output ${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionsq --url $urlsq --name $NETAPP_NAME
                     docker run -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.pdf $DOCKER_PATH/${REPORT_FILENAME}-${NETAPP_NAME_LOWER}-${GIT_NETAPP_BRANCH}.md
                     declare -a files=("json" "html" "md" "pdf")
 
