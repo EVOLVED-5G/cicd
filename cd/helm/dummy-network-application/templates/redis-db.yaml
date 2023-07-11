@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "dummy-network-application.fullname" . }}-redis-db
+  labels:
+    io.kompose.service: redis-db
+  {{- include "dummy-network-application.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  type: {{ .Values.redisDb.type }}
+  selector:
+    io.kompose.service: redis-db
+  {{- include "dummy-network-application.selectorLabels" . | nindent 4 }}
+  ports:
+	{{- .Values.redisDb.ports | toYaml | nindent 2 -}}
