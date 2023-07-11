@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+  labels:
+    io.kompose.service: capif-callback-server-env
+  {{- include "dummy-network-application.labels" . | nindent 4 }}
+data:
+  CAPIF_CALLBACK_PORT: {{ .Values.env.capifCallbackPort | quote }}
+  CAPIF_CALLBACK_URL: {{ .Values.env.capifCallbackUrl | quote }}
+  CAPIF_HOSTNAME: {{ .Values.env.capifHostname | quote }}
+  CAPIF_PORT: {{ .Values.env.capifPort | quote }}
+  CAPIF_PORT_HTTPS: {{ .Values.env.capifPortHttps | quote }}
+  NEF_CALLBACK_IP: {{ .Values.env.nefCallbackIp | quote }}
+  NEF_CALLBACK_PORT: {{ .Values.env.nefCallbackPort | quote }}
+  NEF_IP: {{ .Values.env.nefAddress | quote }}
+  NEF_PASS: {{ .Values.env.nefPassword | quote }}
+  NEF_PORT: {{ .Values.env.nefPort | quote }}
+  NEF_USER: {{ .Values.env.nefUser | quote }}
+  PATH_TO_CERTS: {{ .Values.env.pathToCerts | quote }}
+  REDIS_HOST: {{ .Values.env.redisHost | quote }}
+  REDIS_PORT: {{ .Values.env.redisPort | quote }}
+  REQUESTS_CA_BUNDLE: {{ .Values.env.requestsCaBundle | quote }}
+  SSL_CERT_FILE: {{ .Values.env.sslCertFile | quote }}
+  TSN_IP: {{ .Values.env.tsnIp | quote }}
+  TSN_PORT: {{ .Values.env.tsnPort | quote }}
