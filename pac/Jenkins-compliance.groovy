@@ -140,8 +140,7 @@ pipeline {
                     remove=1
                 fi
 
-                echo "licensecheck --using $using --format json"
-                licensecheck --using $using --format json --file compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json
+                python3 -m licensecheck --using $using --format json --file compliance_${NETAPP_NAME}_"$GIT_COMMIT".report.json
 
                 if [ $remove -eq 1 ];then
                 rm pyproject.toml
