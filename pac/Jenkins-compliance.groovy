@@ -119,16 +119,16 @@ pipeline {
                     retry(3)
             }
             steps {
-                sh '''
+                sh '''#!/bin/bash
                 cd "${WORKSPACE}/${NETAPP_NAME}"
                 FILES=$(find . -name "requirements*.txt")
 
                 using="requirements"
                 echo ${#FILES[@]}
-                    for req in $FILES
-                    do
-                        using+=:$req
-                    done
+                for req in $FILES
+                do
+                    using+=:$req
+                done
                 echo $using
 
                 remove=0
