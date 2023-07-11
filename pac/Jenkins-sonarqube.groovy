@@ -45,7 +45,7 @@ pipeline {
         SONARQB_PASSWORD = credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
-        STAGE = ${params.STAGE}
+        STAGE = "${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
