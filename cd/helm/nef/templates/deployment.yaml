@@ -314,6 +314,11 @@ spec:
             configMapKeyRef:
               key: USE_PUBLIC_KEY_VERIFICATION
               name: {{ include "nef.fullname" . }}-configmap
+        - name: USERS_OPEN_REGISTRATION
+          valueFrom:
+            configMapKeyRef:
+              key: USERS_OPEN_REGISTRATION
+              name: {{ include "nef.fullname" . }}-configmap
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.backend.backend.image.repository }}-{{ .Values.backend.backend.image.tag | default .Chart.AppVersion }}
