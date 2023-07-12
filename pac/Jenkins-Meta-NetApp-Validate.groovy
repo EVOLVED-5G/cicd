@@ -163,10 +163,10 @@ pipeline {
                                 parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
-
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
                                 buildResults['steps'][step_name] = jobResult
@@ -185,6 +185,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -206,6 +207,7 @@ pipeline {
                                                 string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
                                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]
@@ -546,6 +548,7 @@ pipeline {
                                 string(name: 'VERSION_NETAPP', value: String.valueOf(VERSION_NETAPP)),
                                 string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                 string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                 string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                 booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
                                 booleanParam(name: 'SEND_DEV_MAIL', value: false)]

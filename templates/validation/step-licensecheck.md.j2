@@ -1,0 +1,45 @@
+# OPEN SOURCE LICENSES REPORT
+# Analisys Results
+
+Test Description: This test identifies the required licenses used in the Network App {{name}}.
+Network App repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
+
+Licenses introduce a varying degree of conditions to be fulfilled for using the licensed software. Open Source licenses gives indeed many freedoms, but seldom completely unconditionally:
+
+* Almost all licenses require you to attribute the distributed software with a copyright and a permission notice, sometimes in addition with the entire license text.
+* Some licenses require you to publish the source code as well, which add work to ensure that you are in compliance with the license.
+* Some licenses add rights and conditions beyond the copyright, suchs as on patents, trademarks, data, and privacy which may make it more difficult to altogether achieve compliance of a license.
+* And to complicate things even further, some Open Source licenses have conditions which makes them incompatible with other Open Source licenses. This is most notably with the GPL license.
+
+The licenses scan has been performed using licensecheck.
+
+* Strong copyleft license requires that other code that is used for adding, enhancing, and/or modifying the original work also must inherit all the original work’s license requirements such as to make the code publicly available.
+* Weak copyleft license only requires that the source code of the original or modified work is made publicly available, other code that is used together with the work does not necessarily inherit the original work’s license requirements.
+
+## Licenses Summary Results
+
+| License Name | Dependencies |
+|---|:---:|
+
+{%- for license, value in licenses.items() %}
+| {{license}} | {{value["count"]}} |
+{%- endfor %}
+
+
+***
+
+## Dependencies Results
+
+|Compatible|Package|Version|License
+|:--:|:--|:--:|:--|
+
+{%- for package in packages %}
+{%- if package["licenseCompat"] == true %}
+| ✔️ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- else %}
+| ❌ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- endif %}
+{%- endfor %}
+
