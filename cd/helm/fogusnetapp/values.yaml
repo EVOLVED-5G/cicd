@@ -10,7 +10,7 @@ dbnetapp:
   netapppostgres:
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netapppostgres"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netapppostgres"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "latest"
@@ -31,7 +31,7 @@ django:
   netappdjango:
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappdjango"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "latest"
@@ -68,7 +68,7 @@ netapp:
   netappfe:
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappfe"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "latest"
