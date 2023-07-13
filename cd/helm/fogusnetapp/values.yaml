@@ -49,8 +49,8 @@ django:
   replicas: 1
   type: ClusterIP
 env:
-  environment: development
-  callbackAddress: 192.168.1.5:8000
+  environment: production
+  callbackAddress: https://my-fogus.apps.ocp-epg.hi.inet
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "30048"
   capifPortHttps: "30548"
