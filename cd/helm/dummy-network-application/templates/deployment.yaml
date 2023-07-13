@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dummy-network-application.fullname" . }}-python-app
+  labels:
+    io.kompose.service: python-app
+  {{- include "dummy-network-application.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.pythonApp.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: python-app
+    {{- include "dummy-network-application.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: python-app
+      {{- include "dummy-network-application.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      containers:
+      - env:
+        - name: CAPIF_CALLBACK_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_CALLBACK_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: CAPIF_CALLBACK_URL
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_CALLBACK_URL
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: CAPIF_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_HOSTNAME
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: CAPIF_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: CAPIF_PORT_HTTPS
+          valueFrom:
+            configMapKeyRef:
+              key: CAPIF_PORT_HTTPS
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_CALLBACK_IP
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_CALLBACK_IP
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_CALLBACK_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_CALLBACK_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_IP
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_IP
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_PASS
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_PASS
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: NEF_USER
+          valueFrom:
+            configMapKeyRef:
+              key: NEF_USER
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: PATH_TO_CERTS
+          valueFrom:
+            configMapKeyRef:
+              key: PATH_TO_CERTS
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_HOST
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: REQUESTS_CA_BUNDLE
+          valueFrom:
+            configMapKeyRef:
+              key: REQUESTS_CA_BUNDLE
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: SSL_CERT_FILE
+          valueFrom:
+            configMapKeyRef:
+              key: SSL_CERT_FILE
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: TSN_IP
+          valueFrom:
+            configMapKeyRef:
+              key: TSN_IP
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: TSN_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: TSN_PORT
+              name: {{ include "dummy-network-application.fullname" . }}-env-dummy-network-app
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.pythonApp.pythonApp.image.repository }}-{{ .Values.pythonApp.pythonApp.image.tag | default .Chart.AppVersion }}
+        name: python-app
+        resources: {}
+        volumeMounts:
+        - mountPath: /usr/src/app/capif_registration.json
+          name: capif-registration
+          subPath: capif-registration.json
+      imagePullSecrets:
+        - name: regcred
+      {{- if eq .Values.environment "kubernetes-athens" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-uma" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.uma }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
+      restartPolicy: Always
+      volumes:
+      - configMap:
+          items:
+          - key: capif-registration.json
+            path: capif-registration.json
+          name: {{ include "dummy-network-application.fullname" . }}-capif-registration
+        name: capif-registration
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "dummy-network-application.fullname" . }}-redis-db
+  labels:
+    io.kompose.service: redis-db
+  {{- include "dummy-network-application.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+spec:
+  replicas: {{ .Values.redisDb.replicas }}
+  selector:
+    matchLabels:
+      io.kompose.service: redis-db
+    {{- include "dummy-network-application.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: redis-db
+      {{- include "dummy-network-application.selectorLabels" . | nindent 8 }}
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_CLUSTER_DOMAIN
+          value: {{ quote .Values.kubernetesClusterDomain }}
+        image: {{ .Values.redisDb.redisDb.image.repository }}:{{ .Values.redisDb.redisDb.image.tag | default .Chart.AppVersion }}
+        name: redis-db
+        resources: {}
+      restartPolicy: Always

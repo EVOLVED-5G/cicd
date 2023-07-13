@@ -65,12 +65,12 @@ spec:
               export COMPOSER_ALLOW_SUPERUSER=1 &&
               composer install &&
               composer dump-autoload &&
-              php artisan key:generate &&
-              php artisan migrate &&
-              php artisan db:seed &&
-              php artisan storage:link &&
+              yes | php artisan key:generate &&
+              yes | php artisan migrate &&
+              yes | php artisan db:seed &&
+              yes | php artisan storage:link &&
               npm install &&
-              npm run development
+              npm run production
       restartPolicy: Always
 
 

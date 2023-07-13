@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+metadata:
+  name: {{ include "dummy-network-application.fullname" . }}-
+  labels:
+  {{- include "dummy-network-application.labels" . | nindent 4 }}
+namespace: dummy-network-app
+resources:
+- ./env-configmap.yaml
+- ./python-app-deployment.yaml
+- ./redis_server-service.yaml
+- ./redis-db-deployment.yaml

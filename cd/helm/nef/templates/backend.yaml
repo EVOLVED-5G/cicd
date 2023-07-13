@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-backend
   labels:
-  {{- include "nef-kube.labels" . | nindent 4 }}
+  {{- include "nef.labels" . | nindent 4 }}
   annotations:
     kompose.cmd: kompose convert -f docker-compose-resolved.yaml -c -o folder
     kompose.version: 1.26.1 (HEAD)
@@ -17,26 +17,68 @@ spec:
       paths:
       - backend:
           service:
+            name: '{{ include "nef.fullname" . }}-backend'
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  {{- if eq .Values.environment "openshift" }}
+  tls:
+  - {}
+  {{ else }}
+  tls:
+  - hosts:
+    - {{ .Values.backend.ingress.host }}
+    secretName: {{ include "nef.fullname" . }}-backend-http
+  {{- end }}
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: backend-ssl
+  labels:
+  {{- include "nef.labels" . | nindent 4 }}
+  annotations:
+    kompose.cmd: kompose -f ../services/docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+    {{- if eq .Values.environment "kubernetes-uma" }}
+    ingress.kubernetes.io/force-ssl-redirect: "true"
+    kubernetes.io/ingress.class: contour
+    kubernetes.io/tls-acme: "true"
+    {{- end }}
+    cert-manager.io/cluster-issuer: cert-evolved5g-issuer
+spec:
+  {{- if eq .Values.environment "kubernetes-athens" }}
+  ingressClassName: nginx
+  {{- end }}
+  tls:
+    - hosts:
+      - "{{ .Values.backend.ingress.host }}"
+      secretName: backend-http
+  rules:
+  - host: "{{ .Values.backend.ingress.host }}"
+    http:
+      paths:
+      - backend:
+          service:
             name: 'backend'
             port:
               number: 8888
         path: /
         pathType: Prefix
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend
+  name: {{ include "nef.fullname" . }}-backend
   labels:
-    io.kompose.service: backend
-  {{- include "nef-kube.labels" . | nindent 4 }}
-  annotations:
-    kompose.cmd: kompose -f ../docker-compose.yml convert
-    kompose.version: 1.28.0 (c4137012e)
+  {{- include "nef.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.backend.type }}
   selector:
-    io.kompose.service: backend
-  {{- include "nef-kube.selectorLabels" . | nindent 4 }}
+    app: backend
+  {{- include "nef.selectorLabels" . | nindent 4 }}
   ports:
 	{{- .Values.backend.ports | toYaml | nindent 2 -}}

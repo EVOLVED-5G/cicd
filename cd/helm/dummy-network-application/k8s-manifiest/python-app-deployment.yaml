@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -f docker-compose.yml convert
+    kompose.version: 1.28.0 (c4137012e)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: python-app
+  name: python-app
+  namespace: dummy-network-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: python-app
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -f docker-compose.yml convert
+        kompose.version: 1.28.0 (c4137012e)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/demo-network: "true"
+        io.kompose.service: python-app
+    spec:
+      containers:
+      - name: python-app
+        image: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:dummy-network-app-python-app-0.0.1"
+        env:
+          - name: CAPIF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_PORT
+                name: env-dummy-network-app
+          - name: CAPIF_CALLBACK_URL
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_CALLBACK_URL
+                name: env-dummy-network-app
+          - name: CAPIF_HOSTNAME
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_HOSTNAME
+                name: env-dummy-network-app
+          - name: CAPIF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT
+                name: env-dummy-network-app
+          - name: CAPIF_PORT_HTTPS
+            valueFrom:
+              configMapKeyRef:
+                key: CAPIF_PORT_HTTPS
+                name: env-dummy-network-app
+          - name: NEF_CALLBACK_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_IP
+                name: env-dummy-network-app
+          - name: NEF_CALLBACK_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_CALLBACK_PORT
+                name: env-dummy-network-app
+          - name: NEF_IP
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_IP
+                name: env-dummy-network-app
+          - name: NEF_PASS
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PASS
+                name: env-dummy-network-app
+          - name: NEF_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_PORT
+                name: env-dummy-network-app
+          - name: NEF_USER
+            valueFrom:
+              configMapKeyRef:
+                key: NEF_USER
+                name: env-dummy-network-app
+          - name: PATH_TO_CERTS
+            valueFrom:
+              configMapKeyRef:
+                key: PATH_TO_CERTS
+                name: env-dummy-network-app
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_HOST
+                name: env-dummy-network-app
+          - name: REDIS_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: REDIS_PORT
+                name: env-dummy-network-app
+          - name: REQUESTS_CA_BUNDLE
+            valueFrom:
+              configMapKeyRef:
+                key: REQUESTS_CA_BUNDLE
+                name: env-dummy-network-app
+          - name: SSL_CERT_FILE
+            valueFrom:
+              configMapKeyRef:
+                key: SSL_CERT_FILE
+                name: env-dummy-network-app
+          - name: TSN_IP
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_IP
+                name: env-dummy-network-app
+          - name: TSN_PORT
+            valueFrom:
+              configMapKeyRef:
+                key: TSN_PORT
+                name: env-dummy-network-app
+        volumeMounts:
+        - name: capif-registration
+          mountPath: /usr/src/app/capif_registration.json
+          subPath: capif-registration.json
+      imagePullSecrets:
+      - name: regcred
+      hostAliases:
+      - hostnames:
+        - dummy-network-app-nef.apps.ocp-epg.hi.inet
+        - dummy-network-app-capif.apps.ocp-epg.hi.inet
+        ip: 10.161.1.126
+      volumes:
+      - name: capif-registration
+        configMap:
+          name: capif-registration
+          items:
+            - key: capif-registration.json
+              path: capif-registration.json
+      restartPolicy: Always
+status: {}
