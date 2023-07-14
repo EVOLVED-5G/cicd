@@ -67,8 +67,10 @@ spec:
           value: {{ quote .Values.env.nefUser }}
         - name: NEF_PASSWORD
           value: {{ quote .Values.env.nefPassword }}
-        - name: UE_EXTERNAL_ID
-          value: {{ quote .Values.env.ueExternalId }}
+        - name: UE_EXTERNAL_ID_1
+          value: {{ quote .Values.env.ueExternalId1 }}
+        - name: UE_EXTERNAL_ID_2
+          value: {{ quote .Values.env.ueExternalId2 }}
         - name: ENVIRONMENT
           value: {{ quote .Values.env.deployment }}
         - name: ROS_DOMAIN_ID

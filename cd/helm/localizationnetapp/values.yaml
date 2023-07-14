@@ -19,7 +19,8 @@ env:
   nefPort: "30548"
   nefUser: admin@my-email.com
   nefPassword: pass
-  ueExternalId: "10002@domain.com"
+  ueExternalId1: "tiago@companionapp.com"
+  ueExternalId2: "mir250@companionapp.com"
   environment: "development"
   rosDomainId: "1"
   network: evolved5G_dds

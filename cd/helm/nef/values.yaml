@@ -10,10 +10,10 @@ backend:
   backend:
     image:
       # -- The docker image repository to use
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_emulator-backend-1"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:nef_commpanion_app"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""
+      tag: "backend-1"
     imagePullPolicy: Always
   ingress:
     host: localization-nef.apps.ocp-epg.hi.inet
