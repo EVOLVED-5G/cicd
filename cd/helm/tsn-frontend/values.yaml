@@ -26,6 +26,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 configMap:
+  backEnd: "http://10.11.32.60:5000"
   capifEnabled: true
   capifSecurityEnabled: true
   capifLoggingEnabled: true
