@@ -48,8 +48,10 @@ String getArtifactoryUrl(phase) {
 
 
 String getHost(String url) {
-    URI uri = new URI(url);
-    String host = uri.getHost();
+    // URI uri = new URI(url);
+    // String host = uri.getHost();
+    // return host
+    String host = url.split('/')[2].split(':')[0]
     return host
 }
 
@@ -114,7 +116,7 @@ pipeline {
                 dir ("${env.WORKSPACE}/utils/platform_assesment/") {
                     sh '''
                     pip3 install -r requirements.txt
-                    python3 platform_assesment.py ${ELCM_HOST} ${ANALYTICS_HOST} ${REPORT_FILENAME}
+                    python3 platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}
                     '''
                 }
             }
