@@ -49,14 +49,14 @@ spec:
             - name: frontend-port
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe: #when deleted command, uncomment liveness and rediness probe
-            httpGet:
-              path: /
-              port:  frontend-port
-          readinessProbe:
-            httpGet:
-              path: /
-              port:  frontend-port
+#          livenessProbe: #when deleted command, uncomment liveness and rediness probe
+#            httpGet:
+#              path: /
+#              port:  frontend-port
+#          readinessProbe:
+#            httpGet:
+#              path: /
+#              port:  frontend-port
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
