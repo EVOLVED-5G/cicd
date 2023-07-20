@@ -80,7 +80,8 @@ if __name__ == '__main__':
         status = execution_status.get('Status')
         if status != 'Not Running':
             sleep(10)
-    print('Polling finished')
+    print('Polling finished, final response:')
+    print(execution_status)
 
     execution_kpis_url = elcm_url + '/execution/' + execution_id + '/kpis'
     response = requests.get(execution_kpis_url)
@@ -90,13 +91,17 @@ if __name__ == '__main__':
     execution_kpis = response.json()
 
     results=dict()
+    results['KPIs']=dict()
     for kpi in execution_kpis.get('KPIs'):
         result=get_kpi_value(analitics_url, execution_id, kpi)
         if result.get('experimentid') != {} and result.get('experimentid').get(execution_id) != {}:
-            results.update(result.get('experimentid').get(execution_id))
+            results['KPIs'].update(result.get('experimentid').get(execution_id))
+            results['KPIs'][kpi[1]].update({ "status": True })
         else:
-            results.update({ kpi[1]: { "status":"FAILED" } })
+            results['KPIs'].update({ kpi[1]: { "status": False } })
             print('Measurement ' + kpi[0] + ' of kpi ' + kpi[1] + ' FAILS')
+
+    results['Verdict'] = execution_status.get('Verdict')
         
     print(json.dumps(results, indent=4))
 
