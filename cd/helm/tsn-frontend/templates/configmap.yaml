@@ -14,7 +14,7 @@ data:
         "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
         "SecurityEnabled": {{ default "true" .Values.configMap.capifSecurityEnabled }},
         "LoggingEnabled": {{ default "true" .Values.configMap.capifLoggingEnabled }},
-        "Host": "{{ quote .Values.configMap.capifHostname }}",
+        "Host": {{ quote .Values.configMap.capifHostname }},
         "HttpPort": {{ .Values.configMap.capifPortHttp }},
         "HttpsPort": {{ .Values.configMap.capifPortHttps }}
       }
