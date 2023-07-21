@@ -136,10 +136,10 @@ pipeline {
 
         stage('Execute the Experiment in the platform') {
             steps {
-                dir ("${env.WORKSPACE}/utils/platform_assesment/") {
+                dir ("${env.WORKSPACE}") {
                     sh '''
-                    pip3 install -r requirements.txt
-                    python3 platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json
+                    pip3 install -r utils/platform_assesment/requirements.txt
+                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json
                     '''
                 }
             }
