@@ -1,6 +1,6 @@
 import groovy.json.JsonOutput
 
-String useOf5gApis = '5g_apis'
+String useOf5gApis = 'apis_5g'
 def buildResults = [:]
 buildResults['steps'] = [:]
 buildResults['tests_ok'] = true

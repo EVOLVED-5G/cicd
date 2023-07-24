@@ -13,9 +13,9 @@ The individual result of the validations test is displayed in the following tabl
 {% set vars = {'foo': False} %}
 
 | Name | Result |
-|:---:|:---|
-{%- for step in 5g_apis%}
-{% if step.name == "NEF Services logged at CAPIF" %}
+|:---|:---|
+{%- for step in apis_5g %}
+{%- if step.name == "NEF Services logged at CAPIF" %}
       {%- for api_id,api_name in step.value.items() %}
 | {{ step.name|upper|replace("-"," ") + ' ***' + api_name + '***' }} | SUCCESS |
       {%- endfor %}
