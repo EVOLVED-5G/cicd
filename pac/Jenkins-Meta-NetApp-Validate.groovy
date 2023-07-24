@@ -1,8 +1,10 @@
 import groovy.json.JsonOutput
 
+String useOf5gApis = '5g_apis'
 def buildResults = [:]
 buildResults['steps'] = [:]
 buildResults['tests_ok'] = true
+buildResults[useOf5gApis] = []
 
 String netappName(String url) {
     String url2 = url ?: ''
@@ -349,7 +351,9 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
-                            buildResults['steps'][step_name] = jobResult
+                            buildResults[useOf5gApis][0]=[:]
+                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
+                            buildResults[useOf5gApis][0]['value'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 buildResults['tests_ok'] = false
                             }
@@ -378,7 +382,9 @@ pipeline {
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
-                                    buildResults['steps'][step_nef_services_apis] = nef_services_check_results
+                                    buildResults[useOf5gApis][1]=[:]
+                                    buildResults[useOf5gApis][1]['name'] = 'NEF Services logged at CAPIF'
+                                    buildResults[useOf5gApis][1]['value'] = nef_services_check_results
                                 }
                             }
                         }
@@ -401,7 +407,9 @@ pipeline {
             //                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
             //                            def jobResult = jobBuild.getResult()
             //                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-            //                            buildResults['steps'][step_name] = jobResult
+            //                            buildResults[useOf5gApis][2]=[:]
+            //                            buildResults[useOf5gApis][2]['name'] = 'Discover NEF APIs from CAPIF'
+            //                            buildResults[useOf5gApis][2]['value'] = jobResult
             //                            if (jobResult == 'FAILURE') {
             //                                buildResults['tests_ok'] = false
             //                            }

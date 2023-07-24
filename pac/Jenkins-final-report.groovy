@@ -48,6 +48,7 @@ pipeline {
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
+        USE_5G_APIS_REPORT_FILENAME = '006-report-use-of-5g-api'
     }
 
     stages {
@@ -76,7 +77,7 @@ pipeline {
                 }
             }
         }
-        stage('Generate steps summary') {
+        stage('Generate steps summary an use of 5g APIs') {
             when {
                 expression {
                     return REPORTING
@@ -103,6 +104,8 @@ pipeline {
                 commit=$(git ls-remote ${GIT_NETAPP_URL}.git | grep $GIT_NETAPP_BRANCH | awk '{ print $1}')
                 python3 utils/report_generator.py --template templates/${STAGE}/step-final-report-summary.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output executive_summary/report-steps-$NETAPP_NAME_LOWER.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $VERSION_NETAPP --url url --name $NETAPP_NAME
                 docker run --rm -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf $DOCKER_PATH/executive_summary/report-steps-$NETAPP_NAME_LOWER.md
+                python3 utils/report_generator.py --template templates/${STAGE}/step-use-of-5g-apis.md.j2 --json executive_summary/report-steps-"$NETAPP_NAME_LOWER".json --output ${USE_5G_APIS_REPORT_FILENAME}.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $VERSION_NETAPP --url url --name $NETAPP_NAME
+                docker run --rm -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/${USE_5G_APIS_REPORT_FILENAME}.pdf $DOCKER_PATH/${USE_5G_APIS_REPORT_FILENAME}.md
                 '''
                 }
             }
