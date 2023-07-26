@@ -1,0 +1,25 @@
+
+# Platform Assessment
+
+This step show results of platform assessment measures.
+
+{% if KPIs|length > 0 %}
+| KPI Name | Min | Max | Mean | Median | Standar Deviation | Description |
+|:---|:---|:---|:---|:---|:---|:---|
+{%- for kpi_name,kpi_complete_info in KPIs.items() %}
+  {%- if kpi_complete_info.status %}
+  {%- set kpi_stats = kpi_complete_info['Test Case Statistics'] %}
+| {{kpi_name}}| {{'%0.2f'| format(kpi_stats.Min.Value)}} | {{'%0.2f'| format(kpi_stats.Max.Value)}} | {{'%0.2f'| format(kpi_stats.Mean.Value)}} | {{'%0.2f'| format(kpi_stats.Median.Value)}} | {{'%0.2f'| format(kpi_stats['Standard Deviation'].Value)}} | - |
+  {%- else %}
+| {{kpi_name}}| No data obtained  |
+  {%- endif %}  
+{%- endfor %}
+{% if Verdict == 'Error' %}
+**WARNING:** Some KPIs fails on platform assessment, maybe some values displayed are 0.
+{% endif %}
+{% else %}
+Something fails obtaining platform assessment, no KPIs present
+
+{% endif %}
+
+
