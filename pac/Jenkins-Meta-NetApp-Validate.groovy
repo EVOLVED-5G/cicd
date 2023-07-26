@@ -1,8 +1,11 @@
 import groovy.json.JsonOutput
 
+String useOf5gApis = 'apis_5g'
 def buildResults = [:]
 buildResults['steps'] = [:]
 buildResults['tests_ok'] = true
+buildResults['tests_executed'] = false
+buildResults[useOf5gApis] = []
 
 String netappName(String url) {
     String url2 = url ?: ''
@@ -43,7 +46,7 @@ String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
-String getPhase(){
+String getPhase() {
     return 'Validation'
 }
 
@@ -62,7 +65,8 @@ def step_build = 'network-app-build-and-port-check'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
 // def step_validate_capif = 'validate-capif'
-def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
+def step_use_of_5g_apis = 'use-of-5g-apis'
+// def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
 def step_discover_nef_apis = 'discover-apis'
 // def step_nef_services_monitoringevent_api = 'nef-services-monitoringevent-api'
 // def step_nef_services_monitoringevent = 'nef-services-monitoringevent'
@@ -139,7 +143,8 @@ pipeline {
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     // buildResults['steps'][step_validate_capif] = initial_status
-                    buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
+                    buildResults['steps'][step_use_of_5g_apis] = initial_status
+                    // buildResults['steps'][step_onboard_netApp_to_capif] = initial_status
                     // buildResults['steps'][step_discover_nef_apis] = initial_status
                     // buildResults['steps'][step_nef_services_monitoringevent_api] = initial_status
                     // buildResults['steps'][step_nef_services_monitoringevent] = initial_status
@@ -329,6 +334,9 @@ pipeline {
         stage('Leave some time to perform needed operations by all components') {
             steps {
                 sleep(time: 1, unit: 'MINUTES')
+                script {
+                    buildResults['tests_executed'] = true
+                }
             }
         }
         //11
@@ -341,15 +349,15 @@ pipeline {
                 stage('Validation: Onboarding NetworkApp to CAPIF') {
                     steps {
                         script {
-                            def step_name = step_onboard_netApp_to_capif
-                            buildResults['steps'][step_name] = 'FAILURE'
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: true,
                                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                         string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
-                            buildResults['steps'][step_name] = jobResult
+                            buildResults[useOf5gApis][0] = [:]
+                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
+                            buildResults[useOf5gApis][0]['value'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 buildResults['tests_ok'] = false
                             }
@@ -378,7 +386,9 @@ pipeline {
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
-                                    buildResults['steps'][step_nef_services_apis] = nef_services_check_results
+                                    buildResults[useOf5gApis][1] = [:]
+                                    buildResults[useOf5gApis][1]['name'] = 'NEF Services logged at CAPIF'
+                                    buildResults[useOf5gApis][1]['value'] = nef_services_check_results
                                 }
                             }
                         }
@@ -393,15 +403,15 @@ pipeline {
             //                    }
             //                    steps {
             //                        script {
-            //                            def step_name = step_discover_nef_apis
-            //                            buildResults['steps'][step_name] = 'FAILURE'
             //                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
             //                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
             //                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
             //                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
             //                            def jobResult = jobBuild.getResult()
             //                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-            //                            buildResults['steps'][step_name] = jobResult
+            //                            buildResults[useOf5gApis][2]=[:]
+            //                            buildResults[useOf5gApis][2]['name'] = 'Discover NEF APIs from CAPIF'
+            //                            buildResults[useOf5gApis][2]['value'] = jobResult
             //                            if (jobResult == 'FAILURE') {
             //                                buildResults['tests_ok'] = false
             //                            }
@@ -514,6 +524,13 @@ pipeline {
                     buildResults['result'] = currentBuild.currentResult
                     if (buildResults['tests_ok'] == false) {
                         buildResults['result'] = 'FAILURE'
+                        if (buildResults['tests_executed']) {
+                            buildResults['steps'][step_use_of_5g_apis] = 'FAILURE'
+                        }
+                    } else {
+                        if (buildResults['tests_executed']) {
+                            buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
+                        }
                     }
                     buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
