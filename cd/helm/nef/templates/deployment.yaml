@@ -214,6 +214,26 @@ spec:
       - command:
         - /start-reload.sh
         env:
+        - name: PRODUCTION
+          valueFrom:
+            configMapKeyRef:
+              key: PRODUCTION
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: DOMAIN_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: DOMAIN_NAME
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: NGINX_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: NGINX_HOST
+              name: {{ include "nef.fullname" . }}-configmap
+        - name: NGINX_HTTPS
+          valueFrom:
+            configMapKeyRef:
+              key: NGINX_HTTPS
+              name: {{ include "nef.fullname" . }}-configmap
         - name: SERVER_NAME
           valueFrom:
             configMapKeyRef:
