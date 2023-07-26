@@ -345,7 +345,6 @@ pipeline {
                 timeout(time: 5, unit: 'MINUTES')
             }
             parallel {
-                //12
                 stage('Validation: Onboarding NetworkApp to CAPIF') {
                     steps {
                         script {
@@ -358,6 +357,29 @@ pipeline {
                             buildResults[useOf5gApis][0] = [:]
                             buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
                             buildResults[useOf5gApis][0]['value'] = jobResult
+                            if (jobResult == 'FAILURE') {
+                                buildResults['tests_ok'] = false
+                            }
+                        }
+                    }
+                }
+                stage('Validation: Discover NEF APIs from CAPIF') {
+                    options {
+                        timeout(time: 5, unit: 'MINUTES')
+                    }
+                    steps {
+                        script {
+                            def step_name = step_discover_nef_apis
+                            buildResults['steps'][step_name] = 'FAILURE'
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
+                            buildResults[useOf5gApis][1]=[:]
+                            buildResults[useOf5gApis][1]['name'] = 'Discover NEF APIs from CAPIF'
+                            buildResults[useOf5gApis][1]['value'] = jobResult
                             if (jobResult == 'FAILURE') {
                                 buildResults['tests_ok'] = false
                             }
@@ -386,33 +408,10 @@ pipeline {
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
-                                    buildResults[useOf5gApis][1] = [:]
-                                    buildResults[useOf5gApis][1]['name'] = 'NEF Services logged at CAPIF'
-                                    buildResults[useOf5gApis][1]['value'] = nef_services_check_results
+                                    buildResults[useOf5gApis][2] = [:]
+                                    buildResults[useOf5gApis][2]['name'] = 'NEF Services logged at CAPIF'
+                                    buildResults[useOf5gApis][2]['value'] = nef_services_check_results
                                 }
-                            }
-                        }
-                    }
-                }
-                stage('Validation: Discover NEF APIs from CAPIF') {
-                    options {
-                        timeout(time: 5, unit: 'MINUTES')
-                    }
-                    steps {
-                        script {
-                            def step_name = step_discover_nef_apis
-                            buildResults['steps'][step_name] = 'FAILURE'
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-                            def jobResult = jobBuild.getResult()
-                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-                            buildResults[useOf5gApis][2]=[:]
-                            buildResults[useOf5gApis][2]['name'] = 'Discover NEF APIs from CAPIF'
-                            buildResults[useOf5gApis][2]['value'] = jobResult
-                            if (jobResult == 'FAILURE') {
-                                buildResults['tests_ok'] = false
                             }
                         }
                     }
