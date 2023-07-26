@@ -4,6 +4,7 @@ String useOf5gApis = 'apis_5g'
 def buildResults = [:]
 buildResults['steps'] = [:]
 buildResults['tests_ok'] = true
+buildResults['tests_executed'] = false
 buildResults[useOf5gApis] = []
 
 String netappName(String url) {
@@ -45,7 +46,7 @@ String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
-String getPhase(){
+String getPhase() {
     return 'Validation'
 }
 
@@ -333,6 +334,9 @@ pipeline {
         stage('Leave some time to perform needed operations by all components') {
             steps {
                 sleep(time: 1, unit: 'MINUTES')
+                script {
+                    buildResults['tests_executed'] = true
+                }
             }
         }
         //11
@@ -351,7 +355,7 @@ pipeline {
                                         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
-                            buildResults[useOf5gApis][0]=[:]
+                            buildResults[useOf5gApis][0] = [:]
                             buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
                             buildResults[useOf5gApis][0]['value'] = jobResult
                             if (jobResult == 'FAILURE') {
@@ -382,7 +386,7 @@ pipeline {
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
-                                    buildResults[useOf5gApis][1]=[:]
+                                    buildResults[useOf5gApis][1] = [:]
                                     buildResults[useOf5gApis][1]['name'] = 'NEF Services logged at CAPIF'
                                     buildResults[useOf5gApis][1]['value'] = nef_services_check_results
                                 }
@@ -520,9 +524,13 @@ pipeline {
                     buildResults['result'] = currentBuild.currentResult
                     if (buildResults['tests_ok'] == false) {
                         buildResults['result'] = 'FAILURE'
-                        buildResults['steps'][step_use_of_5g_apis] = 'FAILURE'
+                        if (buildResults['tests_executed']) {
+                            buildResults['steps'][step_use_of_5g_apis] = 'FAILURE'
+                        }
                     } else {
-                        buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
+                        if (buildResults['tests_executed']) {
+                            buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
+                        }
                     }
                     buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
