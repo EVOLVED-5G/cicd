@@ -14,7 +14,7 @@ backend:
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
   ingress:
     host: localization-nef.apps.ocp-epg.hi.inet
   ports:
