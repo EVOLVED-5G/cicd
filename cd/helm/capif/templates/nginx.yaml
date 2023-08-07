@@ -8,7 +8,7 @@ metadata:
     kompose.cmd: kompose -f ../services/docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
 spec:
-  {{- if eq .Values.env "kubernetes-athens" }}
+  {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-cosmote") }}
   ingressClassName: nginx
   {{- end }}
   rules:

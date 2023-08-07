@@ -33,6 +33,13 @@ spec:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
       {{- end }}
+      {{- if eq .Values.environment "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+      {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
