@@ -45,6 +45,9 @@ String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
+def image
+def name
+
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
@@ -221,8 +224,8 @@ pipeline {
                         script {
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
-                            def image = sh(returnStdout: true, script: cmd).trim()
-                            def name  = sh(returnStdout: true, script: cmd2).trim()
+                            image = sh(returnStdout: true, script: cmd).trim()
+                            name  = sh(returnStdout: true, script: cmd2).trim()
                             sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
                                 if (env.PATH_AWS != null) {
@@ -288,11 +291,11 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(2) {
                         script {
-                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                            def cmd = "docker ps --format '{{.Image}}'"
-                            def cmd2 = "docker ps --format '{{.Names}}'"
-                            def image = sh(returnStdout: true, script: cmd).trim()
-                            def name  = sh(returnStdout: true, script: cmd2).trim()
+                            // sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                            // def cmd = "docker ps --format '{{.Image}}'"
+                            // def cmd2 = "docker ps --format '{{.Names}}'"
+                            // def image = sh(returnStdout: true, script: cmd).trim()
+                            // def name  = sh(returnStdout: true, script: cmd2).trim()
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
                                 if (env.PATH_DOCKER != null) {
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
