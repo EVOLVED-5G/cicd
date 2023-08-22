@@ -11,7 +11,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
-  {{- if eq .Values.env "kubernetes-athens" }}
+  {{- if or (eq .Values.env "kubernetes-athens") (eq .Values.env "kubernetes-cosmote") }}
   ingressClassName: nginx
   {{- end }}
   rules:

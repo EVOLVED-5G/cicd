@@ -32,6 +32,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases: 
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -90,6 +96,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -162,6 +174,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -231,6 +249,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -290,6 +314,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -346,6 +376,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -419,6 +455,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:  
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -475,6 +517,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -537,6 +585,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -593,6 +647,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -656,6 +716,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -726,6 +792,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -793,6 +865,12 @@ spec:
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.env "kubernetes-uma" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.uma }}"
@@ -849,6 +927,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
@@ -917,6 +1001,12 @@ spec:
       {{- if eq .Values.env "kubernetes-athens" }}
       hostAliases:
         - ip: "{{ .Values.ingress_ip.athens }}"
+          hostnames:
+            - "{{ .Values.nginx.nginx.env.capifHostname }}"
+      {{- end }}
+      {{- if eq .Values.env "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
           hostnames:
             - "{{ .Values.nginx.nginx.env.capifHostname }}"
       {{- end }}
