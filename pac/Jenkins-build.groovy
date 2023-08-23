@@ -45,6 +45,9 @@ String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
+def image
+def name
+
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
@@ -221,8 +224,8 @@ pipeline {
                         script {
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
-                            def image = sh(returnStdout: true, script: cmd).trim()
-                            def name  = sh(returnStdout: true, script: cmd2).trim()
+                            image = sh(returnStdout: true, script: cmd).trim()
+                            name  = sh(returnStdout: true, script: cmd2).trim()
                             sh '''$(aws ecr get-login --no-include-email)'''
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
                                 if (env.PATH_AWS != null) {
@@ -230,16 +233,16 @@ pipeline {
                                     sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
                                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
                                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER}-${x[1]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER}-${x[1]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g${env.PATH_AWS}:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
                                 }
                                 else {
                                     sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
                                     sh """ docker tag ${x[0]} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
                                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
                                     sh """ docker image push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${x[0]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER}-${x[1]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-${VERSION}"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER}-${x[1]} aws_images ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/evolved5g:${NETAPP_NAME_LOWER}-${x[1]}-latest"""
                                 }
                             }
                         }
@@ -288,25 +291,25 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
                     retry(2) {
                         script {
-                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                            def cmd = "docker ps --format '{{.Image}}'"
-                            def cmd2 = "docker ps --format '{{.Names}}'"
-                            def image = sh(returnStdout: true, script: cmd).trim()
-                            def name  = sh(returnStdout: true, script: cmd2).trim()
+                            // sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
+                            // def cmd = "docker ps --format '{{.Image}}'"
+                            // def cmd2 = "docker ps --format '{{.Names}}'"
+                            // def image = sh(returnStdout: true, script: cmd).trim()
+                            // def name  = sh(returnStdout: true, script: cmd2).trim()
                             [image.tokenize(), name.tokenize()].transpose().each { x ->
                                 if (env.PATH_DOCKER != null) {
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
                                     sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
                                     sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                 } else {
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                     sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
                                     sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${x[0]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
                                     sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                                 }
                             }

@@ -91,16 +91,17 @@ if __name__ == '__main__':
                 data = yaml.load(f, Loader=SafeLoader)
                 for service_name in data['services']:
                     service=data['services'][service_name]
+                    container_name=networkapp_image_name + '-' + data['services'][service_name].get('container_name',service_name)
                     ports = service.get('ports',None)
                     if ports is not None:
-                        networkapp_ports['services'][service_name]=dict()
-                        networkapp_ports['services'][service_name]['ports']=list()
+                        networkapp_ports['services'][container_name]=dict()
+                        networkapp_ports['services'][container_name]['ports']=list()
                         for port_docker_compose in ports:
                             port=port_docker_compose.split(':')[0]
                             result=isOpen(networkapp_host, port)
                             if not result:
                                 success=False
-                            networkapp_ports['services'][service_name]['ports'].append({"port":port,"listening":result})
+                            networkapp_ports['services'][container_name]['ports'].append({"port":port,"listening":result})
 
         elif (bool(repo_docker_file)):
             repo_dir_docker = find_file(os.path.basename(repo_docker_file[0]), repo_dir)

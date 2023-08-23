@@ -28,6 +28,12 @@ spec:
           hostnames:
             - "{{ .Values.configMap.capifHostname }}"
       {{- end }}
+      {{- if eq .Values.environment "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.configMap.capifHostname }}"
+      {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases: 
         - ip: "{{ .Values.ingress_ip.uma }}"

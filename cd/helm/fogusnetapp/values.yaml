@@ -5,6 +5,7 @@ environment: "openshift"
 ingress_ip: 
     athens: "10.161.1.126"
     uma: "10.11.23.49"
+    cosmote: "172.25.2.100"
 
 dbnetapp:
   netapppostgres:
