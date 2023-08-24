@@ -16,15 +16,14 @@ String getPathAWS(deployment) {
 }
 
 def getAgent(deployment) {
-    // String var = deployment
-    // if ('openshift'.equals(var)) {
-    //     return 'evol5-openshift'
-    // }else if ('kubernetes-athens'.equals(var)) {
-    //     return 'evol5-athens'
-    // }else {
-    //     return 'evol5-slave'
-    // }
-    return 'evol5-slave'
+    String var = deployment
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    }else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    }else {
+        return 'evol5-slave'
+    }
 }
 
 def getReportFilename(String netappNameLower) {
@@ -93,6 +92,11 @@ pipeline {
                     if( "${STAGE}" != 'certification' ) {
                         currentBuild.result = 'ABORTED'
                         error("This job will be only executed on Certification Stage.")
+                        return
+                    }
+                    if( "${DEPLOYMENT}" != 'kubernetes-uma') {
+                        currentBuild.result = 'ABORTED'
+                        error("This job can be only executed on UMA Stage.")
                         return
                     }
                 }

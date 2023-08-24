@@ -1,0 +1,40 @@
+# USE OF 5G APIs
+***
+
+This section will show all usage of 5g APIs of the Network App **{{name}}** version **{{version}}**
+
+{% if tests_executed == true %}
+Repo used for Validation: **{{repo}}**
+Branch used for Validation: {{branch}}
+Last commit ID: {{commit}}
+Environment used: **{{environment}}**
+Build number at Jenkins: {{build_number}}
+
+The individual result of the validations test is displayed in the following table:
+{% set vars = {'foo': False} %}
+
+| Name | Result |
+|:---|:---|
+{%- for step in apis_5g %}
+{%- if step.name == "NEF Services logged at CAPIF" %}
+      {%- for api_id,api_name in step.value.items() %}
+| {{ step.name|upper|replace("-"," ") + ' ***' + api_name + '***' }} | SUCCESS |
+      {%- endfor %}
+    {%- else %}
+| {{ step.name|upper|replace("-"," ") }} | {{step.value}} |
+      {%- if step_status == "FAILURE" -%}
+        {%- if vars.update({'foo': True}) -%}
+        {%- endif %}
+      {%- endif %}
+    {%- endif %}
+{%- endfor %}
+
+{% if vars.foo %}
+  **Please, take a look to those API uses that are failing.**
+{% else %}
+  **Congratulations all checks are working properly**
+{% endif %}
+{% else %}
+  **This section was skipped due to some previous errors, please check summary to find the step with problems** 
+{% endif %}
+
