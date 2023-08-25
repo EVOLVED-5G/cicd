@@ -335,6 +335,7 @@ pipeline {
                         parameters: [
                             string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                             string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                             string(name: 'HOSTNAME_CAPIF', value:  String.valueOf(HOSTNAME_CAPIF)),
                             string(name: 'VERSION_CAPIF', value: String.valueOf(VERSION_CAPIF)),
                             string(name: 'RELEASE_NAME_CAPIF', value: String.valueOf(RELEASE_CAPIF)),
@@ -412,6 +413,7 @@ pipeline {
                                     string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                     string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                    string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
                                     string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
                                     booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),

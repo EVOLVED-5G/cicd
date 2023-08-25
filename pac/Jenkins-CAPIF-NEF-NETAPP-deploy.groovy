@@ -39,6 +39,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.0', description: 'Version of CAPIF')
         string(name: 'RELEASE_NAME_CAPIF', defaultValue: 'capif', description: 'Release name Helm to CAPIF')
@@ -70,7 +71,7 @@ pipeline {
         VERSION="${params.VERSION}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
 

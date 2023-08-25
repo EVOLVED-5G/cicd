@@ -19,6 +19,7 @@ def getAgent(deployment) {
     return 'evol5-slave2'
 }
 
+
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
@@ -44,7 +45,7 @@ pipeline {
         SQ_TOKEN = credentials('SONARQUBE_TOKEN')
         SONARQB_PASSWORD = credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         STAGE = "${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'

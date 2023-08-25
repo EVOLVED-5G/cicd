@@ -44,7 +44,7 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         STAGE = "${params.STAGE}"
         TOKEN = credentials('github_token_cred')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'

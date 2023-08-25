@@ -29,6 +29,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: 'URL of the Github Repository')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         string(name: 'RELEASE_NAME', defaultValue: 'capif', description: 'Helm Release name to CAPIF')
         choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
@@ -38,7 +39,7 @@ pipeline {
     environment {
         RELEASE_NAME = "${params.RELEASE_NAME}"
         REPORT_FILENAME = '006-report-nef-logging'
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         ARTIFACTORY_CRED = credentials('artifactory_credentials')

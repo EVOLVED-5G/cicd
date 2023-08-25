@@ -75,7 +75,7 @@ pipeline {
         CHECKPORTS_PATH = 'utils/checkports'
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         DOCKER_PATH = '/usr/src/app'
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'

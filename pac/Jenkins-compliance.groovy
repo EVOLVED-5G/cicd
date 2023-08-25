@@ -49,7 +49,7 @@ pipeline {
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
