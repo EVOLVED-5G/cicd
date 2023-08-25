@@ -158,7 +158,7 @@ pipeline {
                     script {
                         def step_name = step_platform_assessment
                         buildResults['steps'][step_name] = 'FAILURE'
-                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: true,
+                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: false,
                             parameters: [
                                 string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
                                 string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
