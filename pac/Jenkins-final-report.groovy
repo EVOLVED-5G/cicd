@@ -150,7 +150,7 @@ pipeline {
                     if [ "$STAGE" == "certification" ]
                     then
                         echo "Adding fingerprint"
-                        FINGERPRINT=$(jq .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                        FINGERPRINT=$(jq -r .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
                         python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME
                         pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
                         pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf

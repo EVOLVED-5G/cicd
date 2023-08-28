@@ -19,18 +19,18 @@ def generate_fingerprint(fingerprint, network_app):
 
 
     if fingerprint != None:
-        title_font_size =15
         title_span = 30
-        fingerprint_page.setFont("Georgia", title_font_size)
-
-        title_width = stringWidth("%s" %network_app, "Georgia", title_font_size)
-        fingerprint_page.drawString(int((PAGE_WIDTH - title_width) / 2.0), int((PAGE_HEIGHT - title_font_size - title_span)), "%s" %network_app)
-
         title_font_size =30
         fingerprint_page.setFont("Georgia", title_font_size)
         title_width = stringWidth("Fingerprint", "Georgia", title_font_size)
-        fingerprint_page.drawString(int((PAGE_WIDTH - title_width) / 2.0), int((PAGE_HEIGHT - title_font_size - title_span)-title_font_size), "Fingerprint")
+        fingerprint_page.drawString(int((PAGE_WIDTH - title_width) / 2.0), int((PAGE_HEIGHT - title_font_size - title_span)), "Fingerprint")
 
+        second_title_font_size =15
+        fingerprint_page.setFont("Georgia", second_title_font_size)
+        title_width = stringWidth("%s" %network_app, "Georgia", second_title_font_size)
+        fingerprint_page.drawString(int((PAGE_WIDTH - title_width) / 2.0), int(PAGE_HEIGHT - title_font_size - 2 * title_span - second_title_font_size), "%s" %network_app)
+
+        
         box_height=60
         font_size=20
         fingerprint_page.setFont("Georgia", font_size)
