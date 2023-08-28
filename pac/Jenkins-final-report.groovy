@@ -140,14 +140,25 @@ pipeline {
                     pip install -r utils/requirements.txt
                     python3 utils/cover.py -t "$NETAPP_NAME" -d $today
 
-                    FINGERPRINT=$(jq .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
-                    python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME
-                    pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
+                    
 
                     # Remember install PDFTK for watermarking
                     pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
                     pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf
-                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf
+                    
+                    
+                    if [ "$STAGE" == "certification" ]
+                    then
+                        echo "Adding fingerprint"
+                        FINGERPRINT=$(jq .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                        python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME
+                        pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
+                        pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf
+                    else
+                        echo "Only Certification stage will include fingerprint"
+                        pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
+                    fi
+
                     '''
                 }
             }
