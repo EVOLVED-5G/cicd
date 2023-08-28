@@ -90,13 +90,13 @@ pipeline {
                 mkdir executive_summary
                 cd executive_summary
 
-                response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
+                response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
                 artifacts=($response)
 
                 for x in "${artifacts[@]}"
                 do
                     echo $x
-                    url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                     curl -u $PASSWORD_ARTIFACTORY $url -o $x
                 done
 
@@ -122,12 +122,12 @@ pipeline {
                     sh '''#!/bin/bash
                     sudo apt update || echo "Error updating system references"
                     sudo apt install -y poppler-utils pdftk || echo "error installing Poppler utils and pdftk"
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
+                    response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
