@@ -50,6 +50,11 @@ spec:
               value: {{ .Values.db_password }}
         ports:
           - containerPort: 80
+        livenessProbe:
+          tcpSocket:
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 5
         volumeMounts:
             - name: mktp-php-pvc
               mountPath: /var/www/html/public/assets
@@ -64,7 +69,6 @@ spec:
         args:
           - -c
           - >-
-              sleep 30
               chown -R laravel:www-data * &&
               export COMPOSER_ALLOW_SUPERUSER=1 &&
               composer install &&
