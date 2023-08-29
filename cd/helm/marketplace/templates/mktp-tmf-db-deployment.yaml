@@ -31,11 +31,17 @@ spec:
           name: {{ .Values.mktp_tmf_db_service }}
           ports:
             - containerPort: 27017
+          volumeMounts:
+            - name: tmf-db-pvc
+              mountPath: /data/db
           securityContext:
             runAsUser: 0
             allowPrivilegeEscalation: false
-
       restartPolicy: Always
+      volumes:
+      - name: tmf-db-pvc
+        persistentVolumeClaim:
+          claimName: tmf-db-pvc
 
 
 status: {}
