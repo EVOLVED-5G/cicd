@@ -94,7 +94,7 @@ pipeline {
                         error("This job will be only executed on Certification Stage.")
                         return
                     }
-                    if( "${DEPLOYMENT}" != 'kubernetes-uma') {
+                    if( "${DEPLOYMENT}" != 'kubernetes-uma-noworking') {
                         currentBuild.result = 'ABORTED'
                         error("This job can be only executed on UMA Stage.")
                         return
