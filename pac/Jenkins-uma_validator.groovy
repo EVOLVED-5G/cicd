@@ -16,15 +16,14 @@ String getPathAWS(deployment) {
 }
 
 def getAgent(deployment) {
-    // String var = deployment
-    // if ('openshift'.equals(var)) {
-    //     return 'evol5-openshift'
-    // }else if ('kubernetes-athens'.equals(var)) {
-    //     return 'evol5-athens'
-    // }else {
-    //     return 'evol5-slave'
-    // }
-    return 'evol5-slave'
+    String var = deployment
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    }else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    }else {
+        return 'evol5-slave'
+    }
 }
 
 def getReportFilename(String netappNameLower) {
@@ -76,7 +75,7 @@ pipeline {
         CHECKPORTS_PATH = 'utils/checkports'
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         DOCKER_PATH = '/usr/src/app'
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
@@ -93,6 +92,11 @@ pipeline {
                     if( "${STAGE}" != 'certification' ) {
                         currentBuild.result = 'ABORTED'
                         error("This job will be only executed on Certification Stage.")
+                        return
+                    }
+                    if( "${DEPLOYMENT}" != 'kubernetes-uma-noworking') {
+                        currentBuild.result = 'ABORTED'
+                        error("This job can be only executed on UMA Stage.")
                         return
                     }
                 }

@@ -1,0 +1,60 @@
+
+# CERTIFICATION REPORT EXECUTIVE SUMMARY
+***
+
+This Certification Report contains the results of the Certification process executed over the Network App **{{name}}** version **{{version}}**
+
+Certification triggered by {{build_trigger_by}}
+Repo used for Certification: **{{repo}}**
+Branch used for Certification: {{branch}}
+Last commit ID: {{commit}}
+Environment used: **{{environment}}**
+Build number at Jenkins: {{build_number}}
+{%- if deploy_kpi is defined and deploy_kpi|length %}
+Network App deploy time KPI: **{{deploy_kpi}}** **seconds**
+{%- endif %}
+Total Certification time: **{{total_duration}}**
+
+The result of the Certification Process over the Network App **{{name}}** has been: **{{result}}**
+
+The individual result of the certifications test is displayed in the following table:
+
+{% set vars = {'foo': False} %}
+{% set counter = {'counter':0} -%}
+| Step | Step Name | Result |
+|:---:|:---|:---:|
+{%- for step_name,step_status in steps.items() %}
+  {%- if step_status != "NOT_REPORT" -%}
+    {% if step_name == "nef-services-apis" %}
+      {%- for api_id,api_name in step_status.items() %}
+| {{ counter.counter }} | {{ step_name|upper|replace("-"," ") + ' ***' + api_name + '***' }} | SUCCESS |
+        {%- if counter.update({'counter':counter.counter + 1}) -%}
+        {%- endif -%}
+      {%- endfor %}
+    {%- else %}
+| {{ counter.counter }} | {{ step_name|upper|replace("-"," ") }} | {{step_status}} |
+      {%- if step_status == "FAILURE" -%}
+        {%- if vars.update({'foo': True}) -%}
+        {%- endif %}
+      {%- endif %}
+      {%- if counter.update({'counter':counter.counter + 1}) -%}
+      {%- endif -%}
+    {%- endif %}
+  {%- endif -%}
+{% endfor %}
+{% if vars.foo %}
+  **Please, take a look to those steps that are failing.**
+{% else %}
+  **Congratulations your Network App {{name}} has been certificated**
+{% endif %}
+
+
+In the following pages, we provide details of the tests executed 
+and the results.
+
+
+
+
+
+
+

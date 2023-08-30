@@ -44,7 +44,7 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         STAGE = "${params.STAGE}"
         TOKEN = credentials('github_token_cred')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
@@ -90,12 +90,13 @@ pipeline {
                 mkdir executive_summary
                 cd executive_summary
 
-                response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
+                response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".json" | tr -d '"' )
                 artifacts=($response)
 
                 for x in "${artifacts[@]}"
                 do
-                    url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                    echo $x
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                     curl -u $PASSWORD_ARTIFACTORY $url -o $x
                 done
 
@@ -121,12 +122,12 @@ pipeline {
                     sh '''#!/bin/bash
                     sudo apt update || echo "Error updating system references"
                     sudo apt install -y poppler-utils pdftk || echo "error installing Poppler utils and pdftk"
-                    response=$(curl -s http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
+                    response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | grep ".pdf" | tr -d '"' )
                     artifacts=($response)
 
                     for x in "${artifacts[@]}"
                     do
-                        url="http://artifactory.hi.inet:80/artifactory/misc-evolved5g/validation/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$x"
                         curl -u $PASSWORD_ARTIFACTORY $url -o $x
                     done
 
@@ -137,12 +138,28 @@ pipeline {
                     [ -e executive_summary/*-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     pip install -r utils/requirements.txt
-                    python3 utils/cover.py -t "$NETAPP_NAME" -d $today
+                    python3 utils/cover.py -t "$NETAPP_NAME" -d $today -s $STAGE
+
+                    
 
                     # Remember install PDFTK for watermarking
                     pdftk mid_report.pdf multistamp utils/watermark.pdf output mid_report_watermark.pdf
                     pdftk executive_summary/report-steps-$NETAPP_NAME_LOWER.pdf multistamp utils/watermark.pdf output executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf
-                    pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
+                    
+                    
+                    if [ "$STAGE" == "certification" ]
+                    then
+                        echo "Adding fingerprint"
+                        FINGERPRINT=$(jq -r .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                        VERSION=$(jq -r .fingerprint.Version executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                        python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME -v $VERSION
+                        pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
+                        pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf
+                    else
+                        echo "Only Certification stage will include fingerprint"
+                        pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
+                    fi
+
                     '''
                 }
             }

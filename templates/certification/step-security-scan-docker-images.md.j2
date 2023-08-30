@@ -1,0 +1,46 @@
+{%- set image_name = id.split("-") -%}
+# IMAGE SECURITY ANALYSIS OF {{image_name|last}} {{counter}}
+# Test Results
+
+Test Description: This test detects vulnerabilities in the Network App docker images built.
+Network App image under study: **{{image_name|last}}**
+Network App repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+
+***
+{% if not vulnerabilities %} 
+Good work. No vulnerabilities found.
+{% else %}
+## Summary
+{%- set severities = [ "CRITICAL" , "HIGH" , "MEDIUM" , "LOW" ,  "UNKNOWN"] %}
+
+| Severity | Number of vulnerabilities |
+|---|---|
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == severity %}
+| {{summary_type.Severity}} | {{summary_type.counts}} |
+    {%- endif %}
+  {%- endfor %}
+{%- endfor %}
+
+***
+
+
+## Critical Vulnerabilities
+|  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
+|---|---|---|---|---|---|
+  {%- for severity in severities %}
+    {%- for vuln in vulnerabilities %}
+      {%- if vuln.Severity == severity %}
+        {%- if vuln.Severity == "CRITICAL" %}
+|{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
+        {%- endif %}
+      {%- endif %}
+    {%- endfor %}
+  {%- endfor %}
+{%- endif %}
+***
+The Docker Images Security Analysis has been completed successfuly
+Information about high, medium, low and unknown issues can be found in the following link: {{url}}
