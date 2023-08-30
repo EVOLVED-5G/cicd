@@ -138,7 +138,7 @@ pipeline {
                     [ -e executive_summary/*-licenses*.pdf ] && pdfunite mid_report1.pdf executive_summary/*-licenses*.pdf mid_report.pdf || pdfunite mid_report1.pdf mid_report.pdf
 
                     pip install -r utils/requirements.txt
-                    python3 utils/cover.py -t "$NETAPP_NAME" -d $today
+                    python3 utils/cover.py -t "$NETAPP_NAME" -d $today -s $STAGE
 
                     
 
