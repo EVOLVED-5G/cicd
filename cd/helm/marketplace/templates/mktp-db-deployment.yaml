@@ -40,7 +40,14 @@ spec:
           name:  {{ .Values.mktp_db_service }}
           ports:
             - containerPort: 3306
+          volumeMounts:
+            - name: mktp-db-pvc
+              mountPath: /var/lib/mysql
           resources: {}
+      volumes:
+      - name: mktp-db-pvc
+        persistentVolumeClaim:
+          claimName: mktp-db-pvc
       restartPolicy: Always
 
 status: {}
