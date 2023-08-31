@@ -18,6 +18,12 @@ String robotTestSelection(String tests, String customTest) {
     return tests == 'NONE' ? ' ' : '--include ' + test_plan[tests]
 }
 
+String netappName(String url) {
+    String url2 = url ?: ''
+    String var = url2.substring(url2.lastIndexOf('/') + 1)
+    return var
+}
+
 def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
@@ -67,6 +73,7 @@ pipeline {
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: 'URL of the Github Repository')
+        string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         
         
     }
