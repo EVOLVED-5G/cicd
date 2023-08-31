@@ -389,6 +389,12 @@ pipeline {
                 stage('Certification: Onboarding NetworkApp to CAPIF') {
                     steps {
                         script {
+                            buildResults[useOf5gApis][0] = [:]
+                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
+                            buildResults[useOf5gApis][0]['value'] = 'FAILURE'
+                            def initial_test_ok = buildResults['tests_ok']
+                            buildResults['tests_ok'] = false
+
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: true,
                                 parameters: [
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -397,9 +403,8 @@ pipeline {
                                     ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
-                            buildResults[useOf5gApis][0] = [:]
-                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
                             buildResults[useOf5gApis][0]['value'] = jobResult
+                            buildResults['tests_ok'] = initial_test_ok
                             if (jobResult == 'FAILURE') {
                                 buildResults['tests_ok'] = false
                             }
