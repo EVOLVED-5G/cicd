@@ -155,7 +155,7 @@ pipeline {
                                 docker build  -t ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} .
                                 cd ${WORKSPACE}
                             fi
-                            mkdir -p ${ROBOT_RESULTS_DIRECTORY}
+                            mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
                             docker run --tty --rm --network="host" \
                                 -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
                                 -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
@@ -163,6 +163,7 @@ pipeline {
                                 --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
                                 --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
                                 ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
+                            #sudo chown contint:contint -R "${ROBOT_RESULTS_DIRECTORY}"
                     '''
                 }
             }
@@ -213,7 +214,10 @@ pipeline {
 
             script {
                 dir("${env.WORKSPACE}") {
-                    sh "sudo rm -rf ${env.ROBOT_TESTS_DIRECTORY}"
+                    sh '''
+                    sudo rm -rf "${env.ROBOT_TESTS_DIRECTORY}"
+                    sudo rm -rf "${env.CAPIF_REPOSITORY_DIRECTORY}"
+                    '''
                 }
             }
         }
