@@ -157,8 +157,8 @@ pipeline {
                             fi
                             mkdir -p ${ROBOT_RESULTS_DIRECTORY}
                             docker run --tty --rm --network="host" \
-                                -v ${ROBOT_TESTS_DIRECTORY}:/opt/robot-tests/tests \
-                                -v ${ROBOT_RESULTS_DIRECTORY}:/opt/robot-tests/results ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}  \
+                                -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
+                                -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
                                 --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
                                 --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
                                 --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
