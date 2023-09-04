@@ -130,6 +130,7 @@ pipeline {
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
         ELCM_URL = "http://10.11.23.220:5551"
         ANALYTICS_URL = "http://10.11.23.220:5003"
+        NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
     }
 
     stages {
@@ -390,6 +391,12 @@ pipeline {
                 stage('Certification: Onboarding NetworkApp to CAPIF') {
                     steps {
                         script {
+                            buildResults[useOf5gApis][0] = [:]
+                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
+                            buildResults[useOf5gApis][0]['value'] = 'FAILURE'
+                            def initial_test_ok = buildResults['tests_ok']
+                            buildResults['tests_ok'] = false
+
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/008-Onboard NetApp to CAPIF', wait: true, propagate: true,
                                 parameters: [
                                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
@@ -398,9 +405,8 @@ pipeline {
                                     ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Onboarding NetworkApp to CAPIF' returned result: ${jobResult}"
-                            buildResults[useOf5gApis][0] = [:]
-                            buildResults[useOf5gApis][0]['name'] = 'Onboarding NetworkApp to CAPIF'
                             buildResults[useOf5gApis][0]['value'] = jobResult
+                            buildResults['tests_ok'] = initial_test_ok
                             if (jobResult == 'FAILURE') {
                                 buildResults['tests_ok'] = false
                             }
@@ -490,6 +496,30 @@ pipeline {
                         currentBuild.result = 'ABORTED'
                         aborted = true
                         error('CAPIF is not working properly, abort pipeline')
+                    }
+                }
+            }
+        }
+
+        stage('Certification: Validate NEF') {
+            steps {
+                script {
+                    def jobBuild = build job: '/1000-NEF_VALIDATION/nef_emulator_validation/nef_emulator_validation_capif', wait: true, propagate: false,
+                        parameters: [
+                            string(name: 'CAPIF_HOST', value: String.valueOf(HOSTNAME_CAPIF)),
+                            string(name: 'CAPIF_HTTP_PORT', value: String.valueOf(CAPIF_PORT)),
+                            string(name: 'CAPIF_HTTPS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
+                            string(name: 'NEF_API_HOSTNAME', value: String.valueOf(NEF_API_HOSTNAME)),
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+                            ]
+
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                    if (jobResult == 'FAILURE') {
+                        buildResults['tests_ok'] = false
+                        currentBuild.result = 'ABORTED'
+                        aborted = true
+                        error('NEF is not working properly, abort pipeline')
                     }
                 }
             }
