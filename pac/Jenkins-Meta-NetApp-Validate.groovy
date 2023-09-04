@@ -457,7 +457,7 @@ pipeline {
             }
         }
 
-        stage('Certification: Validate NEF') {
+        stage('Validation: Validate NEF') {
             steps {
                 script {
                     def jobBuild = build job: '/1000-NEF_VALIDATION/nef_emulator_validation/nef_emulator_validation_capif', wait: true, propagate: false,
