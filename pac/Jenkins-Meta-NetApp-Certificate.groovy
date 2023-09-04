@@ -512,7 +512,7 @@ pipeline {
                             ]
 
                     def jobResult = jobBuild.getResult()
-                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
                         currentBuild.result = 'ABORTED'
