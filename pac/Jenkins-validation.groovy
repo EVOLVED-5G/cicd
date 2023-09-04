@@ -1,11 +1,13 @@
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
-    }else {
-        return "evol5-slave";
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
+        return 'evol5-slave'
     }
 }
 
@@ -14,7 +16,7 @@ pipeline {
 
     parameters {
         string(name: 'NETAPP_NAME', defaultValue: '1.0', description: '')
-        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
     }
 
     environment {

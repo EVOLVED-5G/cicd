@@ -16,12 +16,14 @@ def getNamespace(deployment,name) {
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
-    }else {
-        return "evol5-slave";
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
+        return 'evol5-slave'
     }
 }
 
@@ -35,7 +37,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'RELEASE_NAME', defaultValue: 'dummy-nef', description: 'Release name')
-        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])  
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
     }
 
     environment {

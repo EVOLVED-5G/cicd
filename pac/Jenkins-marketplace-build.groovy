@@ -2,9 +2,11 @@ def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
         return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
+    } else if ('kubernetes-athens'.equals(var)) {
         return 'evol5-athens'
-    }else {
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
         return 'evol5-slave'
     }
 }
@@ -21,7 +23,7 @@ pipeline {
         string(name: 'GIT_MARKET_BLOCKCHAIN_BRANCH', defaultValue: 'main', description: 'Marketplace Blockchain branch name')
         string(name: 'GIT_MARKET_TMF620_URL', defaultValue: 'https://github.com/EVOLVED-5G/marketplace-tmf620-api.git', description: 'marketplace Tmf620 repository.')
         string(name: 'GIT_MARKET_TMF620_BRANCH', defaultValue: 'master', description: 'Marketplace TMF620 branch name')
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote'])
     }
 
     environment {

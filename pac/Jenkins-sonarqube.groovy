@@ -8,14 +8,6 @@ String netappName(String url) {
 }
 
 def getAgent(deployment) {
-    // String var = deployment
-    // if ('openshift'.equals(var)) {
-    //     return 'evol5-openshift'
-    // }else if ('kubernetes-athens'.equals(var)) {
-    //     return 'evol5-athens'
-    // }else {
-    //     return 'evol5-slave'
-    // }
     return 'evol5-slave2'
 }
 
@@ -33,7 +25,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }

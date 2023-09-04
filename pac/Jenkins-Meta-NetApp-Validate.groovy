@@ -17,9 +17,11 @@ def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
         return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
+    } else if ('kubernetes-athens'.equals(var)) {
         return 'evol5-athens'
-    }else {
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
         return 'evol5-slave'
     }
 }
@@ -102,7 +104,7 @@ pipeline {
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         string(name: 'RELEASE_TSN', defaultValue: 'tsn', description: 'Helm Release name to TSN')
         string(name: 'HOSTNAME_TSN', defaultValue: 'tsn.apps.ocp-epg.hi.inet', description: 'Hostname to TSN')
-        choice(name: 'ENVIRONMENT', choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])
+        choice(name: 'ENVIRONMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: false, description: 'Send mail to Developers')
         string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
