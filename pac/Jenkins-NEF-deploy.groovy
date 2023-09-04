@@ -16,12 +16,14 @@ def getNamespace(deployment,name) {
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
-    }else {
-        return "evol5-slave";
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
+        return 'evol5-slave'
     }
 }
 
@@ -37,7 +39,7 @@ pipeline {
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef-5g.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         string(name: 'RELEASE_NAME_NEF', defaultValue: 'nef', description: 'Release name to NEF')
-        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])  
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
     }
 
     environment {
