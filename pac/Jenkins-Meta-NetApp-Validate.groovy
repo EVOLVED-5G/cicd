@@ -380,14 +380,16 @@ pipeline {
                     steps {
                         script {
                             def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-NEF Services Check', wait: true, propagate: false,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                            string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                                            string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-                                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                            booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                parameters: [
+                                    string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                    string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                    booleanParam(name: 'SEND_DEV_MAIL', value: false)
+                                    ]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
