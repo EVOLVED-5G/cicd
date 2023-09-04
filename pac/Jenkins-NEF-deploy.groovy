@@ -39,7 +39,7 @@ pipeline {
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'HOSTNAME_NEF', defaultValue: 'nef-5g.apps.ocp-epg.hi.inet', description: 'Hostname to NEF')
         string(name: 'RELEASE_NAME_NEF', defaultValue: 'nef', description: 'Release name to NEF')
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote'])
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
     }
 
     environment {
