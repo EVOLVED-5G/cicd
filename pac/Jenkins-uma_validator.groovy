@@ -19,9 +19,11 @@ def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
         return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
+    } else if ('kubernetes-athens'.equals(var)) {
         return 'evol5-athens'
-    }else {
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
         return 'evol5-slave'
     }
 }
@@ -36,9 +38,6 @@ String getArtifactoryUrl(phase) {
 
 
 String getHost(String url) {
-    // URI uri = new URI(url);
-    // String host = uri.getHost();
-    // return host
     String host = url.split('/')[2].split(':')[0]
     return host
 }
@@ -56,7 +55,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote'])
         string(name: 'ELCM_URL', defaultValue: 'http://10.11.23.220:5551', description: 'URL to ELCM')
         string(name: 'ANALYTICS_URL', defaultValue: 'http://10.11.23.220:5003', description: 'URL to Analytics')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')

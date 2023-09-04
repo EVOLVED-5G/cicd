@@ -16,12 +16,14 @@ def getNamespace(deployment,name) {
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
-    }else {
-        return "evol5-slave";
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
+        return 'evol5-slave'
     }
 }
 
@@ -51,7 +53,7 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
-        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])  
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
