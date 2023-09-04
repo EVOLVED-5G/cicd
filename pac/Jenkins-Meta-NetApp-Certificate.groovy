@@ -128,7 +128,7 @@ pipeline {
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
         ELCM_URL = "http://10.11.23.220:5551"
         ANALYTICS_URL = "http://10.11.23.220:5003"
-        NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}"
+        NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
     }
 
     stages {

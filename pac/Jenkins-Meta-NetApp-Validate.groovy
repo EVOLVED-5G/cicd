@@ -127,6 +127,7 @@ pipeline {
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
         FINGERPRINT_FILENAME = getFingerprintFilename()
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
+        NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
     }
 
     stages {
