@@ -102,9 +102,9 @@ pipeline {
         CAPIF_GITHUB_URL = "https://github.com/EVOLVED-5G/CAPIF_API_Services"
     }
     stages {
-        stage('Prepare robot docker image tool') {
+        stage('Docker Login') {
             options {
-                retry(2)
+                retry(10)
             }
 
             steps {
@@ -117,14 +117,33 @@ pipeline {
                     script {
                         try {
                             sh '''
+                            #!/bin/bash
                             docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
-                            docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
                             '''
                     } catch (Exception e) {
-                                echo 'Robot Docker version is not currently uploaded to artifactory.'
+                                echo 'Docker login has failed.'
                             }
                         }
                 }
+                }
+            }
+        }
+        stage('Prepare robot docker image tool') {
+            options {
+                retry(10)
+            }
+            steps {
+                dir("${env.WORKSPACE}") {
+                    script {
+                        try {
+                            sh '''
+                            #!/bin/bash
+                            docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
+                            '''
+                        } catch (Exception e) {
+                            echo 'Robot Docker version is not currently uploaded to artifactory.'
+                        }
+                    }
                 }
             }
         }
@@ -136,6 +155,7 @@ pipeline {
              steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
+                    #!/bin/bash
                     rm -rf "$CAPIF_REPOSITORY_DIRECTORY"
                     mkdir "$CAPIF_REPOSITORY_DIRECTORY"
                     cd "$CAPIF_REPOSITORY_DIRECTORY"
@@ -148,24 +168,24 @@ pipeline {
         stage('CAPIF: Launch tests') {
             steps {
                 dir("${env.WORKSPACE}") {
-                    sh '''#!/bin/bash
-                            echo "Executing tests in ${DEPLOYMENT}"
-                            docker images|grep -Eq '^'$ROBOT_IMAGE_NAME'[ ]+[ ]'$ROBOT_VERSION''
-                            if [[ $? -ne 0 ]]; then
-                                echo "Building Robot docker image."
-                                cd ${ROBOT_DOCKER_FILE_FOLDER}
-                                docker build  -t ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} .
-                                cd ${WORKSPACE}
-                            fi
-                            mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
-                            docker run --tty --rm --network="host" \
-                                -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
-                                -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
-                                --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
-                                --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
-                                --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
-                                ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
-                            #sudo chown contint:contint -R "${ROBOT_RESULTS_DIRECTORY}"
+                    sh '''
+                    #!/bin/bash
+                    echo "Executing tests in ${DEPLOYMENT}"
+                    docker images|grep -Eq '^'$ROBOT_IMAGE_NAME'[ ]+[ ]'$ROBOT_VERSION''
+                    if [[ $? -ne 0 ]]; then
+                        echo "Building Robot docker image."
+                        cd "${ROBOT_DOCKER_FILE_FOLDER}"
+                        docker build  -t "${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}" .
+                        cd "${WORKSPACE}"
+                    fi
+                    mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
+                    docker run --tty --rm --network="host" \
+                        -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
+                        -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
+                        --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
+                        --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
+                        --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
+                        ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
                     '''
                 }
             }
@@ -193,7 +213,8 @@ pipeline {
 
             script {
                 dir("${env.ROBOT_RESULTS_DIRECTORY}") {
-                    sh '''#!/bin/bash
+                    sh '''
+                    #!/bin/bash
 
                     results_file="CAPIF_robot_tests.tar.gz"
                     tar czvf "${results_file}" *
