@@ -100,6 +100,7 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         VERSION = "${params.VERSION}"
         CAPIF_GITHUB_URL = "https://github.com/EVOLVED-5G/CAPIF_API_Services"
+        ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
     stages {
         stage('Docker Login') {
