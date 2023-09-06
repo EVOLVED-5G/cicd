@@ -82,6 +82,7 @@ pipeline {
     environment {
         BRANCH_NAME = "${params.BRANCH_NAME}"
         CAPIF_REPOSITORY_DIRECTORY = "${WORKSPACE}/capif_api_services"
+        CAPIF_SERVICES_DIRECTORY = "${CAPIF_REPOSITORY_DIRECTORY}/services"
         ROBOT_TESTS_DIRECTORY = "${CAPIF_REPOSITORY_DIRECTORY}/tests"
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         ROBOT_DOCKER_FILE_FOLDER = "${CAPIF_REPOSITORY_DIRECTORY}/tools/robot"
@@ -182,7 +183,8 @@ pipeline {
                     mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
                     docker run --tty --rm --network="host" \
                         -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
-                        -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
+                        -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results \
+                        "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
                         --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
                         --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
                         --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
@@ -219,10 +221,11 @@ pipeline {
 
                     results_file="CAPIF_robot_tests.tar.gz"
                     tar czvf "${results_file}" *
+                    ls -l
                         
                     if [ -f "${results_file}" ]; then
 
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$VERSION/${image_file}"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$results_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"${results_file}" \
@@ -235,13 +238,11 @@ pipeline {
 
                 }
             }
-
             script {
                 dir("${env.WORKSPACE}") {
-                    sh '''
-                    sudo rm -rf "${env.ROBOT_TESTS_DIRECTORY}"
-                    sudo rm -rf "${env.CAPIF_REPOSITORY_DIRECTORY}"
-                    '''
+                    sh "sudo rm -rf ${env.ROBOT_TESTS_DIRECTORY}"
+                    sh "sudo rm -rf ${env.CAPIF_SERVICES_DIRECTORY}"
+                    sh "sudo rm -rf ${env.CAPIF_REPOSITORY_DIRECTORY}"
                 }
             }
         }
