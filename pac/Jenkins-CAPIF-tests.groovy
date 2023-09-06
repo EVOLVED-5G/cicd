@@ -76,8 +76,6 @@ pipeline {
         string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: 'URL of the Github Repository')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        
-        
     }
     environment {
         BRANCH_NAME = "${params.BRANCH_NAME}"
@@ -225,7 +223,7 @@ pipeline {
                         
                     if [ -f "${results_file}" ]; then
 
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$results_file"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$results_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"${results_file}" \

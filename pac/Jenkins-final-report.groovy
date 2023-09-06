@@ -178,7 +178,7 @@ pipeline {
                     sh '''#!/bin/bash
 
                     report_file="final_report.pdf"
-                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$report_file"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$report_file"
 
                     curl -v -f -i -X PUT -u $PASSWORD_ARTIFACTORY \
                         --data-binary @"$report_file" \
