@@ -187,6 +187,8 @@ pipeline {
                         --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
                         --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
                         ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
+
+                    sudo chown contint:contint -R capif_api_services
                     '''
                 }
             }
