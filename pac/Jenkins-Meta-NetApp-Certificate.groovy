@@ -661,44 +661,39 @@ pipeline {
             script {
                 // Nettaps emails to send the report
                 if (emails?.split(' ')) {
-                    if (aborted == false) {
-                        dir("${WORKSPACE}/") {
-                            sh '''#!/bin/bash
+                    // if (aborted == false) {
+                    dir("${WORKSPACE}/") {
+                        sh '''#!/bin/bash
 
-                            // report_file="final_report.pdf"
-                            // url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$report_file"
-                            // mkdir attachments
-                            // curl  $url -u $ARTIFACTORY_CRED -o attachments/final_report.pdf
+                        response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID/attachments" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | tr -d '"' )
+                        artifacts=($response)
 
-                            response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID/attachments" -u $PASSWORD_ARTIFACTORY | jq ".children[].name" | tr -d '"' )
-                            artifacts=($response)
-
-                            for x in "${artifacts[@]}"
-                            do
-                                url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$x"
-                                curl -u $PASSWORD_ARTIFACTORY $url -o attachments/$x
-                            done
-                            '''
-                        }
-                        emails.tokenize().each() {
-                            email -> emailext attachmentsPattern: '**/attachments/**',
-                                    body: '''${SCRIPT, template="groovy-html.template"}''',
-                                    mimeType: 'text/html',
-                                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                                    from: 'jenkins-evolved5G@tid.es',
-                                    replyTo: 'jenkins-evolved5G',
-                                    to: email
-                        }
-                    } else {
-                        emails.tokenize().each() {
-                            email -> emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                                    mimeType: 'text/html',
-                                    subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                                    from: 'jenkins-evolved5G@tid.es',
-                                    replyTo: 'jenkins-evolved5G',
-                                    to: email
-                        }
+                        for x in "${artifacts[@]}"
+                        do
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$x"
+                            curl -u $PASSWORD_ARTIFACTORY $url -o attachments/$x
+                        done
+                        '''
                     }
+                    emails.tokenize().each() {
+                        email -> emailext attachmentsPattern: '**/attachments/**',
+                                body: '''${SCRIPT, template="groovy-html.template"}''',
+                                mimeType: 'text/html',
+                                subject: "Jenkins ${env.NETAPP_NAME} Certification Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                from: 'jenkins-evolved5G@tid.es',
+                                replyTo: 'jenkins-evolved5G',
+                                to: email
+                    }
+                    // } else {
+                    //     emails.tokenize().each() {
+                    //         email -> emailext body: '''${SCRIPT, template="groovy-html.template"}''',
+                    //                 mimeType: 'text/html',
+                    //                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                    //                 from: 'jenkins-evolved5G@tid.es',
+                    //                 replyTo: 'jenkins-evolved5G',
+                    //                 to: email
+                    //     }
+                    // }
                 }
             }
             script {
