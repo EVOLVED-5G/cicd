@@ -158,13 +158,10 @@ pipeline {
                 dir("${env.WORKSPACE}/") {
                     sh '''
                     #!/bin/bash
-                    ls -l
                     rm -rf "$CAPIF_REPOSITORY_DIRECTORY"
                     mkdir "$CAPIF_REPOSITORY_DIRECTORY"
-                    ls -l
                     cd "$CAPIF_REPOSITORY_DIRECTORY"
                     git clone --single-branch --branch $BRANCH_NAME $CAPIF_GITHUB_URL .
-                    ls -l
                     '''
                 }
             }
@@ -244,9 +241,6 @@ pipeline {
             script {
                 dir("${env.WORKSPACE}") {
                     sh "sudo rm -rf capif_api_services"
-                    sh "sudo rm -rf ${env.ROBOT_TESTS_DIRECTORY}"
-                    sh "sudo rm -rf ${env.CAPIF_SERVICES_DIRECTORY}"
-                    sh "sudo rm -rf ${env.CAPIF_REPOSITORY_DIRECTORY}"
                 }
             }
         }
