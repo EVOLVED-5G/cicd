@@ -639,7 +639,7 @@ pipeline {
                         email -> emailext attachmentsPattern: '**/attachments/**',
                                 body: '''${SCRIPT, template="groovy-html.template"}''',
                                 mimeType: 'text/html',
-                                subject: "Jenkins ${env.NETAPP_NAME} Certification Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
+                                subject: "Jenkins ${env.NETAPP_NAME} Validation Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
                                 from: 'jenkins-evolved5G@tid.es',
                                 replyTo: 'jenkins-evolved5G',
                                 to: email
