@@ -441,13 +441,21 @@ pipeline {
             steps {
                 script {
                     // def step_name = step_validate_capif
-                    def jobBuild = build job: '/001-CAPIF/Launch_Robot_Tests', wait: true, propagate: false,
-                        parameters: [string(name: 'BRANCH_NAME', value: String.valueOf(CAPIF_TESTS_BRANCH)),
-                                    booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
-                                    string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
-                                    string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
-                                    string(name: 'CAPIF_TLS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
-                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                    def jobBuild = build job: '003-NETAPPS/003-Helpers/021-CAPIF Validation Tests', wait: true, propagate: false,
+                        parameters: [
+                            string(name: 'BRANCH_NAME', value: String.valueOf(CAPIF_TESTS_BRANCH)),
+                            booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
+                            string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
+                            string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
+                            string(name: 'CAPIF_TLS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                            string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                            string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))
+                            ]
+
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
 
