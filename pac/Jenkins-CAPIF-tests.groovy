@@ -196,7 +196,6 @@ pipeline {
     }
     post {
         always {
-
             script {
                 /* Manually clean up /keys due to permissions failure */
                 echo 'Robot test executed'
@@ -222,7 +221,7 @@ pipeline {
                     results_file="CAPIF_robot_tests.tar.gz"
                     tar czvf "${results_file}" *
                     ls -l
-                        
+
                     if [ -f "${results_file}" ]; then
 
                         url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$results_file"
@@ -235,7 +234,6 @@ pipeline {
                     fi
 
                     '''
-
                 }
             }
             script {

@@ -665,8 +665,10 @@ pipeline {
                     dir("${WORKSPACE}/") {
                         sh '''#!/bin/bash
 
-                        response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$STAGE/$NETAPP_NAME_LOWER/$BUILD_ID/attachments" -u $ARTIFACTORY_CRED | jq ".children[].name" | tr -d '"' )
+                        response=$(curl -s "http://artifactory.hi.inet/ui/api/v1/ui/nativeBrowser/misc-evolved5g/$PHASE_LOWER/$NETAPP_NAME_LOWER/$BUILD_ID/attachments" -u $ARTIFACTORY_CRED | jq ".children[].name" | tr -d '"' )
                         artifacts=($response)
+
+                        mkdir attachments
 
                         for x in "${artifacts[@]}"
                         do
@@ -684,16 +686,6 @@ pipeline {
                                 replyTo: 'jenkins-evolved5G',
                                 to: email
                     }
-                    // } else {
-                    //     emails.tokenize().each() {
-                    //         email -> emailext body: '''${SCRIPT, template="groovy-html.template"}''',
-                    //                 mimeType: 'text/html',
-                    //                 subject: "Jenkins Build ${currentBuild.currentResult}: Job ${env.JOB_NAME}",
-                    //                 from: 'jenkins-evolved5G@tid.es',
-                    //                 replyTo: 'jenkins-evolved5G',
-                    //                 to: email
-                    //     }
-                    // }
                 }
             }
             script {
