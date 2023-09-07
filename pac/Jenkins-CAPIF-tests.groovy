@@ -76,8 +76,6 @@ pipeline {
         string(name: 'VERSION', defaultValue: '1.0', description: 'Version of NetworkApp')
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: 'URL of the Github Repository')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
-        
-        
     }
     environment {
         BRANCH_NAME = "${params.BRANCH_NAME}"
@@ -100,11 +98,12 @@ pipeline {
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
         VERSION = "${params.VERSION}"
         CAPIF_GITHUB_URL = "https://github.com/EVOLVED-5G/CAPIF_API_Services"
+        ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
     stages {
-        stage('Prepare robot docker image tool') {
+        stage('Docker Login') {
             options {
-                retry(2)
+                retry(10)
             }
 
             steps {
@@ -117,14 +116,33 @@ pipeline {
                     script {
                         try {
                             sh '''
+                            #!/bin/bash
                             docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
-                            docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
                             '''
                     } catch (Exception e) {
-                                echo 'Robot Docker version is not currently uploaded to artifactory.'
+                                echo 'Docker login has failed.'
                             }
                         }
                 }
+                }
+            }
+        }
+        stage('Prepare robot docker image tool') {
+            options {
+                retry(10)
+            }
+            steps {
+                dir("${env.WORKSPACE}") {
+                    script {
+                        try {
+                            sh '''
+                            #!/bin/bash
+                            docker pull ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}
+                            '''
+                        } catch (Exception e) {
+                            echo 'Robot Docker version is not currently uploaded to artifactory.'
+                        }
+                    }
                 }
             }
         }
@@ -136,10 +154,11 @@ pipeline {
              steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
+                    #!/bin/bash
                     rm -rf "$CAPIF_REPOSITORY_DIRECTORY"
                     mkdir "$CAPIF_REPOSITORY_DIRECTORY"
                     cd "$CAPIF_REPOSITORY_DIRECTORY"
-                    git clone --single-branch --branch $BRANCH_NAME $CAPIF_GITHUB_URL .
+                    git clone --single-branch --branch $BRANCH_NAME "$CAPIF_GITHUB_URL" .
                     '''
                 }
             }
@@ -148,24 +167,27 @@ pipeline {
         stage('CAPIF: Launch tests') {
             steps {
                 dir("${env.WORKSPACE}") {
-                    sh '''#!/bin/bash
-                            echo "Executing tests in ${DEPLOYMENT}"
-                            docker images|grep -Eq '^'$ROBOT_IMAGE_NAME'[ ]+[ ]'$ROBOT_VERSION''
-                            if [[ $? -ne 0 ]]; then
-                                echo "Building Robot docker image."
-                                cd ${ROBOT_DOCKER_FILE_FOLDER}
-                                docker build  -t ${ROBOT_IMAGE_NAME}:${ROBOT_VERSION} .
-                                cd ${WORKSPACE}
-                            fi
-                            mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
-                            docker run --tty --rm --network="host" \
-                                -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
-                                -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
-                                --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
-                                --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
-                                --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
-                                ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
-                            #sudo chown contint:contint -R "${ROBOT_RESULTS_DIRECTORY}"
+                    sh '''
+                    #!/bin/bash
+                    echo "Executing tests in ${DEPLOYMENT}"
+                    docker images|grep -Eq '^'$ROBOT_IMAGE_NAME'[ ]+[ ]'$ROBOT_VERSION''
+                    if [[ $? -ne 0 ]]; then
+                        echo "Building Robot docker image."
+                        cd "${ROBOT_DOCKER_FILE_FOLDER}"
+                        docker build  -t "${ROBOT_IMAGE_NAME}:${ROBOT_VERSION}" .
+                        cd "${WORKSPACE}"
+                    fi
+                    mkdir -p "${ROBOT_RESULTS_DIRECTORY}"
+                    docker run --tty --rm --network="host" \
+                        -v "${ROBOT_TESTS_DIRECTORY}":/opt/robot-tests/tests \
+                        -v "${ROBOT_RESULTS_DIRECTORY}":/opt/robot-tests/results \
+                        "${ROBOT_IMAGE_NAME}":"${ROBOT_VERSION}"  \
+                        --variable CAPIF_HOSTNAME:${CAPIF_HOSTNAME} \
+                        --variable CAPIF_HTTP_PORT:${CAPIF_PORT} \
+                        --variable CAPIF_HTTPS_PORT:${CAPIF_TLS_PORT} \
+                        ${ROBOT_TESTS_INCLUDE} ${ROBOT_TEST_OPTIONS}
+
+                    sudo chown contint:contint -R capif_api_services
                     '''
                 }
             }
@@ -173,7 +195,6 @@ pipeline {
     }
     post {
         always {
-
             script {
                 /* Manually clean up /keys due to permissions failure */
                 echo 'Robot test executed'
@@ -193,14 +214,16 @@ pipeline {
 
             script {
                 dir("${env.ROBOT_RESULTS_DIRECTORY}") {
-                    sh '''#!/bin/bash
+                    sh '''
+                    #!/bin/bash
 
                     results_file="CAPIF_robot_tests.tar.gz"
+                    rm output.xml
                     tar czvf "${results_file}" *
-                        
+
                     if [ -f "${results_file}" ]; then
 
-                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$VERSION/${image_file}"
+                        url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/attachments/$results_file"
 
                         curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"${results_file}" \
@@ -210,16 +233,11 @@ pipeline {
                     fi
 
                     '''
-
                 }
             }
-
             script {
                 dir("${env.WORKSPACE}") {
-                    sh '''
-                    sudo rm -rf "${env.ROBOT_TESTS_DIRECTORY}"
-                    sudo rm -rf "${env.CAPIF_REPOSITORY_DIRECTORY}"
-                    '''
+                    sh "sudo rm -rf capif_api_services"
                 }
             }
         }
