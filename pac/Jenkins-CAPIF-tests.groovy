@@ -80,7 +80,6 @@ pipeline {
     environment {
         BRANCH_NAME = "${params.BRANCH_NAME}"
         CAPIF_REPOSITORY_DIRECTORY = "${WORKSPACE}/capif_api_services"
-        CAPIF_SERVICES_DIRECTORY = "${CAPIF_REPOSITORY_DIRECTORY}/services"
         ROBOT_TESTS_DIRECTORY = "${CAPIF_REPOSITORY_DIRECTORY}/tests"
         ROBOT_RESULTS_DIRECTORY = "${WORKSPACE}/results"
         ROBOT_DOCKER_FILE_FOLDER = "${CAPIF_REPOSITORY_DIRECTORY}/tools/robot"
@@ -219,8 +218,8 @@ pipeline {
                     #!/bin/bash
 
                     results_file="CAPIF_robot_tests.tar.gz"
+                    rm output.xml
                     tar czvf "${results_file}" *
-                    ls -l
 
                     if [ -f "${results_file}" ]; then
 
