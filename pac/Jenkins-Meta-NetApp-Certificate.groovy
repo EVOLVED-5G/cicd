@@ -507,16 +507,44 @@ pipeline {
             }
         }
 
+        // stage('Certification: Validate NEF') {
+        //     steps {
+        //         script {
+        //             def jobBuild = build job: '/1000-NEF_VALIDATION/nef_emulator_validation/nef_emulator_validation_capif', wait: true, propagate: false,
+        //                 parameters: [
+        //                     string(name: 'CAPIF_HOST', value: String.valueOf(HOSTNAME_CAPIF)),
+        //                     string(name: 'CAPIF_HTTP_PORT', value: String.valueOf(CAPIF_PORT)),
+        //                     string(name: 'CAPIF_HTTPS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
+        //                     string(name: 'NEF_API_HOSTNAME', value: String.valueOf(NEF_API_HOSTNAME)),
+        //                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+        //                     ]
+
+        //             def jobResult = jobBuild.getResult()
+        //             echo "Build of 'Validate NEF' returned result: ${jobResult}"
+        //             if (jobResult == 'FAILURE') {
+        //                 buildResults['tests_ok'] = false
+        //                 currentBuild.result = 'ABORTED'
+        //                 aborted = true
+        //                 error('NEF is not working properly, abort pipeline')
+        //             }
+        //         }
+        //     }
+        // }
         stage('Certification: Validate NEF') {
             steps {
                 script {
-                    def jobBuild = build job: '/1000-NEF_VALIDATION/nef_emulator_validation/nef_emulator_validation_capif', wait: true, propagate: false,
+                    def jobBuild = build job: '003-NETAPPS/003-Helpers/022-NEF Validation Tests', wait: true, propagate: false,
                         parameters: [
                             string(name: 'CAPIF_HOST', value: String.valueOf(HOSTNAME_CAPIF)),
                             string(name: 'CAPIF_HTTP_PORT', value: String.valueOf(CAPIF_PORT)),
                             string(name: 'CAPIF_HTTPS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
                             string(name: 'NEF_API_HOSTNAME', value: String.valueOf(NEF_API_HOSTNAME)),
-                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))
+                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                            string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                            string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                            string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))
                             ]
 
                     def jobResult = jobBuild.getResult()

@@ -158,7 +158,7 @@ pipeline {
                     rm -rf "$CAPIF_REPOSITORY_DIRECTORY"
                     mkdir "$CAPIF_REPOSITORY_DIRECTORY"
                     cd "$CAPIF_REPOSITORY_DIRECTORY"
-                    git clone --single-branch --branch $BRANCH_NAME $CAPIF_GITHUB_URL .
+                    git clone --single-branch --branch $BRANCH_NAME "$CAPIF_GITHUB_URL" .
                     '''
                 }
             }
