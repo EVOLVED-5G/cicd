@@ -123,7 +123,7 @@ pipeline{
                     rm -rf "$NEF_REPOSITORY_DIRECTORY"
                     mkdir "$NEF_REPOSITORY_DIRECTORY"
                     cd "$NEF_REPOSITORY_DIRECTORY"
-                    git clone --single-branch --branch capif $NEF_VALIDATION_GITHUB_URL .
+                    git clone --single-branch --branch capif "$NEF_VALIDATION_GITHUB_URL" .
                     '''
                 }
             }
