@@ -151,6 +151,7 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
+                    sudo chown contint:contint -R "$NETAPP_NAME_LOWER"
                     sudo rm -rf "$NETAPP_NAME_LOWER"
                     mkdir "$NETAPP_NAME_LOWER"
                     cd "$NETAPP_NAME_LOWER"
@@ -410,9 +411,10 @@ pipeline {
                 }
             }
             sh '''
+            sudo chown contint:contint -R "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
-            sudo rm -rf $WORKSPACE/$NETAPP_NAME_LOWER/
+            sudo rm -rf "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
             '''
             script {
                 if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
