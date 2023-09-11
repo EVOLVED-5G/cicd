@@ -151,7 +151,6 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
-                    sudo chown contint:contint -R "$NETAPP_NAME_LOWER"
                     sudo rm -rf "$NETAPP_NAME_LOWER"
                     mkdir "$NETAPP_NAME_LOWER"
                     cd "$NETAPP_NAME_LOWER"
