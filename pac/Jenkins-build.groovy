@@ -30,9 +30,11 @@ def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
         return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
+    } else if ('kubernetes-athens'.equals(var)) {
         return 'evol5-athens'
-    }else {
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
         return 'evol5-slave'
     }
 }
@@ -61,7 +63,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -83,7 +85,7 @@ pipeline {
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
         DOCKER_PATH = '/usr/src/app'
         ARTIFACTORY_IMAGE_URL = getArtifactoryUrl("${env.PATH_DOCKER}")
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
@@ -95,23 +97,18 @@ pipeline {
                     sh '''
                     docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
                     docker system prune -a -f --volumes
-                    sudo rm -rf $WORKSPACE/$NETAPP_NAME_LOWER/
+                    sudo rm -rf "$WORKSPACE/$NETAPP_NAME_LOWER/"
                     docker network create services_default
                     echo $PATH_AWS
-                    sudo rm -rf $WORKSPACE/${NETAPP_NAME_LOWER}-images/
-                    mkdir $WORKSPACE/${NETAPP_NAME_LOWER}-images/
+                    sudo rm -rf "$WORKSPACE/${NETAPP_NAME_LOWER}-images/"
+                    mkdir "$WORKSPACE/${NETAPP_NAME_LOWER}-images/"
                     '''
                 }
             }
         }
-        stage('Prepare pdf generator tools') {
-            when {
-                expression {
-                    return REPORTING
-                }
-            }
+        stage('Dockerhub login') {
             options {
-                retry(2)
+                retry(20)
             }
 
             steps {
@@ -122,10 +119,27 @@ pipeline {
                     passwordVariable: 'PASS'
                 )]) {
                         sh '''
-                        docker login --username ${USER} --password ${PASS} dockerhub.hi.inet
-                        docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                        echo "$PASS" | docker login --username ${USER} --password-stdin dockerhub.hi.inet
                         '''
                 }
+                }
+            }
+        }
+        stage('Prepare pdf generator tools') {
+            when {
+                expression {
+                    return REPORTING
+                }
+            }
+            options {
+                retry(20)
+            }
+
+            steps {
+                dir("${env.WORKSPACE}") {
+                    sh '''
+                    docker pull ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION}
+                    '''
                 }
             }
         }
@@ -137,9 +151,9 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf $NETAPP_NAME_LOWER
-                    mkdir $NETAPP_NAME_LOWER
-                    cd $NETAPP_NAME_LOWER
+                    sudo rm -rf "$NETAPP_NAME_LOWER"
+                    mkdir "$NETAPP_NAME_LOWER"
+                    cd "$NETAPP_NAME_LOWER"
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
                     '''
                 }
@@ -164,21 +178,18 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
-                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                        sh '''
-                    docker build -t ${NETAPP_NAME_LOWER} .
-                    container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
-                    sleep 10
-                    cd ..
-                    docker ps|grep ${NETAPP_NAME_LOWER} || echo "Docker exited"
-                    docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id
-                    docker ps|grep ${NETAPP_NAME_LOWER} || docker logs $container_id > ${NETAPP_NAME_LOWER}-build-runtime_error.log 2>&1
-                    docker ps|grep ${NETAPP_NAME_LOWER} || echo '{"result":false}' | jq . > ${REPORT_FILENAME}.json
-                    docker ps|grep ${NETAPP_NAME_LOWER} || exit 1
-                    '''
-                    }
+                dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
+                    sh '''
+                docker build -t ${NETAPP_NAME_LOWER} .
+                container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
+                sleep 10
+                cd ..
+                docker ps|grep "${NETAPP_NAME_LOWER}" || echo "Docker exited"
+                docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id
+                docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id > ${NETAPP_NAME_LOWER}-build-runtime_error.log 2>&1
+                docker ps|grep "${NETAPP_NAME_LOWER}" || echo '{"result":false}' | jq . > ${REPORT_FILENAME}.json
+                docker ps|grep "${NETAPP_NAME_LOWER}" || exit 1
+                '''
                 }
             }
         }
@@ -189,14 +200,11 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
-                        sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                        sh '''
-                    docker network create demo-network
-                    make run-dev || docker-compose up --build --force-recreate -d
-                    '''
-                    }
+                dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
+                    sh '''
+                docker network create demo-network
+                make run-dev || docker-compose up --build --force-recreate -d
+                '''
                 }
             }
         }
@@ -220,7 +228,7 @@ pipeline {
             }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    retry(2) {
+                    retry(10) {
                         script {
                             def cmd = "docker ps --format '{{.Image}}'"
                             def cmd2 = "docker ps --format '{{.Names}}'"
@@ -258,7 +266,7 @@ pipeline {
             }
             steps {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'evolved5g-push', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    retry(2) {
+                    retry(10) {
                         script {
                             sh ''' $(aws ecr get-login --no-include-email) '''
                             if (env.PATH_DOCKER != null) {
@@ -288,30 +296,23 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    retry(2) {
-                        script {
-                            // sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                            // def cmd = "docker ps --format '{{.Image}}'"
-                            // def cmd2 = "docker ps --format '{{.Names}}'"
-                            // def image = sh(returnStdout: true, script: cmd).trim()
-                            // def name  = sh(returnStdout: true, script: cmd2).trim()
-                            [image.tokenize(), name.tokenize()].transpose().each { x ->
-                                if (env.PATH_DOCKER != null) {
-                                    sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
-                                    sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
-                                    sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                } else {
-                                    sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
-                                    sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                    sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
-                                    sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
-                                }
+                retry(10) {
+                    script {
+                        [image.tokenize(), name.tokenize()].transpose().each { x ->
+                            if (env.PATH_DOCKER != null) {
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
+                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                sh """ docker save -o "${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                            } else {
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                sh """ docker tag "${x[0]}" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}" """
+                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
+                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json "${NETAPP_NAME_LOWER}-${x[1]}" docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":latest"""
+                                sh """ docker save -o "${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}-${x[1]}.docker" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}/"${NETAPP_NAME_LOWER}-${x[1]}":${VERSION}"""
                             }
                         }
                     }
@@ -325,25 +326,22 @@ pipeline {
                 }
             }
             steps {
-                withCredentials([usernamePassword(credentialsId: 'docker_pull_cred', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_CREDENTIALS')]) {
-                    retry(2) {
-                        script {
-                            sh ''' docker login --username ${ARTIFACTORY_USER} --password "${ARTIFACTORY_CREDENTIALS}" dockerhub.hi.inet '''
-                            if (env.PATH_DOCKER != null) {
-                                sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
-                                sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}"""
-                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
-                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:latest"""
-                                sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
-                            } else {
-                                sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
-                                sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest"""
-                                sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}"""
-                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION} """
-                                sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest """
-                                sh """ docker save -o ${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
-                            }
+                retry(10) {
+                    script {
+                        if (env.PATH_DOCKER != null) {
+                            sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
+                            sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:latest"""
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}"""
+                            sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
+                            sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:latest"""
+                            sh """ docker save -o "${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker" dockerhub.hi.inet/evolved-5g/${PATH_DOCKER}${NETAPP_NAME_LOWER}:${VERSION}"""
+                        } else {
+                            sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
+                            sh """ docker image tag ${NETAPP_NAME_LOWER} dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest"""
+                            sh """ docker image push --all-tags dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}"""
+                            sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION} """
+                            sh """ python3 utils/helpers/add_image_json.py ${REPORT_FILENAME}.json ${NETAPP_NAME_LOWER} docker_hub_images dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:latest """
+                            sh """ docker save -o "${NETAPP_NAME_LOWER}-images/${NETAPP_NAME_LOWER}.docker" dockerhub.hi.inet/evolved-5g/${NETAPP_NAME_LOWER}:${VERSION}"""
                         }
                     }
                 }
@@ -354,9 +352,9 @@ pipeline {
                 retry(2) {
                     script {
                         sh '''#!/bin/bash
-                        image_file=${NETAPP_NAME_LOWER}.tar.gz
+                        image_file="${NETAPP_NAME_LOWER}.tar.gz"
 
-                        tar czvf ${image_file} ${NETAPP_NAME_LOWER}-images
+                        tar czvf "${image_file}" "${NETAPP_NAME_LOWER}-images"
                         
                         if [ -f "${image_file}" ]; then
 
@@ -384,7 +382,7 @@ pipeline {
                             echo "$FILE exists."
                         
                             # get Commit Information
-                            cd $NETAPP_NAME_LOWER
+                            cd "$NETAPP_NAME_LOWER"
                             commit=$(git rev-parse HEAD)
                             cd ..
 
@@ -412,9 +410,10 @@ pipeline {
                 }
             }
             sh '''
+            sudo chown contint:contint -R "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
-            sudo rm -rf $WORKSPACE/$NETAPP_NAME_LOWER/
+            sudo rm -rf "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
             '''
             script {
                 if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {

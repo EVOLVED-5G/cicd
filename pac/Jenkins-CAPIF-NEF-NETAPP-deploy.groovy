@@ -16,12 +16,14 @@ def getNamespace(deployment,name) {
 
 def getAgent(deployment) {
     String var = deployment
-    if("openshift".equals(var)) {
-        return "evol5-openshift";
-    }else if("kubernetes-athens".equals(var)){
-        return "evol5-athens"
-    }else {
-        return "evol5-slave";
+    if ('openshift'.equals(var)) {
+        return 'evol5-openshift'
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'evol5-athens'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
+        return 'evol5-slave'
     }
 }
 
@@ -39,6 +41,7 @@ pipeline {
     parameters {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
+        choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
         string(name: 'VERSION_CAPIF', defaultValue: '3.0', description: 'Version of CAPIF')
         string(name: 'RELEASE_NAME_CAPIF', defaultValue: 'capif', description: 'Release name Helm to CAPIF')
@@ -50,7 +53,7 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
-        choice(name: "DEPLOYMENT", choices: ['kubernetes-athens', 'openshift', 'kubernetes-uma'])  
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
 
@@ -70,7 +73,7 @@ pipeline {
         VERSION="${params.VERSION}"
         DEPLOYMENT = "${params.DEPLOYMENT}"
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
     }
 

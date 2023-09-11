@@ -8,7 +8,7 @@ from reportlab.pdfbase.pdfmetrics import stringWidth
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
-def generate_cover(title, date):
+def generate_cover(title, date, stage):
 
     cover = canvas.Canvas("cover.pdf", pagesize=A4)
     pdfmetrics.registerFont(TTFont('Georgia', './utils/fonts/georgia/georgia.ttf'))
@@ -21,8 +21,8 @@ def generate_cover(title, date):
 
     if title != None:
         cover.setFont("Georgia", 20)
-        title_width = stringWidth("Network App Validation Report: %s" %title, "Georgia", 20)
-        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Network App Validation Report: %s" %title)
+        title_width = stringWidth("Network App %s Report: %s" %(stage,title), "Georgia", 20)
+        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Network App %s Report: %s" %(stage,title))
     if date != None:
         cover.setFont("Georgia", 20)
         cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 720, "Date: %s" %date)
@@ -38,8 +38,9 @@ def generate_cover(title, date):
 def main(argv):
     title = None
     date = None
+    stage = 'Validation'
     try:
-        opts, args = getopt.getopt(argv,"ht:d:")
+        opts, args = getopt.getopt(argv,"ht:d:s:")
     except getopt.GetoptError:
         print ('generate_cover.py -t <title> -d <date>')
         sys.exit(2)
@@ -51,7 +52,9 @@ def main(argv):
             title = arg
         elif opt in ("-d"):
             date = arg
-    generate_cover(title, date)
+        elif opt in ("-s"):
+            stage = arg.title()
+    generate_cover(title, date, stage)
 
 
 if __name__ == "__main__":

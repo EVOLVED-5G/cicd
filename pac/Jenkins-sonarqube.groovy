@@ -8,16 +8,9 @@ String netappName(String url) {
 }
 
 def getAgent(deployment) {
-    // String var = deployment
-    // if ('openshift'.equals(var)) {
-    //     return 'evol5-openshift'
-    // }else if ('kubernetes-athens'.equals(var)) {
-    //     return 'evol5-athens'
-    // }else {
-    //     return 'evol5-slave'
-    // }
     return 'evol5-slave2'
 }
+
 
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
@@ -32,7 +25,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -44,7 +37,7 @@ pipeline {
         SQ_TOKEN = credentials('SONARQUBE_TOKEN')
         SONARQB_PASSWORD = credentials('SONARQB_PASSWORD')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         STAGE = "${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'

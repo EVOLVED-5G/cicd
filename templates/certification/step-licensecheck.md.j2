@@ -1,5 +1,5 @@
 # OPEN SOURCE LICENSES REPORT
-# Analisys Results
+***
 
 Test Description: This test identifies the required licenses used in the Network App {{name}}.
 Network App repository used for the analysis: {{repo}}
@@ -13,33 +13,33 @@ Licenses introduce a varying degree of conditions to be fulfilled for using the 
 * Some licenses add rights and conditions beyond the copyright, suchs as on patents, trademarks, data, and privacy which may make it more difficult to altogether achieve compliance of a license.
 * And to complicate things even further, some Open Source licenses have conditions which makes them incompatible with other Open Source licenses. This is most notably with the GPL license.
 
-The licenses scan has been performed using License Check.
+The licenses scan has been performed using licensecheck.
 
-* Permissive licenses are just that, very permissive in what the user may do with the code, sometimes even to relicense the code, though they all have in common the condition that the copyright attribution and permission notice, sometimes the full license text, is maintained in the distribution of binary and/or source code.
 * Strong copyleft license requires that other code that is used for adding, enhancing, and/or modifying the original work also must inherit all the original work’s license requirements such as to make the code publicly available.
 * Weak copyleft license only requires that the source code of the original or modified work is made publicly available, other code that is used together with the work does not necessarily inherit the original work’s license requirements.
 
 ## Licenses Summary Results
 
-| License Name | Families | Dependencies |
-|---|---|---|
+| License Name | Dependencies |
+|---|:---:|
 
 {%- for license, value in licenses.items() %}
-| {{license}} | {{value["family"]}} | {{value["count"]}}  |
+| {{license}} | {{value["count"]}} |
 {%- endfor %}
+
 
 ***
 
-## Dependencies Summary Results
+## Dependencies Results
 
-This is the packages list with license families other than Permissive
+|Compatible|Package|Version|License
+|:--:|:--|:--:|:--|
 
-| Dependency Name | Version | Licenses | Families |
-|---|---|---|---|
-
-{%- for dependency, value in dependencies.items() %}
-    {%- if value["families"].find("Unknown") != -1 or value["families"].find("Strong") != -1 or value["families"].find("Weak") != -1%}
-| {{dependency}} | {{value["version"]}} | {{value["licenses"]}}  | {{value["families"]}}  |
-    {%- endif %}
+{%- for package in packages %}
+{%- if package["licenseCompat"] == true %}
+| ✔️ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- else %}
+| ❌ | {{ package["name"] }} | {{ package["version"] }} | {{ package["license"] }} |
+{%- endif %}
 {%- endfor %}
 

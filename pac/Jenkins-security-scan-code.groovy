@@ -8,9 +8,11 @@ def getAgent(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
         return 'evol5-openshift'
-    }else if ('kubernetes-athens'.equals(var)) {
+    } else if ('kubernetes-athens'.equals(var)) {
         return 'evol5-athens'
-    }else {
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'evol5-cosmote'
+    } else {
         return 'evol5-slave'
     }
 }
@@ -31,7 +33,7 @@ pipeline {
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
-        choice(name: 'DEPLOYMENT', choices: ['openshift', 'kubernetes-athens', 'kubernetes-uma'])
+        choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -47,7 +49,7 @@ pipeline {
         TOKEN_EVOLVED = credentials('github_token_evolved5g')
         TOKEN_TRIVY = credentials('token_trivy')
         ARTIFACTORY_CRED = credentials('artifactory_credentials')
-        ARTIFACTORY_URL = 'http://artifactory.hi.inet/artifactory/misc-evolved5g/validation'
+        ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
