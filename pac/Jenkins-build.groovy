@@ -151,7 +151,7 @@ pipeline {
             steps {
                 dir("${env.WORKSPACE}/") {
                     sh '''
-                    rm -rf "$NETAPP_NAME_LOWER"
+                    sudo rm -rf "$NETAPP_NAME_LOWER"
                     mkdir "$NETAPP_NAME_LOWER"
                     cd "$NETAPP_NAME_LOWER"
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
