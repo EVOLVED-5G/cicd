@@ -188,10 +188,10 @@ spec:
         - sh
         - docker_start_up.sh
         env:
-        - name: ENVIRONMENT
+        - name: ENVIRONMENT_MODE
           valueFrom:
             configMapKeyRef:
-              key: ENVIRONMENT
+              key: ENVIRONMENT_MODE
               name: env
         - name: CALLBACK_ADDRESS
           valueFrom:

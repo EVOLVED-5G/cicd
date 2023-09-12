@@ -50,7 +50,7 @@ django:
   replicas: 1
   type: ClusterIP
 env:
-  environment: production
+  environmentMode: production
   callbackAddress: https://my-fogus.apps.ocp-epg.hi.inet
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "30048"
