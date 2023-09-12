@@ -69,7 +69,7 @@ pipeline {
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
                             echo "NAMESPACE $NAMESPACE"
-                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'|tail -n 1)
+                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'|uniq)
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
