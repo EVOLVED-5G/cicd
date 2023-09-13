@@ -7,8 +7,7 @@ data:
     {
       "BackEnd": null,
       "FrontEnd": {
-        "Host": "{{ include "tsn-frontend.fullname" . }}",
-        "Port": {{ .Values.service.port }}
+        "DomainName": {{ include "tsn-frontend.fullname" . }}
       },
       "CAPIF": {
         "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
