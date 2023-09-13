@@ -64,7 +64,6 @@ pipeline {
                     script {
                         try {
                             sh '''#!/bin/bash
-                            //sleep 60
 
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
@@ -73,7 +72,9 @@ pipeline {
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
-                                echo $INVOCATION_LOGS |sed \"s/'/\\\"/g\" > ${REPORT_FILENAME}.json
+                                echo "{" > ${REPORT_FILENAME}.json
+                                echo $INVOCATION_LOGS |sed \"s/'/\\\"/g\"| sed \"s/{//g\"| sed \"s/}/,/g\" | sed \"s/,$//g\" >> ${REPORT_FILENAME}.json
+                                echo "}" >> ${REPORT_FILENAME}.json
                                 echo "Network App is onboarded correctly in CAPIF"
                                 echo "NGINX_LOGS:"
                                 kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs
@@ -123,7 +124,9 @@ pipeline {
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
-                                echo $INVOCATION_LOGS |sed \"s/'/\\\"/g\" > ${REPORT_FILENAME}.json
+                                echo "{" > ${REPORT_FILENAME}.json
+                                echo $INVOCATION_LOGS |sed \"s/'/\\\"/g\"| sed \"s/{//g\"| sed \"s/}/,/g\" | sed \"s/,$//g\" >> ${REPORT_FILENAME}.json
+                                echo "}" >> ${REPORT_FILENAME}.json
                                 echo "NGINX_LOG:"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
                                 echo "Network App is onboarded correctly in CAPIF"
