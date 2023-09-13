@@ -7,7 +7,7 @@ data:
     {
       "BackEnd": null,
       "FrontEnd": {
-        "DomainName": {{ include "tsn-frontend.fullname" . }}
+        "DomainName": "{{ include "tsn-frontend.fullname" . }}"
       },
       "CAPIF": {
         "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
