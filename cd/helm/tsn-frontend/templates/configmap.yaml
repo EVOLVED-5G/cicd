@@ -3,12 +3,11 @@ kind: ConfigMap
 metadata:
   name: {{ include "tsn-frontend.fullname" . }}-configmap
 data:
-  {{- with (first .Values.ingress.hosts) }}
   config.json: |
     {
       "BackEnd": null,
       "FrontEnd": {
-        "DomainName": "{{ default "tsn.apps.ocp-epg.hi.inet" .host }}"
+        "DomainName": "{{ default "tsn.apps.ocp-epg.hi.inet" .Values.ingress.hosts.host }}"
       },
       "CAPIF": {
         "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
@@ -19,4 +18,3 @@ data:
         "HttpsPort": {{ .Values.configMap.capifPortHttps }}
       }
     }
-  {{- end }}
