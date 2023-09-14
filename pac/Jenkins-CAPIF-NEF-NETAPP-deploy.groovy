@@ -179,7 +179,7 @@ pipeline {
                             --arg NAMESPACE tsn-$BUILD_NUMBER --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg CREATE_NS $CREATE_NS --arg DOMAIN_NAME $HOSTNAME_TSN:$CAPIF_HTTPS_PORT \
+                            --arg CREATE_NS $CREATE_NS --arg DOMAIN_NAME $HOSTNAME_TSN \
                             -f $WORKSPACE/cd/helm/helmfile.d/02-tsn.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-tsn-${BUILD_NUMBER}.yaml
                             
