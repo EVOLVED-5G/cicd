@@ -93,14 +93,14 @@ pipeline {
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
-                            -f ./cd/helm/helmfile.d/02-netapp.json \
-                            | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            -f ./cd/helm/helmfile.d/03-netapp.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 
-                            echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
-                            cat ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            echo "./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "#### applying helmfile ####"
-                            helmfile sync --debug -f ${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            helmfile sync --debug -f ${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
                     '''
 
                 }
@@ -147,7 +147,7 @@ pipeline {
 
                             echo "#### setting up network-app variables ####"
 
-                            cat ./cd/helm/helmfile.d/02-netapp.json
+                            cat ./cd/helm/helmfile.d/03-netapp.json
 
                             jq -n --arg RELEASE_NAME $RELEASE_NAME --arg CHART_NAME $FOLDER_NETWORK_APP \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $FOLDER_NETWORK_APP \
@@ -155,15 +155,15 @@ pipeline {
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
-                            -f ./cd/helm/helmfile.d/02-netapp.json \
-                            | yq -P > ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            -f ./cd/helm/helmfile.d/03-netapp.json \
+                            | yq -P > ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 
-                            echo "./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml"
-                            cat ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            echo "./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml"
+                            cat ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "#### applying helmfile ####"
                             oc login --insecure-skip-tls-verify --token=$TOKEN_NS_NETAPP
-                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/02-tmp-network-app-${BUILD_NUMBER}.yaml
+                            helmfile sync --debug -f ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
                             
                     '''
                 }
