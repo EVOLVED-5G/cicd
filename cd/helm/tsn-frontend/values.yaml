@@ -59,6 +59,7 @@ service:
   port: 8899
 
 ingress:
+  domainName: "tsn.apps.ocp-epg.hi.inet:443"
   enabled: true
   className: ""
   annotations: {}

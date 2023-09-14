@@ -7,7 +7,7 @@ data:
     {
       "BackEnd": null,
       "FrontEnd": {
-        "DomainName": "{{ include "tsn-frontend.fullname" . }}"
+        "DomainName": "{{ default "tsn.apps.ocp-epg.hi.inet" .Values.ingress.domainName }}"
       },
       "CAPIF": {
         "Enabled": {{ default "true" .Values.configMap.capifEnabled }},
