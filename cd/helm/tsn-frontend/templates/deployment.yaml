@@ -55,6 +55,9 @@ spec:
             - name: frontend-port
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            - containerPort: 443
+              name: frontend-https
+              protocol: TCP
           livenessProbe: #when deleted command, uncomment liveness and rediness probe
             httpGet:
               path: /
