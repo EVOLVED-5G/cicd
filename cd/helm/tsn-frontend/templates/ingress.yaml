@@ -7,15 +7,11 @@ metadata:
   name: ingress-frontend
   labels:
     {{- include "tsn-frontend.labels" . | nindent 4 }}
-  {{- if eq .Values.environment "kubernetes-uma" }}
   annotations:
-    ingress.kubernetes.io/force-ssl-redirect: "true"
+  {{- if eq .Values.environment "kubernetes-uma" }}
     kubernetes.io/ingress.class: contour
-    kubernetes.io/tls-acme: "true"
-    cert-manager.io/cluster-issuer: cert-evolved5g-issuer
   {{- end }}
   {{- with .Values.ingress.annotations }}
-  annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
