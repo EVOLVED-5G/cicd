@@ -65,6 +65,7 @@ env:
   postgresPassword: evolvepass
   postgresUser: evolveclient
   vappAddress: 195.134.66.79:8443
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 netapp:
   netappfe:
     # -- The docker image repository to use
