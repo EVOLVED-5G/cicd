@@ -80,20 +80,20 @@ pipeline {
                                 echo "NGINX_LOGS:"
                                 kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs
                             else
-                                echo "The NEF Services logs are not present in CAPIF"
+                                echo "The TSN Services logs are not present in CAPIF"
                                 echo "NGINX_LOG:"
                                 kubectl -n $NAMESPACE get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $NAMESPACE logs
                                 exit 1
                             fi
                             '''
                         } catch (e) {
-                            echo "The NEF Services logs are not present in CAPIF"
+                            echo "The TSN Services logs are not present in CAPIF"
                         }
                     }
                 }
             }
         }
-        stage('Verify is NEF create a log on CAPIF - Openshift') {
+        stage('Verify is TSN create a log on CAPIF - Openshift') {
             when {
                     allOf {
                         expression { DEPLOYMENT == "openshift"}
@@ -132,14 +132,14 @@ pipeline {
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs
                                 echo "Network App is onboarded correctly in CAPIF"
                             else
-                                echo "The NEF Services logs are not present in CAPIF"
+                                echo "The TSN Services logs are not present in CAPIF"
                                 echo "NGINX_LOG:"
                                 kubectl -n $TMP_NS_CAPIF get pods | grep nginx | awk '{print $1}' | xargs kubectl -n $TMP_NS_CAPIF logs 
                                 exit 1
                             fi
                             '''
                         } catch (e) {
-                            echo "The NEF Services logs are not present in CAPIF"
+                            echo "The TSN Services logs are not present in CAPIF"
                         }
                     }
                 }
