@@ -448,7 +448,7 @@ pipeline {
                                     booleanParam(name: 'SEND_DEV_MAIL', value: false)
                                     ]
                             def jobResult = jobBuild.getResult()
-                            echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
+                            echo "Build of 'TSN Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
                                 sh '''#!/bin/bash
                                 result_file="006-report-tsn-logging.json"
