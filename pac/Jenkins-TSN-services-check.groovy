@@ -40,7 +40,7 @@ pipeline {
 
     environment {
         RELEASE_NAME = "${params.RELEASE_NAME}"
-        REPORT_FILENAME = '006-report-nef-logging'
+        REPORT_FILENAME = '006-report-tsn-logging'
         ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()
@@ -49,11 +49,12 @@ pipeline {
 
     stages {
         
-        stage('Verify is NEF create a log on CAPIF - Kubernetes') {
+        stage('Verify is TSN create a log on CAPIF - Kubernetes') {
             when {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
                     expression { DEPLOYMENT == "kubernetes-uma" }
+                    expression { DEPLOYMENT == "kubernetes-cosmote" }
                 }
             }
             options {
@@ -68,7 +69,7 @@ pipeline {
                             echo "RELEASE_NAME: $RELEASE_NAME"
                             NAMESPACE=$(helm ls --kubeconfig /home/contint/.kube/config --all-namespaces -f "^$RELEASE_NAME" | awk 'NR==2{print $2}')
                             echo "NAMESPACE $NAMESPACE"
-                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'| grep 'nef/api' |uniq)
+                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'| grep 'tsn/api' |uniq)
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"
@@ -120,7 +121,7 @@ pipeline {
                             // INVOCATION_LOGS=$(kubectl logs \
                             // -l io.kompose.service=api-invocation-logs | grep "Added log entry to apis:")
 
-                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'| grep 'nef/api' |uniq)
+                            INVOCATION_LOGS=$(kubectl -n $NAMESPACE get pods | grep api-invocation-logs | awk '{print $1}' |xargs  kubectl -n $NAMESPACE logs | awk -F'Added log entry to apis: ' '/Added log entry to apis: /{ print $2 }'| grep 'tsn/api' |uniq)
 
                             if [[ $INVOCATION_LOGS ]]; then
                                 echo "INVOCATION_LOGS: $INVOCATION_LOGS"

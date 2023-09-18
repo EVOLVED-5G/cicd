@@ -433,6 +433,39 @@ pipeline {
                         }
                     }
                 }
+                stage('Validation: TSN Services logged at CAPIF') {
+                    steps {
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-TSN Services Check', wait: true, propagate: false,
+                                parameters: [
+                                    string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                    string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                    booleanParam(name: 'SEND_DEV_MAIL', value: false)
+                                    ]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
+                            if (jobResult == 'SUCCESS') {
+                                sh '''#!/bin/bash
+                                result_file="006-report-tsn-logging.json"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
+                                '''
+                                def fileName = '006-report-tsn-logging.json'
+                                if (fileExists(fileName)) {
+                                    def tsn_services_check_results = readJSON file: fileName
+                                    buildResults[useOf5gApis][3] = [:]
+                                    buildResults[useOf5gApis][3]['name'] = 'TSN Services logged at CAPIF'
+                                    buildResults[useOf5gApis][3]['value'] = tsn_services_check_results
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
