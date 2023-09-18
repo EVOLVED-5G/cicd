@@ -13,7 +13,7 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
     print(url)
     response = requests.get(url)
     if not response.ok:
-        raise('Error getting Measurement ' + kpi [0] + ' of kpi ' + kpi[1] + ' for ExecutionId ' + execution_id)
+        raise('Error getting Measurement ' + measurement + ' of kpi ' + kpi + ' for ExecutionId ' + execution_id)
 
     print(json.dumps(response.json(), indent=4))
     return response.json()
