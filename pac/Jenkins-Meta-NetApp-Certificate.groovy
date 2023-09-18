@@ -70,7 +70,7 @@ def step_deploy_capif_nef_netapp = 'deploy-network-app'
 // def step_validate_capif = 'validate-capif'
 def step_use_of_5g_apis = 'use-of-5g-apis'
 // def step_onboard_netApp_to_capif = 'network-app-onboarding-to-capif'
-def step_discover_nef_apis = 'discover-apis'
+// def step_discover_nef_apis = 'discover-apis'
 def step_nef_services_apis = 'nef-services-apis'
 def step_destroy_network_app = 'destroy-netapp'
 def step_destroy_nef = 'destroy-nef'
@@ -413,6 +413,27 @@ pipeline {
                         }
                     }
                 }
+                stage('Certification: Discover NEF APIs from CAPIF') {
+                    options {
+                        timeout(time: 5, unit: 'MINUTES')
+                    }
+                    steps {
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
+                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
+                            buildResults[useOf5gApis][1]=[:]
+                            buildResults[useOf5gApis][1]['name'] = 'Discover NEF APIs from CAPIF'
+                            buildResults[useOf5gApis][1]['value'] = jobResult
+                            if (jobResult == 'FAILURE') {
+                                buildResults['tests_ok'] = false
+                            }
+                        }
+                    }
+                }
                 stage('Certification: NEF Services logged at CAPIF') {
                     steps {
                         script {
@@ -438,39 +459,47 @@ pipeline {
                                 def fileName = '006-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
-                                    buildResults[useOf5gApis][1] = [:]
-                                    buildResults[useOf5gApis][1]['name'] = 'NEF Services logged at CAPIF'
-                                    buildResults[useOf5gApis][1]['value'] = nef_services_check_results
+                                    buildResults[useOf5gApis][2] = [:]
+                                    buildResults[useOf5gApis][2]['name'] = 'NEF Services logged at CAPIF'
+                                    buildResults[useOf5gApis][2]['value'] = nef_services_check_results
                                 }
                             }
                         }
                     }
                 }
-
-            //Review Parameters
-            //15
-            //                stage('Certification: Discover NEF APIs from CAPIF') {
-            //                    options {
-            //                        timeout(time: 5, unit: 'MINUTES')
-            //                    }
-            //                    steps {
-            //                        script {
-            //                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
-            //                                        parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-            //                                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
-            //                                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
-            //                            def jobResult = jobBuild.getResult()
-            //                            echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-            //                            buildResults[useOf5gApis][2]=[:]
-            //                            buildResults[useOf5gApis][2]['name'] = 'Discover NEF APIs from CAPIF'
-            //                            buildResults[useOf5gApis][2]['value'] = jobResult
-            //                            if (jobResult == 'FAILURE') {
-            //                                buildResults['tests_ok'] = false
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //
+                stage('Certification: TSN Services logged at CAPIF') {
+                    steps {
+                        script {
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/020-TSN Services Check', wait: true, propagate: false,
+                                parameters: [
+                                    string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                    string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                    string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                    string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                                    string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
+                                    string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                    booleanParam(name: 'SEND_DEV_MAIL', value: false)
+                                    ]
+                            def jobResult = jobBuild.getResult()
+                            echo "Build of 'TSN Services logged at CAPIF' returned result: ${jobResult}"
+                            if (jobResult == 'SUCCESS') {
+                                sh '''#!/bin/bash
+                                result_file="006-report-tsn-logging.json"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
+                                '''
+                                def fileName = '006-report-tsn-logging.json'
+                                if (fileExists(fileName)) {
+                                    def tsn_services_check_results = readJSON file: fileName
+                                    buildResults[useOf5gApis][3] = [:]
+                                    buildResults[useOf5gApis][3]['name'] = 'TSN Services logged at CAPIF'
+                                    buildResults[useOf5gApis][3]['value'] = tsn_services_check_results
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
