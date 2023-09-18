@@ -99,19 +99,26 @@ if __name__ == '__main__':
     results['KPIs']=dict()
     for kpi_info in execution_kpis.get('KPIs'):
         result=get_kpi_value(analitics_url, execution_id, kpi_info)
+        Type = 'NoType'
+        if kpi_info.get('Type', '') != '':
+            Type = kpi_info.get('Type')
+
+        if Type not in results['KPIs']:
+            results['KPIs'][Type]=dict()
+
         if result.get('experimentid') != {} and result.get('experimentid').get(execution_id) != {}:
-            results['KPIs'].update(result.get('experimentid').get(execution_id))
-            results['KPIs'][kpi_info.get('KPI')].update({ "status": True })
-            results['KPIs'][kpi_info.get('KPI')].update(kpi_info)
+            results['KPIs'][Type].update(result.get('experimentid').get(execution_id))
+            results['KPIs'][Type][kpi_info.get('KPI')].update({ "status": True })
+            results['KPIs'][Type][kpi_info.get('KPI')].update(kpi_info)
         else:
-            results['KPIs'].update({ kpi_info.get('KPI'): { "status": False } })
+            results['KPIs'][Type].update({ kpi_info.get('KPI'): { "status": False } })
             print('Measurement ' + kpi_info.get('Measurement') + ' of kpi ' + kpi_info.get('KPI') + ' FAILS')
 
     results['Verdict'] = execution_status.get('Verdict')
 
     print('---Result JSON Generated---')
     print(json.dumps(results, indent=4))
-    print('---------------------------')'
+    print('---------------------------')
 
     with open(output_filename, 'w') as outfile:
         json.dump(results, outfile)
