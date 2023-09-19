@@ -202,7 +202,13 @@ pipeline {
                             cat ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
                             
                             echo "#### applying helmfile ####"
-                            helmfile sync --debug -f ${BUILD_NUMBER}.d/
+                            helmfile sync --debug -f ${BUILD_NUMBER}.d/00-tmp-capif-${BUILD_NUMBER}.yaml
+                            sleep 30
+                            helmfile sync --debug -f ${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
+                            sleep 30
+                            helmfile sync --debug -f ${BUILD_NUMBER}.d/02-tmp-tsn-${BUILD_NUMBER}.yaml
+                            sleep 30
+                            helmfile sync --debug -f ${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 
                             echo "#### getting PKI ####"
                             
