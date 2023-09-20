@@ -23,6 +23,7 @@ db:
   type: ClusterIP
 
 env:
+  environmentMode: production
   frontendAddress: my-umacsic.apps.ocp-epg.hi.inet
   callbackAddress: ""
   capifHostname: my-capif.apps.ocp-epg.hi.inet
@@ -41,6 +42,7 @@ env:
   secretKey: 7110c8ae51a4b5af97be6534caefs0e4bb9bdcb3380af00sr50b23a5d1616bf319bc298105da20fe
   showSqlalchemyLogMessages: "False"
   sqlalchemyTrackModifications: "False"
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 netapp:
   netapp:
