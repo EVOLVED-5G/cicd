@@ -30,7 +30,7 @@ netapp:
   immNetappContainer:
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:immersionnetapp-imm_netapp_container"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:immersionnetapp-imm_netapp_container"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""

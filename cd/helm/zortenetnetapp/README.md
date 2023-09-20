@@ -31,7 +31,7 @@ A Helm chart to Zortenet Network App in Kubernetes
 | netapp.ports[0].targetPort | int | `5000` |  |
 | netapp.replicas | int | `1` |  |
 | netapp.type | string | `"ClusterIP"` |  |
-| netapp.zorteNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:zortenetnetapp-zorte_netapp","tag":""}` | The docker image repository to use |
+| netapp.zorteNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:zortenetnetapp-zorte_netapp","tag":""}` | The docker image repository to use |
 | netapp.zorteNetapp.image.tag | string | `""` | @default Chart version |
 
 

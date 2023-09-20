@@ -8,7 +8,7 @@ A Helm chart to 8bells Network App in Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| adminer.NetappAdminer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_adminer","tag":""}` | The docker image repository to use |
+| adminer.NetappAdminer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_adminer","tag":""}` | The docker image repository to use |
 | adminer.NetappAdminer.image.tag | string | `""` | @default Chart version |
 | adminer.env.adminerPassword | string | `"1234"` |  |
 | adminer.env.adminerPortOne | string | `"8008"` |  |
@@ -30,8 +30,8 @@ A Helm chart to 8bells Network App in Kubernetes
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.Netapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp","tag":""}` | The docker image repository to use |
-| netapp.Netapp.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp"` | @default Chart version |
+| netapp.Netapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp","tag":""}` | The docker image repository to use |
+| netapp.Netapp.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp"` | @default Chart version |
 | netapp.env.callbackAddress | string | `"http://netapp:5000/monitoring/callback:5000"` |  |
 | netapp.env.callbackAdr | string | `"http://netapp:5000/monitoring/callback"` |  |
 | netapp.env.nefPassword | string | `"pass"` |  |
@@ -48,7 +48,7 @@ A Helm chart to 8bells Network App in Kubernetes
 | netapp.ports[0].targetPort | int | `5000` |  |
 | netapp.replicas | int | `1` |  |
 | netapp.type | string | `"ClusterIP"` |  |
-| postgres.NetappDb.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_db","tag":""}` | The docker image repository to use |
+| postgres.NetappDb.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_db","tag":""}` | The docker image repository to use |
 | postgres.NetappDb.image.tag | string | `""` | @default Chart version |
 | postgres.env.postgresDb | string | `"postgres"` |  |
 | postgres.env.postgresPassword | string | `"postgres"` |  |

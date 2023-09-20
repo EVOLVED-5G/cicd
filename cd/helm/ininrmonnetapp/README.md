@@ -38,7 +38,7 @@ A Helm chart to IninRmon Network App in Kubernetes
 | netapp.ports[0].port | int | `80` |  |
 | netapp.ports[0].targetPort | int | `80` |  |
 | netapp.replicas | int | `1` |  |
-| netapp.rmonnetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:ininrmonnetapp","tag":""}` | The docker image repository to use |
+| netapp.rmonnetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:ininrmonnetapp","tag":""}` | The docker image repository to use |
 | netapp.rmonnetapp.image.tag | string | `""` | @default Chart version |
 | netapp.type | string | `"ClusterIP"` |  |
 

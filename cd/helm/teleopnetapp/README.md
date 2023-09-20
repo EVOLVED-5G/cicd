@@ -28,7 +28,7 @@ A Helm chart to TeleOp Network App in Kubernetes
 | netapp.ports[0].port | int | `5000` |  |
 | netapp.ports[0].targetPort | int | `5000` |  |
 | netapp.replicas | int | `1` |  |
-| netapp.teleopNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:teleopnetapp","tag":""}` | The docker image repository to use |
+| netapp.teleopNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:teleopnetapp","tag":""}` | The docker image repository to use |
 | netapp.teleopNetapp.image.tag | string | `""` | @default Chart version |
 | netapp.type | string | `"ClusterIP"` |  |
 

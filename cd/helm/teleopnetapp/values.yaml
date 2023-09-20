@@ -21,7 +21,7 @@ netapp:
   teleopNetapp:
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:teleopnetapp"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:teleopnetapp"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""

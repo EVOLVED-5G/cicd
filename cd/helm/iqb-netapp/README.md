@@ -14,8 +14,8 @@ A Helm chart to IQB Network App in Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| callbacks.callbacks.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-callbacks","tag":""}` | The docker image repository to use |
-| callbacks.callbacks.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-callbacks"` | @default Chart version |
+| callbacks.callbacks.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-callbacks","tag":""}` | The docker image repository to use |
+| callbacks.callbacks.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-callbacks"` | @default Chart version |
 | callbacks.ports[0].name | string | `"netapp-callbacks"` |  |
 | callbacks.ports[0].port | int | `5002` |  |
 | callbacks.ports[0].targetPort | int | `5002` |  |
@@ -49,7 +49,7 @@ A Helm chart to IQB Network App in Kubernetes
 | keycloak.keycloak.env.keycloakLoglevel | string | `"DEBUG"` |  |
 | keycloak.keycloak.env.keycloakPassword | string | `"admin"` |  |
 | keycloak.keycloak.env.keycloakUser | string | `"admin"` |  |
-| keycloak.keycloak.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-keycloak","tag":""}` | The docker image repository to use |
+| keycloak.keycloak.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-keycloak","tag":""}` | The docker image repository to use |
 | keycloak.keycloak.image.tag | string | `""` | @default Chart version |
 | keycloak.ports[0].name | string | `"keycloak"` |  |
 | keycloak.ports[0].port | int | `8980` |  |
@@ -57,7 +57,7 @@ A Helm chart to IQB Network App in Kubernetes
 | keycloak.replicas | int | `1` |  |
 | keycloak.type | string | `"ClusterIP"` |  |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.iqbNetapp.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-iqb_netapp"` | The docker image repository to use |
+| netapp.iqbNetapp.image.repository | string | `"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-iqb_netapp"` | The docker image repository to use |
 | netapp.iqbNetapp.image.tag | string | `""` | @default Chart version |
 | netapp.ports[0].name | string | `"netapp-port-web"` |  |
 | netapp.ports[0].port | int | `5000` |  |
