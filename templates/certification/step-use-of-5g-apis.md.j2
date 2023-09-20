@@ -10,7 +10,7 @@ Last commit ID: {{commit}}
 Environment used: **{{environment}}**
 Build number at Jenkins: {{build_number}}
 
-The individual result of the validations test is displayed in the following table:
+The individual result of the certification tests are displayed in the following table:
 {% set vars = {'foo': False} %}
 
 | Name | Result |
@@ -32,7 +32,7 @@ The individual result of the validations test is displayed in the following tabl
 {% if vars.foo %}
   **Please, take a look to those API uses that are failing.**
 {% else %}
-  **Congratulations all checks are working properly**
+  **Congratulations usage of all 5G APIs has been sucessful**
 {% endif %}
 {% else %}
   **This section was skipped due to some previous errors, please check summary to find the step with problems** 
