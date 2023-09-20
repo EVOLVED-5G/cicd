@@ -52,11 +52,6 @@ spec:
       {{- end }}
       containers:
       - env:
-        - name: ENVIRONMENT_MODE
-          valueFrom:
-            configMapKeyRef:
-              key: ENVIRONMENT_MODE
-              name: env
         - name: CALLBACK_ADDRESS
           valueFrom:
             configMapKeyRef:
@@ -211,6 +206,11 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: ENVIRONMENT_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: ENVIRONMENT_MODE
+              name: {{ include "umacsic.fullname" . }}-env
         - name: CALLBACK_ADDRESS
           valueFrom:
             configMapKeyRef:
