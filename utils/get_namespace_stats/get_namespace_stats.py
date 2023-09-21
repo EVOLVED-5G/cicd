@@ -8,6 +8,8 @@ import json
 
 top_information=dict()
 top_processed_information = dict()
+top_processed_information['PODS'] = dict()
+top_processed_information['TITLES'] = dict()
 
 def add_metrics(titles,results):
     titles_array = titles.split(':')
@@ -30,8 +32,9 @@ def add_metrics(titles,results):
 
     index = 0
     for data in info_array:
-        data_clean=re.search("^([0-9]+)[a-zA-Z]*$",data)
+        data_clean=re.search("^([0-9]+)([a-zA-Z]*$)",data)
         top_information[name][titles_array[index]].append(int(data_clean[1]))
+        top_processed_information['TITLES'][titles_array[index]]=data_clean[2]
         index = index + 1
 
 def getData(namespace):
@@ -83,18 +86,20 @@ def main(argv):
     print(top_information)
 
     for pod_name, info in top_information.items():
-        top_processed_information[pod_name] = dict()
+        top_processed_information['PODS'][pod_name] = dict()
         df = pd.DataFrame(info)
         mean_value=df.mean(axis=0,skipna = True)
         max_value=df.max(axis=0,skipna = True)
         min_value=df.min(axis=0,skipna = True)
         std_value=df.std(axis=0,skipna = True)
+        median_value=df.median(axis=0,skipna = True)
         for title, values in info.items():
-            top_processed_information[pod_name][title] = dict()
-            top_processed_information[pod_name][title]['Mean'] = str(mean_value[title])
-            top_processed_information[pod_name][title]['Max'] = str(max_value[title])
-            top_processed_information[pod_name][title]['Min'] = str(min_value[title])
-            top_processed_information[pod_name][title]['Standar Deviation'] = str(std_value[title])
+            top_processed_information['PODS'][pod_name][title] = dict()
+            top_processed_information['PODS'][pod_name][title]['Mean'] = str(mean_value[title])
+            top_processed_information['PODS'][pod_name][title]['Max'] = str(max_value[title])
+            top_processed_information['PODS'][pod_name][title]['Min'] = str(min_value[title])
+            top_processed_information['PODS'][pod_name][title]['Standar Deviation'] = str(std_value[title])
+            top_processed_information['PODS'][pod_name][title]['Median'] = str(median_value[title])
 
     print(top_processed_information)
     # Serializing json
@@ -107,3 +112,4 @@ def main(argv):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+

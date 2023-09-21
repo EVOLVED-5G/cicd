@@ -1,0 +1,20 @@
+# NETWORK APP KPIS
+***
+
+This section will show all **{{name}}** Network Application with version **{{version}}** KPIs for all pods deployed.
+
+
+| Name | Kpi measured | Min | Max | Mean | Median | Standar Deviation |
+|:---|:---|:---|:---|:---|:---|:---|
+{%- for pod_name, kpis in PODS.items() %}
+|**{{pod_name}}**|  |  |  |  |  |  |
+{%- for kpi_name, kpi_data in kpis.items() %}
+{%- set min = kpi_data['Min'] | int %}
+{%- set max = kpi_data['Max'] | int %}
+{%- set mean = kpi_data['Mean'] | int %}
+{%- set median = kpi_data['Median'] | int %}
+{%- set std = kpi_data['Standar Deviation'] | int %}
+|  | ***{{kpi_name}}*** |{{'%0.2f'|format(min) + TITLES[kpi_name]}}|{{'%0.2f'|format(max) + TITLES[kpi_name]}}|{{'%0.2f'|format(mean) + TITLES[kpi_name]}}|{{'%0.2f'|format(median) + TITLES[kpi_name]}}|{{'%0.2f'|format(std) + TITLES[kpi_name]}}|
+{%- endfor%}
+{%- endfor %}
+
