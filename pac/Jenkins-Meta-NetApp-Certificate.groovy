@@ -60,6 +60,22 @@ def getDeployReportFilename(String netappNameLower) {
     return '019-report-deploy-' + netappNameLower
 }
 
+def nefValidation( capif_host, capif_http_port, capif_https_port, nef_api_hostname, deployment, build_id, stage, version, git_netapp_url, git_cicd_branch ) {
+    return build job: '003-NETAPPS/003-Helpers/022-NEF Validation Tests', wait: true, propagate: false,
+        parameters: [
+            string(name: 'CAPIF_HOST', value: capif_host),
+            string(name: 'CAPIF_HTTP_PORT', value: capif_http_port),
+            string(name: 'CAPIF_HTTPS_PORT', value: capif_https_port),
+            string(name: 'NEF_API_HOSTNAME', value: nef_api_hostname),
+            string(name: 'DEPLOYMENT', value: deployment),
+            string(name: 'BUILD_ID', value: build_id),
+            string(name: 'STAGE', value: stage),
+            string(name: 'VERSION', value: version),
+            string(name: 'GIT_NETAPP_URL', value: git_netapp_url),
+            string(name: 'GIT_CICD_BRANCH', value: git_cicd_branch)
+            ]
+}
+
 def step_platform_assessment = 'platform-assessment'
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
