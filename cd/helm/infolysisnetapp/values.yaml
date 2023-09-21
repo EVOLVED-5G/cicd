@@ -8,6 +8,8 @@ ingress_ip:
     cosmote: "172.25.2.100"
 
 env:
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
   frontendAddress: "my-netapp.apps.ocp-epg.hi.inet"
   capifHostname: "my-capif.apps.ocp-epg.hi.inet"
   capifPortHttp: "30048"
