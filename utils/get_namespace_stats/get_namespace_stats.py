@@ -12,6 +12,8 @@ top_processed_information['PODS'] = dict()
 top_processed_information['TITLES'] = dict()
 
 def add_metrics(titles,results):
+    titles=titles.replace('cores','%')
+    titles=titles.replace('bytes','megabytes')
     titles_array = titles.split(':')
     titles_array.pop(0)
 
@@ -33,7 +35,10 @@ def add_metrics(titles,results):
     index = 0
     for data in info_array:
         data_clean=re.search("^([0-9]+)([a-zA-Z]*$)",data)
-        top_information[name][titles_array[index]].append(int(data_clean[1]))
+        data_value = float(data_clean[1])
+        if data_clean[2] == 'm':
+            data_value = data_value / 10
+        top_information[name][titles_array[index]].append(data_value)
         top_processed_information['TITLES'][titles_array[index]]=data_clean[2]
         index = index + 1
 
