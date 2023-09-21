@@ -32,6 +32,7 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-cosmote" }}
       hostAliases:
@@ -39,6 +40,7 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases:
@@ -46,6 +48,7 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       containers:
       - env:
@@ -183,6 +186,15 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
+      {{- end }}
+      {{- if eq .Values.environment "kubernetes-cosmote" }}
+      hostAliases:
+        - ip: "{{ .Values.ingress_ip.cosmote }}"
+          hostnames:
+            - "{{ .Values.env.capifHostname }}"
+            - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases:
@@ -190,9 +202,15 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       containers:
       - env:
+        - name: ENVIRONMENT_MODE
+          valueFrom:
+            configMapKeyRef:
+              key: ENVIRONMENT_MODE
+              name: {{ include "umacsic.fullname" . }}-env
         - name: CALLBACK_ADDRESS
           valueFrom:
             configMapKeyRef:

@@ -14,6 +14,7 @@ data:
   DOCKER_IMAGE_FRONTEND: {{ .Values.env.dockerImageFrontend | quote }}
   DOCKER_IMAGE_PROXY: {{ .Values.env.dockerImageProxy | quote }}
   DOMAIN: {{ .Values.env.domain | quote }}
+  DOMAIN_NAME: {{ .Values.backend.ingress.host | quote }}
   EMAILS_FROM_EMAIL: {{ .Values.env.emailsFromEmail | quote }}
   EXTERNAL_NET: {{ .Values.env.externalNet | quote }}
   FIRST_SUPERUSER: {{ .Values.env.firstSuperuser | quote }}
@@ -24,6 +25,7 @@ data:
   MONGO_PASSWORD: {{ .Values.env.mongoPassword | quote }}
   MONGO_USER: {{ .Values.env.mongoUser | quote }}
   NEF_HOST: {{ include "nef.fullname" . }}-backend
+  NGINX_HOST: {{ .Values.backend.ingress.host | quote }}
   NGINX_HTTP: {{ .Values.env.nginxHttp | quote }}
   NGINX_HTTPS: {{ .Values.env.nginxHttps | quote }}
   PGADMIN_DEFAULT_EMAIL: {{ .Values.env.pgadminDefaultEmail | quote }}
@@ -33,6 +35,7 @@ data:
   POSTGRES_PASSWORD: {{ .Values.env.postgresPassword | quote }}
   POSTGRES_SERVER: {{ include "nef.fullname" . }}-db
   POSTGRES_USER: {{ .Values.env.postgresUser | quote }}
+  PRODUCTION: {{ .Values.env.production | quote }}
   PROJECT_NAME: {{ .Values.env.projectName | quote }}
   PROXY_TAG: {{ .Values.env.proxyTag | quote }}
   SECRET_KEY: {{ .Values.env.secretKey | quote }}

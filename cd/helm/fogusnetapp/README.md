@@ -14,7 +14,7 @@ A Helm chart to fogus Network Appp in Kubernetes
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| dbnetapp.netapppostgres.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netapppostgres","tag":"latest"}` | The docker image repository to use |
+| dbnetapp.netapppostgres.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netapppostgres","tag":"latest"}` | The docker image repository to use |
 | dbnetapp.netapppostgres.image.tag | string | `"latest"` | @default Chart version |
 | dbnetapp.netapppostgres.resources.limits.cpu | string | `"100m"` |  |
 | dbnetapp.netapppostgres.resources.limits.memory | string | `"128Mi"` |  |
@@ -25,7 +25,7 @@ A Helm chart to fogus Network Appp in Kubernetes
 | dbnetapp.ports[0].targetPort | int | `5432` |  |
 | dbnetapp.replicas | int | `1` |  |
 | dbnetapp.type | string | `"ClusterIP"` |  |
-| django.netappdjango.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappdjango","tag":"latest"}` | The docker image repository to use |
+| django.netappdjango.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappdjango","tag":"latest"}` | The docker image repository to use |
 | django.netappdjango.image.tag | string | `"latest"` | @default Chart version |
 | django.netappdjango.resources.limits.cpu | string | `"100m"` |  |
 | django.netappdjango.resources.limits.memory | string | `"128Mi"` |  |
@@ -53,7 +53,7 @@ A Helm chart to fogus Network Appp in Kubernetes
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.netappfe.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:fogusnetapp-netappfe","tag":"latest"}` | The docker image repository to use |
+| netapp.netappfe.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappfe","tag":"latest"}` | The docker image repository to use |
 | netapp.netappfe.image.tag | string | `"latest"` | @default Chart version |
 | netapp.netappfe.resources | object | `{}` |  |
 | netapp.ports[0].name | string | `"fe"` |  |

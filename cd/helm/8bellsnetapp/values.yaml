@@ -11,7 +11,7 @@ adminer:
   NetappAdminer:
      # -- The docker image repository to use
     image:
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_adminer
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_adminer
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
@@ -43,7 +43,7 @@ netapp:
     image:
       # -- The docker image tag to use
       # -- @default Chart version
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp
       tag: ""
   env:
     callbackAddress:  http://netapp:5000/monitoring/callback:5000
@@ -68,7 +68,7 @@ postgres:
   NetappDb:
      # -- The docker image repository to use
     image:
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:8bellsnetapp-8b_netapp_db
+      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_db
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""  

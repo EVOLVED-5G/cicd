@@ -33,7 +33,7 @@ A Helm chart to localization Network App in Kubernetes
 | env.vappAddress | string | `"195.134.66.79:7000"` |  |
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
-| netapp.localizationNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:localizationnetapp","tag":""}` | The docker image repository to use |
+| netapp.localizationNetapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:localizationnetapp","tag":""}` | The docker image repository to use |
 | netapp.localizationNetapp.image.tag | string | `""` | @default Chart version |
 | netapp.portsUdp[0].name | string | `"netapp-upd-0"` |  |
 | netapp.portsUdp[0].port | int | `7660` |  |

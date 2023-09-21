@@ -17,7 +17,7 @@ A Helm chart to UMACsic Network App in Kubernetes
 | db.ports[0].name | string | `"db-port"` |  |
 | db.ports[0].port | int | `5432` |  |
 | db.ports[0].targetPort | int | `5432` |  |
-| db.postgresContainer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-postgres_container","tag":""}` | The docker image repository to use |
+| db.postgresContainer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:umacsictest-postgres_container","tag":""}` | The docker image repository to use |
 | db.postgresContainer.image.tag | string | `""` | @default Chart version |
 | db.replicas | int | `1` |  |
 | db.type | string | `"ClusterIP"` |  |
@@ -42,7 +42,7 @@ A Helm chart to UMACsic Network App in Kubernetes
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.netapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:umacsictest-netapp","tag":""}` | The docker image repository to use |
+| netapp.netapp.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:umacsictest-netapp","tag":""}` | The docker image repository to use |
 | netapp.netapp.image.tag | string | `""` | @default Chart version |
 | netapp.ports[0].name | string | `"netapp-port"` |  |
 | netapp.ports[0].port | int | `10001` |  |

@@ -13,6 +13,7 @@
         "../cd/helm/tsn-frontend/values.yaml",
         {
           "ingress": {
+            "domainName": "\($DOMAIN_NAME)",
             "hosts": [
               {
                 "host": "\($HOSTNAME_TSN)",
@@ -21,6 +22,14 @@
                     "path": "/",
                     "pathType": "Prefix"     
                   }
+                ]
+              }
+            ],
+            "tls": [
+              {
+                "secretName": "tsn-https",
+                "hosts": [
+                  "\($HOSTNAME_TSN)"
                 ]
               }
             ]

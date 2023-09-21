@@ -59,9 +59,13 @@ service:
   port: 8899
 
 ingress:
+  domainName: "tsn.apps.ocp-epg.hi.inet"
   enabled: true
   className: ""
-  annotations: {}
+  annotations:
+    cert-manager.io/cluster-issuer: cert-evolved5g-issuer
+    kubernetes.io/tls-acme: "true"
+    ingress.kubernetes.io/force-ssl-redirect: "true"
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -69,10 +73,10 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  tls: 
+    - secretName: tsn-https
+      hosts:
+        - tsn.apps.ocp-epg.hi.inet
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

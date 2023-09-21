@@ -3,14 +3,19 @@ import json
 from time import sleep
 import sys
 
-def get_kpi_value(analitics_url ,execution_id, kpi):
-    url= analitics_url + '/statistical_analysis/uma_mydb?experimentid=' + execution_id +'&measurement=' + kpi[0] + '&kpi=' + kpi[1]
+def get_kpi_value(analitics_url ,execution_id, kpi_info):
+    print('******')
+    print(kpi_info)
+    print('******')
+    measurement=kpi_info.get('Measurement')
+    kpi=kpi_info.get('KPI')
+    url= analitics_url + '/statistical_analysis/uma_mydb?experimentid=' + execution_id +'&measurement=' + measurement + '&kpi=' + kpi
     print(url)
     response = requests.get(url)
     if not response.ok:
-        raise('Error getting Measurement ' + kpi [0] + ' of kpi ' + kpi[1] + ' for ExecutionId ' + execution_id)
+        raise('Error getting Measurement ' + measurement + ' of kpi ' + kpi + ' for ExecutionId ' + execution_id)
 
-    print(response.json())
+    print(json.dumps(response.json(), indent=4))
     return response.json()
 
 descriptor = {
@@ -92,18 +97,28 @@ if __name__ == '__main__':
 
     results=dict()
     results['KPIs']=dict()
-    for kpi in execution_kpis.get('KPIs'):
-        result=get_kpi_value(analitics_url, execution_id, kpi)
+    for kpi_info in execution_kpis.get('KPIs'):
+        result=get_kpi_value(analitics_url, execution_id, kpi_info)
+        Type = 'NoType'
+        if kpi_info.get('Type', '') != '':
+            Type = kpi_info.get('Type')
+
+        if Type not in results['KPIs']:
+            results['KPIs'][Type]=dict()
+
         if result.get('experimentid') != {} and result.get('experimentid').get(execution_id) != {}:
-            results['KPIs'].update(result.get('experimentid').get(execution_id))
-            results['KPIs'][kpi[1]].update({ "status": True })
+            results['KPIs'][Type].update(result.get('experimentid').get(execution_id))
+            results['KPIs'][Type][kpi_info.get('KPI')].update({ "status": True })
+            results['KPIs'][Type][kpi_info.get('KPI')].update(kpi_info)
         else:
-            results['KPIs'].update({ kpi[1]: { "status": False } })
-            print('Measurement ' + kpi[0] + ' of kpi ' + kpi[1] + ' FAILS')
+            results['KPIs'][Type].update({ kpi_info.get('KPI'): { "status": False } })
+            print('Measurement ' + kpi_info.get('Measurement') + ' of kpi ' + kpi_info.get('KPI') + ' FAILS')
 
     results['Verdict'] = execution_status.get('Verdict')
-        
+
+    print('---Result JSON Generated---')
     print(json.dumps(results, indent=4))
+    print('---------------------------')
 
     with open(output_filename, 'w') as outfile:
         json.dump(results, outfile)

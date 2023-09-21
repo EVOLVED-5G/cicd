@@ -21,7 +21,7 @@ A Helm chart to Infolysis Network App in Kubernetes
 | env.nefAddress | string | `"my-nef.apps.ocp-epg.hi.inet"` |  |
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
 | ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
-| netapp.infolysisNetappContainer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:infolysisnetapp","tag":""}` | The docker image repository to use |
+| netapp.infolysisNetappContainer.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:infolysisnetapp","tag":""}` | The docker image repository to use |
 | netapp.infolysisNetappContainer.image.tag | string | `""` | @default Chart version |
 | netapp.ports[0].name | string | `"frontend-config"` |  |
 | netapp.ports[0].port | int | `80` |  |

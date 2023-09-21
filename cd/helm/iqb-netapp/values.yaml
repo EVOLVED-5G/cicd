@@ -13,7 +13,7 @@ callbacks:
     image:
       # -- The docker image tag to use
       # -- @default Chart version
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-callbacks"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-callbacks"
       tag: ""
   ports:
   - name: "netapp-callbacks"
@@ -51,7 +51,7 @@ netapp:
   iqbNetapp:
     image:
       # -- The docker image repository to use
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-iqb_netapp"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-iqb_netapp"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""
@@ -74,7 +74,7 @@ keycloak:
       keycloakUser: admin
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g:iqb-netapp-keycloak"
+      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-keycloak"
       # -- The docker image tag to use
       # -- @default Chart version
       tag: ""

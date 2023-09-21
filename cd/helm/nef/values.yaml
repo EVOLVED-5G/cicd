@@ -53,6 +53,7 @@ env:
   postgresPassword: pass
 #  postgresServer: nef-db
   postgresUser: postgres
+  production: "true"
   projectName: NEF_Emulator
   proxyTag: "1.0"
   secretKey: 2D47CF2958CEC7CC86C988E9F9684
