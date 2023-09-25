@@ -26,6 +26,8 @@ env:
   capifPortHttp: "80"
   capifPortHttps: "443"
   capifPathToCerts: "certificates"
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 netapp:
   cafatechNetapp3:

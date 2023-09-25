@@ -35,6 +35,9 @@ env:
   vappIp: 10.10.10.40
   vappPass: admin8b
   vappUser: admin8b
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
+
 kubernetesClusterDomain: cluster.local
 
 netapp:

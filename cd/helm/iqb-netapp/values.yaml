@@ -46,6 +46,8 @@ env:
   netappServerVapp: ""
   pathToCerts: /app/capif_onboarding
   vappAddress: NA
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 netapp:
   iqbNetapp:

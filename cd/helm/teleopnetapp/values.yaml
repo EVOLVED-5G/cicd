@@ -16,6 +16,8 @@ env:
   nefAddress: my-nef.apps.ocp-epg.hi.inet
   nefUser: admin@my-email.com
   nefPassword: pass
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 netapp:
   teleopNetapp:

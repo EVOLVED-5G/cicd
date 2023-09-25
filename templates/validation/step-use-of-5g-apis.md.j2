@@ -18,7 +18,11 @@ The individual result of the validations test is displayed in the following tabl
 {%- for step in apis_5g %}
 {%- if "Services logged at CAPIF" in step.name %}
       {%- for api_id,api_name in step.value.items() %}
+{%- if api_name is string %}
 | {{ step.name|upper|replace("-"," ") + ' ***' + api_name + '***' }} | SUCCESS |
+{%- else %}
+| {{ step.name|upper|replace("-"," ") + ' ***' + api_name[0] + '***' }} | SUCCESS |
+{%- endif %}
       {%- endfor %}
     {%- else %}
 | {{ step.name|upper|replace("-"," ") }} | {{step.value}} |

@@ -25,6 +25,9 @@ env:
   rosDomainId: "1"
   network: evolved5G_dds
   ddsExternalAddress: "10.11.23.53"
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
+
 
 netapp:
   localizationNetapp:
