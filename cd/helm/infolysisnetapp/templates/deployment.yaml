@@ -32,6 +32,7 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-cosmote" }}
       hostAliases:
@@ -39,6 +40,7 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
       {{- if eq .Values.environment "kubernetes-uma" }}
       hostAliases:
@@ -46,10 +48,13 @@ spec:
           hostnames:
             - "{{ .Values.env.capifHostname }}"
             - "{{ .Values.env.nefAddress }}"
+            - "{{ .Values.env.tsnAddress }}"
       {{- end }}
 
       containers:
       - env:
+        - name: ENVIRONMENT_MODE
+          value: {{ quote .Values.env.environmentMode }}
         - name: NEF_HOSTNAME
           value: {{ quote .Values.env.nefAddress }}
         - name: CAPIF_HOSTNAME
