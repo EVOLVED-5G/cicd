@@ -24,6 +24,8 @@ env:
   netappPortVapp: 9877
   netappPortWeb: 9998
   netappServerVapp: 127.0.0.1
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 
 netapp:
