@@ -26,6 +26,8 @@ env:
   netApiProt: http
   netApiUser: admin@my-email.com
   netAppName: test
+  environmentMode: production
+  tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 
 netapp:
   replicas: 1
