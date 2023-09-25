@@ -30,7 +30,7 @@
           "environment": "\($DEPLOYMENT)"
         },
         {
-          "pipeline": "\($PIPELINE_TYPE)"
+          "pipeline": "\($STAGE)"
         }
       ]
     }

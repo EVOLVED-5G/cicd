@@ -129,7 +129,6 @@ pipeline {
         ELCM_URL = "http://10.11.23.220:5551/elcm/api/v1"
         ANALYTICS_URL = "http://10.11.23.220:5003"
         NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
-        PIPELINE_TYPE = "certification"
     }
 
     stages {
@@ -350,7 +349,6 @@ pipeline {
                             string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                             string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
                             string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                            string(name: 'PIPELINE_TYPE', value: String.valueOf(PIPELINE_TYPE)),
                             booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))
                             ]
                     def jobResult = jobBuild.getResult()
