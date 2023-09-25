@@ -28,6 +28,9 @@
         },
         {
           "environment": "\($DEPLOYMENT)"
+        },
+        {
+          "pipeline": "\($PIPELINE_TYPE)"
         }
       ]
     }

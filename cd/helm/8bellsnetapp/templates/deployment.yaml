@@ -51,8 +51,7 @@ spec:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.adminer.NetappAdminer.image.repository }}-{{ .Values.adminer.NetappAdminer.image.tag
-          | default .Chart.AppVersion }}
+        image: {{- include "8bells.baseRepo" . }}{{- include "8bells.pipeline" . }}:{{ .Values.adminer.NetappAdminer.image.tag }}-{{ .Chart.AppVersion }}
         imagePullPolicy: Always
         name: 8b-netapp-adminer
         ports:
@@ -256,8 +255,7 @@ spec:
               name: {{ include "8bells.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.Netapp.image.repository }}-{{ .Values.netapp.Netapp.image.tag
-          | default .Chart.AppVersion }}
+        image: {{- include "8bells.baseRepo" . }}{{- include "8bells.pipeline" . }}:{{ .Values.netapp.Netapp.image.tag }}-{{ .Chart.AppVersion }}
         imagePullPolicy: Always
         name: 8b-netapp
         ports:
@@ -320,8 +318,7 @@ spec:
           value: {{ quote .Values.postgres.env.postgresPassword }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.postgres.NetappDb.image.repository }}-{{ .Values.postgres.NetappDb.image.tag
-          | default .Chart.AppVersion }}
+        image: {{- include "8bells.baseRepo" . }}{{- include "8bells.pipeline" . }}:{{ .Values.postgres.NetappDb.image.tag }}-{{ .Chart.AppVersion }}
         imagePullPolicy: Always
         livenessProbe:
           exec:

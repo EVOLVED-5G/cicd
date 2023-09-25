@@ -53,6 +53,7 @@ pipeline {
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'networkapp.apps.ocp-epg.hi.inet', description: 'Hostname to NetwrokApp')
         string(name: 'RELEASE_NAME_NETAPP', defaultValue: 'netapp-example', description: 'Release name Helm to NetworkApp')
         string(name: 'APP_REPLICAS', defaultValue: '1', description: 'Number of NetworkApp pods to run')
+        choice(name: 'PIPELINE_TYPE', choices: ['validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
     }
@@ -193,8 +194,8 @@ pipeline {
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
-                            --arg HOSTNAME_TSN $HOSTNAME_TSN \
+                            --arg PIPELINE_TYPE $PIPELINE_TYPE --arg APP_REPLICAS $APP_REPLICAS \
+                             --arg CREATE_NS $CREATE_NS --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             -f $WORKSPACE/cd/helm/helmfile.d/03-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 

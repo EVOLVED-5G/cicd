@@ -122,6 +122,7 @@ pipeline {
         FINGERPRINT_FILENAME = getFingerprintFilename()
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
         NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
+        PIPELINE_TYPE = "validation"
     }
 
     stages {
@@ -301,6 +302,7 @@ pipeline {
                                     string(name: 'RELEASE_NAME_NETAPP', value: String.valueOf(NETAPP_NAME_LOWER)),
                                     string(name: 'APP_REPLICAS', value: String.valueOf(APP_REPLICAS_NETAPP)),
                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                    string(name: 'PIPELINE_TYPE', value: String.valueOf(PIPELINE_TYPE)),
                                     booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING))]
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Deploy CAPIF, NEF and Network App' returned result: ${jobResult}"
