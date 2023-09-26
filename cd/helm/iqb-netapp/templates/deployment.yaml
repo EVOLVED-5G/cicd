@@ -51,8 +51,11 @@ spec:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.callbacks.callbacks.image.repository }}-{{ .Values.callbacks.callbacks.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "iqb.baseRepo" . }}:{{ .Values.callbacks.callbacks.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "iqb.baseRepo" . }}{{- include "iqb.pipeline" . }}:{{ .Values.callbacks.callbacks.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: callbacks
         ports:
@@ -151,8 +154,11 @@ spec:
           value: {{ quote .Values.env.vappAddress }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.iqbNetapp.image.repository }}-{{ .Values.netapp.iqbNetapp.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "iqb.baseRepo" . }}:{{ .Values.netapp.iqbNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "iqb.baseRepo" . }}{{- include "iqb.pipeline" . }}:{{ .Values.netapp.iqbNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: iqb-netapp
         ports:
@@ -216,8 +222,11 @@ spec:
           value: {{ quote .Values.keycloak.keycloak.env.keycloakUser }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.keycloak.keycloak.image.repository }}-{{ .Values.keycloak.keycloak.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "iqb.baseRepo" . }}:{{ .Values.keycloak.keycloak.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "iqb.baseRepo" . }}{{- include "iqb.pipeline" . }}:{{ .Values.keycloak.keycloak.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: keycloak
         ports:

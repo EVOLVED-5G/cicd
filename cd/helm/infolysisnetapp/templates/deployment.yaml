@@ -63,8 +63,11 @@ spec:
           value: {{ quote .Values.env.capifPortHttp }}
         - name: CAPIF_PORT_HTTPS
           value: {{ quote .Values.env.capifPortHttps }}
-        image: {{ .Values.netapp.infolysisNetappContainer.image.repository }}-{{ .Values.netapp.infolysisNetappContainer.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "infolysis.baseRepo" . }}:{{ .Values.netapp.infolysisNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "infolysis.baseRepo" . }}{{- include "infolysis.pipeline" . }}:{{ .Values.netapp.infolysisNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: infolysis-netapp
         ports:

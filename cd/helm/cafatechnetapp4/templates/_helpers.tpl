@@ -8,14 +8,14 @@ Expand the name of the chart.
 {{/*
  Define base aws repo
  */}}
-{{- define "8bells.baseRepo" -}}
+{{- define "cafatech.baseRepo" -}}
 {{- printf " 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g" }}
 {{- end }}
 
 {{/*
  Define type of pipeline
  */}}
-{{- define "8bells.pipeline" -}}
+{{- define "cafatech.pipeline" -}}
 {{- if eq .Values.pipeline "validation" }}
 {{- printf "validation" }}
 {{- else if eq .Values.pipeline "certification" }}

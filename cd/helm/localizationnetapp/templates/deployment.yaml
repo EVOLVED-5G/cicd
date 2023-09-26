@@ -84,7 +84,11 @@ spec:
           value: {{ quote .Values.env.network }}
         - name: DDS_EXTERNAL_ADDRESS
           value: {{ quote .Values.env.ddsExternalAddress }}
-        image: {{ .Values.netapp.localizationNetapp.image.repository }}-{{ .Values.netapp.localizationNetapp.image.tag | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "localization.baseRepo" . }}:{{ .Values.netapp.localizationNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "localization.baseRepo" . }}{{- include "localization.pipeline" . }}:{{ .Values.netapp.localizationNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: localizationnetapp
         ports:

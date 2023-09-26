@@ -79,8 +79,11 @@ spec:
           value: {{ quote .Values.env.ueRequestedIp }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.gmiNetappContainer.image.repository }}-{{ .Values.netapp.gmiNetappContainer.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "gmi.baseRepo" . }}:{{ .Values.netapp.gmiNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "gmi.baseRepo" . }}{{- include "gmi.pipeline" . }}:{{ .Values.netapp.gmiNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: gmi-netapp-container
         ports:

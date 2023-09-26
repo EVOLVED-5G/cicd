@@ -1,6 +1,9 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
+# pipeline. It accepts: validation, certification or verification
+pipeline: certification
+
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
@@ -13,8 +16,7 @@ callbacks:
     image:
       # -- The docker image tag to use
       # -- @default Chart version
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-callbacks"
-      tag: ""
+      tag: "iqb-netapp-callbacks"
   ports:
   - name: "netapp-callbacks"
     port: 5002
@@ -50,11 +52,9 @@ env:
 netapp:
   iqbNetapp:
     image:
-      # -- The docker image repository to use
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-iqb_netapp"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""
+      tag: "iqb-netapp-iqb_netapp"
   replicas: 1
   ports:
   - name: "netapp-port-web"
@@ -74,10 +74,9 @@ keycloak:
       keycloakUser: admin
     # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:iqb-netapp-keycloak"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""
+      tag: "iqb-netapp-keycloak"
   ports:
   - name: "keycloak"
     port: 8980

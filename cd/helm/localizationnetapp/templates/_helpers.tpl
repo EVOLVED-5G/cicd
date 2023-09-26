@@ -6,6 +6,28 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
+ Define base aws repo
+ */}}
+{{- define "localization.baseRepo" -}}
+{{- printf " 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5g" }}
+{{- end }}
+
+{{/*
+ Define type of pipeline
+ */}}
+{{- define "localization.pipeline" -}}
+{{- if eq .Values.pipeline "validation" }}
+{{- printf "validation" }}
+{{- else if eq .Values.pipeline "certification" }}
+{{- printf "certification" }}
+{{- else if eq .Values.pipeline "verification" }}
+{{- printf "verification" }}
+{{- else }}
+{{- printf "validation" }}
+{{- end }}
+{{- end }}
+
+{{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
