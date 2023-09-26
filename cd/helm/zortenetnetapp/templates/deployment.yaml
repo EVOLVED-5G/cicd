@@ -72,8 +72,11 @@ spec:
           value: {{ quote .Values.env.pathToCerts }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.zorteNetapp.image.repository }}-{{ .Values.netapp.zorteNetapp.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "zortenet.baseRepo" . }}:{{ .Values.netapp.zorteNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "zortenet.baseRepo" . }}{{- include "zortenet.pipeline" . }}:{{ .Values.netapp.zorteNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: zorte-netapp
         ports:

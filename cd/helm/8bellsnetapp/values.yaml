@@ -1,6 +1,9 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
+# pipeline. It accepts: validation, certification or verification
+pipeline: verification
+
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
@@ -9,12 +12,10 @@ ingress_ip:
 
 adminer:
   NetappAdminer:
-     # -- The docker image repository to use
     image:
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_adminer
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""
+      tag: "8bellsnetapp-8b_netapp_adminer"
   env:
     adminerPassword: "1234"
     adminerPortOne: "8008"
@@ -42,12 +43,10 @@ kubernetesClusterDomain: cluster.local
 
 netapp:
   Netapp:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp
-      tag: ""
+      tag: "8bellsnetapp-8b_netapp"
   env:
     callbackAddress:  http://netapp:5000/monitoring/callback:5000
     callbackAdr: http://netapp:5000/monitoring/callback
@@ -69,12 +68,10 @@ netapp:
 
 postgres:
   NetappDb:
-     # -- The docker image repository to use
     image:
-      repository: 709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:8bellsnetapp-8b_netapp_db
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""  
+      tag: "8bellsnetapp-8b_netapp_db"  
   env:
     postgresPassword: postgres
     postgresDb: postgres

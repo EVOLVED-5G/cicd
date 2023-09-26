@@ -1,21 +1,15 @@
-# Helm of Fogus
+# fogusnetapp
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=for-the-badge)
-![Type: application](https://img.shields.io/badge/Type-application-informational?style=for-the-badge) 
-![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=for-the-badge) 
-
-## Description
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: latest](https://img.shields.io/badge/AppVersion-latest-informational?style=flat-square)
 
 A Helm chart to fogus Network Appp in Kubernetes
-
-## Usage
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| dbnetapp.netapppostgres.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netapppostgres","tag":"latest"}` | The docker image repository to use |
-| dbnetapp.netapppostgres.image.tag | string | `"latest"` | @default Chart version |
+| dbnetapp.netapppostgres.image | object | `{"tag":"fogusnetapp-netapppostgres"}` | The docker image repository to use |
+| dbnetapp.netapppostgres.image.tag | string | `"fogusnetapp-netapppostgres"` | @default Chart version |
 | dbnetapp.netapppostgres.resources.limits.cpu | string | `"100m"` |  |
 | dbnetapp.netapppostgres.resources.limits.memory | string | `"128Mi"` |  |
 | dbnetapp.netapppostgres.resources.requests.cpu | string | `"100m"` |  |
@@ -25,8 +19,8 @@ A Helm chart to fogus Network Appp in Kubernetes
 | dbnetapp.ports[0].targetPort | int | `5432` |  |
 | dbnetapp.replicas | int | `1` |  |
 | dbnetapp.type | string | `"ClusterIP"` |  |
-| django.netappdjango.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappdjango","tag":"latest"}` | The docker image repository to use |
-| django.netappdjango.image.tag | string | `"latest"` | @default Chart version |
+| django.netappdjango.image | object | `{"tag":"fogusnetapp-netappdjango"}` | The docker image repository to use |
+| django.netappdjango.image.tag | string | `"fogusnetapp-netappdjango"` | @default Chart version |
 | django.netappdjango.resources.limits.cpu | string | `"100m"` |  |
 | django.netappdjango.resources.limits.memory | string | `"128Mi"` |  |
 | django.netappdjango.resources.requests.cpu | string | `"100m"` |  |
@@ -36,10 +30,11 @@ A Helm chart to fogus Network Appp in Kubernetes
 | django.ports[0].targetPort | int | `8000` |  |
 | django.replicas | int | `1` |  |
 | django.type | string | `"ClusterIP"` |  |
-| env.callbackAddress | string | `"192.168.1.5:8000"` |  |
+| env.callbackAddress | string | `"https://my-fogus.apps.ocp-epg.hi.inet"` |  |
 | env.capifHostname | string | `"my-capif.apps.ocp-epg.hi.inet"` |  |
 | env.capifPortHttp | string | `"30048"` |  |
 | env.capifPortHttps | string | `"30548"` |  |
+| env.environmentMode | string | `"production"` |  |
 | env.frontendAddress | string | `"my-fogus.apps.ocp-epg.hi.inet"` |  |
 | env.nefAddress | string | `"my-nef.apps.ocp-epg.hi.inet"` |  |
 | env.nefPassword | string | `"pass"` |  |
@@ -49,21 +44,20 @@ A Helm chart to fogus Network Appp in Kubernetes
 | env.postgresDb | string | `"evolvedb"` |  |
 | env.postgresPassword | string | `"evolvepass"` |  |
 | env.postgresUser | string | `"evolveclient"` |  |
+| env.tsnAddress | string | `"my-tsn.apps.ocp-epg.hi.inet"` |  |
 | env.vappAddress | string | `"195.134.66.79:8443"` |  |
 | environment | string | `"openshift"` | The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift' |
-| ingress_ip | object | `{"athens":"10.161.1.126","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
+| ingress_ip | object | `{"athens":"10.161.1.126","cosmote":"172.25.2.100","uma":"10.11.23.49"}` | If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s |
 | kubernetesClusterDomain | string | `"cluster.local"` |  |
-| netapp.netappfe.image | object | `{"repository":"709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappfe","tag":"latest"}` | The docker image repository to use |
-| netapp.netappfe.image.tag | string | `"latest"` | @default Chart version |
+| netapp.netappfe.image | object | `{"tag":"fogusnetapp-netappfe"}` | The docker image repository to use |
+| netapp.netappfe.image.tag | string | `"fogusnetapp-netappfe"` | @default Chart version |
 | netapp.netappfe.resources | object | `{}` |  |
 | netapp.ports[0].name | string | `"fe"` |  |
 | netapp.ports[0].port | int | `4200` |  |
 | netapp.ports[0].targetPort | int | `4200` |  |
 | netapp.replicas | int | `1` |  |
 | netapp.type | string | `"ClusterIP"` |  |
+| pipeline | string | `"certification"` |  |
 
-
-
-
-
-
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.11.0](https://github.com/norwoodj/helm-docs/releases/v1.11.0)

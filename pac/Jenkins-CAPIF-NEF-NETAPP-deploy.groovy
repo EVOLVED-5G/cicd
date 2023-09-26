@@ -193,8 +193,8 @@ pipeline {
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
-                            --arg HOSTNAME_TSN $HOSTNAME_TSN \
+                            --arg STAGE $STAGE --arg APP_REPLICAS $APP_REPLICAS \
+                            --arg CREATE_NS $CREATE_NS --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             -f $WORKSPACE/cd/helm/helmfile.d/03-netapp.json \
                             | yq -P > ./${BUILD_NUMBER}.d/03-tmp-network-app-${BUILD_NUMBER}.yaml
 

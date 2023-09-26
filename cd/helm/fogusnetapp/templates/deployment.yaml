@@ -125,8 +125,11 @@ spec:
               name: env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.dbnetapp.netapppostgres.image.repository }}-{{ .Values.dbnetapp.netapppostgres.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "fogus-kube.baseRepo" . }}:{{ .Values.dbnetapp.netapppostgres.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "fogus-kube.baseRepo" . }}{{- include "fogus-kube.pipeline" . }}:{{ .Values.dbnetapp.netapppostgres.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: netapppostgres
         resources:
@@ -271,8 +274,11 @@ spec:
               name: env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.django.netappdjango.image.repository }}-{{ .Values.django.netappdjango.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "fogus-kube.baseRepo" . }}:{{ .Values.django.netappdjango.image.tag  }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "fogus-kube.baseRepo" . }}{{- include "fogus-kube.pipeline" . }}:{{ .Values.django.netappdjango.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: netappdjango
         ports:
@@ -408,8 +414,11 @@ spec:
               name: env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.netappfe.image.repository }}-{{ .Values.netapp.netappfe.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "fogus-kube.baseRepo" . }}:{{ .Values.netapp.netappfe.image.tag  }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "fogus-kube.baseRepo" . }}{{- include "fogus-kube.pipeline" . }}:{{ .Values.netapp.netappfe.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: netappfe
         ports:

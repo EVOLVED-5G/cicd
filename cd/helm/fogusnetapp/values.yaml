@@ -1,6 +1,9 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
+# pipeline. It accepts: validation, certification or verification
+pipeline: certification
+
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
@@ -9,12 +12,10 @@ ingress_ip:
 
 dbnetapp:
   netapppostgres:
-    # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netapppostgres"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: "latest"
+      tag: "fogusnetapp-netapppostgres"
     resources:
      limits:
        cpu: 100m
@@ -30,12 +31,10 @@ dbnetapp:
   replicas: 1
 django:
   netappdjango:
-    # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappdjango"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: "latest"
+      tag: "fogusnetapp-netappdjango"
     resources:
      limits:
        cpu: 100m
@@ -68,12 +67,10 @@ env:
   tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 netapp:
   netappfe:
-    # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:fogusnetapp-netappfe"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: "latest"
+      tag: "fogusnetapp-netappfe"
     resources: {}
 #     limits:
 #       cpu: 100m
