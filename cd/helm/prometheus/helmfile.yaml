@@ -1,0 +1,23 @@
+# helmfile sync -f helmfile.d/04-prometheus.yaml
+
+helmDefaults:
+  createNamespace: true
+  force: true
+  timeout: 600
+
+releases:
+  - name: prometheus-123
+    chart: ../cicd/cd/helm/prometheus/
+    namespace: prometheus-123
+#    atomic: true
+    wait: true
+    timeout: 600
+    values:
+      - ../cicd/cd/helm/prometheus/values.yaml
+      - prometheus:
+          ingress:
+            hosts:
+              - host: prometheus.mon.int
+                paths:
+                  - path: /
+                    pathType: Prefix
