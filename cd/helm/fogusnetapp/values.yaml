@@ -12,7 +12,6 @@ ingress_ip:
 
 dbnetapp:
   netapppostgres:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version
@@ -32,7 +31,6 @@ dbnetapp:
   replicas: 1
 django:
   netappdjango:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version
@@ -69,7 +67,6 @@ env:
   tsnAddress: my-tsn.apps.ocp-epg.hi.inet
 netapp:
   netappfe:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version

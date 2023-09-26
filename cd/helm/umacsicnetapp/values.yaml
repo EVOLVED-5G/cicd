@@ -16,7 +16,6 @@ db:
     port: 5432
     targetPort: 5432
   postgresContainer:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version
@@ -48,7 +47,6 @@ env:
 
 netapp:
   netapp:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version

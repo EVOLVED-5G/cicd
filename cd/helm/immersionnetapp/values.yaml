@@ -31,7 +31,6 @@ env:
 
 netapp:
   immNetappContainer:
-    # -- The docker image repository to use
     image:
       # -- The docker image tag to use
       # -- @default Chart version
