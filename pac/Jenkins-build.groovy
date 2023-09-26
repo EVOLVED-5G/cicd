@@ -193,7 +193,7 @@ pipeline {
                 dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME_LOWER} .
-                    container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
+                    container_id=$(docker run -d -P ${NETAPP_NAME_LOWER} --variable ENVIRONMENT_MODE:development)
                     sleep 10
                     cd ..
                     docker ps|grep "${NETAPP_NAME_LOWER}" || echo "Docker exited"
@@ -428,9 +428,11 @@ pipeline {
             }
             sh '''
             sudo chown contint:contint -R "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
+            sudo chown contint:contint -R "$WORKSPACE"/capif/
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
+            sudo rm -rf "$WORKSPACE"/capif/
             '''
             script {
                 if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
