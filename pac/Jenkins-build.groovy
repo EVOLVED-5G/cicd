@@ -193,7 +193,7 @@ pipeline {
                 dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME_LOWER} .
-                    container_id=$(docker run -d -P ${NETAPP_NAME_LOWER} --variable ENVIRONMENT_MODE:development)
+                    container_id=$(docker run -d -P --env ENVIRONMENT_MODE=development -it --entrypoint /bin/bash ${NETAPP_NAME_LOWER})
                     sleep 10
                     cd ..
                     docker ps|grep "${NETAPP_NAME_LOWER}" || echo "Docker exited"
