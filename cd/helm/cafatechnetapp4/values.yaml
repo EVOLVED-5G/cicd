@@ -2,7 +2,7 @@
 environment: "openshift"
 
 # pipeline. It accepts: validation or certification
-pipeline: validation
+pipeline: certification
 
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 

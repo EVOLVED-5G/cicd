@@ -81,7 +81,11 @@ spec:
           value: {{ quote .Values.env.capifPathToCerts }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "8bells.baseRepo" . }}:{{ .Values.netapp.cafatechNetapp3.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
         image: {{- include "8bells.baseRepo" . }}{{- include "8bells.pipeline" . }}:{{ .Values.netapp.cafatechNetapp3.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: cafatech-netapp-3
         ports:

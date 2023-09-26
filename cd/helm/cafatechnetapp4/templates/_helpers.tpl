@@ -18,8 +18,12 @@ Expand the name of the chart.
 {{- define "8bells.pipeline" -}}
 {{- if eq .Values.pipeline "validation" }}
 {{- printf "validation" }}
-{{- else }}
+{{- else if eq .Values.pipeline "certification" }}
 {{- printf "certification" }}
+{{- else if eq .Values.pipeline "verification" }}
+{{- printf "verification" }}
+{{- else }}
+{{- printf "validation" }}
 {{- end }}
 {{- end }}
 
