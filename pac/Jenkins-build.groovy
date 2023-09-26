@@ -184,12 +184,12 @@ pipeline {
                 }
             }
             steps {
-                dir("${env.WORKSPACE}/capif/services/") {
-                    sh '''
-                    ./run.sh
-                    sleep 10
-                    '''
-                }
+                // dir("${env.WORKSPACE}/capif/services/") {
+                //     sh '''
+                //     ./run.sh
+                //     sleep 10
+                //     '''
+                // }
                 dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME_LOWER} .
@@ -229,11 +229,11 @@ pipeline {
                     python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME_LOWER} ${REPORT_FILENAME}.json
                     '''
                 }
-                dir("${env.WORKSPACE}/capif/services/") {
-                    sh '''
-                    ./clean_capif_docker_services.sh
-                    '''
-                }
+                // dir("${env.WORKSPACE}/capif/services/") {
+                //     sh '''
+                //     ./clean_capif_docker_services.sh
+                //     '''
+                // }
             }
         }
         //----
