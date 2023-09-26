@@ -89,6 +89,7 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
+        GIT_CAPIF_URL = 'https://github.com/EVOLVED-5G/CAPIF_API_Services'
     }
     stages {
         stage('Clean workspace') {
@@ -155,6 +156,11 @@ pipeline {
                     mkdir "$NETAPP_NAME_LOWER"
                     cd "$NETAPP_NAME_LOWER"
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
+                    cd ..
+                    sudo rm -rf "capif"
+                    mkdir "capif"
+                    cd "capif"
+                    git clone --single-branch --branch develop $GIT_CAPIF_URL .
                     '''
                 }
             }
@@ -178,18 +184,24 @@ pipeline {
                 }
             }
             steps {
+                dir("${env.WORKSPACE}/capif/services/") {
+                    sh '''
+                    ./run.sh
+                    sleep 10
+                    '''
+                }
                 dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
                     sh '''
-                docker build -t ${NETAPP_NAME_LOWER} .
-                container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
-                sleep 10
-                cd ..
-                docker ps|grep "${NETAPP_NAME_LOWER}" || echo "Docker exited"
-                docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id
-                docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id > ${NETAPP_NAME_LOWER}-build-runtime_error.log 2>&1
-                docker ps|grep "${NETAPP_NAME_LOWER}" || echo '{"result":false}' | jq . > ${REPORT_FILENAME}.json
-                docker ps|grep "${NETAPP_NAME_LOWER}" || exit 1
-                '''
+                    docker build -t ${NETAPP_NAME_LOWER} .
+                    container_id=$(docker run -d -P ${NETAPP_NAME_LOWER})
+                    sleep 10
+                    cd ..
+                    docker ps|grep "${NETAPP_NAME_LOWER}" || echo "Docker exited"
+                    docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id
+                    docker ps|grep "${NETAPP_NAME_LOWER}" || docker logs $container_id > ${NETAPP_NAME_LOWER}-build-runtime_error.log 2>&1
+                    docker ps|grep "${NETAPP_NAME_LOWER}" || echo '{"result":false}' | jq . > ${REPORT_FILENAME}.json
+                    docker ps|grep "${NETAPP_NAME_LOWER}" || exit 1
+                    '''
                 }
             }
         }
@@ -215,6 +227,11 @@ pipeline {
                     sh '''
                     pip install -r ${CHECKPORTS_PATH}/requirements.txt
                     python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME_LOWER} ${REPORT_FILENAME}.json
+                    '''
+                }
+                dir("${env.WORKSPACE}/capif/services/") {
+                    sh '''
+                    ./clean_capif_docker_services.sh
                     '''
                 }
             }
@@ -355,7 +372,7 @@ pipeline {
                         image_file="${NETAPP_NAME_LOWER}.tar.gz"
 
                         tar czvf "${image_file}" "${NETAPP_NAME_LOWER}-images"
-                        
+
                         if [ -f "${image_file}" ]; then
 
                             url="$ARTIFACTORY_IMAGE_URL/$NETAPP_NAME_LOWER/$VERSION/${image_file}"
@@ -380,7 +397,7 @@ pipeline {
                         sh '''#!/bin/bash
                         if [ -f "${REPORT_FILENAME}.json" ]; then
                             echo "$FILE exists."
-                        
+
                             # get Commit Information
                             cd "$NETAPP_NAME_LOWER"
                             commit=$(git rev-parse HEAD)
