@@ -1,7 +1,7 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
-# pipeline. It accepts: validation or certification
+# pipeline. It accepts: validation, certification or verification
 pipeline: certification
 
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
@@ -35,7 +35,7 @@ netapp:
     image:
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: "cafatechnetapp3"
+      tag: "cafatechnetapp3-cafatech-netapp-3"
   ports:
   - name: netapp
     port: 5555
