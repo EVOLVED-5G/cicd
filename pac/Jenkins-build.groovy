@@ -89,7 +89,6 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        GIT_CAPIF_URL = 'https://github.com/EVOLVED-5G/CAPIF_API_Services'
     }
     stages {
         stage('Clean workspace') {
@@ -156,11 +155,6 @@ pipeline {
                     mkdir "$NETAPP_NAME_LOWER"
                     cd "$NETAPP_NAME_LOWER"
                     git clone --single-branch --branch $GIT_NETAPP_BRANCH $GIT_NETAPP_URL .
-                    cd ..
-                    sudo rm -rf "capif"
-                    mkdir "capif"
-                    cd "capif"
-                    git clone --single-branch --branch develop $GIT_CAPIF_URL .
                     '''
                 }
             }
@@ -184,12 +178,6 @@ pipeline {
                 }
             }
             steps {
-                // dir("${env.WORKSPACE}/capif/services/") {
-                //     sh '''
-                //     ./run.sh
-                //     sleep 10
-                //     '''
-                // }
                 dir("${env.WORKSPACE}/${NETAPP_NAME_LOWER}/") {
                     sh '''
                     docker build -t ${NETAPP_NAME_LOWER} .
@@ -229,11 +217,6 @@ pipeline {
                     python3 ${CHECKPORTS_PATH}/checkportscicd.py $GIT_NETAPP_BRANCH $GIT_NETAPP_URL ${NETAPP_NAME_LOWER} ${REPORT_FILENAME}.json
                     '''
                 }
-                // dir("${env.WORKSPACE}/capif/services/") {
-                //     sh '''
-                //     ./clean_capif_docker_services.sh
-                //     '''
-                // }
             }
         }
         //----
@@ -428,11 +411,9 @@ pipeline {
             }
             sh '''
             sudo chown contint:contint -R "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
-            sudo chown contint:contint -R "$WORKSPACE"/capif/
             docker ps -a -q | xargs --no-run-if-empty docker stop $(docker ps -a -q)
             docker system prune -a -f --volumes
             sudo rm -rf "$WORKSPACE"/"$NETAPP_NAME_LOWER"/
-            sudo rm -rf "$WORKSPACE"/capif/
             '''
             script {
                 if ("${params.SEND_DEV_MAIL}".toBoolean() == true) {
