@@ -31,6 +31,7 @@ env:
   capifPathToCerts: "certificates"
   environmentMode: production
   tsnAddress: my-tsn.apps.ocp-epg.hi.inet
+  capifCallbackUrl: "http://netapp:55555/nefcallbacks"
 
 netapp:
   cafatechNetapp3:
