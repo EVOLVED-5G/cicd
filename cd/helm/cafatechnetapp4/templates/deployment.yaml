@@ -86,6 +86,8 @@ spec:
           value: {{ quote .Values.env.capifPathToCerts }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        - name: CAPIF_CALLBACK_URL
+          value: {{ quote .Values.env.capifCallbackUrl }}
         {{- if eq .Values.pipeline "verification" }}
         image: {{- include "cafatech.baseRepo" . }}:{{ .Values.netapp.cafatechNetapp3.image.tag }}-{{ .Chart.AppVersion }}
         {{- else }}
