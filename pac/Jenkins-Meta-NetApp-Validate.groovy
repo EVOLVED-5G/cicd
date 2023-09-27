@@ -367,7 +367,7 @@ pipeline {
                     }
                     steps {
                         script {
-                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: false,
+                            def jobBuild = build job: '/003-NETAPPS/003-Helpers/009-Discover NEF APIs', wait: true, propagate: true,
                                         parameters: [string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
                                                     string(name: 'RELEASE_NAME', value: String.valueOf(RELEASE_CAPIF)),
                                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]

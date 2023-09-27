@@ -26,7 +26,7 @@ The individual result of the certification tests are displayed in the following 
       {%- endfor %}
     {%- else %}
 | {{ step.name|upper|replace("-"," ") }} | {{step.value}} |
-      {%- if step_status == "FAILURE" -%}
+      {%- if step.value == "FAILURE" -%}
         {%- if vars.update({'foo': True}) -%}
         {%- endif %}
       {%- endif %}
