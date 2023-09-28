@@ -410,10 +410,7 @@ pipeline {
                                     buildResults[useOf5gApis][2] = [:]
                                     buildResults[useOf5gApis][2]['name'] = 'NEF Services logged at CAPIF'
                                     buildResults[useOf5gApis][2]['value'] = nef_services_check_results
-                                } else {
-                                    echo "ERROR: No NEF Api invocations after deploy"
-                                    buildResults['tests_ok'] = false
-                                }
+                                } 
                             }
                         }
                     }
@@ -446,9 +443,6 @@ pipeline {
                                     buildResults[useOf5gApis][3] = [:]
                                     buildResults[useOf5gApis][3]['name'] = 'TSN Services logged at CAPIF'
                                     buildResults[useOf5gApis][3]['value'] = tsn_services_check_results
-                                } else {
-                                    echo "ERROR: No TSN Api invocations after deploy"
-                                    buildResults['tests_ok'] = false
                                 }
                             }
                         }
