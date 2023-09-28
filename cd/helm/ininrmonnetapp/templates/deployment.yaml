@@ -52,6 +52,11 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: ENDPOINT_TEST
+          valueFrom:
+            configMapKeyRef:
+              key: ENDPOINT_TEST
+              name: {{ include "inin.fullname" . }}-env
         - name: ENVIRONMENT_MODE
           valueFrom:
             configMapKeyRef:
