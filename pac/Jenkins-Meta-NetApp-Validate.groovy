@@ -74,6 +74,19 @@ def initial_status = 'SKIPPED'
 def not_report = 'NOT_REPORT'
 def aborted = false
 
+def staticCodeAnalysis(gitNetappUrl, gitNetappBranch, gitCicdBranch, stage, buildId, reporting) {
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
+        parameters: [
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(gitNetappUrl)),
+            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(gitNetappBranch)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(gitCicdBranch)),
+            string(name: 'STAGE', value: String.valueOf(stage)),
+            string(name: 'BUILD_ID', value: String.valueOf(buildId)),
+            booleanParam(name: 'REPORTING', value: String.valueOf(reporting)),
+            booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+    return jobBuild
+}
+
 pipeline {
     agent { node { label getAgent("${params.ENVIRONMENT }") == 'any' ? '' : getAgent("${params.ENVIRONMENT }") } }
     options {
@@ -151,14 +164,7 @@ pipeline {
                             script {
                                 def step_name = step_static_code_analysis
                                 buildResults['steps'][step_name] = 'FAILURE'
-                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
-                                parameters: [string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                                booleanParam(name: 'SEND_DEV_MAIL', value: false)]
+                                def jobBuild = staticCodeAnalysis(String.valueOf(GIT_NETAPP_URL), String.valueOf(GIT_NETAPP_BRANCH), String.valueOf(GIT_CICD_BRANCH), String.valueOf(PHASE_LOWER), String.valueOf(BUILD_NUMBER), String.valueOf(REPORTING))
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
                                 buildResults['steps'][step_name] = jobResult
@@ -252,8 +258,8 @@ pipeline {
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
                                 buildResults['steps'][step_name] = jobResult
-                                // buildResults['steps'][step_name] = 'SUCCESS'
-                                // echo "BUILD NOT EXECUTED, TESTING PURPOUSE"
+                            // buildResults['steps'][step_name] = 'SUCCESS'
+                            // echo "BUILD NOT EXECUTED, TESTING PURPOUSE"
                             }
                         }
                         retry(2) {
@@ -373,7 +379,7 @@ pipeline {
                                                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT))]
                             def jobResult = jobBuild.getResult()
                             echo "Build of 'Discover NEF APIs' returned result: ${jobResult}"
-                            buildResults[useOf5gApis][1]=[:]
+                            buildResults[useOf5gApis][1] = [:]
                             buildResults[useOf5gApis][1]['name'] = 'Discover NEF APIs from CAPIF'
                             buildResults[useOf5gApis][1]['value'] = jobResult
                             if (jobResult == 'FAILURE') {
@@ -411,6 +417,9 @@ pipeline {
                                     buildResults[useOf5gApis][2]['name'] = 'NEF Services logged at CAPIF'
                                     buildResults[useOf5gApis][2]['value'] = nef_services_check_results
                                 }
+                            } else {
+                                echo 'NEF Apis are not invoked during validation'
+                                buildResults['tests_ok'] = false
                             }
                         }
                     }
@@ -444,6 +453,9 @@ pipeline {
                                     buildResults[useOf5gApis][3]['name'] = 'TSN Services logged at CAPIF'
                                     buildResults[useOf5gApis][3]['value'] = tsn_services_check_results
                                 }
+                            } else {
+                                echo 'TSN Apis are not invoked during validation'
+                                buildResults['tests_ok'] = false
                             }
                         }
                     }
