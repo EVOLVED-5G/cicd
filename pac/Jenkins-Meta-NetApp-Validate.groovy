@@ -411,6 +411,9 @@ pipeline {
                                     buildResults[useOf5gApis][2]['name'] = 'NEF Services logged at CAPIF'
                                     buildResults[useOf5gApis][2]['value'] = nef_services_check_results
                                 } 
+                            } else {
+                                echo "NEF Apis are not invoked during validation"
+                                buildResults['tests_ok'] = false
                             }
                         }
                     }
@@ -444,6 +447,9 @@ pipeline {
                                     buildResults[useOf5gApis][3]['name'] = 'TSN Services logged at CAPIF'
                                     buildResults[useOf5gApis][3]['value'] = tsn_services_check_results
                                 }
+                            } else {
+                                echo "TSN Apis are not invoked during validation"
+                                buildResults['tests_ok'] = false
                             }
                         }
                     }
