@@ -192,7 +192,7 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $NETAPP_NAME_LOWER \
                             --arg NAMESPACE network-app-$BUILD_NUMBER --arg FOLDER_NETWORK_APP $NETAPP_NAME_LOWER \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF:$CAPIF_HTTPS_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg STAGE $STAGE --arg APP_REPLICAS $APP_REPLICAS \
                             --arg CREATE_NS $CREATE_NS --arg HOSTNAME_TSN $HOSTNAME_TSN \
@@ -404,7 +404,7 @@ pipeline {
                             jq -n --arg RELEASE_NAME $RELEASE_NAME_NETAPP --arg CHART_NAME $NETAPP_NAME_LOWER \
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $NETAPP_NAME_LOWER \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
-                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF:$CAPIF_HTTPS_PORT \
+                            --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
                             --arg HOSTNAME_TSN $HOSTNAME_TSN \
