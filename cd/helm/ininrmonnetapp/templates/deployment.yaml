@@ -56,7 +56,7 @@ spec:
           valueFrom:
             configMapKeyRef:
               key: ENVIRONMENT_MODE
-              name: env
+              name: {{ include "inin.fullname" . }}-env
         - name: CALLBACK_ADDRESS
           valueFrom:
             configMapKeyRef:
