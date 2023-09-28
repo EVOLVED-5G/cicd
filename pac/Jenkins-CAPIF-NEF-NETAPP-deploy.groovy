@@ -167,7 +167,8 @@ pipeline {
                             --arg NAMESPACE nef-$BUILD_NUMBER --arg HOSTNAME_NEF $HOSTNAME_NEF \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg CREATE_NS $CREATE_NS -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
+                            --arg CREATE_NS $CREATE_NS --arg DOMAIN_NAME $HOSTNAME_NEF:$CAPIF_HTTPS_PORT \
+                            -f $WORKSPACE/cd/helm/helmfile.d/01-nef.json \
                             | yq -P > ./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml
 
                             echo "./${BUILD_NUMBER}.d/01-tmp-nef-${BUILD_NUMBER}.yaml"
@@ -179,7 +180,7 @@ pipeline {
                             --arg NAMESPACE tsn-$BUILD_NUMBER --arg HOSTNAME_TSN $HOSTNAME_TSN \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg DEPLOYMENT $DEPLOYMENT \
-                            --arg CREATE_NS $CREATE_NS --arg DOMAIN_NAME $HOSTNAME_TSN \
+                            --arg CREATE_NS $CREATE_NS --arg DOMAIN_NAME $HOSTNAME_TSN:CAPIF_HTTPS_PORT \
                             -f $WORKSPACE/cd/helm/helmfile.d/02-tsn.json \
                             | yq -P > ./${BUILD_NUMBER}.d/02-tmp-tsn-${BUILD_NUMBER}.yaml
                             

@@ -14,7 +14,8 @@
         {
           "backend": {
             "ingress": {
-              "host": "\($HOSTNAME_NEF)"
+              "host": "\($HOSTNAME_NEF)",
+              "domainName": "\($DOMAIN_NAME)",
             }
           }
         },
