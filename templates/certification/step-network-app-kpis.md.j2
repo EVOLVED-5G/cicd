@@ -1,22 +1,48 @@
+
 # NETWORK APP KPIS
 ***
 
 This section will show all **{{name}}** Network Application with version **{{version}}** KPIs for all pods deployed.
 
-
-| Name | Kpi measured | Min | Max | Mean | Median | Standar Deviation |
-|:---|:---|:---|:---|:---|:---|:---|
-{%- for pod_name, kpis in PODS.items() %}
-|**{{pod_name}}**|  |  |  |  |  |  |
-{%- for kpi_name, kpi_data in kpis.items() %}
-{%- set min = kpi_data['Min'] | int %}
-{%- set max = kpi_data['Max'] | int %}
-{%- set mean = kpi_data['Mean'] | int %}
-{%- set median = kpi_data['Median'] | int %}
-{%- set std = kpi_data['Standar Deviation'] | int %}
-|  | ***{{kpi_name}}*** |{{'%0.2f'|format(min)}}|{{'%0.2f'|format(max)}}|{{'%0.2f'|format(mean)}}|{{'%0.2f'|format(median)}}|{{'%0.2f'|format(std)}}|
-{%- endfor%}
+## Host KPIs
+| Host |
+{%- for instance_title, instance_formatted_title in instance_titles.items() -%}
+ {{ instance_formatted_title }} |
+{%- endfor %}
+|:---|
+{%- for instance_title, instance_formatted_title in instance_titles.items() -%}
+:---:|
+{%- endfor %}
+{%- for instance_name, instance_value in instance.items() %}
+| {{instance_name}} | 
+{%- for instance_title, instance_formatted_title in instance_titles.items() -%}
+{%- if instance_value[instance_title] -%}
+{%- set measure_value = instance_value[instance_title]['value'] | float -%}
+ {{'%0.2f'|format(measure_value)}} |
+{%- else -%}
+- |
+{%- endif -%}
+{%- endfor -%}
 {%- endfor %}
 
-
+## Pod KPIs
+| Pod |
+{%- for pod_title, pod_title_formatted_value in pod_titles.items() -%}
+ {{ pod_title_formatted_value }} |
+{%- endfor %}
+|:---|
+{%- for pod_title, pod_title_formatted_value in pod_titles.items() -%}
+:---:|
+{%- endfor %}
+{%- for pod_name, pod_value in pod.items() %}
+| {{pod_name}} | 
+{%- for pod_title, pod_title_formatted_value in pod_titles.items() -%}
+{%- if pod_value[pod_title] -%}
+{%- set measure_value = pod_value[pod_title]['value'] | float -%}
+ {{'%0.2f'|format(measure_value)}} |
+{%- else -%}
+- |
+{%- endif -%}
+{%- endfor -%}
+{%- endfor %}
 

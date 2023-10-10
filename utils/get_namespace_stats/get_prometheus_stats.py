@@ -1,63 +1,53 @@
 import subprocess
 import time
 import re
-import pandas as pd
 import sys,getopt
 import json
 from  requests import get
 
 
-
-top_information=dict()
-top_processed_information = dict()
-top_processed_information['PODS'] = dict()
-top_processed_information['TITLES'] = dict()
-
-PROMETHEUS_URL
-
-def get_prometheus_data(url, params):
-    params=dict()
-    params['query'] = '100*sum(rate(container_cpu_usage_seconds_total{namespace="andres"}[5m]))by(instance)/on(instance)machine_cpu_cores'
-    get(url, params)
+kpis_results=dict()
 
 
-    # curl -g 'http://prometheus.mon.int:30048/api/v1/query?query=100*sum(rate(container_cpu_usage_seconds_total{namespace="andres"}[5m]))by(instance)/on(instance)machine_cpu_cores'
+def get_prometheus_data(url,queries):
+    for kpi_name, kpi in queries.items():
+        # Store Title of kpi with properly title format
+        measure_name = ' '.join(kpi_name.title().split('_'))
+        if kpis_results.get(kpi['type'] + '_titles', None) == None:
+            kpis_results[kpi['type'] + '_titles']=dict()
+        kpis_results[kpi['type'] + '_titles'][kpi_name] = '{}({})'.format(measure_name,kpi['unit'])
+        
+        params = {
+            "query": kpi['query']
+        }
+        response = get(url, params)
+        if response.json()['status'] == 'success':
+            results=response.json()['data']['result']
 
-def add_metrics(titles,results):
-    titles=titles.replace('cores','%')
-    titles=titles.replace('bytes','megabytes')
-    titles_array = titles.split(':')
-    titles_array.pop(0)
+            for result in results:
+                element_name = result['metric'][kpi['type']]
+                # Setup name without UUID if it's a pod
+                if kpi['type'] == "pod":
+                    element_name = '-'.join(element_name.split('-')[:-2])
+                
+                # Create kpi results type dict (pod or instance)
+                if kpis_results.get(kpi['type'],None) == None:
+                    kpis_results[kpi['type']]=dict()
+                
+                # Create element dictionary
+                if kpis_results[kpi['type']].get(element_name,None) == None:
+                    kpis_results[kpi['type']][element_name]=dict()
+                
+                # Store KPI information with value obtained
+                kpis_results[kpi['type']][element_name][kpi_name]=kpi
 
-    info_array = results.split(':')
-    name=info_array[0]
-    info_array.pop(0)
-    
-    if top_information.get(name,None) == None:
-        top_information[name]=dict()
-        for title in titles_array:
-            top_information[name][title]=list()
+                # Store value of KPI obtained
+                kpis_results[kpi['type']][element_name][kpi_name]['value'] = result['value'][1]
 
-    titles_array_len = len(titles_array)
-    info_array_len = len(info_array)
+                
+                
 
-    if info_array_len != titles_array_len:
-        raise Exception('info array has not the same length than titles')
-
-    index = 0
-    for data in info_array:
-        data_clean=re.search("^([0-9]+)([a-zA-Z]*$)",data)
-        data_value = float(data_clean[1])
-        if data_clean[2] == 'm':
-            data_value = data_value / 10
-        top_information[name][titles_array[index]].append(data_value)
-        top_processed_information['TITLES'][titles_array[index]]=data_clean[2]
-        index = index + 1
-
-def getData(namespace):
-    command="kubectl top pods -n {} ".format(namespace) + '| awk \'{ print $1":"$2":"$3}\''
-    p = subprocess.run(command,stdout=subprocess.PIPE, shell=True,universal_newlines=True)
-    return p.stdout.split('\n')
+        print(json.dumps(response.json(), indent=4))
 
 def main(argv):
     namespace = None
@@ -82,48 +72,52 @@ def main(argv):
     if namespace == None or output_file == None or url == None:
         print ('get_prometheus_stats.py -n <namespace> -u <prometheus_url> -o <output_file>')
         exit(1)
+
+    queries= {
+        "cpu" : {
+            "unit": '%',
+            "query":'100 * sum (rate (container_cpu_usage_seconds_total {{namespace="{namespace}"}} [5m])) by (instance) / on (instance) machine_cpu_cores'.format(namespace=namespace),
+            "type": 'instance'
+        },
+        "memory" :  {
+            "unit": "%",
+            "query": '100 * sum (container_memory_working_set_bytes {{namespace="{namespace}"}}) by (instance) / on (instance) machine_memory_bytes'.format(namespace=namespace),
+            "type": 'instance'
+        },
+        "memory_usage": {
+            "unit": "%",
+            "query": 'sum (container_memory_working_set_bytes {{namespace="{namespace}"}}) by (pod) / sum (kube_pod_container_resource_limits{{resource="memory", namespace="{namespace}"}}) by (pod)'.format(namespace=namespace),
+            "type": 'pod'
+        },
+        "net_i/o": {
+            "unit": "Bytes",
+            "query": 'sum by (pod) (rate (container_network_receive_bytes_total {{namespace="{namespace}"}} [1m])) + sum by (pod) (rate (container_network_transmit_bytes_total {{namespace="{namespace}"}} [1m]))'.format(namespace=namespace),
+            "type": 'pod'
+        },
+        "mem_failures": {
+            "unit": "Times",
+            "query": 'sum by (pod) (changes (container_memory_oom_total {{namespace="{namespace}"}} [5m]))'.format(namespace=namespace),
+            "type": 'pod'
+        },
+        "block_i/o": {
+            "unit": "Blocks",
+            "query": 'sum by (pod) (rate (container_fs_writes_bytes_total {{namespace="{namespace}"}} [1m])) + sum by (pod) (rate (container_fs_reads_bytes_total {{namespace="{namespace}"}} [1m]))'.format(namespace=namespace),
+            "type": 'pod'
+        }
+    }
+
+    print(json.dumps(queries, indent=4))
+
+    get_prometheus_data(url,queries)
+
+    print(json.dumps(kpis_results, indent=4))
+
+    # Serializing json
+    json_object = json.dumps(kpis_results, indent=4)
     
-    
-    # for index in range(0,int(loops)):
-        # results = getData(namespace)
-    get_prometheus_data(url,params)
-        # title_array = results[0]
-        # results.pop(0)
-
-        # for result in results:
-        #     if result:
-        #         add_metrics(title_array,result)
-        
-        # print(json.dumps(top_information, indent=4))
-
-    #     time.sleep(float(delay))
-
-    print(top_information)
-
-    # for pod_name, info in top_information.items():
-    #     top_processed_information['PODS'][pod_name] = dict()
-    #     df = pd.DataFrame(info)
-    #     mean_value=df.mean(axis=0,skipna = True)
-    #     max_value=df.max(axis=0,skipna = True)
-    #     min_value=df.min(axis=0,skipna = True)
-    #     std_value=df.std(axis=0,skipna = True)
-    #     median_value=df.median(axis=0,skipna = True)
-    #     for title, values in info.items():
-    #         top_processed_information['PODS'][pod_name][title] = dict()
-    #         top_processed_information['PODS'][pod_name][title]['Mean'] = str(mean_value[title])
-    #         top_processed_information['PODS'][pod_name][title]['Max'] = str(max_value[title])
-    #         top_processed_information['PODS'][pod_name][title]['Min'] = str(min_value[title])
-    #         top_processed_information['PODS'][pod_name][title]['Standar Deviation'] = str(std_value[title])
-    #         top_processed_information['PODS'][pod_name][title]['Median'] = str(median_value[title])
-
-    # print(top_processed_information)
-    # # Serializing json
-    # json_object = json.dumps(top_processed_information, indent=4)
-    
-    # # Writing to sample.json
-    # with open(output_file, "w") as outfile:
-    #     outfile.write(json_object)
-
+    # Writing to sample.json
+    with open(output_file, "w") as outfile:
+        outfile.write(json_object)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
