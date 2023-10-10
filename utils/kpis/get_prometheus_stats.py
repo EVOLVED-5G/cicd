@@ -1,9 +1,7 @@
-import subprocess
-import time
-import re
 import sys,getopt
 import json
 from  requests import get
+import copy
 
 
 kpis_results=dict()
@@ -39,7 +37,7 @@ def get_prometheus_data(url,queries):
                     kpis_results[kpi['type']][element_name]=dict()
                 
                 # Store KPI information with value obtained
-                kpis_results[kpi['type']][element_name][kpi_name]=kpi
+                kpis_results[kpi['type']][element_name][kpi_name]=copy.deepcopy(kpi)
 
                 # Store value of KPI obtained
                 kpis_results[kpi['type']][element_name][kpi_name]['value'] = result['value'][1]
