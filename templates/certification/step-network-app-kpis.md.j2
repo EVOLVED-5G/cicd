@@ -2,11 +2,11 @@
 # NETWORK APP KPIS
 ***
 
-This section will show all **{{name}}** Network Application with version **{{version}}** KPIs for all pods deployed.
+This section will show all **{{name}}** Network Application with version **{{version}}** related KPIs.
 
 &nbsp;
 
-## K8s Host KPIs
+## Network App Namespace KPIs
 | Host |
 {%- for instance_title, instance_formatted_title in instance_titles.items() -%}
  {{ instance_formatted_title }} |
@@ -29,7 +29,7 @@ This section will show all **{{name}}** Network Application with version **{{ver
 
 &nbsp;
 
-## Network App KPIs
+## Network App Pods KPIs
 | Service |
 {%- for pod_title, pod_title_formatted_value in pod_titles.items() -%}
  {{ pod_title_formatted_value }} |
