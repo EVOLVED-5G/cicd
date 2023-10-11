@@ -7,7 +7,7 @@
       "name": "\($RELEASE_NAME)",
       "chart": "../cd/helm/\($CHART_NAME)/",
       "namespace": "\($NAMESPACE)",
-      "atomic": true,
+      "atomic": false,
       "wait": true,
       "values": [
         "../cd/helm/nef/values.yaml",
