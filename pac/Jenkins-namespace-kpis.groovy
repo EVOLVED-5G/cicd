@@ -61,7 +61,7 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
-        string(name: 'NAMESPACE', defaultValue: 'network-app-123', description: 'Namespace to get KPIs')
+        // string(name: 'NAMESPACE', defaultValue: 'network-app-123', description: 'Namespace to get KPIs')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -82,7 +82,7 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        NAMESPACE = "${params.NAMESPACE}"
+        // NAMESPACE = "${params.NAMESPACE}"
         PROMETHEUS_QUERY_URL =getPrometheusUrl("${params.DEPLOYMENT}")
     }
 
@@ -134,6 +134,8 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     pip3 install -r utils/kpis/requirements.txt
+                    NAMESPACE=$(kubectl get namespaces|awk '/^network-app/{ print $1 }'|sort|uniq|tail -n 1)
+                    echo "${NAMESPACE}"
                     python3 utils/kpis/get_prometheus_stats.py -n ${NAMESPACE} -u ${PROMETHEUS_QUERY_URL} -o ${REPORT_FILENAME}.json
                     '''
                 }
