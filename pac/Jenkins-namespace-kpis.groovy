@@ -36,6 +36,16 @@ String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
+String getPrometheusUrl(deployment) {
+    String var = deployment
+    if ('kubernetes-athens'.equals(var)) {
+        return 'http://prometheus.mon.int:30048/api/v1/query'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'http://prometheus.mon.int/api/v1/query'
+    } else {
+        return ' '
+    }
+}
 
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
@@ -52,7 +62,6 @@ pipeline {
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
         string(name: 'NAMESPACE', defaultValue: 'network-app-123', description: 'Namespace to get KPIs')
-        string(name: 'PROMETHEUS_QUERY_URL', defaultValue: 'http://prometheus.mon.int:30048/api/v1/query', description: 'URL to query endpoing on prometheus')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -74,7 +83,7 @@ pipeline {
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
         NAMESPACE = "${params.NAMESPACE}"
-        PROMETHEUS_QUERY_URL = "${params.PROMETHEUS_QUERY_URL}"
+        PROMETHEUS_QUERY_URL =getPrometheusUrl("${params.DEPLOYMENT}")
     }
 
     stages {
