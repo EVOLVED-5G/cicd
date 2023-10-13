@@ -43,7 +43,7 @@ String getPrometheusUrl(deployment) {
     } else if ('kubernetes-cosmote'.equals(var)) {
         return 'http://prometheus.mon.int/api/v1/query'
     } else {
-        return ' '
+        return 'NONE'
     }
 }
 
@@ -95,9 +95,9 @@ pipeline {
                         error("This job will be only executed on Certification Stage.")
                         return
                     }
-                    if( "${DEPLOYMENT}" != 'kubernetes-athens') {
+                    if( "${PROMETHEUS_QUERY_URL}" == 'NONE') {
                         currentBuild.result = 'ABORTED'
-                        error("This job can be only executed on Athens Stage.")
+                        error("This job can't be executed on ${DEPLOYMENT} Environment.")
                         return
                     }
                 }
