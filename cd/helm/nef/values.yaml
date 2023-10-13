@@ -18,6 +18,7 @@ backend:
     imagePullPolicy: Always
   ingress:
     host: localization-nef.apps.ocp-epg.hi.inet
+    domainName: localization-nef.apps.ocp-epg.hi.inet
   ports:
   - port: 80
     protocol: TCP

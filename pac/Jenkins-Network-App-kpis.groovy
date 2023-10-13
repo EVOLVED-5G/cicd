@@ -29,17 +29,22 @@ def getAgent(deployment) {
 }
 
 def getReportFilename(String netappNameLower) {
-    return '000-report-platform-assesment-' + netappNameLower
+    return '000-report-kpis-' + netappNameLower
 }
 
 String getArtifactoryUrl(phase) {
     return 'http://artifactory.hi.inet/artifactory/misc-evolved5g/' + phase
 }
 
-
-String getHost(String url) {
-    String host = url.split('/')[2].split(':')[0]
-    return host
+String getPrometheusUrl(deployment) {
+    String var = deployment
+    if ('kubernetes-athens'.equals(var)) {
+        return 'http://prometheus.mon.int:30048/api/v1/query'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'http://prometheus.mon.int/api/v1/query'
+    } else {
+        return 'NONE'
+    }
 }
 
 pipeline {
@@ -56,8 +61,6 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
-        string(name: 'ELCM_URL', defaultValue: 'http://10.11.23.220:5551/elcm/api/v1', description: 'URL to ELCM')
-        string(name: 'ANALYTICS_URL', defaultValue: 'http://10.11.23.220:5003', description: 'URL to Analytics')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -78,10 +81,7 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        ELCM_URL = "${params.ELCM_URL}"
-        ANALYTICS_URL = "${params.ANALYTICS_URL}"
-        ELCM_HOST = getHost(ELCM_URL)
-        ANALYTICS_HOST = getHost(ANALYTICS_URL)
+        PROMETHEUS_QUERY_URL =getPrometheusUrl("${params.DEPLOYMENT}")
     }
 
     stages {
@@ -93,9 +93,9 @@ pipeline {
                         error("This job will be only executed on Certification Stage.")
                         return
                     }
-                    if( "${DEPLOYMENT}" != 'kubernetes-uma') {
+                    if( "${PROMETHEUS_QUERY_URL}" == 'NONE') {
                         currentBuild.result = 'ABORTED'
-                        error("This job can be only executed on UMA Stage.")
+                        error("This job can't be executed on ${DEPLOYMENT} Environment.")
                         return
                     }
                 }
@@ -126,23 +126,15 @@ pipeline {
                 }
             }
         }
-        stage('Check the connectivity with UMA ECLM') {
-            steps {
-                dir ("${env.WORKSPACE}") {
-                    sh '''
-                    ping -c 3 ${ELCM_HOST}
-                    ping -c 3 ${ANALYTICS_HOST}
-                    '''
-                }
-            }
-        }
 
-        stage('Execute the Experiment in the platform') {
+        stage('Get KPIs of namespace') {
             steps {
                 dir ("${env.WORKSPACE}") {
                     sh '''
-                    pip3 install -r utils/platform_assesment/requirements.txt
-                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json
+                    pip3 install -r utils/kpis/requirements.txt
+                    NAMESPACE=$(kubectl get namespaces|awk '/^network-app/{ print $1 }'|sort|uniq|tail -n 1)
+                    echo "${NAMESPACE}"
+                    python3 utils/kpis/get_prometheus_stats.py -n ${NAMESPACE} -u ${PROMETHEUS_QUERY_URL} -o ${REPORT_FILENAME}.json
                     '''
                 }
             }
@@ -162,7 +154,7 @@ pipeline {
                                 urlT=https://github.com/EVOLVED-5G/$NETAPP_NAME_LOWER/wiki/Telefonica-Evolved5g-$NETAPP_NAME_LOWER
                                 versionT=${VERSION}
 
-                                python3 utils/report_generator.py --template templates/${STAGE}/step-platform-assessment.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME --logs ${NETAPP_NAME_LOWER}-build-runtime_error.log
+                                python3 utils/report_generator.py --template templates/${STAGE}/step-network-app-kpis.md.j2 --json ${REPORT_FILENAME}.json --output $REPORT_FILENAME.md --repo ${GIT_NETAPP_URL} --branch ${GIT_NETAPP_BRANCH} --commit $commit --version $versionT --url $urlT --name $NETAPP_NAME --logs ${NETAPP_NAME_LOWER}-build-runtime_error.log
                                 docker run --rm -v "$WORKSPACE":$DOCKER_PATH ${PDF_GENERATOR_IMAGE_NAME}:${PDF_GENERATOR_VERSION} markdown-pdf -f A4 -b 1cm -s $DOCKER_PATH/utils/docker_generate_pdf/style.css -o $DOCKER_PATH/$REPORT_FILENAME.pdf $DOCKER_PATH/$REPORT_FILENAME.md
                                 declare -a files=("json" "md" "pdf")
 

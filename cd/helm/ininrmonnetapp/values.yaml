@@ -2,6 +2,9 @@
 # -- The Environment variable. It accepts: 'kuberentes-athens', 'kuberentes-uma', 'openshift'
 environment: "openshift"
 
+# pipeline. It accepts: validation, certification or verification
+pipeline: verification
+
 # -- If env: 'kuberentes-athens' or env: 'kuberentes-uma', use the Ip address dude for the kubernetes to your Ingress Controller ej: kubectl -n NAMESPACE_CAPIF get ing s
 ingress_ip: 
     athens: "10.161.1.126"
@@ -28,16 +31,15 @@ env:
   netAppName: test
   environmentMode: production
   tsnAddress: my-tsn.apps.ocp-epg.hi.inet
+  endpointTest: True
 
 netapp:
   replicas: 1
   rmonnetapp:
-    # -- The docker image repository to use
     image:
-      repository: "709233559969.dkr.ecr.eu-central-1.amazonaws.com/evolved5gvalidation:ininrmonnetapp"
       # -- The docker image tag to use
       # -- @default Chart version
-      tag: ""
+      tag: "ininrmonnetapp-ininrmonnetapp_rmonnetapp_1"
   ports:
   - name: "netapp"
     port: 80

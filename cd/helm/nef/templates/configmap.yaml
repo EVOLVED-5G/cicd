@@ -14,7 +14,7 @@ data:
   DOCKER_IMAGE_FRONTEND: {{ .Values.env.dockerImageFrontend | quote }}
   DOCKER_IMAGE_PROXY: {{ .Values.env.dockerImageProxy | quote }}
   DOMAIN: {{ .Values.env.domain | quote }}
-  DOMAIN_NAME: {{ .Values.backend.ingress.host | quote }}
+  DOMAIN_NAME: {{ .Values.backend.ingress.domainName | quote }}
   EMAILS_FROM_EMAIL: {{ .Values.env.emailsFromEmail | quote }}
   EXTERNAL_NET: {{ .Values.env.externalNet | quote }}
   FIRST_SUPERUSER: {{ .Values.env.firstSuperuser | quote }}

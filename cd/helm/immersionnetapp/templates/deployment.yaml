@@ -90,8 +90,11 @@ spec:
           value: {{ quote .Values.env.netappServerVapp }}
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.immNetappContainer.image.repository }}-{{ .Values.netapp.immNetappContainer.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "immersion.baseRepo" . }}:{{ .Values.netapp.immNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "immersion.baseRepo" . }}{{- include "immersion.pipeline" . }}:{{ .Values.netapp.immNetappContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: imm-netapp-container
         ports:

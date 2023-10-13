@@ -88,6 +88,7 @@ pipeline {
                             '''
                         } catch (e) {
                             echo "The NEF Services logs are not present in CAPIF"
+                            sh "exit 1"
                         }
                     }
                 }
@@ -140,6 +141,7 @@ pipeline {
                             '''
                         } catch (e) {
                             echo "The NEF Services logs are not present in CAPIF"
+                            sh "exit 1"
                         }
                     }
                 }

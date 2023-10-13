@@ -4,9 +4,40 @@
 
 This step show results of platform assessment measures.
 
+## One-Way Delay (ns) - TSN scenario
+| Indicator          | Value      | Confidence Interval |
+| :----------------- | :--------- | :------------------ |
+| 25% Percentile     | 5636150.39 | 235867.39           |
+| 5% Percentile      | 5485145.36 | 252703.17           |
+| 75% Percentile     | 6171831.91 | 367331.07           |
+| 95% Percentile     | 6482334.64 | 344746.05           |
+| Max                | 7455185.73 | 1105994.33          |
+| Mean               | 5918610.89 | 268066.77           |
+| Median             | 5899707.63 | 308110.15           |
+| Min                | 5336491.35 | 204376.80           |
+| Standard Deviation | 387955.97  | 124961.22           |
+
+&nbsp;
+
+## Jitter (ns) - TSN scenario
+| Indicator          | Value      | Confidence Interval |
+| :----------------- | :--------- | :------------------ |
+| 25% Percentile     | 922242.65  | 202034.36           |
+| 5% Percentile      | 712654.77  | 137255.15           |
+| 75% Percentile     | 1391197.28 | 222058.36           |
+| 95% Percentile     | 1622248.64 | 155953.38           |
+| Max                | 1988893.58 | 171223.24           |
+| Mean               | 1126875.32 | 167678.41           |
+| Median             | 1037233.30 | 213507.84           |
+| Min                | 606141.43  | 133045.07           |
+| Standard Deviation | 331972.47  | 76597.79            |
+
+&nbsp;
+
 {% if KPIs|length > 0 %}
 {%- for type, kpi_info in KPIs.items() %}
 {%- if type == 'NoType' %}
+&nbsp;
 ## Kpi not categorized
 {%- else %}
 ## Kpi type {{ type }}

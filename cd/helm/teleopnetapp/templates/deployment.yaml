@@ -74,8 +74,11 @@ spec:
           value: {{ quote .Values.env.capifPortHttps }}
         - name: CALLBACK_ADDRESS
           value: http://{{ .Values.env.frontendAddress }}
-        image: {{ .Values.netapp.teleopNetapp.image.repository }}-{{ .Values.netapp.teleopNetapp.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "teleop.baseRepo" . }}:{{ .Values.netapp.teleopNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "teleop.baseRepo" . }}{{- include "teleop.pipeline" . }}:{{ .Values.netapp.teleopNetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: teleopnetapp
         ports:

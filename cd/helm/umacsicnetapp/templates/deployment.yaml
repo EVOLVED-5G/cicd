@@ -134,8 +134,11 @@ spec:
               name: {{ include "umacsic.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.db.postgresContainer.image.repository }}-{{ .Values.db.postgresContainer.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "umacsic.baseRepo" . }}:{{ .Values.db.postgresContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "umacsic.baseRepo" . }}{{- include "umacsic.pipeline" . }}:{{ .Values.db.postgresContainer.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         name: postgres-container
         ports:
         - containerPort: {{ .Values.env.postgresPort }}
@@ -293,8 +296,11 @@ spec:
               name: {{ include "umacsic.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.netapp.image.repository }}-{{ .Values.netapp.netapp.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "umacsic.baseRepo" . }}:{{ .Values.netapp.netapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "umacsic.baseRepo" . }}{{- include "umacsic.pipeline" . }}:{{ .Values.netapp.netapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         name: netapp
         ports:
         - containerPort: 10001

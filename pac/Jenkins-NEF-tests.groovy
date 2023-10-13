@@ -242,6 +242,8 @@ pipeline{
 
             script {
                 echo "Deleting directories."
+                sh "sudo chown contint:contint -R nef_validation"
+                sh "sudo rm -rf nef_validation"
                 cleanWs deleteDirs: true
             }
             echo "Done."

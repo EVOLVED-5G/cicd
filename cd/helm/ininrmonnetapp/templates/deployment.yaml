@@ -52,11 +52,16 @@ spec:
       {{- end }}
       containers:
       - env:
+        - name: ENDPOINT_TEST
+          valueFrom:
+            configMapKeyRef:
+              key: ENDPOINT_TEST
+              name: {{ include "inin.fullname" . }}-env
         - name: ENVIRONMENT_MODE
           valueFrom:
             configMapKeyRef:
               key: ENVIRONMENT_MODE
-              name: env
+              name: {{ include "inin.fullname" . }}-env
         - name: CALLBACK_ADDRESS
           valueFrom:
             configMapKeyRef:
@@ -139,8 +144,11 @@ spec:
               name: {{ include "inin.fullname" . }}-env
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
-        image: {{ .Values.netapp.rmonnetapp.image.repository }}-{{ .Values.netapp.rmonnetapp.image.tag
-          | default .Chart.AppVersion }}
+        {{- if eq .Values.pipeline "verification" }}
+        image: {{- include "inin.baseRepo" . }}:{{ .Values.netapp.rmonnetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- else }}
+        image: {{- include "inin.baseRepo" . }}{{- include "inin.pipeline" . }}:{{ .Values.netapp.rmonnetapp.image.tag }}-{{ .Chart.AppVersion }}
+        {{- end }}
         imagePullPolicy: Always
         name: rmonnetapp
         ports:
