@@ -17,6 +17,8 @@ This step show results of platform assessment measures.
 | Min                | 5336491.35 | 204376.80           |
 | Standard Deviation | 387955.97  | 124961.22           |
 
+&nbsp;
+
 ## Jitter (ns) - TSN scenario
 | Indicator          | Value      | Confidence Interval |
 | :----------------- | :--------- | :------------------ |
@@ -30,9 +32,12 @@ This step show results of platform assessment measures.
 | Min                | 606141.43  | 133045.07           |
 | Standard Deviation | 331972.47  | 76597.79            |
 
+&nbsp;
+
 {% if KPIs|length > 0 %}
 {%- for type, kpi_info in KPIs.items() %}
 {%- if type == 'NoType' %}
+&nbsp;
 ## Kpi not categorized
 {%- else %}
 ## Kpi type {{ type }}
