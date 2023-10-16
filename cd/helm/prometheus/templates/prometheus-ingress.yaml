@@ -1,0 +1,34 @@
+{{- if eq .Values.prometheus.enable "true" }}
+{{- if .Values.prometheus.ingress.enabled -}}
+{{- $svcPort := .Values.prometheus.service.port -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-ingress
+  labels:
+    {{- include "prometheus.labels" . | nindent 4 }}
+  {{- with .Values.prometheus.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+{{- if .Values.prometheus.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.prometheus.ingress.ingressClassName }}
+{{- end }}
+  rules:
+    {{- range .Values.prometheus.ingress.hosts }}
+  - host: {{ .host | quote }}
+    http:
+      paths:
+        {{- range .paths }}
+        - path: {{ .path }}
+          pathType: {{ .pathType }}
+          backend:
+            service:
+              name: prometheus
+              port:
+                number: {{ $svcPort }}
+        {{- end }}
+    {{- end }}
+{{- end }}
+{{- end }}

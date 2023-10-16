@@ -1,0 +1,20 @@
+{{- if eq .Values.prometheus.enable "true" }}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/path: /metrics
+    prometheus.io/port: {{ quote .Values.prometheus.service.port }}
+    prometheus.io/scrape: "true"
+  name: prometheus
+  labels:
+    {{- include "prometheus.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.prometheus.service.type }}
+  ports:
+  - port: {{ .Values.prometheus.service.port }}
+    protocol: TCP
+    targetPort: {{ .Values.prometheus.service.port }}
+  selector:
+    app: prometheus
+{{- end }}
