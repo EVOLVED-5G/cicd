@@ -40,7 +40,7 @@ pipeline {
 
     environment {
         RELEASE_NAME = "${params.RELEASE_NAME}"
-        REPORT_FILENAME = '006-report-nef-logging'
+        REPORT_FILENAME = '060-report-nef-logging'
         ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         NETAPP_NAME = netappName("${params.GIT_NETAPP_URL}")
         NETAPP_NAME_LOWER = NETAPP_NAME.toLowerCase()

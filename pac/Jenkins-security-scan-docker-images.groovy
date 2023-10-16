@@ -60,7 +60,7 @@ pipeline {
         STAGE = getPath("${params.STAGE}")
         ARTIFACTORY_URL = "http://artifactory.hi.inet/artifactory/misc-evolved5g/${params.STAGE}"
         DOCKER_PATH = '/usr/src/app'
-        REPORT_FILENAME = '005-report-tr-img'
+        REPORT_FILENAME = '050-report-tr-img'
         REPORT_FILENAME_PREFIX = '005'
         REPORT_FILENAME_SUFFIX = '-report-tr-img'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'

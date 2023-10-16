@@ -60,11 +60,95 @@ def getDeployReportFilename(String netappNameLower) {
     return '019-report-deploy-' + netappNameLower
 }
 
+
+def umaValidation(env){
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: false,
+        parameters: [
+            string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(env.GIT_NETAPP_BRANCH)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
+            string(name: 'ELCM_URL', value: String.valueOf(env.ELCM_URL)),
+            string(name: 'ANALYTICS_URL', value: String.valueOf(env.ANALYTICS_URL)),
+            booleanParam(name: 'REPORTING', value: String.valueOf(env.REPORTING)),
+            booleanParam(name: 'SEND_DEV_MAIL', value: false)
+            ]
+    return jobBuild
+}
+
+def obtainNetworkAppKPIs(env){
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-Obtain Network App KPIs', wait: true, propagate: false,
+        parameters: [
+            string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(env.GIT_NETAPP_BRANCH)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
+            booleanParam(name: 'REPORTING', value: String.valueOf(env.REPORTING)),
+            booleanParam(name: 'SEND_DEV_MAIL', value: false)
+            ]
+    return jobBuild
+}
+
+def staticCodeAnalysis(env) {
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
+        parameters: [
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(env.GIT_NETAPP_BRANCH)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            booleanParam(name: 'REPORTING', value: String.valueOf(env.REPORTING)),
+            booleanParam(name: 'SEND_DEV_MAIL', value: false)
+            ]
+    return jobBuild
+}
+
+def capifValidation(env) {
+     def jobBuild = build job: '003-NETAPPS/003-Helpers/021-CAPIF Validation Tests', wait: true, propagate: false,
+        parameters: [
+            string(name: 'BRANCH_NAME', value: String.valueOf(env.CAPIF_TESTS_BRANCH)),
+            booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
+            string(name: 'CAPIF_HOSTNAME', value: String.valueOf(env.HOSTNAME_CAPIF)),
+            string(name: 'CAPIF_PORT', value: String.valueOf(env.CAPIF_PORT)),
+            string(name: 'CAPIF_TLS_PORT', value: String.valueOf(env.CAPIF_TLS_PORT)),
+            string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH))
+            ]
+    return jobBuild
+}
+
+def nefValidation(env) {
+    def jobBuild = build job: '003-NETAPPS/003-Helpers/022-NEF Validation Tests', wait: true, propagate: false,
+        parameters: [
+            string(name: 'CAPIF_HOST', value: String.valueOf(env.HOSTNAME_CAPIF)),
+            string(name: 'CAPIF_HTTP_PORT', value: String.valueOf(env.CAPIF_PORT)),
+            string(name: 'CAPIF_HTTPS_PORT', value: String.valueOf(env.CAPIF_TLS_PORT)),
+            string(name: 'NEF_API_HOSTNAME', value: String.valueOf(env.NEF_API_HOSTNAME)),
+            string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH))]
+    return jobBuild
+}
+
 def step_platform_assessment = 'platform-assessment'
 def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
+def step_network_app_kpis = 'network-app-kpis'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
 // def step_validate_capif = 'validate-capif'
@@ -142,6 +226,7 @@ pipeline {
                     buildResults['steps'][step_security_scan_code] = initial_status
                     buildResults['steps'][step_security_scan_secrets] = initial_status
                     buildResults['steps'][step_build] = initial_status
+                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     // buildResults['steps'][step_validate_capif] = initial_status
@@ -157,20 +242,7 @@ pipeline {
                     script {
                         def step_name = step_platform_assessment
                         buildResults['steps'][step_name] = 'FAILURE'
-                        def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: false,
-                            parameters: [
-                                string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                                string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                                string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                string(name: 'ELCM_URL', value: String.valueOf(ELCM_URL)),
-                                string(name: 'ANALYTICS_URL', value: String.valueOf(ANALYTICS_URL)),
-                                booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                booleanParam(name: 'SEND_DEV_MAIL', value: false)
-                                ]
+                        def jobBuild = umaValidation(env)
                         def jobResult = jobBuild.getResult()
                         echo "Build of 'Performance Assesment at platform' returned result: ${jobResult}"
                         buildResults['steps'][step_name] = jobResult
@@ -186,16 +258,7 @@ pipeline {
                             script {
                                 def step_name = step_static_code_analysis
                                 buildResults['steps'][step_name] = 'FAILURE'
-                                def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
-                                    parameters: [
-                                        string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                        string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                        booleanParam(name: 'SEND_DEV_MAIL', value: false)
-                                        ]
+                                def jobBuild = staticCodeAnalysis(env)
                                 def jobResult = jobBuild.getResult()
                                 echo "Build of 'Static Code Analysis' returned result: ${jobResult}"
                                 buildResults['steps'][step_name] = jobResult
@@ -281,24 +344,24 @@ pipeline {
                         retry(2) {
                             script {
                                 def step_name = step_build
-                                // buildResults['steps'][step_name] = 'FAILURE'
-                                // def jobBuild = build job: '003-NETAPPS/003-Helpers/004-Build Network App', wait: true, propagate: true,
-                                //     parameters: [
-                                //         string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                                //         string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                                //         string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
-                                //         string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
-                                //         string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                                //         string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                                //         string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                                //         booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
-                                //         booleanParam(name: 'SEND_DEV_MAIL', value: false)
-                                //         ]
-                                // def jobResult = jobBuild.getResult()
-                                // echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
-                                // buildResults['steps'][step_name] = jobResult
-                                buildResults['steps'][step_name] = 'SUCCESS'
-                                echo "BUILD NOT EXECUTED, TESTING PURPOUSE"
+                                buildResults['steps'][step_name] = 'FAILURE'
+                                def jobBuild = build job: '003-NETAPPS/003-Helpers/004-Build Network App', wait: true, propagate: true,
+                                    parameters: [
+                                        string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
+                                        string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
+                                        string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(GIT_NETAPP_BRANCH)),
+                                        string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH)),
+                                        string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
+                                        string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
+                                        string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
+                                        booleanParam(name: 'REPORTING', value: String.valueOf(REPORTING)),
+                                        booleanParam(name: 'SEND_DEV_MAIL', value: false)
+                                        ]
+                                def jobResult = jobBuild.getResult()
+                                echo "Build of '$NETAPP_NAME' returned result: ${jobResult}"
+                                buildResults['steps'][step_name] = jobResult
+                                // buildResults['steps'][step_name] = 'SUCCESS'
+                                // echo "BUILD NOT EXECUTED, TESTING PURPOUSE"
                             }
                         }
                         retry(2) {
@@ -450,11 +513,11 @@ pipeline {
                             echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
                                 sh '''#!/bin/bash
-                                result_file="006-report-nef-logging.json"
+                                result_file="060-report-nef-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
                                 curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
-                                def fileName = '006-report-nef-logging.json'
+                                def fileName = '060-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
                                     buildResults[useOf5gApis][2] = [:]
@@ -483,11 +546,11 @@ pipeline {
                             echo "Build of 'TSN Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
                                 sh '''#!/bin/bash
-                                result_file="006-report-tsn-logging.json"
+                                result_file="060-report-tsn-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
                                 curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
-                                def fileName = '006-report-tsn-logging.json'
+                                def fileName = '060-report-tsn-logging.json'
                                 if (fileExists(fileName)) {
                                     def tsn_services_check_results = readJSON file: fileName
                                     buildResults[useOf5gApis][3] = [:]
@@ -504,26 +567,9 @@ pipeline {
         stage('Certification: Validate CAPIF') {
             steps {
                 script {
-                    // def step_name = step_validate_capif
-                    def jobBuild = build job: '003-NETAPPS/003-Helpers/021-CAPIF Validation Tests', wait: true, propagate: false,
-                        parameters: [
-                            string(name: 'BRANCH_NAME', value: String.valueOf(CAPIF_TESTS_BRANCH)),
-                            booleanParam(name: 'RUN_LOCAL_CAPIF', value: false),
-                            string(name: 'CAPIF_HOSTNAME', value: String.valueOf(HOSTNAME_CAPIF)),
-                            string(name: 'CAPIF_PORT', value: String.valueOf(CAPIF_PORT)),
-                            string(name: 'CAPIF_TLS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
-                            string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-                            string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-                            string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-                            string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-                            string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-                            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))
-                            ]
-
+                    def jobBuild = capifValidation(env)
                     def jobResult = jobBuild.getResult()
                     echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-
-                    // buildResults['steps'][step_name] = jobResult
                     if (jobResult == 'FAILURE') {
                         buildResults['tests_ok'] = false
                         currentBuild.result = 'ABORTED'
@@ -533,34 +579,36 @@ pipeline {
                 }
             }
         }
-        // stage('Certification: Validate NEF') {
-        //     steps {
-        //         script {
-        //             def jobBuild = build job: '003-NETAPPS/003-Helpers/022-NEF Validation Tests', wait: true, propagate: false,
-        //                 parameters: [
-        //                     string(name: 'CAPIF_HOST', value: String.valueOf(HOSTNAME_CAPIF)),
-        //                     string(name: 'CAPIF_HTTP_PORT', value: String.valueOf(CAPIF_PORT)),
-        //                     string(name: 'CAPIF_HTTPS_PORT', value: String.valueOf(CAPIF_TLS_PORT)),
-        //                     string(name: 'NEF_API_HOSTNAME', value: String.valueOf(NEF_API_HOSTNAME)),
-        //                     string(name: 'DEPLOYMENT', value: String.valueOf(ENVIRONMENT)),
-        //                     string(name: 'BUILD_ID', value: String.valueOf(BUILD_NUMBER)),
-        //                     string(name: 'STAGE', value: String.valueOf(PHASE_LOWER)),
-        //                     string(name: 'VERSION', value: String.valueOf(VERSION_NETAPP)),
-        //                     string(name: 'GIT_NETAPP_URL', value: String.valueOf(GIT_NETAPP_URL)),
-        //                     string(name: 'GIT_CICD_BRANCH', value: String.valueOf(GIT_CICD_BRANCH))
-        //                     ]
+        stage('Certification: Validate NEF') {
+            steps {
+                script {
+                    def jobBuild = nefValidation(env)
+                    def jobResult = jobBuild.getResult()
+                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                    if (jobResult == 'FAILURE') {
+                        buildResults['tests_ok'] = false
+                        currentBuild.result = 'ABORTED'
+                        aborted = true
+                        error('NEF is not working properly, abort pipeline')
+                    }
+                }
+            }
+        }
 
-        //             def jobResult = jobBuild.getResult()
-        //             echo "Build of 'Validate NEF' returned result: ${jobResult}"
-        //             if (jobResult == 'FAILURE') {
-        //                 buildResults['tests_ok'] = false
-        //                 currentBuild.result = 'ABORTED'
-        //                 aborted = true
-        //                 error('NEF is not working properly, abort pipeline')
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Certification: Network App KPIs') {
+            steps {
+                retry(2) {
+                    script {
+                        def step_name = step_network_app_kpis
+                        buildResults['steps'][step_name] = 'FAILURE'
+                        def jobBuild = obtainNetworkAppKPIs(env)
+                        def jobResult = jobBuild.getResult()
+                        echo "Build of 'Network App KPIs' returned result: ${jobResult}"
+                        buildResults['steps'][step_name] = jobResult
+                    }
+                }
+            }
+        }
 
         stage('Certification: Check Tests results') {
             steps {

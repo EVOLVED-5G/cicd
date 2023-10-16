@@ -50,7 +50,7 @@ pipeline {
         DOCKER_PATH = '/usr/src/app'
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        USE_5G_APIS_REPORT_FILENAME = '006-report-use-of-5g-api'
+        USE_5G_APIS_REPORT_FILENAME = '060-report-use-of-5g-api'
     }
 
     stages {
