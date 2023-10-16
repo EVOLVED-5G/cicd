@@ -40,7 +40,7 @@ def getAgent(deployment) {
 }
 
 def getReportFilename(String netappNameLower) {
-    return '004-report-build-' + netappNameLower
+    return '040-report-build-' + netappNameLower
 }
 
 String getArtifactoryUrl(phase) {

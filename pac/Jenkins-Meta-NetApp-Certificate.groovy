@@ -79,6 +79,22 @@ def umaValidation(env){
     return jobBuild
 }
 
+def obtainNetworkAppKPIs(env){
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-Obtain Network App KPIs', wait: true, propagate: false,
+        parameters: [
+            string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
+            string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
+            string(name: 'GIT_NETAPP_BRANCH', value: String.valueOf(env.GIT_NETAPP_BRANCH)),
+            string(name: 'GIT_CICD_BRANCH', value: String.valueOf(env.GIT_CICD_BRANCH)),
+            string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
+            string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
+            string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
+            booleanParam(name: 'REPORTING', value: String.valueOf(env.REPORTING)),
+            booleanParam(name: 'SEND_DEV_MAIL', value: false)
+            ]
+    return jobBuild
+}
+
 def staticCodeAnalysis(env) {
     def jobBuild = build job: '/003-NETAPPS/003-Helpers/001-Static Code Analysis', wait: true, propagate: true,
         parameters: [
@@ -132,6 +148,7 @@ def step_static_code_analysis = 'source-code-static-analysis'
 def step_security_scan_code = 'source-code-security-analysis'
 def step_security_scan_secrets = 'source-code-secrets-leakage'
 def step_build = 'network-app-build-and-port-check'
+def step_network_app_kpis = 'network-app-kpis'
 def step_security_scan_docker_images = 'image-security-analysis'
 def step_deploy_capif_nef_netapp = 'deploy-network-app'
 // def step_validate_capif = 'validate-capif'
@@ -209,6 +226,7 @@ pipeline {
                     buildResults['steps'][step_security_scan_code] = initial_status
                     buildResults['steps'][step_security_scan_secrets] = initial_status
                     buildResults['steps'][step_build] = initial_status
+                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
                     buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     // buildResults['steps'][step_validate_capif] = initial_status
@@ -495,11 +513,11 @@ pipeline {
                             echo "Build of 'NEF Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
                                 sh '''#!/bin/bash
-                                result_file="006-report-nef-logging.json"
+                                result_file="060-report-nef-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
                                 curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
-                                def fileName = '006-report-nef-logging.json'
+                                def fileName = '060-report-nef-logging.json'
                                 if (fileExists(fileName)) {
                                     def nef_services_check_results = readJSON file: fileName
                                     buildResults[useOf5gApis][2] = [:]
@@ -528,11 +546,11 @@ pipeline {
                             echo "Build of 'TSN Services logged at CAPIF' returned result: ${jobResult}"
                             if (jobResult == 'SUCCESS') {
                                 sh '''#!/bin/bash
-                                result_file="006-report-tsn-logging.json"
+                                result_file="060-report-tsn-logging.json"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME_LOWER/$BUILD_ID/$result_file"
                                 curl  -f $url -u $ARTIFACTORY_CRED -o $result_file || echo "No result obtained"
                                 '''
-                                def fileName = '006-report-tsn-logging.json'
+                                def fileName = '060-report-tsn-logging.json'
                                 if (fileExists(fileName)) {
                                     def tsn_services_check_results = readJSON file: fileName
                                     buildResults[useOf5gApis][3] = [:]
@@ -572,6 +590,21 @@ pipeline {
                         currentBuild.result = 'ABORTED'
                         aborted = true
                         error('NEF is not working properly, abort pipeline')
+                    }
+                }
+            }
+        }
+
+        stage('Certification: Network App KPIs') {
+            steps {
+                retry(2) {
+                    script {
+                        def step_name = step_network_app_kpis
+                        buildResults['steps'][step_name] = 'FAILURE'
+                        def jobBuild = obtainNetworkAppKPIs(env)
+                        def jobResult = jobBuild.getResult()
+                        echo "Build of 'Network App KPIs' returned result: ${jobResult}"
+                        buildResults['steps'][step_name] = jobResult
                     }
                 }
             }

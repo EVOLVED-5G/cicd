@@ -18,7 +18,7 @@ def getAgent(deployment) {
 }
 
 def getReportFilename(String netappNameLower) {
-    return '003-report-licenses-repo-' + netappNameLower
+    return '030-report-licenses-repo-' + netappNameLower
 }
 
 pipeline {
