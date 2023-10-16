@@ -1,0 +1,38 @@
+prometheus:
+    # -- With prometheus.enabled: "". It won't be deployed. prometheus.enable: "true"
+    # -- It will deploy prometheus
+    enable: "true"
+    image: 
+      # -- The docker image repository to use
+      repository: "prom/prometheus"
+      # -- The docker image tag to use
+      # @default Chart version
+      tag: "latest"
+    resources: {}
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+    persistence:
+      enable: ""
+      storage: 1Gi
+    service:
+      type: ClusterIP
+      port: 9090
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        # kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+      hosts:
+        - host: prometheus.mon.int
+          paths:
+            - path: /
+              pathType: Prefix
+      tls: []
+      #  - secretName: chart-example-tls
+      #    hosts:
+      #      - chart-example.local

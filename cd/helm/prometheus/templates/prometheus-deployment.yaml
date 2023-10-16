@@ -1,0 +1,60 @@
+{{- if eq .Values.prometheus.enable "true" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  labels:
+    app: prometheus
+    {{- include "prometheus.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      {{- include "prometheus.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/prometheus-configmap.yaml") . | sha256sum }}
+      labels:
+        app: prometheus
+        {{- include "prometheus.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: prometheus
+      containers:
+      - name: prometheus
+        image: {{ .Values.prometheus.image.repository }}:{{ .Values.prometheus.image.tag }}
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml"
+        - "--storage.tsdb.path=/prometheus/"
+        - "--storage.tsdb.retention.time=2h"
+        ports:
+        - containerPort: 9090
+        resources:
+          {{- toYaml .Values.prometheus.resources | nindent 12 }}
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - name: prometheus-config
+          mountPath: /etc/prometheus/
+        {{- if eq .Values.prometheus.persistence.enable "true" }}
+        - name: prometheus-storage-volume
+          mountPath: /prometheus/
+        {{ else }}
+        - name: prometheus-storage
+          mountPath: /prometheus/
+        {{- end }}
+      volumes:
+      - name: prometheus-config
+        configMap:
+          defaultMode: 420
+          name: prometheus-config
+      {{- if eq .Values.prometheus.persistence.enable "true" }}
+      - name: prometheus-storage-volume
+        persistentVolumeClaim:
+          claimName: prometheus-pvc
+      {{ else }}
+      - name: prometheus-storage
+        emptyDir: {}
+      {{- end }}
+{{- end }}
