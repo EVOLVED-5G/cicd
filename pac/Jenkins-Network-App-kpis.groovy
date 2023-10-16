@@ -42,6 +42,8 @@ String getPrometheusUrl(deployment) {
         return 'http://prometheus.mon.int:30048/api/v1/query'
     } else if ('kubernetes-cosmote'.equals(var)) {
         return 'http://prometheus.mon.int/api/v1/query'
+    } else if ('kubernetes-uma') {
+        return 'http://10.11.23.50:8080/api/v1/query'
     } else {
         return 'NONE'
     }
