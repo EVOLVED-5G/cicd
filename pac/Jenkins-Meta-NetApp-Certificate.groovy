@@ -676,24 +676,7 @@ pipeline {
                 }
             }
             dir("${env.WORKSPACE}/") {
-                sh '''#!/bin/bash
-                UUID=$(uuidgen)
-                echo $UUID
-                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
-
-                cat $FINGERPRINT_FILENAME
-
-                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                --data-binary @"$FINGERPRINT_FILENAME" \
-                "$url"
-                '''
                 script {
-                    def fileName = getFingerprintFilename()
-                    if (fileExists(fileName)) {
-                        def fingerprint = readJSON file: fileName
-                        buildResults['fingerprint'] = fingerprint
-                    }
                     buildResults['environment'] = String.valueOf(ENVIRONMENT)
                     buildResults['build_number'] = String.valueOf(BUILD_NUMBER)
                     buildResults['result'] = currentBuild.currentResult
@@ -705,19 +688,39 @@ pipeline {
                     } else {
                         if (buildResults['tests_executed']) {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
+                            sh '''#!/bin/bash
+                            UUID=$(uuidgen)
+                            echo $UUID
+                            jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
+
+                            cat $FINGERPRINT_FILENAME
+
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$FINGERPRINT_FILENAME" \
+                            "$url"
+                            '''
                         }
                     }
+
+                    def fileName = getFingerprintFilename()
+                    if (fileExists(fileName)) {
+                        def fingerprint = readJSON file: fileName
+                        buildResults['fingerprint'] = fingerprint
+                    }
+
                     buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
                     writeFile file: "report-steps-${env.NETAPP_NAME_LOWER}.json", text: JsonOutput.toJson(buildResults)
+                    
+                    sh '''#!/bin/bash
+                    report_file="report-steps-$NETAPP_NAME_LOWER.json"
+                    url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
+                    curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                    --data-binary @"$report_file" \
+                    "$url"
+                    '''
                 }
-                sh '''#!/bin/bash
-                report_file="report-steps-$NETAPP_NAME_LOWER.json"
-                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$report_file"
-                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                --data-binary @"$report_file" \
-                "$url"
-                '''
             }
             retry(3) {
                 script {
