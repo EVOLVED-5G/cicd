@@ -1,10 +1,18 @@
 
-# Platform Assessment
+# PLATFORM ASSESSMENT
 ***
 
 This step show results of platform assessment measures.
 
-## One-Way Delay (ns) - TSN scenario
+## TSN experiments
+
+Delay and jitter experiments were carried out using predefined test case templates: UMA_TSN_OWD and UMA_TSN_Jitter, 
+which corresponds to the evaluation of the Downlink One-Way Delay (OWD) and jitter on the TSN over 5G architecture, respectively.
+
+
+### One-Way Delay (ns) - TSN scenario
+This test evaluates the One-Way Delay (OWD) of a TSN over 5G SA network. The main goal of this test is to assess the end-to-end delay of the TSN over 5G infrastructure that lays on the UMA platform. 
+
 | Indicator          | Value      | Confidence Interval |
 | :----------------- | :--------- | :------------------ |
 | 25% Percentile     | 5636150.39 | 235867.39           |
@@ -19,7 +27,8 @@ This step show results of platform assessment measures.
 
 &nbsp;
 
-## Jitter (ns) - TSN scenario
+### Jitter (ns) - TSN scenario
+This test evaluates the Jitter of a TSN over 5G SA network. The main goal of this test is to assess the end-to-end jitter of the TSN over 5G infrastructure that lays on the UMA platform.
 | Indicator          | Value      | Confidence Interval |
 | :----------------- | :--------- | :------------------ |
 | 25% Percentile     | 922242.65  | 202034.36           |
@@ -34,13 +43,19 @@ This step show results of platform assessment measures.
 
 &nbsp;
 
+## Platform KPIs
+This experiments over platform shows the usual measures at environment under test like Delay, Jitter and Throughput of traffic and also percent of total memory used.
+
+&nbsp;
+
 {% if KPIs|length > 0 %}
 {%- for type, kpi_info in KPIs.items() %}
 {%- if type == 'NoType' %}
 &nbsp;
-## Kpi not categorized
+### Kpi not categorized
+These KPIs were not categorized by ELCM.
 {%- else %}
-## Kpi type {{ type }}
+### Kpi type {{ type }}
 {%- endif%}
 
 | KPI Name | Min | Max | Mean | Median | Standar Deviation | Description |
