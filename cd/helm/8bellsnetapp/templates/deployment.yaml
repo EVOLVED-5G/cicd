@@ -63,7 +63,8 @@ spec:
         name: 8b-netapp-adminer
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          {{- toYaml .Values.adminer.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -276,7 +277,8 @@ spec:
         name: 8b-netapp
         ports:
         - containerPort: 5000
-        resources: {}
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -353,5 +355,6 @@ spec:
         name: 8b-netapp-db
         ports:
         - containerPort: 5432
-        resources: {}
+        resources:
+          {{- toYaml .Values.postgres.resources | nindent 12 }}
       restartPolicy: Always

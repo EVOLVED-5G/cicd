@@ -16,38 +16,58 @@ dbnetapp:
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "fogusnetapp-netapppostgres"
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
   ports:
   - name: "5432"
     port: 5432
     targetPort: 5432
   type: ClusterIP
   replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 500m
+      memory: 128Mi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 django:
   netappdjango:
     image:
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "fogusnetapp-netappdjango"
-    resources:
-     limits:
-       cpu: 100m
-       memory: 128Mi
-     requests:
-       cpu: 100m
-       memory: 128Mi
   ports:
   - name: "8000"
     port: 8000
     targetPort: 8000
   replicas: 1
   type: ClusterIP
+  resources:
+    limits:
+      cpu: 500m
+      memory: 128Mi
+    requests:
+      cpu: 500m
+      memory: 128Mi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 env:
   environmentMode: production
   callbackAddress: https://my-fogus.apps.ocp-epg.hi.inet
@@ -71,13 +91,23 @@ netapp:
       # -- The docker image tag to use
       # -- @default Chart version
       tag: "fogusnetapp-netappfe"
-    resources: {}
-#     limits:
-#       cpu: 100m
-#       memory: 128Mi
-#     requests:
-#       cpu: 100m
-#       memory: 128Mi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 500m
+      memory: 512Mi
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
   ports:
   - name: "fe"
     port: 4200
