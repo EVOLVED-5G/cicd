@@ -63,7 +63,8 @@ spec:
         name: callbacks
         ports:
         - containerPort: 5002
-        resources: {}
+        resources:
+          {{- toYaml .Values.callbacks.resources | nindent 12 }}
       hostname: callbacks
       restartPolicy: Always
 ---
@@ -179,7 +180,8 @@ spec:
         ports:
         - containerPort: 5000
         - containerPort: 6000
-        resources: {}
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       hostname: iqb-netapp
       restartPolicy: Always
 ---
@@ -256,6 +258,7 @@ spec:
         name: keycloak
         ports:
         - containerPort: 8080
-        resources: {}
+        resources:
+          {{- toYaml .Values.keycloak.resources | nindent 12 }}
       hostname: keycloak
       restartPolicy: Always
