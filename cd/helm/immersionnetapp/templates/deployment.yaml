@@ -102,5 +102,6 @@ spec:
         - containerPort: 9877
         - containerPort: 9998
         - containerPort: 9999
-        resources: {}
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always
