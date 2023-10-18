@@ -151,12 +151,20 @@ pipeline {
                     
                     if [ "$STAGE" == "certification" ]
                     then
-                        echo "Adding fingerprint"
-                        FINGERPRINT=$(jq -r .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
-                        VERSION=$(jq -r .fingerprint.Version executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
-                        python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME -v $VERSION
-                        pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
-                        pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf
+                        
+                        FINGERPRINT_PRESENT=$(jq 'has("fingerprint")' executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                        if "${FINGERPRINT_PRESENT}"
+                        then
+                            echo "Adding fingerprint"
+                            FINGERPRINT=$(jq -r .fingerprint.certificationid executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                            VERSION=$(jq -r .fingerprint.Version executive_summary/report-steps-"$NETAPP_NAME_LOWER".json)
+                            python3 utils/fingerprint/fingerprint.py -f $FINGERPRINT -n $NETAPP_NAME -v $VERSION
+                            pdftk fingerprint.pdf multistamp utils/watermark.pdf output fingerprint_watermark.pdf
+                            pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf fingerprint_watermark.pdf utils/endpage.pdf final_report.pdf
+                        else
+                            echo "Fingerprint is not present, maybe certification is not successfully"
+                            pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf
+                        fi
                     else
                         echo "Only Certification stage will include fingerprint"
                         pdfunite cover.pdf executive_summary/report-steps-$NETAPP_NAME_LOWER_watermark.pdf mid_report_watermark.pdf utils/endpage.pdf final_report.pdf

@@ -113,6 +113,8 @@ pipeline {
                     sh '''#!/bin/bash
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=true&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=md"
                     curl -s -H 'Content-Type: application/json' -X POST "http://epg-trivy.hi.inet:5000/scan-repo?token=$TOKEN_TRIVY&update_wiki=false&repository=Telefonica/Evolved5g-$NETAPP_NAME&branch=$GIT_NETAPP_BRANCH&output_format=json" > ${REPORT_FILENAME}.json
+                    echo "Trivy Results:"
+                    cat ${REPORT_FILENAME}.json
                     '''
                 }
             }

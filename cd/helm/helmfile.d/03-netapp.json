@@ -17,6 +17,7 @@
             "capifPortHttp": "\($CAPIF_HTTP_PORT)",
             "capifPortHttps": "\($CAPIF_HTTPS_PORT)",
             "nefAddress": "\($HOSTNAME_NEF)",
+            "nefPort": "\($HOSTNAME_NEF_PORT)",
             "frontendAddress": "\($HOSTNAME_NETAPP)",
             "tsnAddress": "\($HOSTNAME_TSN)"
           }

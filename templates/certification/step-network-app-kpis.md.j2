@@ -6,7 +6,9 @@ This section will show all **{{name}}** Network Application with version **{{ver
 
 &nbsp;
 
-## Network App Namespace KPIs
+## **Network App Namespace KPIs**
+At this section the KPIs are related with k8s environment. Here we can find CPU and Memory usage rate from network app deployment respect to the base k8s nodes total capacity.
+
 | Host |
 {%- for instance_title, instance_formatted_title in instance_titles.items() -%}
  {{ instance_formatted_title }} |
@@ -27,9 +29,14 @@ This section will show all **{{name}}** Network Application with version **{{ver
 {%- endfor -%}
 {%- endfor %}
 
+***CPU (%)***: The percentage of the host's CPU the container is using.
+***Memory (%)***: The percentage of the host's Memory the container is using.
+
 &nbsp;
 
-## Network App Pods KPIs
+## **Network App Pods KPIs**
+At this section the KPIs are related with caontiner deployed of the Network App under test.
+
 | Service |
 {%- for pod_title, pod_title_formatted_value in pod_titles.items() -%}
  {{ pod_title_formatted_value }} |
@@ -50,3 +57,7 @@ This section will show all **{{name}}** Network Application with version **{{ver
 {%- endfor -%}
 {%- endfor %}
 
+***Memory Usage(%)***: The total memory the container is using / the total amount of memory it is allowed to use.
+***Net I/O (Bytes)***: The amount of data the container has received and sent over its network interface.
+***Mem Failures (Times)***: Tracks the number of times a container has experienced an out-of-memorv (OOM) event.
+***Block I/O (Blocks)***: The amount of data the container has written to and read from block devices on the host.
