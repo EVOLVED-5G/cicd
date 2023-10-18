@@ -120,7 +120,8 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.pythonApp.pythonApp.image.repository }}-{{ .Values.pythonApp.pythonApp.image.tag | default .Chart.AppVersion }}
         name: python-app
-        resources: {}
+        resources:
+          {{- toYaml .Values.pythonApp.resources | nindent 12 }}
         volumeMounts:
         - mountPath: /usr/src/app/capif_registration.json
           name: capif-registration
@@ -189,5 +190,6 @@ spec:
           value: {{ quote .Values.kubernetesClusterDomain }}
         image: {{ .Values.redisDb.redisDb.image.repository }}:{{ .Values.redisDb.redisDb.image.tag | default .Chart.AppVersion }}
         name: redis-db
-        resources: {}
+        resources:
+          {{- toYaml .Values.redisDb.resources | nindent 12 }}
       restartPolicy: Always

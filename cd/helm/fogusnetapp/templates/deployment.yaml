@@ -133,7 +133,7 @@ spec:
         imagePullPolicy: Always
         name: netapppostgres
         resources:
-            {{- toYaml .Values.dbnetapp.netapppostgres.resources | nindent 12 }}
+            {{- toYaml .Values.dbnetapp.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -284,7 +284,7 @@ spec:
         ports:
         - containerPort: 8000
         resources:
-            {{- toYaml .Values.django.netappdjango.resources | nindent 12 }}
+            {{- toYaml .Values.django.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -424,5 +424,5 @@ spec:
         ports:
         - containerPort: 4200
         resources:
-            {{- toYaml .Values.netapp.netappfe.resources | nindent 12 }}
+            {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always

@@ -91,5 +91,6 @@ spec:
           failureThreshold: 10
           initialDelaySeconds: 15
           periodSeconds: 5
-        resources: {} 
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always

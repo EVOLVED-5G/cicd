@@ -110,5 +110,6 @@ spec:
             containerPort: 7664
           - protocol: UDP
             containerPort: 7665
-        resources: {} 
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always

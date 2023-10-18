@@ -152,7 +152,8 @@ spec:
             port: {{ .Values.env.postgresPort }}
           initialDelaySeconds: 15
           periodSeconds: 20
-        resources: {}
+        resources:
+          {{- toYaml .Values.db.resources | nindent 12 }}
       restartPolicy: Always
 ---
 apiVersion: apps/v1
@@ -304,5 +305,6 @@ spec:
         name: netapp
         ports:
         - containerPort: 10001
-        resources: {}
+        resources:
+          {{- toYaml .Values.netapp.resources | nindent 12 }}
       restartPolicy: Always
