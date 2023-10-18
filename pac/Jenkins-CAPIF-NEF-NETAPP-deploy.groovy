@@ -83,6 +83,7 @@ pipeline {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens"}
                     expression { DEPLOYMENT == "kubernetes-uma" }
+                    expression { DEPLOYMENT == "kubernetes-cosmote" }
                 }
             }
             steps {
@@ -125,6 +126,7 @@ pipeline {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
                     expression { DEPLOYMENT == "kubernetes-uma" }
+                    expression { DEPLOYMENT == "kubernetes-cosmote" }
                 }
             }
             steps {
@@ -406,6 +408,7 @@ pipeline {
                             --arg NAMESPACE $TMP_NS_NETAPP --arg FOLDER_NETWORK_APP $NETAPP_NAME_LOWER \
                             --arg HOSTNAME_CAPIF $HOSTNAME_CAPIF --arg CAPIF_HTTP_PORT $CAPIF_HTTP_PORT \
                             --arg CAPIF_HTTPS_PORT $CAPIF_HTTPS_PORT --arg HOSTNAME_NEF $HOSTNAME_NEF \
+                            --arg HOSTNAME_NEF_PORT $CAPIF_HTTPS_PORT \
                             --arg HOSTNAME_NETAPP $HOSTNAME_NETAPP --arg DEPLOYMENT $DEPLOYMENT \
                             --arg APP_REPLICAS $APP_REPLICAS --arg CREATE_NS $CREATE_NS \
                             --arg HOSTNAME_TSN $HOSTNAME_TSN \
