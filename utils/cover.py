@@ -21,11 +21,15 @@ def generate_cover(title, date, stage):
 
     if title != None:
         cover.setFont("Georgia", 20)
-        title_width = stringWidth("Network App %s Report: %s" %(stage,title), "Georgia", 20)
-        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Network App %s Report: %s" %(stage,title))
+        title_width = stringWidth("Network App %s Report:" %(stage), "Georgia", 20)
+        cover.drawString(100, 750, "Network App %s Report:" %(stage))
+        cover.drawString(100, 720, "%s" %(title))
+        # cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 750, "Network App %s Report:" %(stage))
+        # cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 720, "%s" %(title))
     if date != None:
         cover.setFont("Georgia", 20)
-        cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 720, "Date: %s" %date)
+        cover.drawString(100, 690, "Date: %s" %date)
+        # cover.drawString(int((PAGE_WIDTH - title_width) / 2.0), 690, "Date: %s" %date)
     # if buildnumber != None:
     #     cover.setFont("Times-Roman", 20)
     #     cover.drawString(400, 50, "Build Number: %s" %buildnumber)
