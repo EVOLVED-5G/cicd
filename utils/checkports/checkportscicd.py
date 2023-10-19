@@ -108,7 +108,7 @@ if __name__ == '__main__':
             with open(repo_dir_docker) as input:
                 expose_list=list()
                 for line in input:
-                    expose_list += re.findall(r'EXPOSE \d+ ?\d*', line)
+                    expose_list += re.findall(r'EXPOSE \d+( \d*)?', line)
                 networkapp_ports['services'][networkapp_image_name]=dict()
                 networkapp_ports['services'][networkapp_image_name]['ports']=list()
                 for port in expose_list:
