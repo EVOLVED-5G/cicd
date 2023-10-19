@@ -30,6 +30,7 @@ env:
   ddsExternalAddress: "10.11.23.53"
   environmentMode: production
   tsnAddress: my-tsn.apps.ocp-epg.hi.inet
+  enableNefCallbacks: false
 
 
 netapp:
