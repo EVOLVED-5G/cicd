@@ -52,9 +52,9 @@ metadata:
   annotations:
     kompose.cmd: kompose -f docker-compose.yml convert
     kompose.version: 1.28.0 (c4137012e)
-    {{- if eq .Values.environment "kubernetes-uma" }}
-    metallb.universe.tf/loadBalancerIPs: 10.11.23.53
-    {{- end }}
+    # {{- if eq .Values.environment "kubernetes-uma" }}
+    # metallb.universe.tf/loadBalancerIPs: 10.11.23.53
+    # {{- end }}
 spec:
   {{- if eq .Values.environment "kubernetes-uma" }}
   type: {{ .Values.netapp.typeUdp }}

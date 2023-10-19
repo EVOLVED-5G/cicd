@@ -89,6 +89,8 @@ spec:
           value: {{ quote .Values.env.network }}
         - name: DDS_EXTERNAL_ADDRESS
           value: {{ quote .Values.env.ddsExternalAddress }}
+        - name: ENABLE_NEF_CALLBACKS
+          value: {{ quote .Values.env.enableNefCallbacks }}
         {{- if eq .Values.pipeline "verification" }}
         image: {{- include "localization.baseRepo" . }}:{{ .Values.netapp.localizationNetapp.image.tag }}-{{ .Chart.AppVersion }}
         {{- else }}
