@@ -699,6 +699,11 @@ pipeline {
                             curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
                             --data-binary @"$FINGERPRINT_FILENAME" \
                             "$url"
+
+                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                            --data-binary @"$FINGERPRINT_FILENAME" \
+                            "$url"
                             '''
                         }
                     }
