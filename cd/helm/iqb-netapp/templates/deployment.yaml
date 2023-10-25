@@ -54,6 +54,14 @@ spec:
       - env:
         - name: KUBERNETES_CLUSTER_DOMAIN
           value: {{ quote .Values.kubernetesClusterDomain }}
+        - name: KEYCLOAK_ADDRESS
+          value: {{ quote .Values.env.keycloakAddress }}
+        - name: KEYCLOAK_REALM
+          value: {{ quote .Values.env.keycloakRealm }}
+        - name: KEYCLOAK_ADMIN
+          value: {{ quote .Values.env.keycloakAdmin }}
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: {{ quote .Values.env.keycloakAdminPassword }}
         {{- if eq .Values.pipeline "verification" }}
         image: {{- include "iqb.baseRepo" . }}:{{ .Values.callbacks.callbacks.image.tag }}-{{ .Chart.AppVersion }}
         {{- else }}
