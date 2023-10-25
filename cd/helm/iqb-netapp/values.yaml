@@ -47,7 +47,7 @@ env:
   capifPortHttps: 30548
   frontendAddress: my-iqb.apps.ocp-epg.hi.inet
 #  frontendCallbackAddress: my-iqb-callbacks.apps.ocp-epg.hi.inet
-  keycloakAddress: keycloak:8980/auth
+  keycloakAddress: keycloak:5002/auth
   keycloakAdmin: admin
   keycloakAdminPassword: admin
   keycloakRealm: EVOLVED-5G
