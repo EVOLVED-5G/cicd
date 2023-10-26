@@ -46,7 +46,7 @@ def getAnalyticsUrl(deployment) {
     if ('openshift'.equals(var)) {
         return ' '
     } else if ('kubernetes-athens'.equals(var)) {
-        return 'http://10.220.2.238:8080'
+        return 'http://10.220.2.238:5003'
     } else if ('kubernetes-cosmote'.equals(var)) {
         return 'http://10.220.2.238:5003'
     } else {
