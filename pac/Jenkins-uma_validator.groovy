@@ -28,10 +28,10 @@ def getAgent(deployment) {
     }
 }
 
-def getElcmUrl(deployment){
+def getElcmUrl(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
-        return ''
+        return ' '
     } else if ('kubernetes-athens'.equals(var)) {
         return 'http://10.220.2.237:8080/elcm/api/v1/'
     } else if ('kubernetes-cosmote'.equals(var)) {
@@ -41,10 +41,10 @@ def getElcmUrl(deployment){
     }
 }
 
-def getAnalyticsUrl(deployment){
+def getAnalyticsUrl(deployment) {
     String var = deployment
     if ('openshift'.equals(var)) {
-        return ''
+        return ' '
     } else if ('kubernetes-athens'.equals(var)) {
         return 'http://10.220.2.238:8080'
     } else if ('kubernetes-cosmote'.equals(var)) {
@@ -105,9 +105,7 @@ pipeline {
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
         ELCM_URL = getElcmUrl("${params.DEPLOYMENT}")
-        // ELCM_URL = "${params.ELCM_URL}"
-        ANALYTICS_URL = getAnalyticsUrl("${param.DEPLOYMENT}")
-        // ANALYTICS_URL = "${params.ANALYTICS_URL}"
+        ANALYTICS_URL = getAnalyticsUrl("${params.DEPLOYMENT}")
         ELCM_HOST = getHost(ELCM_URL)
         ANALYTICS_HOST = getHost(ANALYTICS_URL)
     }
