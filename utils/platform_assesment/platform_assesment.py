@@ -20,7 +20,7 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
 
 def getDescriptor(environment):
     testCase = list()
-    if environment == 'kubernetes-uma':
+    if environment != 'kubernetes-uma':
         testCase.append('SA_Full_Cosmote')
     else:
         testCase.append('EvolvedWp5')
