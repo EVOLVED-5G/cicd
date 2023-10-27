@@ -68,6 +68,8 @@ String getHost(String url) {
     return host
 }
 
+def valid_slaves = ['kubernetes-athens','kubernetes-cosmote','kubernetes-uma']
+
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
     options {
@@ -119,7 +121,7 @@ pipeline {
                         error("This job will be only executed on Certification Stage.")
                         return
                     }
-                    if( "${DEPLOYMENT}" != 'kubernetes-uma') {
+                    if( "${DEPLOYMENT}" in valid_slaves) {
                         currentBuild.result = 'ABORTED'
                         error("This job can be only executed on UMA Stage.")
                         return

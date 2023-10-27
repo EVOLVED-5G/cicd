@@ -18,25 +18,31 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
     print(json.dumps(response.json(), indent=4))
     return response.json()
 
-descriptor = {
-  "Application": None,
-  "Automated": True,
-  "ExclusiveExecution": False,
-  "ExperimentType": "Standard",
-  "Extra": {},
-  "NSs": [],
-  "Parameters": {},
-  "Remote": None,
-  "RemoteDescriptor": None,
-  "ReservationTime": None,
-  "Scenario": None,
-  "Slice": None,
-  "TestCases": [
-    "EvolvedWp5"
-  ],
-  "UEs": [],
-  "Version": "2.1.0"
-}
+def getDescriptor(environment) {
+    testCase = list()
+    if environment == 'kubernetes-uma':
+        testCase.append('SA_Full_Cosmote')
+    else:
+        testCase.append('EvolvedWp5')
+
+    descriptor = {
+        "Application": None,
+        "Automated": True,
+        "ExclusiveExecution": False,
+        "ExperimentType": "Standard",
+        "Extra": {},
+        "NSs": [],
+        "Parameters": {},
+        "Remote": None,
+        "RemoteDescriptor": None,
+        "ReservationTime": None,
+        "Scenario": None,
+        "Slice": None,
+        "TestCases": testCase,
+        "UEs": [],
+        "Version": "2.1.0"
+    }
+    return descriptor
 
 
 if __name__ == '__main__':
@@ -44,15 +50,18 @@ if __name__ == '__main__':
     # total arguments
     n = len(sys.argv)
     
-    if n != 4:
-            print("expected: " + sys.argv[0] + " <elcm_url> <analitics_url> <output_filename>")
-            exit(255)
+    if n != 5:
+        print("expected: " + sys.argv[0] + " <elcm_url> <analitics_url> <output_filename> <environment>")
+        exit(255)
 
     elcm_url = sys.argv[1]
     analitics_url = sys.argv[2]
     output_filename = sys.argv[3]
+    environment = sys.argv[4]
 
     execution_run_url = elcm_url + '/experiment/run'
+
+    descriptor = getDescriptor(environment)
 
     response = requests.post(execution_run_url, json = descriptor)
 
