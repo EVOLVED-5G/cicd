@@ -106,6 +106,7 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
+        ENVIRONMENT = "${params.DEPLOYMENT}"
         ELCM_URL = getElcmUrl("${params.DEPLOYMENT}")
         ANALYTICS_URL = getAnalyticsUrl("${params.DEPLOYMENT}")
         ELCM_HOST = getHost(ELCM_URL)
@@ -170,7 +171,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     pip3 install -r utils/platform_assesment/requirements.txt
-                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json
+                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json ${ENVIRONMENT}
                     '''
                 }
             }
