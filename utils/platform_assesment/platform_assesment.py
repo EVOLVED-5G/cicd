@@ -18,7 +18,7 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
     print(json.dumps(response.json(), indent=4))
     return response.json()
 
-def getDescriptor(environment) {
+def getDescriptor(environment):
     testCase = list()
     if environment == 'kubernetes-uma':
         testCase.append('SA_Full_Cosmote')
