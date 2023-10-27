@@ -25,6 +25,7 @@ def getDescriptor(environment):
     else:
         testCase.append('EvolvedWp5')
 
+    print(testCase)
     descriptor = {
         "Application": None,
         "Automated": True,
@@ -42,6 +43,8 @@ def getDescriptor(environment):
         "UEs": [],
         "Version": "2.1.0"
     }
+
+    print(descriptor)
     return descriptor
 
 
