@@ -6,7 +6,6 @@ import sys
 def get_kpi_value(analitics_url ,execution_id, kpi_info):
     print('******')
     print(kpi_info)
-    print('******')
     measurement=kpi_info.get('Measurement')
     kpi=kpi_info.get('KPI')
     url= analitics_url + '/statistical_analysis/uma_mydb?experimentid=' + execution_id +'&measurement=' + measurement + '&kpi=' + kpi
@@ -16,27 +15,44 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
         raise('Error getting Measurement ' + measurement + ' of kpi ' + kpi + ' for ExecutionId ' + execution_id)
 
     print(json.dumps(response.json(), indent=4))
+    print('******')
     return response.json()
 
-descriptor = {
-  "Application": None,
-  "Automated": True,
-  "ExclusiveExecution": False,
-  "ExperimentType": "Standard",
-  "Extra": {},
-  "NSs": [],
-  "Parameters": {},
-  "Remote": None,
-  "RemoteDescriptor": None,
-  "ReservationTime": None,
-  "Scenario": None,
-  "Slice": None,
-  "TestCases": [
-    "EvolvedWp5"
-  ],
-  "UEs": [],
-  "Version": "2.1.0"
-}
+def getDescriptor(environment):
+    testCase = list()
+    uesList = list()
+    if environment != 'kubernetes-uma':
+        testCase.append('5G_SA_Full_Cosmote')
+        uesList.append('Xiaomi12Pro')
+
+    else:
+        testCase.append('EvolvedWp5')
+    
+    print('-----')
+    print(testCase)
+    print(uesList)
+    
+    descriptor = {
+        "Application": None,
+        "Automated": True,
+        "ExclusiveExecution": False,
+        "ExperimentType": "Standard",
+        "Extra": {},
+        "NSs": [],
+        "Parameters": {},
+        "Remote": None,
+        "RemoteDescriptor": None,
+        "ReservationTime": None,
+        "Scenario": None,
+        "Slice": None,
+        "TestCases": testCase,
+        "UEs": uesList,
+        "Version": "2.1.0"
+    }
+
+    print(json.dumps(descriptor, indent=4))
+    print('-----')
+    return descriptor
 
 
 if __name__ == '__main__':
@@ -44,15 +60,18 @@ if __name__ == '__main__':
     # total arguments
     n = len(sys.argv)
     
-    if n != 4:
-            print("expected: " + sys.argv[0] + " <elcm_url> <analitics_url> <output_filename>")
-            exit(255)
+    if n != 5:
+        print("expected: " + sys.argv[0] + " <elcm_url> <analitics_url> <output_filename> <environment>")
+        exit(255)
 
     elcm_url = sys.argv[1]
     analitics_url = sys.argv[2]
     output_filename = sys.argv[3]
+    environment = sys.argv[4]
 
     execution_run_url = elcm_url + '/experiment/run'
+
+    descriptor = getDescriptor(environment)
 
     response = requests.post(execution_run_url, json = descriptor)
 
@@ -94,6 +113,7 @@ if __name__ == '__main__':
         raise('Response error requesting kpi list for ExecutionId ' + execution_id)
 
     execution_kpis = response.json()
+    print(json.dumps(execution_kpis, indent=4))
 
     results=dict()
     results['KPIs']=dict()

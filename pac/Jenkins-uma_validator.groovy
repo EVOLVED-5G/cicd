@@ -28,6 +28,32 @@ def getAgent(deployment) {
     }
 }
 
+def getElcmUrl(deployment) {
+    String var = deployment
+    if ('openshift'.equals(var)) {
+        return ' '
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'http://10.220.2.237:8080/elcm/api/v1/'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'http://10.220.2.237:8080/elcm/api/v1/'
+    } else {
+        return 'http://10.11.23.220:5551/elcm/api/v1'
+    }
+}
+
+def getAnalyticsUrl(deployment) {
+    String var = deployment
+    if ('openshift'.equals(var)) {
+        return ' '
+    } else if ('kubernetes-athens'.equals(var)) {
+        return 'http://10.220.2.238:5003'
+    } else if ('kubernetes-cosmote'.equals(var)) {
+        return 'http://10.220.2.238:5003'
+    } else {
+        return 'http://10.11.23.220:5003'
+    }
+}
+
 def getReportFilename(String netappNameLower) {
     return '000-report-platform-assesment-' + netappNameLower
 }
@@ -41,6 +67,8 @@ String getHost(String url) {
     String host = url.split('/')[2].split(':')[0]
     return host
 }
+
+def valid_slaves = ['kubernetes-athens','kubernetes-cosmote','kubernetes-uma']
 
 pipeline {
     agent { node { label getAgent("${params.DEPLOYMENT }") == 'any' ? '' : getAgent("${params.DEPLOYMENT }") } }
@@ -56,8 +84,6 @@ pipeline {
         string(name: 'BUILD_ID', defaultValue: '', description: 'value to identify each execution')
         choice(name: 'STAGE', choices: ['verification', 'validation', 'certification'])
         choice(name: 'DEPLOYMENT', choices: ['kubernetes-athens', 'kubernetes-uma', 'kubernetes-cosmote', 'openshift'])
-        string(name: 'ELCM_URL', defaultValue: 'http://10.11.23.220:5551/elcm/api/v1', description: 'URL to ELCM')
-        string(name: 'ANALYTICS_URL', defaultValue: 'http://10.11.23.220:5003', description: 'URL to Analytics')
         booleanParam(name: 'REPORTING', defaultValue: false, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: true, description: 'Send mail to Developers')
     }
@@ -78,8 +104,9 @@ pipeline {
         REPORT_FILENAME = getReportFilename(NETAPP_NAME_LOWER)
         PDF_GENERATOR_IMAGE_NAME = 'dockerhub.hi.inet/evolved-5g/evolved-pdf-generator'
         PDF_GENERATOR_VERSION = 'latest'
-        ELCM_URL = "${params.ELCM_URL}"
-        ANALYTICS_URL = "${params.ANALYTICS_URL}"
+        ENVIRONMENT = "${params.DEPLOYMENT}"
+        ELCM_URL = getElcmUrl("${params.DEPLOYMENT}")
+        ANALYTICS_URL = getAnalyticsUrl("${params.DEPLOYMENT}")
         ELCM_HOST = getHost(ELCM_URL)
         ANALYTICS_HOST = getHost(ANALYTICS_URL)
     }
@@ -93,7 +120,7 @@ pipeline {
                         error("This job will be only executed on Certification Stage.")
                         return
                     }
-                    if( "${DEPLOYMENT}" != 'kubernetes-uma') {
+                    if( "${DEPLOYMENT}" in valid_slaves) {
                         currentBuild.result = 'ABORTED'
                         error("This job can be only executed on UMA Stage.")
                         return
@@ -142,7 +169,7 @@ pipeline {
                 dir ("${env.WORKSPACE}") {
                     sh '''
                     pip3 install -r utils/platform_assesment/requirements.txt
-                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json
+                    python3 utils/platform_assesment/platform_assesment.py ${ELCM_URL} ${ANALYTICS_URL} ${REPORT_FILENAME}.json ${ENVIRONMENT}
                     '''
                 }
             }
