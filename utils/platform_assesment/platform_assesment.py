@@ -3,12 +3,17 @@ import json
 from time import sleep
 import sys
 
-def get_kpi_value(analitics_url ,execution_id, kpi_info):
+def get_kpi_value(analitics_url ,execution_id, kpi_info, environment):
     print('******')
     print(kpi_info)
     measurement=kpi_info.get('Measurement')
     kpi=kpi_info.get('KPI')
-    url= analitics_url + '/statistical_analysis/uma_mydb?experimentid=' + execution_id +'&measurement=' + measurement + '&kpi=' + kpi
+
+    db_name = 'uma_mydb'
+    if environment != 'kubernetes-uma':
+        db_name = 'ncsrd_genesis'
+
+    url= analitics_url + '/statistical_analysis/' + db_name + '?experimentid=' + execution_id +'&measurement=' + measurement + '&kpi=' + kpi
     print(url)
     response = requests.get(url)
     if not response.ok:
@@ -118,7 +123,7 @@ if __name__ == '__main__':
     results=dict()
     results['KPIs']=dict()
     for kpi_info in execution_kpis.get('KPIs'):
-        result=get_kpi_value(analitics_url, execution_id, kpi_info)
+        result=get_kpi_value(analitics_url, execution_id, kpi_info, environment)
         Type = 'NoType'
         if kpi_info.get('Type', '') != '':
             Type = kpi_info.get('Type')
