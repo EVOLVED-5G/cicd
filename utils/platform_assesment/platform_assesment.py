@@ -20,12 +20,19 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
 
 def getDescriptor(environment):
     testCase = list()
+    uesList = list()
     if environment != 'kubernetes-uma':
-        testCase.append('SA_Full_Cosmote')
+        testCase.append('5G_SA_Full_Cosmote')
+        uesList.append('Xiaomi12Pro')
+
     else:
         testCase.append('EvolvedWp5')
-
+    
+    print('-----')
     print(testCase)
+    print(uesList)
+    print('-----')
+    
     descriptor = {
         "Application": None,
         "Automated": True,
@@ -40,11 +47,11 @@ def getDescriptor(environment):
         "Scenario": None,
         "Slice": None,
         "TestCases": testCase,
-        "UEs": [],
+        "UEs": uesList,
         "Version": "2.1.0"
     }
 
-    print(descriptor)
+    print(json.dumps(descriptor, indent=4))
     return descriptor
 
 
