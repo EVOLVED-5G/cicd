@@ -71,8 +71,6 @@ def umaValidation(env){
             string(name: 'BUILD_ID', value: String.valueOf(env.BUILD_NUMBER)),
             string(name: 'STAGE', value: String.valueOf(env.PHASE_LOWER)),
             string(name: 'DEPLOYMENT', value: String.valueOf(env.ENVIRONMENT)),
-            string(name: 'ELCM_URL', value: String.valueOf(env.ELCM_URL)),
-            string(name: 'ANALYTICS_URL', value: String.valueOf(env.ANALYTICS_URL)),
             booleanParam(name: 'REPORTING', value: String.valueOf(env.REPORTING)),
             booleanParam(name: 'SEND_DEV_MAIL', value: false)
             ]
@@ -210,8 +208,6 @@ pipeline {
         CAPIF_TLS_PORT = getHttpsPort("${params.ENVIRONMENT}")
         FINGERPRINT_FILENAME = getFingerprintFilename()
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
-        ELCM_URL = "http://10.11.23.220:5551/elcm/api/v1"
-        ANALYTICS_URL = "http://10.11.23.220:5003"
         NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
     }
 
