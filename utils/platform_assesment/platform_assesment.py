@@ -6,7 +6,6 @@ import sys
 def get_kpi_value(analitics_url ,execution_id, kpi_info):
     print('******')
     print(kpi_info)
-    print('******')
     measurement=kpi_info.get('Measurement')
     kpi=kpi_info.get('KPI')
     url= analitics_url + '/statistical_analysis/uma_mydb?experimentid=' + execution_id +'&measurement=' + measurement + '&kpi=' + kpi
@@ -16,6 +15,7 @@ def get_kpi_value(analitics_url ,execution_id, kpi_info):
         raise('Error getting Measurement ' + measurement + ' of kpi ' + kpi + ' for ExecutionId ' + execution_id)
 
     print(json.dumps(response.json(), indent=4))
+    print('******')
     return response.json()
 
 def getDescriptor(environment):
@@ -31,7 +31,6 @@ def getDescriptor(environment):
     print('-----')
     print(testCase)
     print(uesList)
-    print('-----')
     
     descriptor = {
         "Application": None,
@@ -52,6 +51,7 @@ def getDescriptor(environment):
     }
 
     print(json.dumps(descriptor, indent=4))
+    print('-----')
     return descriptor
 
 
@@ -113,6 +113,7 @@ if __name__ == '__main__':
         raise('Response error requesting kpi list for ExecutionId ' + execution_id)
 
     execution_kpis = response.json()
+    print(json.dumps(execution_kpis, indent=4))
 
     results=dict()
     results['KPIs']=dict()
