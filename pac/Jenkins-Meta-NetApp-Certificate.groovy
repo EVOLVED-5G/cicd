@@ -172,7 +172,7 @@ pipeline {
         string(name: 'GIT_NETAPP_URL', defaultValue: 'https://github.com/EVOLVED-5G/dummy-network-application', description: '(Required) URL of the Github Repository')
         string(name: 'GIT_NETAPP_BRANCH', defaultValue: 'evolved5g', description: 'NETAPP branch name')
         string(name: 'HOSTNAME_NETAPP', defaultValue: 'network-app.apps.ocp-epg.hi.inet', description: 'Hostname to NetworkApp')
-        string(name: 'VERSION_NETAPP', defaultValue: 'latest', description: 'Version Network App')
+        string(name: 'VERSION_NETAPP', defaultValue: '4.0', description: 'Version Network App')
         string(name: 'GIT_CICD_BRANCH', defaultValue: 'main', description: 'Deployment git branch name')
         string(name: 'APP_REPLICAS_NETAPP', defaultValue: '1', description: 'Number of NetworkApp pods to run')
         string(name: 'HOSTNAME_CAPIF', defaultValue: 'capif.apps.ocp-epg.hi.inet', description: 'Hostname to CAPIF')
@@ -337,7 +337,7 @@ pipeline {
                 }
                 stage('Certification: Build validation image Report and Security Scan Docker Images Builded') {
                     steps {
-                        retry(2) {
+                        retry(5) {
                             script {
                                 def step_name = step_build
                                 buildResults['steps'][step_name] = 'FAILURE'
@@ -562,30 +562,34 @@ pipeline {
 
         stage('Certification: Validate CAPIF') {
             steps {
-                script {
-                    def jobBuild = capifValidation(env)
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
-                    if (jobResult == 'FAILURE') {
-                        buildResults['tests_ok'] = false
-                        currentBuild.result = 'ABORTED'
-                        aborted = true
-                        error('CAPIF is not working properly, abort pipeline')
+                retry(3) {
+                    script {
+                        def jobBuild = capifValidation(env)
+                        def jobResult = jobBuild.getResult()
+                        echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
+                        if (jobResult == 'FAILURE') {
+                            buildResults['tests_ok'] = false
+                            currentBuild.result = 'ABORTED'
+                            aborted = true
+                            error('CAPIF is not working properly, abort pipeline')
+                        }
                     }
                 }
             }
         }
         stage('Certification: Validate NEF') {
             steps {
-                script {
-                    def jobBuild = nefValidation(env)
-                    def jobResult = jobBuild.getResult()
-                    echo "Build of 'Validate NEF' returned result: ${jobResult}"
-                    if (jobResult == 'FAILURE') {
-                        buildResults['tests_ok'] = false
-                        currentBuild.result = 'ABORTED'
-                        aborted = true
-                        error('NEF is not working properly, abort pipeline')
+                retry(3) {
+                    script {
+                        def jobBuild = nefValidation(env)
+                        def jobResult = jobBuild.getResult()
+                        echo "Build of 'Validate NEF' returned result: ${jobResult}"
+                        if (jobResult == 'FAILURE') {
+                            buildResults['tests_ok'] = false
+                            currentBuild.result = 'ABORTED'
+                            aborted = true
+                            error('NEF is not working properly, abort pipeline')
+                        }
                     }
                 }
             }
