@@ -55,6 +55,7 @@ pipeline {
                 anyOf {
                     expression { DEPLOYMENT == "kubernetes-athens" }
                     expression { DEPLOYMENT == "kubernetes-uma" }
+                    expression { DEPLOYMENT == "kubernetes-cosmote" }
                 }
             }
             steps {
