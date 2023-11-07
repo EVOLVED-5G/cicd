@@ -688,31 +688,10 @@ pipeline {
                     } else {
                         if (buildResults['tests_executed']) {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
-                            sh '''#!/bin/bash
-                            UUID=$(uuidgen)
-                            echo $UUID
-                            jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
-
-                            cat $FINGERPRINT_FILENAME
-
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
-
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
-                            '''
                         }
                     }
 
-                    def fileName = getFingerprintFilename()
-                    if (fileExists(fileName)) {
-                        def fingerprint = readJSON file: fileName
-                        buildResults['fingerprint'] = fingerprint
-                    }
+                    
 
                     buildResults['build_trigger_by'] = currentBuild.getBuildCauses()[0].shortDescription.replace('Lanzada por el usuario ', '').split(' ')[0] + ' / ' + currentBuild.getBuildCauses()[0].userId
                     buildResults['total_duration'] = currentBuild.durationString.replace(' and counting', '').replace(' y contando', '')
