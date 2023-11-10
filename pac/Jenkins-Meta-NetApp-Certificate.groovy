@@ -688,7 +688,20 @@ pipeline {
                     } else {
                         if (buildResults['tests_executed']) {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
-                        }
+                            sh '''#!/bin/bash
+                            UUID=$(uuidgen)
+                            echo $UUID
+                            jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
+
+                            cat $FINGERPRINT_FILENAME
+                            '''
+                         }
+                     }
+
+                    def fileName = getFingerprintFilename()
+                    if (fileExists(fileName)) {
+                        def fingerprint = readJSON file: fileName
+                        buildResults['fingerprint'] = fingerprint
                     }
 
                     
