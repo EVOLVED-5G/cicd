@@ -221,10 +221,10 @@ pipeline {
                     buildResults['steps'][step_security_scan_code] = initial_status
                     buildResults['steps'][step_security_scan_secrets] = initial_status
                     buildResults['steps'][step_build] = initial_status
-                    buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
-                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     buildResults['steps'][step_use_of_5g_apis] = initial_status
+                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_nef_services_apis] = not_report
                     buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
