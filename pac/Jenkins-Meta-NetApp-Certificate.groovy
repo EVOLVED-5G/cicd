@@ -185,6 +185,7 @@ pipeline {
         choice(name: 'ENVIRONMENT', choices: ['kubernetes-uma', 'kubernetes-athens', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: false, description: 'Send mail to Developers')
+        booleanParam(name: 'OVERWRITE_FINGERPRINT', defaultValue: false, description: 'Overwrite artifactory fingerprint if present')
         string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
@@ -687,21 +688,36 @@ pipeline {
                         if (buildResults['tests_executed']) {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
                             sh '''#!/bin/bash
-                            UUID=$(uuidgen)
-                            echo $UUID
-                            jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
 
-                            cat $FINGERPRINT_FILENAME
+                            if [ $OVERWRITE_FINGERPRINT == false ]
+                            then
+                                echo "try to recover fingerprint from artifactory"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $FINGERPRINT_FILENAME || echo "No result obtained"
+                            fi
 
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
+                            if [ -f $FINGERPRINT_FILENAME ]
+                            then
+                                echo "Fingerprint is present on artifactory for this netapp ($NETAPP_NAME) and version ($VERSION_NETAPP)"
+                                cat $FINGERPRINT_FILENAME
+                            else
+                                echo "Create Fingerpint and pushing to artifactory"
+                                UUID=$(uuidgen)
+                                echo $UUID
+                                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
 
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
+                                cat $FINGERPRINT_FILENAME
+
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$FINGERPRINT_FILENAME" \
+                                "$url"
+
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$FINGERPRINT_FILENAME" \
+                                "$url"
+                            fi
                             '''
                         }
                     }
