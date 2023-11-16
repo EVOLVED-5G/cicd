@@ -62,7 +62,7 @@ def getDeployReportFilename(String netappNameLower) {
 
 
 def umaValidation(env){
-    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: false,
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: true,
         parameters: [
             string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
             string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
