@@ -209,6 +209,7 @@ pipeline {
         FINGERPRINT_FILENAME = getFingerprintFilename()
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
         NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
+        OVERWRITE_FINGERPRINT = "${params.OVERWRITE_FINGERPRINT}"
     }
 
     stages {
@@ -689,14 +690,14 @@ pipeline {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
                             sh '''#!/bin/bash
 
-                            if [ $OVERWRITE_FINGERPRINT == false ]
+                            if [[ $OVERWRITE_FINGERPRINT == false ]]
                             then
                                 echo "try to recover fingerprint from artifactory"
                                 url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
                                 curl  -f $url -u $ARTIFACTORY_CRED -o $FINGERPRINT_FILENAME || echo "No result obtained"
                             fi
 
-                            if [ -f $FINGERPRINT_FILENAME ]
+                            if [[ -f $FINGERPRINT_FILENAME ]]
                             then
                                 echo "Fingerprint is present on artifactory for this netapp ($NETAPP_NAME) and version ($VERSION_NETAPP)"
                                 cat $FINGERPRINT_FILENAME
