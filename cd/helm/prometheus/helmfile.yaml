@@ -5,6 +5,10 @@ helmDefaults:
   force: true
   timeout: 600
 
+repositories:
+- name: prometheus-community
+  url: https://prometheus-community.github.io/helm-charts
+  
 releases:
   - name: prometheus
     chart: ../prometheus/
@@ -21,3 +25,6 @@ releases:
                 paths:
                   - path: /
                     pathType: Prefix
+  - name: monitoring
+    namespace: prometheus
+    chart: prometheus-community/kube-state-metrics
