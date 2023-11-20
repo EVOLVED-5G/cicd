@@ -29,7 +29,7 @@ def getAgent(deployment) {
 }
 
 def getReportFilename(String netappNameLower) {
-    return '041-report-kpis-' + netappNameLower
+    return '070-report-kpis-' + netappNameLower
 }
 
 String getArtifactoryUrl(phase) {

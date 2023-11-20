@@ -62,7 +62,7 @@ def getDeployReportFilename(String netappNameLower) {
 
 
 def umaValidation(env){
-    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: false,
+    def jobBuild = build job: '/003-NETAPPS/003-Helpers/000-UMA Validation', wait: true, propagate: true,
         parameters: [
             string(name: 'VERSION', value: String.valueOf(env.VERSION_NETAPP)),
             string(name: 'GIT_NETAPP_URL', value: String.valueOf(env.GIT_NETAPP_URL)),
@@ -185,6 +185,7 @@ pipeline {
         choice(name: 'ENVIRONMENT', choices: ['kubernetes-uma', 'kubernetes-athens', 'kubernetes-cosmote', 'openshift'])
         booleanParam(name: 'REPORTING', defaultValue: true, description: 'Save report into artifactory')
         booleanParam(name: 'SEND_DEV_MAIL', defaultValue: false, description: 'Send mail to Developers')
+        booleanParam(name: 'OVERWRITE_FINGERPRINT', defaultValue: false, description: 'Overwrite artifactory fingerprint if present')
         string(name: 'EMAILS', defaultValue: '', description: 'Nettaps emails in order to notify final report')
     }
 
@@ -208,6 +209,7 @@ pipeline {
         FINGERPRINT_FILENAME = getFingerprintFilename()
         DEPLOY_REPORT_FILENAME = getDeployReportFilename(NETAPP_NAME_LOWER)
         NEF_API_HOSTNAME = "https://${params.HOSTNAME_NEF}:${CAPIF_TLS_PORT}"
+        OVERWRITE_FINGERPRINT = "${params.OVERWRITE_FINGERPRINT}"
     }
 
     stages {
@@ -221,10 +223,10 @@ pipeline {
                     buildResults['steps'][step_security_scan_code] = initial_status
                     buildResults['steps'][step_security_scan_secrets] = initial_status
                     buildResults['steps'][step_build] = initial_status
-                    buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
-                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_security_scan_docker_images] = initial_status
+                    buildResults['steps'][step_deploy_capif_nef_netapp] = initial_status
                     buildResults['steps'][step_use_of_5g_apis] = initial_status
+                    buildResults['steps'][step_network_app_kpis] = initial_status
                     buildResults['steps'][step_nef_services_apis] = not_report
                     buildResults['steps'][step_open_source_licenses_report] = initial_status
                 }
@@ -687,21 +689,36 @@ pipeline {
                         if (buildResults['tests_executed']) {
                             buildResults['steps'][step_use_of_5g_apis] = 'SUCCESS'
                             sh '''#!/bin/bash
-                            UUID=$(uuidgen)
-                            echo $UUID
-                            jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
 
-                            cat $FINGERPRINT_FILENAME
+                            if [[ $OVERWRITE_FINGERPRINT == false ]]
+                            then
+                                echo "try to recover fingerprint from artifactory"
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl  -f $url -u $ARTIFACTORY_CRED -o $FINGERPRINT_FILENAME || echo "No result obtained"
+                            fi
 
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
+                            if [[ -f $FINGERPRINT_FILENAME ]]
+                            then
+                                echo "Fingerprint is present on artifactory for this netapp ($NETAPP_NAME) and version ($VERSION_NETAPP)"
+                                cat $FINGERPRINT_FILENAME
+                            else
+                                echo "Create Fingerpint and pushing to artifactory"
+                                UUID=$(uuidgen)
+                                echo $UUID
+                                jq -n --arg CERTIFICATION_ID $UUID --arg VERSION $VERSION_NETAPP -f ./utils/fingerprint/fp_template.json > $FINGERPRINT_FILENAME
 
-                            url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
-                            curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
-                            --data-binary @"$FINGERPRINT_FILENAME" \
-                            "$url"
+                                cat $FINGERPRINT_FILENAME
+
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$BUILD_ID/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$FINGERPRINT_FILENAME" \
+                                "$url"
+
+                                url="$ARTIFACTORY_URL/$NETAPP_NAME/$VERSION_NETAPP/$FINGERPRINT_FILENAME"
+                                curl -v -f -i -X PUT -u $ARTIFACTORY_CRED \
+                                --data-binary @"$FINGERPRINT_FILENAME" \
+                                "$url"
+                            fi
                             '''
                         }
                     }
