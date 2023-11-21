@@ -568,10 +568,12 @@ pipeline {
                         def jobResult = jobBuild.getResult()
                         echo "Build of 'Validate CAPIF' returned result: ${jobResult}"
                         if (jobResult == 'FAILURE') {
-                            buildResults['tests_ok'] = false
-                            currentBuild.result = 'ABORTED'
-                            aborted = true
-                            error('CAPIF is not working properly, abort pipeline')
+                            buildResults['validate_capif'] = false
+                            // currentBuild.result = 'ABORTED'
+                            // aborted = true
+                            // error('CAPIF is not working properly, abort pipeline')
+                        } else {
+                            buildResults['validate_capif'] = true
                         }
                     }
                 }
@@ -585,10 +587,12 @@ pipeline {
                         def jobResult = jobBuild.getResult()
                         echo "Build of 'Validate NEF' returned result: ${jobResult}"
                         if (jobResult == 'FAILURE') {
-                            buildResults['tests_ok'] = false
-                            currentBuild.result = 'ABORTED'
-                            aborted = true
-                            error('NEF is not working properly, abort pipeline')
+                            buildResults['validate_nef'] = false
+                            // currentBuild.result = 'ABORTED'
+                            // aborted = true
+                            // error('NEF is not working properly, abort pipeline')
+                        } else {
+                            buildResults['validate_nef'] = true
                         }
                     }
                 }
@@ -615,6 +619,14 @@ pipeline {
                 script {
                     if (buildResults['tests_ok'] == false) {
                         error(message: 'One or More tests FAILS, please check summary')
+                    } else if (buildResults['validate_capif'] == false) {
+                        currentBuild.result = 'ABORTED'
+                        aborted = true
+                        error('CAPIF is not working properly, abort pipeline')
+                    } else if (buildResults['validate_nef'] == false) {
+                        currentBuild.result = 'ABORTED'
+                        aborted = true
+                        error('NEF is not working properly, abort pipeline')
                     }
                 }
             }
