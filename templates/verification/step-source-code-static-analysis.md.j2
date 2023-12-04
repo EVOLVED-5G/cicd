@@ -1,0 +1,43 @@
+# SOURCE CODE STATIC ANALYSIS
+***
+
+Test Description: SonarQube is a Code Quality Assurance tool that collects and analyzes source code, and provides reports for the code quality of your project. It combines static and dynamic analysis tools and enables quality to be measured continually over time.
+
+Network App repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
+
+The Source Code analysis has been performed using SonarQube version {{version}}
+
+{% set name = projectName.split("-") %}
+{% set blocker_issues = [] %}
+## Scan of {{name.1}}
+
+### Summary
+| Severity | Number of vulnerabilities |
+|---|---|
+{%- for summary_type in summary %}
+| {{summary_type}} | {{summary[summary_type]}}|
+        {%- if summary_type == "blocker" -%}
+          {%- if summary[summary_type] > 0 -%}
+            {%- if blocker_issues.append(1) -%}{%- endif -%}
+          {%- endif -%}
+        {%- endif -%}
+{%- endfor %}
+***
+{% if not blocker_issues %} 
+Good work. Network App code does not have any blocker issues.
+{% else %}
+The Source Code Analysis results have failed because we have found the following blocker issues:
+
+### Blocker issues
+| Issue | Status | Line | Component | Description | 
+|---|---|---|---|---|
+{%- for issue_type in issues -%}
+  {%- if issue_type.severity in ["BLOCKER"] %} 
+| {{ loop.index }} | {{issue_type.status}} | {{issue_type.line}} | {{issue_type.component}} | {{issue_type.description}} | 
+  {%- endif -%}
+{%- endfor %}
+{%- endif %}
+The information for critical, major and minor issues can be found in the following link: {{url}}
+
