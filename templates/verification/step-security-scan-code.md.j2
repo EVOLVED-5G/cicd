@@ -1,0 +1,80 @@
+# SOURCE CODE SECURITY ANALYSIS 
+***
+
+Test Description: This test detects vulnerabilities in the source code of the Network App repo.
+Network App repository used for the analysis: {{repo}}
+Branch used for the Analysis: {{branch}}
+Last Commit ID: {{commit}}
+
+The security scan has been performed using Trivy version {{version}}
+{% set repo_name = repo.split("/") %}
+{% set critical_issues = [] %}
+{% set possible_fixing = [] %}
+# Scan of {{type}}: {{repo_name|last}}
+
+
+***
+{% if not vulnerabilities %} 
+Good work. No vulnerabilities found.
+{% else %}
+## Summary
+{%- set severities = [ "CRITICAL" , "HIGH" , "MEDIUM" , "LOW" ,  "UNKNOWN"] %}
+
+| Severity | Number of vulnerabilities |
+|---|---|
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == severity %}
+| {{summary_type.Severity}} | {{summary_type.counts}} |
+    {%- endif %}
+  {%- endfor %}
+{%- endfor %}
+
+{%- for severity in severities %}
+  {%- for summary_type in summary %}
+    {%- if summary_type.Severity == "CRITICAL" %}
+    {%- if summary_type.counts > 0 %}
+      {% if critical_issues.append(1) %}{% endif %}
+  {%- endif %}
+{%- endif %}
+  {%- endfor %}
+{%- endfor %}
+***
+{% if not critical_issues %} 
+Good work. Network App code does not have any security issue.
+{% else %}
+The Source Code Security Analysis scan has found the following CRITICAL ISSUES:
+
+## Vulnerabilities
+|  Severity | ID | Title | PkgName | InstalledVersion | FixedVersion |
+|---|---|---|---|---|---|
+    {%- for severity in severities %}
+      {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
+|{{vuln.Severity}}|[{{vuln.VulnerabilityID}}](https://nvd.nist.gov/vuln/detail/{{vuln.VulnerabilityID}})|{{vuln.Title}}|{{vuln.PkgName}}|{{vuln.InstalledVersion}}|{{vuln.FixedVersion}}|
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endfor %}
+  {%- endif %}
+{%- for severity in severities %}
+  {%- for vuln in vulnerabilities %}
+        {%- if vuln.Severity == severity %}
+          {%- if vuln.Severity == "CRITICAL" %}
+              {%- if vuln.FixedVersion != "" %}
+                {% if possible_fixing.append(1) %}{% endif %}
+            {%- endif %}
+          {%- endif %}
+        {%- endif %}
+      {%- endfor %}
+    {%- endfor %}
+  {% if possible_fixing %} 
+The Source Code Security Analysis scan stage has failed because we have found Critical Issues with a possible solution. Please try to solve this error.
+  {% else %}
+The Source Code Security Analysis has been completed successfuly
+  {%- endif %}
+{%- endif %}
+***
+Information about high, medium, low and unknown issues can be found in the following link: {{url}}
