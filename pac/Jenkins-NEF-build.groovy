@@ -28,7 +28,7 @@ pipeline {
         GIT_NEF_BRANCH="${params.GIT_NEF_BRANCH}"
         VERSION="${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        AWS_ACCOUNT_ID = '709233559969'
+        AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         FOLDER_NAME = "NEF_emulator"
     }
     stages {

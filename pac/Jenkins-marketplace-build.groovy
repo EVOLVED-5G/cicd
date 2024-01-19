@@ -32,7 +32,7 @@ pipeline {
         GIT_MARKET_BRANCH = "${params.GIT_MARKET_BRANCH}"
         VERSION = "${params.VERSION}"
         AWS_DEFAULT_REGION = 'eu-central-1'
-        AWS_ACCOUNT_ID = '709233559969'
+        AWS_ACCOUNT_ID = credentials('AWS_ACCOUNT_NUMBER')
         MKTP_FOLDER_NAME = 'marketplace'
         MKTP_BLOCKCHAIN_FOLDER_NAME = 'marketplace-blockchain-integration'
         MKTP_TMF620_FOLDER_NAME = 'marketplace-tmf620-integration'
